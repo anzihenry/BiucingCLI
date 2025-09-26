@@ -1,0 +1,32 @@
+# Customize your BiucingCLI experience.
+# Copy this file to ~/.config/biucingcli/config.yaml and tweak as needed.
+
+frontend:
+  preferred: react
+  stacks:
+    react:
+      tools:
+        - name: Next.js
+          category: framework
+          url: https://nextjs.org
+
+mobile:
+  preferred: flutter
+
+backend:
+  preferred: fastapi
+  stacks:
+    fastapi:
+      tools:
+        - name: FastAPI
+          category: framework
+          url: https://fastapi.tiangolo.com
+        - name: Alembic
+          category: migrations
+          url: https://alembic.sqlalchemy.org/
+
+testing:
+  preferred: python
+
+devops:
+  preferred: cloud-native

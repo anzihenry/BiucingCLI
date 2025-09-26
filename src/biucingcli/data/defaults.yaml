@@ -1,0 +1,164 @@
+frontend:
+  stacks:
+    react:
+      description: Modern React SPA stack
+      tools:
+        - name: Vite
+          category: bundler
+          url: https://vitejs.dev
+        - name: TypeScript
+          category: language
+          url: https://www.typescriptlang.org/
+        - name: ESLint
+          category: lint
+          url: https://eslint.org/
+        - name: Vitest
+          category: test
+          url: https://vitest.dev/
+    vue:
+      description: Progressive framework with Vite integration
+      tools:
+        - name: Vite
+          category: bundler
+          url: https://vitejs.dev
+        - name: Pinia
+          category: state
+          url: https://pinia.vuejs.org
+        - name: Cypress
+          category: e2e
+          url: https://www.cypress.io/
+
+mobile:
+  stacks:
+    react-native:
+      description: JavaScript/TypeScript powered cross-platform mobile stack
+      tools:
+        - name: React Native CLI
+          category: framework
+          url: https://reactnative.dev
+        - name: Expo
+          category: tooling
+          url: https://expo.dev
+        - name: Detox
+          category: e2e
+          url: https://wix.github.io/Detox/
+    flutter:
+      description: Dart-based high-performance UI toolkit
+      tools:
+        - name: Flutter SDK
+          category: framework
+          url: https://flutter.dev
+        - name: Melos
+          category: monorepo
+          url: https://melos.invertase.dev
+        - name: Widgetbook
+          category: component-library
+          url: https://widgetbook.io
+
+backend:
+  stacks:
+    fastapi:
+      description: Modern Python async API framework
+      tools:
+        - name: FastAPI
+          category: framework
+          url: https://fastapi.tiangolo.com/
+        - name: SQLModel
+          category: orm
+          url: https://sqlmodel.tiangolo.com/
+        - name: Uvicorn
+          category: asgi
+          url: https://www.uvicorn.org/
+    node-express:
+      description: Battle-tested Node.js REST stack
+      tools:
+        - name: Express.js
+          category: framework
+          url: https://expressjs.com/
+        - name: Prisma
+          category: orm
+          url: https://www.prisma.io/
+        - name: Pino
+          category: logging
+          url: https://getpino.io
+
+desktop:
+  stacks:
+    electron:
+      description: Chromium-powered desktop apps
+      tools:
+        - name: Electron Forge
+          category: tooling
+          url: https://www.electronforge.io
+        - name: Playwright
+          category: testing
+          url: https://playwright.dev
+        - name: Electron Builder
+          category: packaging
+          url: https://www.electron.build
+    tauri:
+      description: Rust + WebView based lightweight desktop apps
+      tools:
+        - name: Tauri CLI
+          category: framework
+          url: https://tauri.app
+        - name: Vite
+          category: bundler
+          url: https://vitejs.dev
+        - name: Cargo Dist
+          category: packaging
+          url: https://github.com/axodotdev/cargo-dist
+
+testing:
+  stacks:
+    python:
+      description: Python testing suite
+      tools:
+        - name: Pytest
+          category: unit
+          url: https://docs.pytest.org/
+        - name: Hypothesis
+          category: property-based
+          url: https://hypothesis.readthedocs.io/
+        - name: Playwright
+          category: e2e
+          url: https://playwright.dev
+    javascript:
+      description: JavaScript testing suite
+      tools:
+        - name: Vitest
+          category: unit
+          url: https://vitest.dev
+        - name: Playwright
+          category: e2e
+          url: https://playwright.dev
+        - name: Lighthouse CI
+          category: performance
+          url: https://github.com/GoogleChrome/lighthouse-ci
+
+devops:
+  stacks:
+    cloud-native:
+      description: Container-first DevOps
+      tools:
+        - name: Docker
+          category: container
+          url: https://www.docker.com
+        - name: Kubernetes
+          category: orchestration
+          url: https://kubernetes.io
+        - name: Argo CD
+          category: gitops
+          url: https://argo-cd.readthedocs.io/
+    ci-cd:
+      description: Continuous integration and deployment
+      tools:
+        - name: GitHub Actions
+          category: workflow
+          url: https://github.com/features/actions
+        - name: CircleCI
+          category: workflow
+          url: https://circleci.com/
+        - name: SonarCloud
+          category: quality
+          url: https://sonarcloud.io
