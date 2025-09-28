@@ -18,7 +18,7 @@ jobs:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@v1
       - name: Install dependencies
-        run: uv sync --group dev
+        run: uv sync --extra dev
       - name: Lint
         run: uv run ruff check src tests
       - name: Type check
