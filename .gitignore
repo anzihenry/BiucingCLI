@@ -17,9 +17,7 @@ dist/
 .venv/
 .env
 
-# Hatch environments
-.pyproject-build/
-.hatch/
+
 
 # Testing
 .coverage

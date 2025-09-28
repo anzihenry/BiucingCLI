@@ -17,8 +17,8 @@ BiucingCLI is a Typer-based command-line companion that curates full-stack devel
 
 ### Prerequisites
 
-- Python 3.10+
-- `pipx`, `pip`, or Hatch
+- Python 3.13+
+- `pipx`, `pip`, or `uv`
 
 ### Installation
 
@@ -49,18 +49,18 @@ Edit the YAML file to select preferred stacks, tools, and automation tasks.
 
 ## Development
 
-Create a virtual environment and install dependencies:
+Use `uv` to provision the project environment with development tooling:
+
+```bash
+uv sync --extra dev
+```
+
+Prefer a manual virtual environment instead?
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev]
-```
-
-Or use Hatch:
-
-```bash
-hatch env create
 ```
 
 ### Makefile Helpers
@@ -75,7 +75,7 @@ make test
 ### Running Tests
 
 ```bash
-hatch run test
+uv run pytest --cov=biucingcli --cov-report=term-missing
 ```
 
 ## Contributing

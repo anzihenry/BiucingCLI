@@ -9,18 +9,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      UV_PROJECT_ENVIRONMENT: .venv
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Install hatch
-        run: pip install hatch
-      - name: Install project
-        run: hatch env create
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v1
+      - name: Install dependencies
+        run: uv sync --group dev
       - name: Lint
-        run: hatch run lint
+        run: uv run ruff check src tests
       - name: Type check
-        run: hatch run typer-check
+        run: uv run mypy src
       - name: Test
-        run: hatch run test
+        run: uv run pytest --cov=biucingcli --cov-report=term-missing

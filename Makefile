@@ -1,26 +1,26 @@
-PYTHON ?= python3
+UV ?= uv
+UV_PROJECT_ENVIRONMENT ?= .venv
+export UV_PROJECT_ENVIRONMENT
 
 .PHONY: install format lint typecheck test coverage clean
 
 install:
-	$(PYTHON) -m pip install --upgrade pip
-	$(PYTHON) -m pip install -e .
-	$(PYTHON) -m pip install black ruff mypy pytest pytest-cov
+	$(UV) sync --extra dev
 
 format:
-	hatch run format
+	$(UV) run black src tests
 
 lint:
-	hatch run lint
+	$(UV) run ruff check src tests
 
 typecheck:
-	hatch run typer-check
+	$(UV) run mypy src
 
 test:
-	hatch run test
+	$(UV) run pytest --cov=biucingcli --cov-report=term-missing
 
 coverage:
-	hatch run test --cov-report=html
+	$(UV) run pytest --cov=biucingcli --cov-report=html
 
 clean:
 	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov

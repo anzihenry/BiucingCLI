@@ -8,10 +8,10 @@
    source .venv/bin/activate
    pip install -e .[dev]
    ```
-   Or use Hatch:
-   ```bash
-   hatch env create
-   ```
+      Or use uv:
+      ```bash
+      uv sync --extra dev
+      ```
 
 2. **Run quality checks**
    ```bash
