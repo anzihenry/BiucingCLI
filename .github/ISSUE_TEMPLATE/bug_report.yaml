@@ -1,0 +1,90 @@
+name: Bug report
+description: Report a reproducible problem with BiucingCLI.
+labels:
+  - bug
+  - needs triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to improve BiucingCLI! Please give us enough detail to reproduce the issue.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+      placeholder: When I run `biucing frontend list`, the command exits with...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps (and CLI commands) that reproduce the bug.
+      placeholder: |
+        1. Install BiucingCLI with ...
+        2. Run `biucing ...`
+        3. Observe ...
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Relevant configuration or data
+      description: Share snippets from `config/biucingcli.yaml` or custom profiles, if applicable.
+      placeholder: |
+        profiles:
+          frontend:
+            stacks:
+              - react
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs & output
+      description: Paste the complete command output, traceback, or log excerpts.
+      render: shell
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: BiucingCLI version
+      description: Output of `biucing --version` or `pip show biucingcli`.
+      placeholder: 0.4.1
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installation method
+      options:
+        - pipx install .
+        - pip install .
+        - uv tool install
+        - Other (describe below)
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: 3.13.0
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 14.6 / Windows 11 / Ubuntu 24.04
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Anything else we should know?
+    validations:
+      required: false

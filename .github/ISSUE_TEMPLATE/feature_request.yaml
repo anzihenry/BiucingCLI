@@ -1,0 +1,56 @@
+name: Feature request
+description: Share an idea to improve BiucingCLI.
+labels:
+  - enhancement
+  - needs triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Help us understand the problem you want to solve and how BiucingCLI can help.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What challenge are you facing today?
+      placeholder: I need BiucingCLI to recommend tools for...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the new command, flag, or recommendation you would like to see.
+      placeholder: Perhaps a new `biucing backend scaffold` command that...
+    validations:
+      required: true
+  - type: textarea
+    id: cli_surface
+    attributes:
+      label: CLI surface
+      description: Suggest how this feature should appear in the CLI (commands, options, examples).
+      placeholder: "biucing devops suggest --stack serverless"
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who benefits and what workflows improve?
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: List other approaches you tried or workarounds you are using.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links, references, or configuration snippets that help us evaluate the request.
+    validations:
+      required: false
