@@ -17,7 +17,7 @@ BiucingCLI is a Typer-based command-line companion that curates full-stack devel
 
 ### Prerequisites
 
-- Python 3.13+
+- Python 3.14+
 - `pipx`, `pip`, or `uv`
 
 ### Installation

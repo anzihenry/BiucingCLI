@@ -34,7 +34,7 @@ List the recurring steps an automation agent should follow. Mark items done (`[x
 Add or remove checklist items to match the Deliverables defined above.
 
 ## 4. Tooling & Environment Notes
-- Python version: 3.13+
+- Python version: 3.14+
 - Dependency manager: `uv` (preferred) or editable `pip` install.
 - Key commands:
   - `make install`

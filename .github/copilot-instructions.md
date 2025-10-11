@@ -26,7 +26,7 @@
 - [ ] Summarize modifications, verification results, and next steps for reviewers.
 
 ## 4. Tooling & Environment Notes
-- Python ≥ 3.13.
+- Python ≥ 3.14.
 - Preferred dependency workflow: `uv sync --extra dev`; alternative: editable install via `pip install -e .[dev]`.
 - Helpful commands:
   - `make install`

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Raised the minimum supported Python version to 3.14 and updated tooling, CI, and documentation to match.
+
 ## [0.1.0] - 2025-09-25
 
 ### Added
