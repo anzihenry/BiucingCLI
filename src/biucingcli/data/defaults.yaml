@@ -805,6 +805,30 @@ devops:
         - name: Argo CD
           category: gitops
           url: https://argo-cd.readthedocs.io/
+        - name: Helm
+          category: package-manager
+          url: https://helm.sh/
+        - name: Istio
+          category: service-mesh
+          url: https://istio.io/
+        - name: Linkerd
+          category: service-mesh
+          url: https://linkerd.io/
+        - name: Prometheus
+          category: monitoring
+          url: https://prometheus.io/
+        - name: Grafana
+          category: visualization
+          url: https://grafana.com/
+        - name: Jaeger
+          category: tracing
+          url: https://jaegertracing.io/
+        - name: Fluentd
+          category: log-aggregation
+          url: https://www.fluentd.org/
+        - name: Velero
+          category: backup
+          url: https://velero.io/
     python-devops:
       description: Python-powered DevOps automation
       tools:
@@ -823,6 +847,24 @@ devops:
         - name: Loguru
           category: logging
           url: https://loguru.readthedocs.io/
+        - name: Pulumi
+          category: infrastructure-as-code
+          url: https://www.pulumi.com/
+        - name: Boto3
+          category: cloud-sdk
+          url: https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
+        - name: Azure SDK for Python
+          category: cloud-sdk
+          url: https://azure.github.io/azure-sdk-for-python/
+        - name: Google Cloud Client Libraries for Python
+          category: cloud-sdk
+          url: https://cloud.google.com/python/docs/reference
+        - name: Click
+          category: cli
+          url: https://click.palletsprojects.com/
+        - name: Pydantic
+          category: data-validation
+          url: https://pydantic.dev/
     ci-cd:
       description: Continuous integration and deployment
       tools:
@@ -835,3 +877,108 @@ devops:
         - name: SonarCloud
           category: quality
           url: https://sonarcloud.io
+        - name: Jenkins
+          category: ci-cd
+          url: https://www.jenkins.io/
+        - name: GitLab CI/CD
+          category: ci-cd
+          url: https://docs.gitlab.com/ee/ci/
+        - name: Drone CI
+          category: ci-cd
+          url: https://www.drone.io/
+        - name: Spinnaker
+          category: deployment
+          url: https://spinnaker.io/
+        - name: Tekton
+          category: pipeline
+          url: https://tekton.dev/
+    security:
+      description: DevSecOps and security tools
+      tools:
+        - name: Trivy
+          category: vulnerability-scanning
+          url: https://aquasecurity.github.io/trivy/
+        - name: Snyk
+          category: dependency-security
+          url: https://snyk.io/
+        - name: OWASP ZAP
+          category: security-testing
+          url: https://www.zaproxy.org/
+        - name: SonarQube
+          category: code-quality-security
+          url: https://www.sonarsource.com/products/sonarqube/
+        - name: Falco
+          category: runtime-security
+          url: https://falco.org/
+        - name: OPA/Gatekeeper
+          category: policy-engine
+          url: https://www.openpolicyagent.org/
+        - name: Harbor
+          category: registry-security
+          url: https://goharbor.io/
+    monitoring-observability:
+      description: Monitoring and observability tools
+      tools:
+        - name: Prometheus
+          category: metrics
+          url: https://prometheus.io/
+        - name: Grafana
+          category: visualization
+          url: https://grafana.com/
+        - name: Jaeger
+          category: tracing
+          url: https://jaegertracing.io/
+        - name: OpenTelemetry
+          category: telemetry
+          url: https://opentelemetry.io/
+        - name: ELK Stack
+          category: logging
+          url: https://www.elastic.co/elk-stack
+        - name: Datadog
+          category: monitoring
+          url: https://www.datadoghq.com/
+        - name: New Relic
+          category: application-monitoring
+          url: https://newrelic.com/
+        - name: Loki
+          category: logging
+          url: https://grafana.com/oss/loki/
+    testing-automation:
+      description: Testing and automation tools
+      tools:
+        - name: PyTest
+          category: testing
+          url: https://docs.pytest.org/
+        - name: Locust
+          category: load-testing
+          url: https://locust.io/
+        - name: JMeter
+          category: performance-testing
+          url: https://jmeter.apache.org/
+        - name: Selenium
+          category: ui-testing
+          url: https://www.selenium.dev/
+        - name: Robot Framework
+          category: acceptance-testing
+          url: https://robotframework.org/
+        - name: Tox
+          category: test-environment
+          url: https://tox.wiki/
+        - name: Coverage.py
+          category: test-coverage
+          url: https://coverage.readthedocs.io/
+    chaos-engineering:
+      description: Chaos engineering and resilience testing
+      tools:
+        - name: Chaos Monkey
+          category: chaos-engineering
+          url: https://netflix.github.io/chaosmonkey/
+        - name: Litmus
+          category: chaos-engineering
+          url: https://litmuschaos.io/
+        - name: Gremlin
+          category: chaos-engineering
+          url: https://www.gremlin.com/
+        - name: PowerfulSeal
+          category: chaos-engineering
+          url: https://github.com/powerfulseal/powerfulseal
