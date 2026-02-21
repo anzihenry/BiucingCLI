@@ -720,40 +720,18 @@ desktop:
         - name: Electron Builder
           category: packaging
           url: https://www.electron.build
-    cpp-cross-platform:
-      description: Cross-platform C++ development
+    react-native-desktop:
+      description: Build desktop apps from React Native codebase
       tools:
-        - name: CMake
-          category: build-system
-          url: https://cmake.org/
-        - name: Conan
-          category: package-manager
-          url: https://conan.io/
-        - name: vcpkg
-          category: package-manager
-          url: https://github.com/microsoft/vcpkg
-        - name: Qt
-          category: gui-framework
-          url: https://www.qt.io/
-        - name: Boost
-          category: libraries
-          url: https://www.boost.org/
-        - name: CppUTest
-          category: testing
-          url: https://cpputest.github.io/
-    tauri:
-      description: Rust + WebView based lightweight desktop apps
-      tools:
-        - name: Tauri CLI
+        - name: Electron
           category: framework
-          url: https://tauri.app
-        - name: Vite
-          category: bundler
-          url: https://vitejs.dev
-        - name: Cargo Dist
-          category: packaging
-          url: https://github.com/axodotdev/cargo-dist
-
+          url: https://www.electronjs.org
+        - name: React Native Web
+          category: compatibility-layer
+          url: https://necolas.github.io/react-native-web/
+        - name: Expo Electron Plugin
+          category: tooling
+          url: https://github.com/byCedric/expo-electron-plugin
 testing:
   stacks:
     python:
