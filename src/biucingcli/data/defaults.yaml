@@ -151,7 +151,7 @@ mobile:
           category: e2e
           url: https://wix.github.io/Detox/
     swift-ios:
-      description: Native iOS development with Swift
+      description: Native iOS development with Swift 6.2+
       tools:
         - name: Xcode
           category: ide
@@ -159,18 +159,96 @@ mobile:
         - name: Swift Package Manager
           category: package-manager
           url: https://swift.org/package-manager/
-        - name: CocoaPods
-          category: dependency-manager
-          url: https://cocoapods.org/
         - name: SwiftUI
           category: ui-framework
           url: https://developer.apple.com/xcode/swiftui/
+        - name: UIKit
+          category: ui-framework
+          url: https://developer.apple.com/documentation/uikit
         - name: Core Data
           category: persistence
           url: https://developer.apple.com/documentation/coredata
+        - name: Realm
+          category: persistence
+          url: https://realm.io/
+        - name: SQLite.swift
+          category: persistence
+          url: https://github.com/stephencelis/SQLite.swift
         - name: XCTest
           category: testing
           url: https://developer.apple.com/documentation/xctest
+        - name: Quick
+          category: testing
+          url: https://github.com/Quick/Quick
+        - name: Nimble
+          category: testing
+          url: https://github.com/Quick/Nimble
+        - name: KIF
+          category: testing
+          url: https://github.com/kif-framework/KIF
+        - name: EarlGrey
+          category: testing
+          url: https://github.com/google/EarlGrey
+        - name: Alamofire
+          category: networking
+          url: https://github.com/Alamofire/Alamofire
+        - name: URLSession
+          category: networking
+          url: https://developer.apple.com/documentation/foundation/urlsession
+        - name: Moya
+          category: networking
+          url: https://github.com/Moya/Moya
+        - name: Combine
+          category: reactive-programming
+          url: https://developer.apple.com/documentation/combine
+        - name: RxSwift
+          category: reactive-programming
+          url: https://github.com/ReactiveX/RxSwift
+        - name: SwiftyJSON
+          category: data-parsing
+          url: https://github.com/SwiftyJSON/SwiftyJSON
+        - name: ObjectMapper
+          category: data-parsing
+          url: https://github.com/tristanhimmelman/ObjectMapper
+        - name: Codable
+          category: data-parsing
+          url: https://developer.apple.com/documentation/swift/codable
+        - name: Kingfisher
+          category: image-loading
+          url: https://github.com/onevcat/Kingfisher
+        - name: SDWebImage
+          category: image-loading
+          url: https://github.com/SDWebImage/SDWebImage
+        - name: SwiftLint
+          category: linting
+          url: https://github.com/realm/SwiftLint
+        - name: Sourcery
+          category: code-generation
+          url: https://github.com/krzysztofzablocki/Sourcery
+        - name: SwiftGen
+          category: code-generation
+          url: https://github.com/SwiftGen/SwiftGen
+        - name: Fastlane
+          category: ci-cd
+          url: https://fastlane.tools/
+        - name: Tuist
+          category: project-generation
+          url: https://tuist.io/
+        - name: Firebase
+          category: backend-services
+          url: https://firebase.google.com/
+        - name: Apollo GraphQL
+          category: graphql
+          url: https://www.apollographql.com/docs/ios/
+        - name: KeychainAccess
+          category: security
+          url: https://github.com/kishikawakatsumi/KeychainAccess
+        - name: CryptoKit
+          category: security
+          url: https://developer.apple.com/documentation/cryptokit
+        - name: The Composable Architecture (TCA)
+          category: architecture
+          url: https://github.com/pointfreeco/swift-composable-architecture
     kotlin-android:
       description: Native Android development with Kotlin
       tools:
