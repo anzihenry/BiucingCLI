@@ -429,54 +429,282 @@ mobile:
 
 backend:
   stacks:
-    fastapi:
-      description: Modern Python async API framework
+    backend-service:
+      description: High-performance Go API service for microservices architecture
       tools:
-        - name: FastAPI
-          category: framework
-          url: https://fastapi.tiangolo.com/
-        - name: SQLModel
-          category: orm
-          url: https://sqlmodel.tiangolo.com/
-        - name: Uvicorn
-          category: asgi
-          url: https://www.uvicorn.org/
-    gin:
-      description: High-performance Go web framework
-      tools:
+        # 核心框架
         - name: Gin
           category: framework
           url: https://gin-gonic.com/
-        - name: GORM
-          category: orm
-          url: https://gorm.io/
-        - name: go-swagger
-          category: api-docs
-          url: https://goswagger.io/
-    echo:
-      description: High-performance Go web framework
-      tools:
+        # 或者
         - name: Echo
           category: framework
           url: https://echo.labstack.com/
+        
+        # 路由和中间件
+        - name: CORS
+          category: middleware
+          url: https://github.com/rs/cors
+        - name: Logger
+          category: middleware
+          url: https://github.com/gin-contrib/logger
+        - name: Recovery
+          category: middleware
+          url: https://github.com/gin-contrib/recovery
+        
+        # 数据库
+        - name: GORM
+          category: orm
+          url: https://gorm.io/
+        # 或者
         - name: Ent
-          category: orm
+          category: graph-orm
           url: https://entgo.io/
-        - name: gRPC
-          category: microservices
-          url: https://grpc.io/
-    node-express:
-      description: Battle-tested Node.js REST stack
+        
+        # 数据库迁移
+        - name: migrate
+          category: migrations
+          url: https://github.com/golang-migrate/migrate
+        
+        # 连接池
+        - name: go-sql-driver/mysql
+          category: database-driver
+          url: https://github.com/go-sql-driver/mysql
+        - name: jackc/pgx
+          category: database-driver
+          url: https://github.com/jackc/pgx
+        
+        # 缓存
+        - name: go-redis
+          category: cache
+          url: https://github.com/go-redis/redis
+        - name: groupcache
+          category: distributed-cache
+          url: https://github.com/golang/groupcache
+        
+        # 认证授权
+        - name: jwt-go
+          category: authentication
+          url: https://github.com/golang-jwt/jwt
+        - name: bcrypt
+          category: password-hashing
+          url: https://pkg.go.dev/golang.org/x/crypto/bcrypt
+        
+        # 配置管理
+        - name: Viper
+          category: configuration
+          url: https://github.com/spf13/viper
+        
+        # 命令行工具
+        - name: Cobra
+          category: cli
+          url: https://github.com/spf13/cobra
+        
+        # 错误处理
+        - name: pkg/errors
+          category: error-handling
+          url: https://github.com/pkg/errors
+        
+        # 参数验证
+        - name: validator
+          category: validation
+          url: https://github.com/go-playground/validator
+        
+        # API文档
+        - name: swaggo/gin-swagger
+          category: api-docs
+          url: https://github.com/swaggo/gin-swagger
+        
+        # 测试
+        - name: testify
+          category: testing
+          url: https://github.com/stretchr/testify
+        - name: gomock
+          category: mocking
+          url: https://github.com/golang/mock
+        
+        # 监控和可观测性
+        - name: Prometheus Client
+          category: metrics
+          url: https://github.com/prometheus/client_golang
+        - name: OpenTelemetry Go
+          category: tracing
+          url: https://opentelemetry.io/docs/instrumentation/go/
+        - name: Zap
+          category: structured-logging
+          url: https://github.com/uber-go/zap
+        
+        # 异步处理
+        - name: Asynq
+          category: job-queue
+          url: https://github.com/hibiken/asynq
+        - name: NATS
+          category: messaging
+          url: https://nats.io/
+        
+        # gRPC
+        - name: gRPC-go
+          category: rpc
+          url: https://github.com/grpc/grpc-go
+        - name: Protocol Buffers
+          category: serialization
+          url: https://developers.google.com/protocol-buffers
+        
+        # HTTP客户端
+        - name: Resty
+          category: http-client
+          url: https://github.com/go-resty/resty
+    
+    web-application:
+      description: Full-featured Go web application with templating and UI rendering
       tools:
-        - name: Express.js
+        # 核心框架
+        - name: Gin
           category: framework
-          url: https://expressjs.com/
-        - name: Prisma
+          url: https://gin-gonic.com/
+        # 或者
+        - name: Echo
+          category: framework
+          url: https://echo.labstack.com/
+        # 或者
+        - name: Buffalo
+          category: full-stack-framework
+          url: https://gobuffalo.io/
+        
+        # 模板引擎
+        - name: html/template
+          category: templating
+          url: https://pkg.go.dev/html/template
+        - name: Pongo2
+          category: templating
+          url: https://github.com/flosch/pongo2
+        - name: Ace
+          category: templating
+          url: https://github.com/yosssi/ace
+        
+        # 会话管理
+        - name: gorilla/sessions
+          category: session
+          url: https://github.com/gorilla/sessions
+        - name: securecookie
+          category: security
+          url: https://github.com/gorilla/securecookie
+        
+        # 静态文件服务
+        - name: gin.Static
+          category: static-files
+          url: https://gin-gonic.com/docs/examples/static-files/
+        - name: embed
+          category: static-files
+          url: https://pkg.go.dev/embed
+        
+        # 路由和中间件
+        - name: CORS
+          category: middleware
+          url: https://github.com/rs/cors
+        - name: Logger
+          category: middleware
+          url: https://github.com/gin-contrib/logger
+        - name: Recovery
+          category: middleware
+          url: https://github.com/gin-contrib/recovery
+        - name: Secure
+          category: security-middleware
+          url: https://github.com/unrolled/secure
+        
+        # 认证授权
+        - name: jwt-go
+          category: authentication
+          url: https://github.com/golang-jwt/jwt
+        - name: OAuth2
+          category: authentication
+          url: https://pkg.go.dev/golang.org/x/oauth2
+        - name: gorilla/csrf
+          category: security
+          url: https://github.com/gorilla/csrf
+        
+        # 数据库
+        - name: GORM
           category: orm
-          url: https://www.prisma.io/
-        - name: Pino
-          category: logging
-          url: https://getpino.io
+          url: https://gorm.io/
+        - name: Ent
+          category: graph-orm
+          url: https://entgo.io/
+        
+        # 数据库迁移
+        - name: migrate
+          category: migrations
+          url: https://github.com/golang-migrate/migrate
+        
+        # 缓存
+        - name: go-redis
+          category: cache
+          url: https://github.com/go-redis/redis
+        
+        # 配置管理
+        - name: Viper
+          category: configuration
+          url: https://github.com/spf13/viper
+        
+        # 命令行工具
+        - name: Cobra
+          category: cli
+          url: https://github.com/spf13/cobra
+        
+        # 错误处理
+        - name: pkg/errors
+          category: error-handling
+          url: https://github.com/pkg/errors
+        
+        # 参数验证
+        - name: validator
+          category: validation
+          url: https://github.com/go-playground/validator
+        
+        # 测试
+        - name: testify
+          category: testing
+          url: https://github.com/stretchr/testify
+        - name: chromedp
+          category: e2e-testing
+          url: https://github.com/chromedp/chromedp
+        
+        # 监控和可观测性
+        - name: Prometheus Client
+          category: metrics
+          url: https://github.com/prometheus/client_golang
+        - name: OpenTelemetry Go
+          category: tracing
+          url: https://opentelemetry.io/docs/instrumentation/go/
+        - name: Zap
+          category: structured-logging
+          url: https://github.com/uber-go/zap
+        
+        # 安全
+        - name: bluemonday
+          category: xss-protection
+          url: https://github.com/microcosm-cc/bluemonday
+        - name: sqlx
+          category: sql-sanitization
+          url: https://github.com/jmoiron/sqlx
+        
+        # 国际化
+        - name: go-i18n
+          category: internationalization
+          url: https://github.com/nicksnyder/go-i18n
+        
+        # 文件上传
+        - name: multipart
+          category: file-upload
+          url: https://pkg.go.dev/mime/multipart
+        - name: MinIO
+          category: object-storage
+          url: https://min.io/
+        
+        # 邮件发送
+        - name: Gomail
+          category: email
+          url: https://github.com/go-gomail/gomail
 
 desktop:
   stacks:
