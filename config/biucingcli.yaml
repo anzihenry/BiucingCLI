@@ -2,13 +2,27 @@
 # Copy this file to ~/.config/biucingcli/config.yaml and tweak as needed.
 
 frontend:
-  preferred: react
+  preferred: vite-react-typescript
   stacks:
     react:
       tools:
         - name: Next.js
           category: framework
           url: https://nextjs.org
+    vite-react-typescript:
+      tools:
+        - name: Vite
+          category: bundler
+          url: https://vitejs.dev
+        - name: React
+          category: framework
+          url: https://react.dev
+        - name: TypeScript
+          category: language
+          url: https://www.typescriptlang.org/
+        - name: Tailwind CSS
+          category: styling
+          url: https://tailwindcss.com/
 
 mobile:
   preferred: flutter

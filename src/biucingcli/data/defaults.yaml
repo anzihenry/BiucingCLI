@@ -9,12 +9,39 @@ frontend:
         - name: TypeScript
           category: language
           url: https://www.typescriptlang.org/
+        - name: React
+          category: framework
+          url: https://react.dev
+        - name: React Router
+          category: routing
+          url: https://reactrouter.com
         - name: ESLint
           category: lint
           url: https://eslint.org/
+        - name: Prettier
+          category: formatting
+          url: https://prettier.io/
         - name: Vitest
           category: test
           url: https://vitest.dev/
+        - name: React Testing Library
+          category: test
+          url: https://testing-library.com/docs/react-testing-library/intro/
+        - name: Tailwind CSS
+          category: styling
+          url: https://tailwindcss.com/
+        - name: Redux Toolkit
+          category: state
+          url: https://redux-toolkit.js.org/
+        - name: Axios
+          category: http-client
+          url: https://axios-http.com/
+        - name: React Hook Form
+          category: form
+          url: https://react-hook-form.com/
+        - name: Zod
+          category: validation
+          url: https://zod.dev/
     typescript-react:
       description: TypeScript-powered React development
       tools:
@@ -36,15 +63,72 @@ frontend:
         - name: Webpack
           category: bundler
           url: https://webpack.js.org/
+    vite-react-typescript:
+      description: Vite-powered React with TypeScript template
+      tools:
+        - name: Vite
+          category: bundler
+          url: https://vitejs.dev
+        - name: React
+          category: framework
+          url: https://react.dev
+        - name: TypeScript
+          category: language
+          url: https://www.typescriptlang.org/
+        - name: Vitest
+          category: test
+          url: https://vitest.dev/
+        - name: React Testing Library
+          category: test
+          url: https://testing-library.com/docs/react-testing-library/intro/
+        - name: Playwright
+          category: e2e
+          url: https://playwright.dev/
+        - name: ESLint
+          category: lint
+          url: https://eslint.org/
+        - name: Prettier
+          category: formatting
+          url: https://prettier.io/
+        - name: Tailwind CSS
+          category: styling
+          url: https://tailwindcss.com/
+        - name: React Router
+          category: routing
+          url: https://reactrouter.com
+        - name: Zustand
+          category: state
+          url: https://zustand-demo.pmnd.rs/
+        - name: Axios
+          category: http-client
+          url: https://axios-http.com/
+        - name: React Hook Form
+          category: form
+          url: https://react-hook-form.com/
+        - name: Zod
+          category: validation
+          url: https://zod.dev/
     vue:
       description: Progressive framework with Vite integration
       tools:
         - name: Vite
           category: bundler
           url: https://vitejs.dev
+        - name: Vue
+          category: framework
+          url: https://vuejs.org/
+        - name: TypeScript
+          category: language
+          url: https://www.typescriptlang.org/
         - name: Pinia
           category: state
           url: https://pinia.vuejs.org
+        - name: Vue Router
+          category: routing
+          url: https://router.vuejs.org/
+        - name: VitePress
+          category: documentation
+          url: https://vitepress.dev/
         - name: Cypress
           category: e2e
           url: https://www.cypress.io/
