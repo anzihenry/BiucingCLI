@@ -111,6 +111,12 @@ frontend:
         - name: Zod
           category: validation
           url: https://zod.dev/
+        - name: protobufjs
+          category: serialization
+          url: https://github.com/protobufjs/protobuf.js
+        - name: "@bufbuild/protobuf"
+          category: serialization
+          url: https://github.com/bufbuild/protobuf-es
     vue:
       description: Progressive framework with Vite integration
       tools:
@@ -210,6 +216,12 @@ mobile:
         - name: Sentry
           category: error-tracking
           url: https://docs.sentry.io/platforms/react-native/
+        - name: protobufjs
+          category: serialization
+          url: https://github.com/protobufjs/protobuf.js
+        - name: "@bufbuild/protobuf"
+          category: serialization
+          url: https://github.com/bufbuild/protobuf-es
     swift-ios:
       description: Native iOS development with Swift 6.2+
       tools:
@@ -339,6 +351,9 @@ mobile:
         - name: Core Location
           category: location
           url: https://developer.apple.com/documentation/corelocation
+        - name: SwiftProtobuf
+          category: serialization
+          url: https://github.com/apple/swift-protobuf
     kotlin-android:
       description: Native Android development with Kotlin
       tools:
@@ -402,6 +417,9 @@ mobile:
         - name: Kotlin Serialization
           category: serialization
           url: https://kotlinlang.org/docs/serialization.html
+        - name: Protocol Buffers (ProtoBuf)
+          category: serialization
+          url: https://developers.google.com/protocol-buffers/docs/kotlinsyntax
         - name: Security
           category: security
           url: https://developer.android.com/jetpack/androidx/releases/security
@@ -426,6 +444,9 @@ mobile:
         - name: Widgetbook
           category: component-library
           url: https://widgetbook.io
+        - name: protobuf
+          category: serialization
+          url: https://pub.dev/packages/protobuf
 
 backend:
   stacks:
@@ -549,6 +570,9 @@ backend:
         - name: Protocol Buffers
           category: serialization
           url: https://developers.google.com/protocol-buffers
+        - name: protoc-gen-go
+          category: code-generation
+          url: https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go
         
         # HTTP客户端
         - name: Resty
@@ -660,6 +684,14 @@ backend:
         - name: validator
           category: validation
           url: https://github.com/go-playground/validator
+        
+        # 序列化
+        - name: Protocol Buffers
+          category: serialization
+          url: https://developers.google.com/protocol-buffers
+        - name: protoc-gen-go
+          category: code-generation
+          url: https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go
         
         # 测试
         - name: testify

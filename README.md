@@ -10,6 +10,7 @@ BiucingCLI is a Typer-based command-line companion that curates full-stack devel
 - 🔧 **Backend**: Suggest frameworks, ORMs, observability, and API tooling (including Go frameworks like Gin and Echo).
 - 🧪 **Testing**: Organize unit, integration, E2E, and performance testing stacks.
 - 🚀 **DevOps**: Provide CI/CD, infrastructure-as-code, container, and monitoring practices (including Python DevOps automation tools).
+- 📦 **Serialization**: Support for Protocol Buffers (protobuf) across all technology stacks for efficient data serialization.
 - 🔧 **Configuration-driven**: Customize recommendations through YAML-driven profiles.
 - ✨ **Rich output**: Uses Rich for colorful, structured terminal UX.
 

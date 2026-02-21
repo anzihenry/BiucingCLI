@@ -39,6 +39,11 @@
 - **API类型生成**: OpenAPI Generator 或 Swagger Codegen
 - **运行时类型检查**: Zod 或 io-ts
 
+### 数据序列化
+- **Protocol Buffers**: 高效的跨语言数据序列化格式
+  - **protobufjs**: JavaScript/TypeScript实现
+  - **@bufbuild/protobuf**: 现代化的TypeScript实现
+
 ## 项目结构建议
 ```
 frontend-project/

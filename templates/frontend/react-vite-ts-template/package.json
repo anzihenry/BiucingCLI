@@ -22,7 +22,9 @@
     "react-hook-form": "^7.45.0",
     "zod": "^3.22.0",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^1.14.0"
+    "tailwind-merge": "^1.14.0",
+    "protobufjs": "^7.2.5",
+    "@bufbuild/protobuf": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

@@ -89,7 +89,18 @@
   - 优秀的TypeScript支持
   - 与React Hook Form完美集成
 
-### 6. 样式处理
+### 6. 序列化
+
+#### Protocol Buffers
+- **包名**: protobufjs, @bufbuild/protobuf
+- **作用**: 高效的数据序列化格式
+- **优势**:
+  - 跨语言支持
+  - 高性能序列化/反序列化
+  - 向后兼容的模式演进
+  - 较小的传输体积
+
+### 7. 样式处理
 
 #### Tailwind CSS
 - **版本**: ^3.x
