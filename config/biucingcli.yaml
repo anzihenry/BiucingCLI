@@ -52,3 +52,62 @@ testing:
 
 devops:
   preferred: python-devops
+
+desktop:
+  preferred: cpp-cross-platform
+  stacks:
+    cpp-cross-platform:
+      tools:
+        - name: C++20
+          category: language
+          url: https://en.cppreference.com/w/cpp/20
+          description: "Latest modern C++ standard with coroutines, modules, and concepts"
+        - name: CMake
+          category: build-system
+          url: https://cmake.org
+          description: "Cross-platform build system generator"
+        - name: Conan
+          category: package-manager
+          url: https://conan.io
+          description: "C/C++ package manager for modern C++"
+        - name: vcpkg
+          category: package-manager
+          url: https://github.com/Microsoft/vcpkg
+          description: "C++ Library Manager for Windows, Linux, and Mac"
+        - name: Ninja
+          category: build-system
+          url: https://ninja-build.org
+          description: "Small build system with a focus on speed"
+        - name: Clang
+          category: compiler
+          url: https://clang.llvm.org
+          description: "C++ compiler supporting modern standards"
+        - name: GCC
+          category: compiler
+          url: https://gcc.gnu.org
+          description: "GNU Compiler Collection with strong C++ support"
+        - name: MSVC
+          category: compiler
+          url: https://visualstudio.microsoft.com/vs/features/cplusplus/
+          description: "Microsoft Visual C++ compiler"
+        - name: Boost
+          category: libraries
+          url: https://www.boost.org
+          description: "Comprehensive C++ libraries collection"
+        - name: Qt
+          category: framework
+          url: https://www.qt.io
+          description: "Cross-platform application framework"
+        - name: Catch2
+          category: testing
+          url: https://github.com/catchorg/Catch2
+          description: "Modern C++ test framework"
+        - name: spdlog
+          category: logging
+          url: https://github.com/gabime/spdlog
+          description: "Fast C++ logging library"
+        - name: fmt
+          category: formatting
+          url: https://fmt.dev
+          description: "Formatting library for modern C++"
+
