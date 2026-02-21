@@ -234,6 +234,100 @@ npm run preview
 3. **虚拟滚动**: 处理大量列表数据时使用虚拟滚动
 4. **图片优化**: 使用现代图片格式和懒加载
 
+## Redux/Flux架构模式
+
+Redux/Flux是一种单向数据流架构模式，有助于管理复杂应用的状态。虽然本技术栈推荐使用Zustand作为更轻量级的状态管理方案，但在大型应用中，Redux仍然是一个强大的选择。
+
+### 核心概念
+
+1. **单一数据源**: 整个应用的状态存储在一个store中
+2. **状态只读**: 不能直接修改状态，只能通过action进行变更
+3. **纯函数变更**: 使用reducer函数来描述如何根据action变更状态
+
+### 实现方式
+
+#### Redux Toolkit (推荐)
+```typescript
+// store/features/counterSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface CounterState {
+  value: number;
+}
+
+const initialState: CounterState = {
+  value: 0,
+};
+
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    increment: (state) => {
+      state.value += 1;
+    },
+    decrement: (state) => {
+      state.value -= 1;
+    },
+    incrementByAmount: (state, action: PayloadAction<number>) => {
+      state.value += action.payload;
+    },
+  },
+});
+
+export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+
+// store/index.ts
+import { configureStore } from '@reduxjs/toolkit';
+import { counterSlice } from './features/counterSlice';
+
+export const store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+#### 与React集成
+```tsx
+// components/Counter.tsx
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../store';
+import { increment, decrement } from '../store/features/counterSlice';
+
+const Counter: React.FC = () => {
+  const count = useSelector((state: RootState) => state.counter.value);
+  const dispatch = useDispatch<AppDispatch>();
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => dispatch(increment())}>+</button>
+      <button onClick={() => dispatch(decrement())}>-</button>
+    </div>
+  );
+};
+```
+
+### 何时使用Redux/Flux
+
+1. **应用状态复杂**: 当应用有多个组件需要共享状态时
+2. **状态更新频繁**: 当状态更新逻辑复杂且频繁时
+3. **调试需求**: 需要时间旅行调试等功能时
+4. **团队协作**: 团队成员较多，需要统一的状态管理模式
+
+### 替代方案对比
+
+| 方案 | 适用场景 | 优点 | 缺点 |
+|------|----------|------|------|
+| Zustand | 中小型应用 | 轻量、简单、无样板代码 | 生态相对较小 |
+| Redux | 大型复杂应用 | 成熟生态、调试工具、中间件 | 样板代码多 |
+| Context API | 简单全局状态 | 内置于React | 可能导致重渲染 |
+
 ## 部署策略
 
 ### 构建优化
