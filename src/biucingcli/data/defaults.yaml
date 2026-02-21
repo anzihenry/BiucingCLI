@@ -150,6 +150,66 @@ mobile:
         - name: Detox
           category: e2e
           url: https://wix.github.io/Detox/
+        - name: React Navigation
+          category: navigation
+          url: https://reactnavigation.org/
+        - name: Redux
+          category: state
+          url: https://redux.js.org/
+        - name: Redux Toolkit
+          category: state
+          url: https://redux-toolkit.js.org/
+        - name: MobX
+          category: state
+          url: https://mobx.js.org/
+        - name: Styled Components
+          category: styling
+          url: https://styled-components.com/
+        - name: React Native Elements
+          category: ui-components
+          url: https://reactnativeelements.com/
+        - name: NativeBase
+          category: ui-components
+          url: https://nativebase.io/
+        - name: React Native Vector Icons
+          category: icons
+          url: https://github.com/oblador/react-native-vector-icons
+        - name: React Native Image Picker
+          category: media
+          url: https://github.com/react-native-image-picker/react-native-image-picker
+        - name: React Native Camera
+          category: camera
+          url: https://github.com/react-native-camera/react-native-camera
+        - name: React Native Maps
+          category: maps
+          url: https://github.com/react-native-maps/react-native-maps
+        - name: Push Notification
+          category: notifications
+          url: https://github.com/zo0r/react-native-push-notification
+        - name: React Native Async Storage
+          category: persistence
+          url: https://react-native-async-storage.github.io/async-storage/
+        - name: Realm
+          category: persistence
+          url: https://realm.io/products/react-native-database/
+        - name: Jest
+          category: testing
+          url: https://jestjs.io/
+        - name: React Native Testing Library
+          category: testing
+          url: https://callstack.github.io/react-native-testing-library/
+        - name: Flipper
+          category: debugging
+          url: https://fbflipper.com/
+        - name: Metro
+          category: bundler
+          url: https://facebook.github.io/metro/
+        - name: CodePush
+          category: deployment
+          url: https://github.com/microsoft/code-push
+        - name: Sentry
+          category: error-tracking
+          url: https://docs.sentry.io/platforms/react-native/
     swift-ios:
       description: Native iOS development with Swift 6.2+
       tools:
@@ -249,6 +309,36 @@ mobile:
         - name: The Composable Architecture (TCA)
           category: architecture
           url: https://github.com/pointfreeco/swift-composable-architecture
+        - name: GRPC
+          category: networking
+          url: https://github.com/grpc/grpc-swift
+        - name: Starscream
+          category: websocket
+          url: https://github.com/daltoniam/Starscream
+        - name: KeychainSwift
+          category: security
+          url: https://github.com/evgenyneu/keychain-swift
+        - name: CryptoSwift
+          category: security
+          url: https://github.com/krzyzanowskim/CryptoSwift
+        - name: ZIPFoundation
+          category: compression
+          url: https://github.com/weichsel/ZIPFoundation
+        - name: PhoneNumberKit
+          category: utilities
+          url: https://github.com/marmelroy/PhoneNumberKit
+        - name: FormatterKit
+          category: utilities
+          url: https://github.com/FormatterKit/FormatterKit
+        - name: Charts
+          category: charting
+          url: https://github.com/danielgindi/Charts
+        - name: MapKit
+          category: mapping
+          url: https://developer.apple.com/documentation/mapkit
+        - name: Core Location
+          category: location
+          url: https://developer.apple.com/documentation/corelocation
     kotlin-android:
       description: Native Android development with Kotlin
       tools:
@@ -270,6 +360,60 @@ mobile:
         - name: JUnit
           category: testing
           url: https://junit.org/junit5/
+        - name: Coroutines
+          category: reactive-programming
+          url: https://kotlinlang.org/docs/coroutines-overview.html
+        - name: Kotlin Flow
+          category: reactive-programming
+          url: https://kotlinlang.org/docs/flow.html
+        - name: Retrofit
+          category: networking
+          url: https://square.github.io/retrofit/
+        - name: OkHttp
+          category: networking
+          url: https://square.github.io/okhttp/
+        - name: Moshi
+          category: data-parsing
+          url: https://github.com/square/moshi
+        - name: Gson
+          category: data-parsing
+          url: https://github.com/google/gson
+        - name: Coil
+          category: image-loading
+          url: https://coil-kt.github.io/coil/
+        - name: Ktlint
+          category: linting
+          url: https://pinterest.github.io/ktlint/
+        - name: Detekt
+          category: linting
+          url: https://detekt.dev/
+        - name: Koin
+          category: dependency-injection
+          url: https://insert-koin.io/
+        - name: Hilt
+          category: dependency-injection
+          url: https://dagger.dev/hilt/
+        - name: Firebase
+          category: backend-services
+          url: https://firebase.google.com/
+        - name: Apollo GraphQL
+          category: graphql
+          url: https://www.apollographql.com/docs/kotlin/
+        - name: Kotlin Serialization
+          category: serialization
+          url: https://kotlinlang.org/docs/serialization.html
+        - name: Security
+          category: security
+          url: https://developer.android.com/jetpack/androidx/releases/security
+        - name: DataStore
+          category: persistence
+          url: https://developer.android.com/topic/libraries/architecture/datastore
+        - name: WorkManager
+          category: background-tasks
+          url: https://developer.android.com/topic/libraries/architecture/workmanager
+        - name: Navigation Component
+          category: navigation
+          url: https://developer.android.com/jetpack/androidx/navigation
     flutter:
       description: Dart-based high-performance UI toolkit
       tools:
