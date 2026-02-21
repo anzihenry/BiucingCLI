@@ -72,6 +72,9 @@ frontend:
         - name: React
           category: framework
           url: https://react.dev
+        - name: React 19
+          category: framework
+          url: https://react.dev/blog/2024/12/05/react-19
         - name: TypeScript
           category: language
           url: https://www.typescriptlang.org/
