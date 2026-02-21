@@ -15,6 +15,27 @@ frontend:
         - name: Vitest
           category: test
           url: https://vitest.dev/
+    typescript-react:
+      description: TypeScript-powered React development
+      tools:
+        - name: Create React App (with TS)
+          category: scaffolding
+          url: https://create-react-app.dev/
+        - name: TypeScript
+          category: language
+          url: https://www.typescriptlang.org/
+        - name: TSC
+          category: compiler
+          url: https://www.typescriptlang.org/docs/handbook/compiler-options.html
+        - name: ESLint with TypeScript
+          category: lint
+          url: https://typescript-eslint.io/
+        - name: Jest with TypeScript
+          category: test
+          url: https://jestjs.io/
+        - name: Webpack
+          category: bundler
+          url: https://webpack.js.org/
     vue:
       description: Progressive framework with Vite integration
       tools:
@@ -42,6 +63,48 @@ mobile:
         - name: Detox
           category: e2e
           url: https://wix.github.io/Detox/
+    swift-ios:
+      description: Native iOS development with Swift
+      tools:
+        - name: Xcode
+          category: ide
+          url: https://developer.apple.com/xcode/
+        - name: Swift Package Manager
+          category: package-manager
+          url: https://swift.org/package-manager/
+        - name: CocoaPods
+          category: dependency-manager
+          url: https://cocoapods.org/
+        - name: SwiftUI
+          category: ui-framework
+          url: https://developer.apple.com/xcode/swiftui/
+        - name: Core Data
+          category: persistence
+          url: https://developer.apple.com/documentation/coredata
+        - name: XCTest
+          category: testing
+          url: https://developer.apple.com/documentation/xctest
+    kotlin-android:
+      description: Native Android development with Kotlin
+      tools:
+        - name: Android Studio
+          category: ide
+          url: https://developer.android.com/studio
+        - name: Gradle
+          category: build-tool
+          url: https://gradle.org/
+        - name: Jetpack Compose
+          category: ui-framework
+          url: https://developer.android.com/jetpack/compose
+        - name: ViewModel
+          category: architecture
+          url: https://developer.android.com/topic/libraries/architecture/viewmodel
+        - name: Room
+          category: persistence
+          url: https://developer.android.com/training/data-storage/room
+        - name: JUnit
+          category: testing
+          url: https://junit.org/junit5/
     flutter:
       description: Dart-based high-performance UI toolkit
       tools:
@@ -69,6 +132,30 @@ backend:
         - name: Uvicorn
           category: asgi
           url: https://www.uvicorn.org/
+    gin:
+      description: High-performance Go web framework
+      tools:
+        - name: Gin
+          category: framework
+          url: https://gin-gonic.com/
+        - name: GORM
+          category: orm
+          url: https://gorm.io/
+        - name: go-swagger
+          category: api-docs
+          url: https://goswagger.io/
+    echo:
+      description: High-performance Go web framework
+      tools:
+        - name: Echo
+          category: framework
+          url: https://echo.labstack.com/
+        - name: Ent
+          category: orm
+          url: https://entgo.io/
+        - name: gRPC
+          category: microservices
+          url: https://grpc.io/
     node-express:
       description: Battle-tested Node.js REST stack
       tools:
@@ -96,6 +183,27 @@ desktop:
         - name: Electron Builder
           category: packaging
           url: https://www.electron.build
+    cpp-cross-platform:
+      description: Cross-platform C++ development
+      tools:
+        - name: CMake
+          category: build-system
+          url: https://cmake.org/
+        - name: Conan
+          category: package-manager
+          url: https://conan.io/
+        - name: vcpkg
+          category: package-manager
+          url: https://github.com/microsoft/vcpkg
+        - name: Qt
+          category: gui-framework
+          url: https://www.qt.io/
+        - name: Boost
+          category: libraries
+          url: https://www.boost.org/
+        - name: CppUTest
+          category: testing
+          url: https://cpputest.github.io/
     tauri:
       description: Rust + WebView based lightweight desktop apps
       tools:
@@ -150,6 +258,24 @@ devops:
         - name: Argo CD
           category: gitops
           url: https://argo-cd.readthedocs.io/
+    python-devops:
+      description: Python-powered DevOps automation
+      tools:
+        - name: Fabric
+          category: automation
+          url: http://www.fabfile.org/
+        - name: Ansible
+          category: configuration-management
+          url: https://www.ansible.com/
+        - name: Terraform Python Provider
+          category: infrastructure-as-code
+          url: https://registry.terraform.io/providers/hashicorp/template/latest/docs
+        - name: Prometheus Python Client
+          category: monitoring
+          url: https://prometheus.github.io/client_python/
+        - name: Loguru
+          category: logging
+          url: https://loguru.readthedocs.io/
     ci-cd:
       description: Continuous integration and deployment
       tools:

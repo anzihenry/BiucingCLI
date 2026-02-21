@@ -4,12 +4,12 @@ BiucingCLI is a Typer-based command-line companion that curates full-stack devel
 
 ## Features
 
-- 🌐 **Frontend**: Recommend bundlers, frameworks, linting, and testing tools for web stacks.
-- 📱 **Mobile**: Surface native and cross-platform options, SDK helpers, and CI tips.
-- 🖥️ **Desktop**: Highlight Electron, Tauri, Qt, and packaging workflows.
-- 🔧 **Backend**: Suggest frameworks, ORMs, observability, and API tooling.
+- 🌐 **Frontend**: Recommend bundlers, frameworks, linting, and testing tools for web stacks (including TypeScript).
+- 📱 **Mobile**: Surface native and cross-platform options, SDK helpers, and CI tips (including React Native, Swift iOS, and Kotlin Android).
+- 🖥️ **Desktop**: Highlight Electron, Tauri, Qt, and packaging workflows (including C++ cross-platform development).
+- 🔧 **Backend**: Suggest frameworks, ORMs, observability, and API tooling (including Go frameworks like Gin and Echo).
 - 🧪 **Testing**: Organize unit, integration, E2E, and performance testing stacks.
-- 🚀 **DevOps**: Provide CI/CD, infrastructure-as-code, container, and monitoring practices.
+- 🚀 **DevOps**: Provide CI/CD, infrastructure-as-code, container, and monitoring practices (including Python DevOps automation tools).
 - 🔧 **Configuration-driven**: Customize recommendations through YAML-driven profiles.
 - ✨ **Rich output**: Uses Rich for colorful, structured terminal UX.
 
@@ -33,6 +33,10 @@ pip install .
 ```bash
 biucing --help
 biucing frontend list
+biucing backend list                    # Lists Go frameworks like Gin and Echo
+biucing mobile list                     # Lists Swift iOS and Kotlin Android options
+biucing devops list                     # Lists Python DevOps tools
+biucing desktop list                    # Lists C++ cross-platform options
 biucing devops suggest --stack cloud-native
 biucing configure show --config config/biucingcli.yaml
 ```

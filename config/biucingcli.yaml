@@ -14,7 +14,7 @@ mobile:
   preferred: flutter
 
 backend:
-  preferred: fastapi
+  preferred: gin
   stacks:
     fastapi:
       tools:
@@ -24,9 +24,17 @@ backend:
         - name: Alembic
           category: migrations
           url: https://alembic.sqlalchemy.org/
+    gin:
+      tools:
+        - name: Gin
+          category: framework
+          url: https://gin-gonic.com/
+        - name: GORM
+          category: orm
+          url: https://gorm.io/
 
 testing:
   preferred: python
 
 devops:
-  preferred: cloud-native
+  preferred: python-devops
