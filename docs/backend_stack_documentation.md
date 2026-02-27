@@ -2,366 +2,516 @@
 
 ## 概述
 
-本文档详细介绍了我们推荐的后端技术栈，该技术栈以Go语言为核心，结合现代化的微服务架构和Web应用开发模式。这个组合提供了高性能、高并发和可扩展的后端解决方案，适用于各种规模的应用程序开发。
+本文档详细介绍了我们推荐的后端技术栈，该技术栈以 Go 语言为核心，结合现代化的微服务架构和 Web 应用开发模式。这个组合提供了高性能、高并发和可扩展的后端解决方案，适用于各种规模的应用程序开发。
 
 ## 技术栈组成
 
-### 1. Web框架 (Gin)
+### 1. Web 框架 (Gin)
 
-#### Gin
-- **作用**: 高性能的Go Web框架
+#### Gin (v1.9.1+)
+- **版本**: v1.9.1+
+- **Go 版本要求**: Go 1.18+
+- **作用**: 高性能的 Go Web 框架
 - **优势**:
   - 快速的路由实现
   - 中间件支持
   - 丰富的错误处理
-  - JSON验证和绑定
+  - JSON 验证和绑定
   - 优秀的性能表现
-- **适用场景**: RESTful API、Web应用、微服务
+- **适用场景**:
+  - RESTful API 服务
+  - 微服务架构中的 HTTP 网关
+  - 实时 Web 应用
+  - 高性能后端服务
+- **性能指标**:
+  - 路由匹配时间：< 100ns
+  - 内存分配：0 allocs/op（路由复用场景）
+  - 吞吐量：~45,000 req/s（基准测试）
+- **安装命令**:
+  ```bash
+  go get -u github.com/gin-gonic/gin
+  ```
 
 ### 2. 微服务框架
 
-#### Go Micro
-- **作用**: Go语言的微服务开发框架
-- **特性**:
-  - 服务发现
-  - 负载均衡
-  - 编解码
-  - RPC通信
-  - 事件驱动
-  - 插件化架构
+#### Go Micro (v3.10.0+)
+- **版本**: v3.10.0+
+- **Go 版本要求**: Go 1.19+
+- **作用**: Go 语言的微服务开发框架
+- **使用场景**:
+  - 需要服务发现的微服务架构
+  - 多语言微服务环境
+  - 需要 RPC 和事件驱动混合模式
+- **核心组件**:
+  - Registry: 服务注册与发现
+  - Broker: 事件消息代理
+  - Transport: RPC 通信传输
+  - Codec: 编码解码器
+  - Server/Client: 服务端和客户端
+- **安装命令**:
+  ```bash
+  go get github.com/micro/go-micro/v3
+  ```
 
-#### Kratos
-- **作用**: Bilibili开源的Go微服务框架
-- **特性**:
-  - 面向HTTP和gRPC服务
-  - 内置熔断、限流、降级功能
-  - 配置管理
-  - 日志系统
-  - 链路追踪
-  - 优雅重启
+#### Kratos (v2.7.1+)
+- **版本**: v2.7.1+
+- **Go 版本要求**: Go 1.19+
+- **作用**: Bilibili 开源的 Go 微服务框架
+- **使用场景**:
+  - 企业级微服务应用
+  - 需要熔断、限流、降级的场景
+  - HTTP 和 gRPC 双协议支持
+- **核心特性**:
+  - 依赖注入 (wire)
+  - 配置管理 (config)
+  - 日志系统 (log)
+  - 中间件 (middleware)
+  - 传输层 (transport)
+- **安装命令**:
+  ```bash
+  go get github.com/go-kratos/kratos/v2
+  go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
+  ```
 
-#### Go Kit
-- **作用**: Go语言的微服务工具包
-- **特性**:
-  - 传输无关的服务设计
-  - 服务发现和负载均衡
-  - 日志和监控
-  - 传输层抽象
-  - 中间件支持
+#### Go Kit (v0.13.0+)
+- **版本**: v0.13.0+
+- **Go 版本要求**: Go 1.17+
+- **作用**: Go 语言的微服务工具包
+- **使用场景**:
+  - 需要高度定制化的微服务
+  - 领域驱动设计 (DDD) 项目
+  - 需要明确架构分层的场景
+- **核心组件**:
+  - Endpoint: 端点抽象
+  - Service: 服务层
+  - Transport: 传输层
+  - Middleware: 中间件
+- **安装命令**:
+  ```bash
+  go get github.com/go-kit/kit
+  ```
 
-#### Service Weaver
-- **作用**: Google开源的分布式应用框架
-- **特性**:
+#### Service Weaver (v0.23.0+)
+- **版本**: v0.23.0+
+- **Go 版本要求**: Go 1.20+
+- **作用**: Google 开源的分布式应用框架
+- **使用场景**:
+  - Google Cloud 环境部署
+  - 需要本地/云端一致性的项目
+  - 自动扩缩容的分布式应用
+- **核心特性**:
   - 透明的分布式计算
-  - 本地开发和云端部署一致性
   - 自动负载均衡
-  - 远程过程调用
-  - 指标收集
-  - 本地/远程透明性
+  - 本地开发和云端部署一致性
+- **安装命令**:
+  ```bash
+  go get github.com/ServiceWeaver/weaver
+  ```
 
-### 3. 数据库与ORM
+### 3. 数据库与 ORM
 
-### 4. 数据库与ORM
+#### GORM (v1.25.5+)
+- **版本**: v1.25.5+
+- **Go 版本要求**: Go 1.18+
+- **作用**: Go 语言的优秀 ORM 库
+- **使用场景**:
+  - 快速原型开发
+  - 复杂查询需求
+  - 需要自动迁移的项目
+- **支持的数据库**:
+  - MySQL (v2.4.0+)
+  - PostgreSQL (v1.5.4+)
+  - SQLite (v1.25.0+)
+  - SQL Server (v1.25.0+)
+- **安装命令**:
+  ```bash
+  go get -u gorm.io/gorm
+  go get -u gorm.io/driver/mysql
+  ```
 
-#### GORM
-- **作用**: Go语言的优秀ORM库
-- **特性**:
-  - 支持多种数据库
-  - 关联关系管理
-  - 预加载优化
-  - 迁移工具
-  - 钩子函数支持
-
-#### Ent
-- **作用**: 图形化的Go ORM框架
-- **优势**:
+#### Ent (v0.12.0+)
+- **版本**: v0.12.0+
+- **Go 版本要求**: Go 1.18+
+- **作用**: 图形化的 Go ORM 框架
+- **使用场景**:
+  - 需要类型安全的查询
+  - 复杂的数据模型关系
+  - 代码生成驱动的开发
+- **核心特性**:
+  - 图形化数据模型定义
   - 类型安全的查询构建器
-  - 代码生成
-  - 图形化数据模型
-  - 灵活的扩展性
-  - 优秀的性能
+  - 自动代码生成
+  - 支持多种数据库驱动
+- **安装命令**:
+  ```bash
+  go get entgo.io/ent/cmd/ent
+  go install entgo.io/ent/cmd/ent@latest
+  ```
 
 #### 数据库驱动
-- **go-sql-driver/mysql**: MySQL数据库驱动
-- **jackc/pgx**: PostgreSQL数据库驱动
-- **sqlx**: 扩展标准库database/sql功能
+- **go-sql-driver/mysql (v1.7.1+)**: MySQL 数据库驱动
+- **jackc/pgx (v5.4.3+)**: PostgreSQL 数据库驱动
+- **sqlx (v1.3.5+)**: 扩展标准库 database/sql 功能
 
 #### 数据库迁移
-- **migrate**: 数据库迁移工具
-- **支持多种数据库**: MySQL, PostgreSQL, SQLite等
-- **版本控制**: SQL脚本版本管理
+- **migrate (v3.5.4+)**:
+  - 支持多种数据库：MySQL, PostgreSQL, SQLite 等
+  - 版本控制：SQL 脚本版本管理
+- **安装命令**:
+  ```bash
+  go get -u github.com/golang-migrate/migrate/v4
+  ```
 
-### 5. 缓存系统
+### 4. 缓存系统
 
-#### go-redis
-- **作用**: Redis客户端库
-- **功能**:
-  - 字符串、哈希、列表、集合等数据结构操作
-  - 发布订阅模式
-  - 事务支持
-  - 连接池管理
-  - 集群支持
+#### go-redis (v9.0.5+)
+- **版本**: v9.0.5+
+- **Go 版本要求**: Go 1.18+
+- **作用**: Redis 客户端库
+- **使用场景**:
+  - 会话存储
+  - 数据缓存
+  - 分布式锁
+  - 发布/订阅消息
+  - 排行榜和计数器
+- **安装命令**:
+  ```bash
+  go get github.com/redis/go-redis/v9
+  ```
 
-#### groupcache
+#### groupcache (v0.0.0-20210331224755-41bb18bfe9da)
+- **版本**: 最后更新时间 2021-03-31
 - **作用**: 分布式缓存系统
+- **使用场景**:
+  - 无中心节点的分布式缓存
+  - 需要自动分片的场景
+  - 内存受限的缓存场景
 - **特点**:
-  - 无中心节点
-  - 自动分片
-  - 一致性哈希
+  - 一致性哈希分片
   - 缓存预热
+  - 防止缓存击穿
 
-### 6. 认证与授权
+### 5. 认证与授权
 
-#### JWT-Go
-- **作用**: JSON Web Token实现
-- **特性**:
-  - 令牌生成和验证
-  - 自定义声明
-  - 多种签名算法
-  - 令牌刷新机制
+#### JWT-Go (v4.5.0+)
+- **版本**: v4.5.0+ (github.com/golang-jwt/jwt/v4)
+- **Go 版本要求**: Go 1.18+
+- **作用**: JSON Web Token 实现
+- **使用场景**:
+  - 无状态认证
+  - API 令牌验证
+  - 微服务间认证
+- **安装命令**:
+  ```bash
+  go get github.com/golang-jwt/jwt/v4
+  ```
 
-#### OAuth2
-- **作用**: OAuth2协议实现
-- **支持**:
-  - 授权码流程
-  - 客户端凭证流程
-  - 资源所有者密码凭证流程
+#### OAuth2 (v2.5.2+)
+- **版本**: v2.5.2+ (golang.org/x/oauth2)
+- **作用**: OAuth2 协议实现
+- **使用场景**:
+  - 第三方登录（Google、GitHub 等）
+  - API 授权
+- **安装命令**:
+  ```bash
+  go get golang.org/x/oauth2
+  ```
 
-#### Bcrypt
+#### Bcrypt (v0.11.0+)
+- **版本**: v0.11.0+ (golang.org/x/crypto/bcrypt)
 - **作用**: 密码哈希函数
-- **优势**:
-  - 安全的密码存储
-  - 可调节的成本参数
-  - 防止彩虹表攻击
+- **使用场景**:
+  - 密码哈希存储
+  - 敏感数据加密
+- **安装命令**:
+  ```bash
+  go get golang.org/x/crypto/bcrypt
+  ```
 
-### 7. 配置管理
+### 6. 配置管理
 
-#### Viper
+#### Viper (v1.18.2+)
+- **版本**: v1.18.2+
+- **Go 版本要求**: Go 1.19+
 - **作用**: 完整的配置解决方案
-- **功能**:
-  - 支持多种配置格式(JSON, TOML, YAML, env等)
-  - 远程配置读取
-  - 监听配置变化
-  - 命令行参数绑定
-  - 环境变量支持
+- **使用场景**:
+  - 多环境配置管理
+  - 动态配置重载
+  - 远程配置中心集成
+- **支持格式**: JSON, TOML, YAML, HCL, envfile, Java properties
+- **安装命令**:
+  ```bash
+  go get github.com/spf13/viper
+  ```
 
-### 8. 命令行工具
+### 7. 命令行工具
 
-#### Cobra
-- **作用**: 现代化的Go命令行接口库
-- **特性**:
-  - 子命令支持
-  - 标志(flag)解析
-  - 自动生成帮助文本
-  - 命令历史
-  - bash自动补全
+#### Cobra (v1.8.0+)
+- **版本**: v1.8.0+
+- **Go 版本要求**: Go 1.19+
+- **作用**: 现代化的 Go 命令行接口库
+- **使用场景**:
+  - CLI 应用程序
+  - 微服务命令行工具
+  - DevOps 自动化工具
+- **安装命令**:
+  ```bash
+  go get -u github.com/spf13/cobra
+  go install github.com/spf13/cobra-cli@latest
+  ```
 
-### 9. 错误处理
+### 8. 错误处理
 
-#### pkg/errors
-- **作用**: Go错误处理增强
-- **功能**:
-  - 堆栈跟踪
-  - 错误包装
-  - 错误格式化
-  - 上下文信息添加
+#### pkg/errors (v0.9.1+)
+- **版本**: v0.9.1+
+- **注意**: Go 1.13+ 已内置错误包装功能，但 pkg/errors 仍广泛使用
+- **作用**: Go 错误处理增强
+- **安装命令**:
+  ```bash
+  go get github.com/pkg/errors
+  ```
 
-### 10. 参数验证
+### 9. 参数验证
 
-#### Validator
-- **作用**: Go结构体和字段验证库
-- **特性**:
-  - 标签(tag)驱动验证
-  - 跨字段验证
-  - 自定义验证函数
-  - 切片/数组验证
-  - 映射验证
+#### Validator (v10.15.5+)
+- **版本**: v10.15.5+ (github.com/go-playground/validator/v10)
+- **Go 版本要求**: Go 1.18+
+- **作用**: Go 结构体和字段验证库
+- **使用场景**:
+  - 请求参数验证
+  - 数据模型验证
+  - 自定义业务规则验证
+- **安装命令**:
+  ```bash
+  go get github.com/go-playground/validator/v10
+  ```
 
-### 11. API文档
+### 10. API 文档
 
-#### Swaggo/gin-swagger
-- **作用**: 自动生成RESTful API文档
-- **功能**:
-  - 基于Go代码注释生成Swagger文档
-  - 交互式API测试界面
-  - 符合OpenAPI规范
-  - 自动化文档更新
+#### Swaggo (v1.16.2+)
+- **版本**: v1.16.2+ (github.com/swaggo/swag)
+- **Go 版本要求**: Go 1.18+
+- **作用**: 自动生成 RESTful API 文档
+- **使用场景**:
+  - RESTful API 文档生成
+  - OpenAPI/Swagger 规范兼容
+  - API 测试界面
+- **安装命令**:
+  ```bash
+  go get github.com/swaggo/swag/cmd/swag
+  go get github.com/swaggo/gin-swagger
+  go get github.com/swaggo/files
+  ```
+- **生成文档命令**:
+  ```bash
+  swag init -g cmd/api/main.go -o ./docs
+  ```
 
-### 12. 测试工具
+### 11. 测试工具
 
-#### Testify
-- **作用**: Go测试工具包
-- **组件**:
-  - 断言库(assert)
-  - 模拟(mock)库
-  - 要求(require)库
-  - Suite测试套件
+#### Testify (v1.8.4+)
+- **版本**: v1.8.4+
+- **Go 版本要求**: Go 1.17+
+- **作用**: Go 测试工具包
+- **使用场景**:
+  - 单元测试断言
+  - Mock 对象创建
+  - 测试套件组织
+- **安装命令**:
+  ```bash
+  go get github.com/stretchr/testify
+  ```
 
-#### Gomock
-- **作用**: Go模拟框架
-- **功能**:
-  - 自动生成模拟代码
-  - 严格的调用期望
-  - 类型安全的模拟
-  - 灵活的匹配器
+#### Gomock (v1.7.0-rc.1+)
+- **版本**: v1.7.0-rc.1+
+- **作用**: Go 模拟框架
+- **安装命令**:
+  ```bash
+  go install go.uber.org/mock/mockgen@latest
+  ```
 
-### 13. 监控与可观测性
+### 12. 监控与可观测性
 
-#### Prometheus Client
-- **作用**: Prometheus指标收集客户端
-- **指标类型**:
-  - Counter(计数器)
-  - Gauge(仪表盘)
-  - Histogram(直方图)
-  - Summary(摘要)
+#### Prometheus Client (v0.17.0+)
+- **版本**: v0.17.0+
+- **作用**: Prometheus 指标收集客户端
+- **使用场景**:
+  - 应用指标收集
+  - 性能监控
+  - 业务指标追踪
+- **安装命令**:
+  ```bash
+  go get github.com/prometheus/client_golang/prometheus
+  ```
 
-#### OpenTelemetry Go
+#### OpenTelemetry Go (v1.16.0+)
+- **版本**: v1.16.0+
 - **作用**: 可观测性框架
-- **功能**:
+- **使用场景**:
   - 分布式追踪
   - 指标收集
   - 日志关联
-  - 标准化遥测数据
+- **安装命令**:
+  ```bash
+  go get go.opentelemetry.io/otel
+  go get go.opentelemetry.io/otel/trace
+  ```
 
-#### Zap
+#### Zap (v1.26.0+)
+- **版本**: v1.26.0+
 - **作用**: 高性能结构化日志库
-- **特性**:
-  - 结构化日志输出
-  - 高性能日志记录
-  - 多种编码器支持
-  - 日志轮转
-  - 调试和生产模式
+- **使用场景**:
+  - 结构化日志记录
+  - 高性能日志需求
+  - 日志级别管理
+- **安装命令**:
+  ```bash
+  go get go.uber.org/zap
+  ```
 
-### 14. 异步处理与消息队列
+### 13. 异步处理与消息队列
 
-#### Asynq
-- **作用**: 基于Redis的Go任务队列
-- **功能**:
-  - 延迟任务调度
-  - 重复任务执行
-  - 任务失败重试
-  - 任务监控面板
+#### Asynq (v0.24.0+)
+- **版本**: v0.24.0+
+- **作用**: 基于 Redis 的 Go 任务队列
+- **使用场景**:
+  - 后台任务处理
+  - 定时任务调度
+  - 延迟任务执行
+- **安装命令**:
+  ```bash
+  go get github.com/hibiken/asynq
+  ```
 
-#### NATS
+#### NATS (v1.30.0+)
+- **版本**: v1.30.0+ (github.com/nats-io/nats.go)
 - **作用**: 高性能消息系统
-- **特性**:
-  - 发布/订阅模式
-  - 请求/回复模式
-  - 队列组
-  - 集群支持
-  - 持久化存储
+- **使用场景**:
+  - 微服务间通信
+  - 事件驱动架构
+  - 流式数据处理
+- **安装命令**:
+  ```bash
+  go get github.com/nats-io/nats.go
+  ```
 
-### 15. RPC与序列化
+### 14. RPC 与序列化
 
-#### gRPC-Go
-- **作用**: 高性能RPC框架
-- **特性**:
-  - 基于HTTP/2
-  - 双向流
-  - 拦截器支持
-  - 负载均衡
-  - 认证支持
+#### gRPC-Go (v1.57.0+)
+- **版本**: v1.57.0+
+- **Go 版本要求**: Go 1.19+
+- **作用**: 高性能 RPC 框架
+- **使用场景**:
+  - 微服务间通信
+  - 高性能 RPC 调用
+  - 流式数据传输
+- **安装命令**:
+  ```bash
+  go get google.golang.org/grpc
+  go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+  ```
 
-#### Protocol Buffers
+#### Protocol Buffers (v3.21.0+)
+- **版本**: v3.21.0+
 - **作用**: 语言中立、平台中立的序列化格式
-- **优势**:
-  - 高效的序列化/反序列化
-  - 向后兼容的模式演进
-  - 跨语言支持
-  - 较小的传输体积
+- **使用场景**:
+  - 高效数据序列化
+  - 跨语言数据交换
+  - API 契约定义
 
-#### protoc-gen-go
-- **作用**: Protocol Buffers Go代码生成器
-- **功能**:
-  - 自动生成Go结构体
-  - 序列化/反序列化方法
-  - gRPC服务接口
+#### protoc-gen-go (v1.30.0+)
+- **版本**: v1.30.0+
+- **作用**: Protocol Buffers Go 代码生成器
 
-### 16. HTTP客户端
+### 15. HTTP 客户端
 
-#### Resty
-- **作用**: 简单而功能强大的HTTP客户端
-- **特性**:
-  - 自动JSON/XML处理
-  - 请求/响应拦截器
-  - 重定向处理
-  - Cookie管理
-  - 超时控制
+#### Resty (v2.11.0+)
+- **版本**: v2.11.0+
+- **作用**: 简单而功能强大的 HTTP 客户端
+- **使用场景**:
+  - HTTP API 调用
+  - 第三方服务集成
+  - 自动化测试
+- **安装命令**:
+  ```bash
+  go get github.com/go-resty/resty/v2
+  ```
 
-### 17. 模板引擎（Web应用）
+### 16. 模板引擎（Web 应用）
 
-#### html/template
-- **作用**: Go内置安全模板引擎
-- **特性**:
-  - XSS防护
-  - HTML上下文感知
-  - 类型安全
-  - 预定义函数
+#### html/template (Go 内置)
+- **作用**: Go 内置安全模板引擎
+- **使用场景**: 简单的 HTML 模板渲染
 
-#### Pongo2
-- **作用**: Django风格的Go模板引擎
-- **特性**:
-  - Django模板语法
-  - 自定义标签和过滤器
-  - 继承和包含
-  - 沙盒执行
+#### Pongo2 (v4.0.2+)
+- **版本**: v4.0.2+
+- **作用**: Django 风格的 Go 模板引擎
+- **使用场景**: Django 风格模板
+- **安装命令**:
+  ```bash
+  go get github.com/flosch/pongo2/v4
+  ```
 
-#### Ace
-- **作用**: HTML模板引擎
-- **特性**:
-  - 类似Slim/Jade的语法
-  - 模板继承
-  - 高性能渲染
-  - 静态分析
+#### Ace (v1.0.0+)
+- **版本**: v1.0.0+
+- **作用**: HTML 模板引擎
+- **使用场景**: 类似 Slim/Jade 的简洁语法
+- **安装命令**:
+  ```bash
+  go get github.com/yosssi/ace
+  ```
 
-### 18. 安全中间件
+### 17. 安全中间件
 
 #### CORS
 - **作用**: 跨域资源共享中间件
-- **功能**:
-  - 配置跨域策略
-  - 预检请求处理
-  - 凭据支持
+- **使用场景**: API 跨域访问控制
+- **安装命令**:
+  ```bash
+  go get github.com/gin-contrib/cors
+  ```
 
 #### Secure
 - **作用**: 安全头部中间件
-- **功能**:
-  - HTTP安全头部设置
-  - XSS防护
-  - HSTS支持
-  - 内容安全策略
+- **使用场景**: HTTP 安全头部设置
+- **安装命令**:
+  ```bash
+  go get github.com/unrolled/secure
+  ```
 
-#### bluemonday
-- **作用**: HTML净化库
-- **功能**:
-  - XSS防护
-  - HTML标签过滤
-  - 属性白名单
-  - 安全HTML输出
+#### bluemonday (v1.0.26+)
+- **版本**: v1.0.26+
+- **作用**: HTML 净化库
+- **使用场景**: HTML 净化，防止 XSS 攻击
+- **安装命令**:
+  ```bash
+  go get github.com/microcosm-cc/bluemonday
+  ```
 
 ## 项目结构
 
 ```
 backend-project/
 ├── cmd/                    # 应用入口点
-│   ├── api/               # API服务入口
+│   ├── api/               # API 服务入口
 │   └── worker/            # 后台任务入口
 ├── internal/              # 私有应用程序代码
-│   ├── handlers/          # HTTP处理器
+│   ├── handlers/          # HTTP 处理器
 │   ├── services/          # 业务逻辑
 │   ├── models/            # 数据模型
 │   ├── repositories/      # 数据访问层
-│   ├── middleware/        # HTTP中间件
+│   ├── middleware/        # HTTP 中间件
 │   ├── utils/             # 工具函数
 │   ├── config/            # 配置管理
 │   └── auth/              # 认证授权
 ├── pkg/                   # 可导出的库代码
 ├── migrations/            # 数据库迁移脚本
-├── docs/                  # API文档
+├── docs/                  # API 文档
 ├── configs/               # 配置文件
 ├── scripts/               # 脚本文件
 ├── tests/                 # 测试文件
-├── docker/                # Docker相关文件
+├── docker/                # Docker 相关文件
 ├── go.mod
 ├── go.sum
 └── main.go
@@ -373,7 +523,6 @@ backend-project/
 ```bash
 go mod init backend-project
 go get github.com/gin-gonic/gin
-# 或其他需要的依赖
 ```
 
 ### 运行开发服务器
@@ -393,234 +542,55 @@ go test -cover ./...
 go build -o bin/api cmd/api/main.go
 ```
 
-### 生成API文档
+### 生成 API 文档
 ```bash
 swag init -g cmd/api/main.go
 ```
 
-## 使用指南
-
-### 1. 项目初始化
-```go
-// main.go
-package main
-
-import (
-    "github.com/gin-gonic/gin"
-    "your-project/internal/config"
-    "your-project/internal/handlers"
-    "your-project/internal/middleware"
-)
-
-func main() {
-    // 加载配置
-    cfg := config.LoadConfig()
-    
-    // 初始化数据库连接
-    db := config.InitDatabase(cfg.DatabaseURL)
-    
-    // 创建Gin引擎
-    r := gin.Default()
-    
-    // 注册中间件
-    r.Use(middleware.LoggerToFile())
-    r.Use(middleware.CORSMiddleware())
-    
-    // 注册路由
-    handlers.SetupRoutes(r, db)
-    
-    // 启动服务器
-    r.Run(cfg.Port)
-}
-```
-
-### 2. 创建API处理器
-```go
-// internal/handlers/user_handler.go
-package handlers
-
-import (
-    "net/http"
-    "github.com/gin-gonic/gin"
-    "your-project/internal/models"
-    "your-project/internal/services"
-)
-
-type UserHandler struct {
-    userService *services.UserService
-}
-
-func NewUserHandler(userService *services.UserService) *UserHandler {
-    return &UserHandler{userService: userService}
-}
-
-func (h *UserHandler) GetUsers(c *gin.Context) {
-    users, err := h.userService.GetAllUsers()
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-    c.JSON(http.StatusOK, users)
-}
-
-func (h *UserHandler) GetUserByID(c *gin.Context) {
-    id := c.Param("id")
-    user, err := h.userService.GetUserByID(id)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-        return
-    }
-    c.JSON(http.StatusOK, user)
-}
-```
-
-### 3. 服务层实现
-```go
-// internal/services/user_service.go
-package services
-
-import (
-    "errors"
-    "your-project/internal/models"
-    "your-project/internal/repositories"
-)
-
-type UserService struct {
-    userRepo *repositories.UserRepository
-}
-
-func NewUserService(userRepo *repositories.UserRepository) *UserService {
-    return &UserService{userRepo: userRepo}
-}
-
-func (s *UserService) GetAllUsers() ([]models.User, error) {
-    return s.userRepo.FindAll()
-}
-
-func (s *UserService) GetUserByID(id string) (*models.User, error) {
-    user, err := s.userRepo.FindByID(id)
-    if err != nil {
-        return nil, err
-    }
-    if user == nil {
-        return nil, errors.New("user not found")
-    }
-    return user, nil
-}
-```
-
-### 4. 数据库操作
-```go
-// internal/repositories/user_repository.go
-package repositories
-
-import (
-    "your-project/internal/models"
-    "gorm.io/gorm"
-)
-
-type UserRepository struct {
-    db *gorm.DB
-}
-
-func NewUserRepository(db *gorm.DB) *UserRepository {
-    return &UserRepository{db: db}
-}
-
-func (r *UserRepository) FindAll() ([]models.User, error) {
-    var users []models.User
-    err := r.db.Find(&users).Error
-    return users, err
-}
-
-func (r *UserRepository) FindByID(id string) (*models.User, error) {
-    var user models.User
-    err := r.db.Where("id = ?", id).First(&user).Error
-    if err != nil {
-        if errors.Is(err, gorm.ErrRecordNotFound) {
-            return nil, nil
-        }
-        return nil, err
-    }
-    return &user, nil
-}
-```
-
-### 5. 配置管理
-```go
-// internal/config/config.go
-package config
-
-import (
-    "github.com/spf13/viper"
-)
-
-type Config struct {
-    Port         string `mapstructure:"PORT"`
-    DatabaseURL  string `mapstructure:"DATABASE_URL"`
-    JWTSecret    string `mapstructure:"JWT_SECRET"`
-    RedisAddr    string `mapstructure:"REDIS_ADDR"`
-}
-
-func LoadConfig() *Config {
-    viper.SetDefault("PORT", "8080")
-    viper.SetDefault("DATABASE_URL", "localhost:5432")
-    viper.AutomaticEnv()
-
-    var config Config
-    err := viper.Unmarshal(&config)
-    if err != nil {
-        panic(err)
-    }
-
-    return &config
-}
-```
-
 ## 最佳实践
 
-### 3. 项目组织
-1. **internal目录**: 存放私有代码，防止外部导入
-2. **pkg目录**: 存放可导出的公共库代码
+### 项目组织
+1. **internal 目录**: 存放私有代码，防止外部导入
+2. **pkg 目录**: 存放可导出的公共库代码
 3. **清晰的分层**: handler -> service -> repository -> model
 
-### 4. 错误处理
+### 错误处理
 1. **统一错误类型**: 定义应用特定的错误类型
-2. **上下文信息**: 使用pkg/errors添加堆栈跟踪
+2. **上下文信息**: 使用 pkg/errors 添加堆栈跟踪
 3. **日志记录**: 在适当层级记录错误日志
 
-### 5. 配置管理
-1. **环境变量**: 使用Viper管理环境特定配置
+### 配置管理
+1. **环境变量**: 使用 Viper 管理环境特定配置
 2. **配置验证**: 启动时验证必要配置项
 3. **默认值**: 为配置项提供合理默认值
 
-### 6. 数据库操作
+### 数据库操作
 1. **连接池**: 合理配置数据库连接池参数
 2. **事务管理**: 在服务层管理数据库事务
 3. **索引优化**: 为常用查询字段建立索引
 
-### 7. API设计
-1. **RESTful原则**: 遵循RESTful API设计原则
-2. **版本控制**: 为API提供版本控制
+### API 设计
+1. **RESTful 原则**: 遵循 RESTful API 设计原则
+2. **版本控制**: 为 API 提供版本控制
 3. **错误响应**: 统一错误响应格式
 4. **认证授权**: 实现适当的认证和授权机制
 
-### 8. 安全考虑
+### 安全考虑
 1. **输入验证**: 对所有用户输入进行验证
-2. **SQL注入防护**: 使用参数化查询或ORM
-3. **XSS防护**: 输出时进行适当的转义
+2. **SQL 注入防护**: 使用参数化查询或 ORM
+3. **XSS 防护**: 输出时进行适当的转义
 4. **认证机制**: 实现安全的认证机制
 
-### 9. 性能优化
-1. **缓存策略**: 合理使用内存缓存和Redis
-2. **数据库查询优化**: 避免N+1查询问题
-3. **并发处理**: 使用goroutine处理并发请求
+### 性能优化
+1. **缓存策略**: 合理使用内存缓存和 Redis
+2. **数据库查询优化**: 避免 N+1 查询问题
+3. **并发处理**: 使用 goroutine 处理并发请求
 4. **资源释放**: 确保资源正确关闭和释放
 
 ## 部署策略
 
 ### 容器化部署
-- 使用Docker容器化应用
+- 使用 Docker 容器化应用
 - 多阶段构建减小镜像大小
 - 环境变量配置
 
@@ -630,7 +600,7 @@ func LoadConfig() *Config {
 - 健康检查端点
 - 告警机制
 
-### CI/CD集成
+### CI/CD 集成
 - 自动化测试
 - 镜像构建和推送
 - 蓝绿部署或滚动更新
@@ -638,20 +608,20 @@ func LoadConfig() *Config {
 
 ## 扩展指南
 
-### 添加新API端点
-1. 在handlers目录中创建新的处理器
-2. 在routes中注册路由
-3. 如需要，创建对应的service和repository
+### 添加新 API 端点
+1. 在 handlers 目录中创建新的处理器
+2. 在 routes 中注册路由
+3. 如需要，创建对应的 service 和 repository
 4. 编写单元测试
 
 ### 集成新数据库
 1. 添加相应的数据库驱动
 2. 配置连接池参数
 3. 创建数据模型和仓库
-4. 实现CRUD操作
+4. 实现 CRUD 操作
 
 ### 添加中间件
-1. 在middleware目录中创建中间件
+1. 在 middleware 目录中创建中间件
 2. 实现中间件逻辑
 3. 在路由中注册中间件
 4. 编写中间件测试
