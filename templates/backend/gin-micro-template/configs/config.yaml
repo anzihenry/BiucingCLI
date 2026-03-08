@@ -1,0 +1,32 @@
+# Server configuration
+server:
+  port: "8080"
+  mode: "debug"  # debug, release, test
+
+# Database configuration
+database:
+  driver: "mysql"
+  host: "localhost"
+  port: "3306"
+  user: "root"
+  password: "password"
+  dbname: "{{project_name}}"
+  max_idle_conns: 10
+  max_open_conns: 100
+
+# Redis configuration
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+  pool_size: 100
+
+# JWT configuration
+jwt:
+  secret: "your-secret-key-change-in-production"
+  expire_hours: 24
+
+# Logging configuration
+logging:
+  level: "debug"  # debug, info, warn, error
+  format: "json"  # json, console

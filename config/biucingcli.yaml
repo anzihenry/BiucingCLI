@@ -28,24 +28,85 @@ mobile:
   preferred: flutter
 
 backend:
-  preferred: gin
+  preferred: gin-micro
   stacks:
-    fastapi:
-      tools:
-        - name: FastAPI
-          category: framework
-          url: https://fastapi.tiangolo.com
-        - name: Alembic
-          category: migrations
-          url: https://alembic.sqlalchemy.org/
-    gin:
+    gin-micro:
+      description: "【推荐】基于 Go 的完整微服务技术栈，集成 Gin、Go Micro、GORM 和 go-redis"
       tools:
         - name: Gin
-          category: framework
+          category: web-framework
           url: https://gin-gonic.com/
+          description: "高性能 Go Web 框架，快速的路由实现和中间件支持"
+        - name: Go Micro
+          category: microservice-framework
+          url: https://micro.io/
+          description: "完整的微服务框架，提供服务发现、RPC 通信、事件驱动等核心功能"
         - name: GORM
           category: orm
           url: https://gorm.io/
+          description: "Go 语言 ORM 库，支持多种数据库和自动迁移"
+        - name: go-redis
+          category: cache
+          url: https://redis.uptrace.dev/
+          description: "Redis 官方 Go 客户端，支持集群、哨兵和 Pub/Sub"
+        - name: Viper
+          category: config
+          url: https://github.com/spf13/viper
+          description: "完整的配置管理解决方案，支持多格式和动态重载"
+        - name: JWT-Go
+          category: auth
+          url: https://github.com/golang-jwt/jwt
+          description: "JSON Web Token 实现，用于无状态认证和 API 令牌验证"
+        - name: Zap
+          category: logging
+          url: https://github.com/uber-go/zap
+          description: "高性能结构化日志库"
+        - name: Swaggo
+          category: api-docs
+          url: https://github.com/swaggo/swag
+          description: "自动生成 RESTful API 文档"
+    gin-basic:
+      description: "基于 Gin 的基础 Web 服务技术栈"
+      tools:
+        - name: Gin
+          category: web-framework
+          url: https://gin-gonic.com/
+          description: "高性能 Go Web 框架"
+        - name: GORM
+          category: orm
+          url: https://gorm.io/
+          description: "Go 语言 ORM 库"
+        - name: Viper
+          category: config
+          url: https://github.com/spf13/viper
+          description: "配置管理库"
+        - name: Zap
+          category: logging
+          url: https://github.com/uber-go/zap
+          description: "高性能日志库"
+    grpc-micro:
+      description: "基于 Go Micro 和 gRPC 的纯微服务技术栈"
+      tools:
+        - name: Go Micro
+          category: microservice-framework
+          url: https://micro.io/
+          description: "微服务框架"
+        - name: gRPC-Go
+          category: rpc
+          url: https://grpc.io/
+          description: "高性能 RPC 框架"
+        - name: Protocol Buffers
+          category: serialization
+          url: https://protobuf.dev/
+          description: "语言中立的数据序列化格式"
+        - name: GORM
+          category: orm
+          url: https://gorm.io/
+          description: "Go 语言 ORM 库"
+        - name: go-redis
+          category: cache
+          url: https://redis.uptrace.dev/
+          description: "Redis 客户端库"
 
 testing:
   preferred: python
