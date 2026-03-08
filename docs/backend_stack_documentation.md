@@ -36,10 +36,20 @@
 
 ### 2. 微服务框架
 
-#### Go Micro (v3.10.0+)
+> **✅ 推荐选择：Go Micro**
+>
+> 我们选择 **Go Micro** 作为项目的微服务框架。它提供了完整的服务发现、RPC 通信、事件驱动等微服务核心功能，具有高度的可扩展性和灵活性。
+
+#### Go Micro (v3.10.0+) 【推荐】
 - **版本**: v3.10.0+
 - **Go 版本要求**: Go 1.21+
 - **作用**: Go 语言的微服务开发框架
+- **选择理由**:
+  - 完整的微服务生态组件（Registry、Broker、Transport、Codec）
+  - 支持多种服务发现后端（Consul、Etcd、Kubernetes）
+  - 内置 RPC 和事件驱动混合模式
+  - 高度可扩展的插件架构
+  - 与 Go 语言生态良好集成
 - **使用场景**:
   - 需要服务发现的微服务架构
   - 多语言微服务环境
@@ -53,26 +63,6 @@
 - **安装命令**:
   ```bash
   go get github.com/micro/go-micro/v3
-  ```
-
-#### Kratos (v2.8.0+)
-- **版本**: v2.8.0+
-- **Go 版本要求**: Go 1.21+
-- **作用**: Bilibili 开源的 Go 微服务框架
-- **使用场景**:
-  - 企业级微服务应用
-  - 需要熔断、限流、降级的场景
-  - HTTP 和 gRPC 双协议支持
-- **核心特性**:
-  - 依赖注入 (wire)
-  - 配置管理 (config)
-  - 日志系统 (log)
-  - 中间件 (middleware)
-  - 传输层 (transport)
-- **安装命令**:
-  ```bash
-  go get github.com/go-kratos/kratos/v2
-  go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
   ```
 
 #### Go Kit (v0.13.0+)
@@ -91,23 +81,6 @@
 - **安装命令**:
   ```bash
   go get github.com/go-kit/kit
-  ```
-
-#### Service Weaver (v0.24.0+)
-- **版本**: v0.24.0+
-- **Go 版本要求**: Go 1.21+
-- **作用**: Google 开源的分布式应用框架
-- **使用场景**:
-  - Google Cloud 环境部署
-  - 需要本地/云端一致性的项目
-  - 自动扩缩容的分布式应用
-- **核心特性**:
-  - 透明的分布式计算
-  - 自动负载均衡
-  - 本地开发和云端部署一致性
-- **安装命令**:
-  ```bash
-  go get github.com/ServiceWeaver/weaver
   ```
 
 ### 3. 数据库与 ORM
@@ -166,10 +139,21 @@
 
 ### 4. 缓存系统
 
-#### go-redis (v9.5.0+)
+> **✅ 推荐选择：go-redis**
+>
+> 我们选择 **go-redis** 作为项目的 Redis 客户端库。它是 Redis 官方的 Go 客户端，提供了完整的 Redis 命令支持、连接池管理、集群支持和优秀的性能表现。
+
+#### go-redis (v9.5.0+) 【推荐】
 - **版本**: v9.5.0+
 - **Go 版本要求**: Go 1.21+
 - **作用**: Redis 客户端库
+- **选择理由**:
+  - Redis 官方推荐的 Go 客户端
+  - 完整的 Redis 命令支持
+  - 内置连接池管理和自动重连
+  - 支持 Redis 集群和哨兵模式
+  - 支持 Pub/Sub 发布订阅
+  - 优秀的性能和活跃的社区维护
 - **使用场景**:
   - 会话存储
   - 数据缓存
