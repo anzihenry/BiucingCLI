@@ -1,0 +1,3 @@
+service:
+  name: {{SERVICE_NAME}}
+  port: {{HTTP_PORT}}

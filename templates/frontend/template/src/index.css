@@ -1,0 +1,50 @@
+:root {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1f2937;
+  background: linear-gradient(180deg, #f4efe6 0%, #fffdf8 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.hero {
+  width: min(720px, 100%);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-size: 12px;
+  color: #7c4a03;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(40px, 8vw, 72px);
+}
+
+.description {
+  max-width: 48ch;
+  font-size: 18px;
+}

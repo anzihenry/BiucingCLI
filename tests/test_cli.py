@@ -1,64 +1,68 @@
-from __future__ import annotations
-
+import io
+import sys
+import tempfile
+import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
-from typer.testing import CliRunner  # type: ignore[import]
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from biucingcli.cli import app
-
-runner = CliRunner()
-
-
-def test_domains_lists_all() -> None:
-    result = runner.invoke(app, ["domains"])
-    assert result.exit_code == 0
-    for domain in ("frontend", "mobile", "backend", "devops", "testing", "desktop"):
-        assert domain in result.stdout
+from biucingcli.cli import main
 
 
-def test_frontend_list() -> None:
-    result = runner.invoke(app, ["frontend", "list"])
-    assert result.exit_code == 0
-    assert "Stacks" in result.stdout
+class CLITestCase(unittest.TestCase):
+    def run_cli(self, argv, stdin_values=None):
+        output = io.StringIO()
+        with redirect_stdout(output):
+            if stdin_values is None:
+                main(argv)
+            else:
+                with patch("builtins.input", side_effect=stdin_values):
+                    main(argv)
+        return output.getvalue()
+
+    def test_main_defaults_to_template_summary(self):
+        output = self.run_cli([])
+
+        self.assertIn("Available templates:", output)
+        self.assertIn("frontend", output)
+        self.assertIn("web", output)
+
+    def test_info_prints_template_details(self):
+        output = self.run_cli(["info", "web"])
+
+        self.assertIn("Template: web", output)
+        self.assertIn("Go, Gin", output)
+        self.assertIn("module_name", output)
+
+    def test_create_frontend_renders_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                ["create", "frontend", "demo-app", "--output-dir", tmpdir]
+            )
+            project_dir = Path(tmpdir) / "demo-app"
+
+            self.assertTrue(project_dir.exists())
+            self.assertTrue((project_dir / "package.json").exists())
+            self.assertIn("Created frontend project: demo-app", output)
+            self.assertIn("npm install", output)
+            self.assertIn("demo-app", (project_dir / "package.json").read_text(encoding="utf-8"))
+
+    def test_create_web_prompts_for_module_name(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                ["create", "web", "user-service", "--output-dir", tmpdir],
+                stdin_values=["github.com/example/user-service"],
+            )
+            project_dir = Path(tmpdir) / "user-service"
+            main_go = (project_dir / "cmd" / "server" / "main.go").read_text(encoding="utf-8")
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created web project: user-service", output)
+            self.assertIn("go mod tidy", output)
+            self.assertIn("github.com/example/user-service", main_go)
 
 
-def test_backend_list() -> None:
-    result = runner.invoke(app, ["backend", "list"])
-    assert result.exit_code == 0
-    assert "Stacks" in result.stdout
-    # Check for Go-related stacks
-    assert "gin" in result.stdout.lower()
-    assert "echo" in result.stdout.lower()
-
-
-def test_mobile_list() -> None:
-    result = runner.invoke(app, ["mobile", "list"])
-    assert result.exit_code == 0
-    assert "Stacks" in result.stdout
-    # Check for Swift and Kotlin stacks
-    assert "swift" in result.stdout.lower()
-    assert "kotlin" in result.stdout.lower()
-
-
-def test_devops_list() -> None:
-    result = runner.invoke(app, ["devops", "list"])
-    assert result.exit_code == 0
-    assert "Stacks" in result.stdout
-    # Check for Python DevOps stack
-    assert "python-devops" in result.stdout.lower()
-
-
-def test_desktop_list() -> None:
-    result = runner.invoke(app, ["desktop", "list"])
-    assert result.exit_code == 0
-    assert "Stacks" in result.stdout
-    # Check for C++ cross-platform stack
-    assert "cpp-cross-platform" in result.stdout.lower()
-
-
-def test_export_config(tmp_path: Path) -> None:
-    target = tmp_path / "config.yaml"
-    result = runner.invoke(app, ["configure", "export", str(target)])
-    assert result.exit_code == 0
-    assert target.exists()
-    assert "Exported configuration" in result.stdout
+if __name__ == "__main__":
+    unittest.main()

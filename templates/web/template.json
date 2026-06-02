@@ -1,0 +1,30 @@
+{
+  "name": "web",
+  "description": "Go + Gin web service starter",
+  "stack": ["Go", "Gin"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "module_name",
+      "required": true,
+      "prompt": "Go module name: "
+    },
+    {
+      "name": "service_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "http_port",
+      "required": false,
+      "default": "8080"
+    }
+  ],
+  "next_steps": [
+    "go mod tidy",
+    "go run ./cmd/server"
+  ]
+}

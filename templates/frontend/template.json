@@ -1,0 +1,25 @@
+{
+  "name": "frontend",
+  "description": "React + TypeScript starter for independent projects",
+  "stack": ["React", "TypeScript"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "display_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "package_name",
+      "required": false,
+      "default_from": "project_name"
+    }
+  ],
+  "next_steps": [
+    "npm install",
+    "npm run dev"
+  ]
+}

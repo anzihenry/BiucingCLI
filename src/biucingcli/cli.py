@@ -1,116 +1,119 @@
-"""Main Typer application entrypoint."""
+"""Command entry point for BiucingCLI."""
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
-import typer
-import yaml  # type: ignore[import-untyped]
-from rich.console import Console
-from rich.pretty import Pretty
-from rich.syntax import Syntax
-
-from .commands import backend, desktop, devops, frontend, mobile, testing
-from .config import DEFAULT_CONFIG_PATH, build_config
-
-console = Console()
-app = typer.Typer(help="BiucingCLI • Full-stack toolchain assistant")
-config_app = typer.Typer(help="Configuration management commands.")
+from biucingcli.templates import load_template
+from biucingcli.templates import load_templates
+from biucingcli.templates import render_template
+from biucingcli.templates import resolve_variables
 
 
-CONFIG_OPTION = typer.Option(
-    None,
-    "--config",
-    "-c",
-    help=f"Override configuration file path (default: {DEFAULT_CONFIG_PATH}).",
-)
+def build_parser() -> argparse.ArgumentParser:
+    """Build the top-level argument parser."""
+    parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
+    subparsers = parser.add_subparsers(dest="command")
 
-DESTINATION_ARGUMENT = typer.Argument(
-    ..., help="Where to export the merged configuration."
-)
+    subparsers.add_parser("list", help="List available templates.")
 
-FORCE_OPTION = typer.Option(
-    False,
-    "--force",
-    "-f",
-    help="Overwrite if the destination exists.",
-)
+    info_parser = subparsers.add_parser("info", help="Show details about a template.")
+    info_parser.add_argument("template", help="Template name.")
 
-
-def _resolve_config_path(path: Path | None) -> Path | None:
-    if path is None:
-        return None
-    if path.exists():
-        return path
-    raise typer.BadParameter(f"Config path does not exist: {path}")
+    create_parser = subparsers.add_parser("create", help="Create a new project from a template.")
+    create_parser.add_argument("template", help="Template name.")
+    create_parser.add_argument("project_name", help="Project directory name.")
+    create_parser.add_argument("--output-dir", default=".", help="Base directory for generation.")
+    create_parser.add_argument("--display-name", help="Display name for frontend projects.")
+    create_parser.add_argument("--package-name", help="Package name for frontend projects.")
+    create_parser.add_argument("--module-name", help="Go module name for web projects.")
+    create_parser.add_argument("--service-name", help="Service name for web projects.")
+    create_parser.add_argument("--http-port", help="HTTP port for web projects.")
+    return parser
 
 
-@app.callback()
-def main(
-    ctx: typer.Context,
-    config: Path | None = CONFIG_OPTION,
-) -> None:
-    """Load configuration before executing subcommands."""
-    override_path = _resolve_config_path(config)
-    ctx.obj = {
-        "config": build_config(override_path),
-        "console": console,
-        "config_path": override_path or DEFAULT_CONFIG_PATH,
-    }
+def format_template_summary() -> str:
+    """Return a concise summary of available templates."""
+    lines = ["Available templates:"]
+    for definition in load_templates():
+        lines.append(f"- {definition.name}: {definition.description}")
+    return "\n".join(lines)
 
 
-default_domain_apps = {
-    "frontend": frontend.app,
-    "mobile": mobile.app,
-    "desktop": desktop.app,
-    "backend": backend.app,
-    "testing": testing.app,
-    "devops": devops.app,
-}
-
-for name, sub_app in default_domain_apps.items():
-    app.add_typer(sub_app, name=name)
-
-
-@app.command()
-def domains() -> None:
-    """List available toolchain domains."""
-    console.print("[bold]Available domains:[/bold]\n" + "\n".join(default_domain_apps))
-
-
-@config_app.command("show")
-def show_config(ctx: typer.Context) -> None:
-    """Display the merged configuration used by the CLI."""
-    config = ctx.ensure_object(dict)["config"]
-    yaml_dump = yaml.safe_dump(config, sort_keys=True)
-    syntax = Syntax(yaml_dump, "yaml", theme="monokai", line_numbers=False)
-    console.print(syntax)
+def format_template_info(template_name: str) -> str:
+    """Return a detailed view of one template."""
+    definition = load_template(template_name)
+    lines = [
+        f"Template: {definition.name}",
+        f"Description: {definition.description}",
+        f"Stack: {', '.join(definition.stack)}",
+        "Variables:",
+    ]
+    for variable in definition.variables:
+        required = "required" if variable.required else "optional"
+        details = [required]
+        if variable.default is not None:
+            details.append(f"default={variable.default}")
+        if variable.default_from is not None:
+            details.append(f"default_from={variable.default_from}")
+        lines.append(f"- {variable.name} ({', '.join(details)})")
+    lines.append("Next steps:")
+    for step in definition.next_steps:
+        lines.append(f"- {step}")
+    return "\n".join(lines)
 
 
-@config_app.command("path")
-def config_path(ctx: typer.Context) -> None:
-    """Print the configuration file path in use."""
-    console.print(Pretty(ctx.ensure_object(dict)["config_path"]))
+def create_project(args: argparse.Namespace) -> str:
+    """Generate a project and return the output message."""
+    definition = load_template(args.template)
+    values = resolve_variables(
+        definition,
+        {
+            "project_name": args.project_name,
+            "display_name": args.display_name or args.project_name.replace("-", " ").title(),
+            "package_name": args.package_name or args.project_name,
+            "module_name": args.module_name,
+            "service_name": args.service_name,
+            "http_port": args.http_port,
+        },
+    )
+
+    target_dir = Path(args.output_dir).resolve() / args.project_name
+    render_template(definition, values, target_dir)
+
+    lines = [
+        f"Created {definition.name} project: {args.project_name}",
+        f"Location: {target_dir}",
+        f"Stack: {', '.join(definition.stack)}",
+        "Next steps:",
+        f"  cd {args.project_name}",
+    ]
+    lines.extend(f"  {step}" for step in definition.next_steps)
+    return "\n".join(lines)
 
 
-@config_app.command("export")
-def export_config(
-    ctx: typer.Context,
-    destination: Path = DESTINATION_ARGUMENT,
-    force: bool = FORCE_OPTION,
-) -> None:
-    """Write the active configuration to the given destination."""
-    if destination.exists() and not force:
-        raise typer.BadParameter(
-            f"Destination exists: {destination}. Use --force to overwrite."
-        )
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    config = ctx.ensure_object(dict)["config"]
-    with destination.open("w", encoding="utf-8") as handle:
-        yaml.safe_dump(config, handle, sort_keys=True)
-    console.print(f"[green]Exported configuration to {destination}[/green]")
+def main(argv: list[str] | None = None) -> None:
+    """Run the CLI."""
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if args.command is None:
+        print(format_template_summary())
+        return
+
+    if args.command == "list":
+        print(format_template_summary())
+        return
+
+    if args.command == "info":
+        print(format_template_info(args.template))
+        return
+
+    if args.command == "create":
+        print(create_project(args))
+        return
 
 
-app.add_typer(config_app, name="configure")
-
-__all__ = ["app"]
+if __name__ == "__main__":
+    main()
