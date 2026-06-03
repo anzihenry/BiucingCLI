@@ -35,7 +35,7 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
             "minimum_os_version": "26.0",
             "tuist_destinations": ".iOS",
             "tuist_deployment_targets": '.iOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "platform=iOS Simulator,name=iPhone 16",
+            "xcodebuild_destination": "generic/platform=iOS Simulator",
             "swiftpm_supported_platform": '.iOS("{{MINIMUM_OS_VERSION}}")',
         },
         "macos": {
@@ -53,7 +53,7 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
             "minimum_os_version": "26.0",
             "tuist_destinations": ".watchOS",
             "tuist_deployment_targets": '.watchOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)",
+            "xcodebuild_destination": "generic/platform=watchOS Simulator",
             "swiftpm_supported_platform": '.watchOS("{{MINIMUM_OS_VERSION}}")',
         },
         "tvos": {
@@ -62,7 +62,7 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
             "minimum_os_version": "26.0",
             "tuist_destinations": ".tvOS",
             "tuist_deployment_targets": '.tvOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "platform=tvOS Simulator,name=Apple TV",
+            "xcodebuild_destination": "generic/platform=tvOS Simulator",
             "swiftpm_supported_platform": '.tvOS("{{MINIMUM_OS_VERSION}}")',
         },
     }
