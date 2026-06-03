@@ -14,7 +14,8 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Bundle ID: {{BUNDLE_IDENTIFIER}}", systemImage: "shippingbox")
-                    Label("Minimum iOS: {{IOS_MINIMUM_VERSION}}", systemImage: "iphone")
+                    Label("Platform: {{APPLE_PLATFORM_NAME}}", systemImage: "app")
+                    Label("Minimum OS: {{MINIMUM_OS_VERSION}}", systemImage: "gear")
                     Label("Team: {{DEVELOPMENT_TEAM}}", systemImage: "person.3")
                 }
                 .font(BiucingTheme.captionFont)

@@ -63,10 +63,15 @@ Suggested placeholders:
 - `{{SERVICE_NAME}}`
 - `{{HTTP_PORT}}`
 - `{{BUNDLE_IDENTIFIER}}`
-- `{{IOS_MINIMUM_VERSION}}`
+- `{{MINIMUM_OS_VERSION}}`
 - `{{DEVELOPMENT_TEAM}}`
 - `{{ORGANIZATION_NAME}}`
 - `{{SWIFT_MODULE_NAME}}`
+- `{{APPLE_PLATFORM}}`
+- `{{APPLE_PLATFORM_NAME}}`
+- `{{TUIST_DESTINATIONS}}`
+- `{{TUIST_DEPLOYMENT_TARGETS}}`
+- `{{XCODEBUILD_DESTINATION}}`
 
 This keeps template files readable and avoids introducing a heavy rendering layer too early.
 
@@ -142,16 +147,17 @@ Core variables:
 
 - `project_name`
 - `display_name`
+- `apple_platform`
 - `bundle_identifier`
 - `organization_name`
 - `development_team`
-- `ios_minimum_version`
+- `minimum_os_version`
 - `swift_module_name`
 
 Suggested output:
 
 ```text
-my-ios-app/
+my-apple-app/
   README.md
   Brewfile
   .mise.toml

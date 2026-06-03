@@ -109,12 +109,16 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{MODULE_NAME}}": values.get("module_name", ""),
         "{{SERVICE_NAME}}": values.get("service_name", ""),
         "{{HTTP_PORT}}": values.get("http_port", ""),
+        "{{APPLE_PLATFORM}}": values.get("apple_platform", ""),
+        "{{APPLE_PLATFORM_NAME}}": values.get("apple_platform_name", ""),
         "{{BUNDLE_IDENTIFIER}}": values.get("bundle_identifier", ""),
-        "{{IOS_MINIMUM_VERSION}}": values.get("ios_minimum_version", ""),
+        "{{MINIMUM_OS_VERSION}}": values.get("minimum_os_version", ""),
         "{{DEVELOPMENT_TEAM}}": values.get("development_team", ""),
         "{{ORGANIZATION_NAME}}": values.get("organization_name", ""),
-        "{{ORGANIZATION_SLUG}}": values.get("organization_slug", ""),
         "{{SWIFT_MODULE_NAME}}": values.get("swift_module_name", ""),
+        "{{TUIST_DESTINATIONS}}": values.get("tuist_destinations", ""),
+        "{{TUIST_DEPLOYMENT_TARGETS}}": values.get("tuist_deployment_targets", ""),
+        "{{XCODEBUILD_DESTINATION}}": values.get("xcodebuild_destination", ""),
     }
 
 

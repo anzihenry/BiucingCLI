@@ -126,18 +126,20 @@ class CLITestCase(unittest.TestCase):
                 [
                     "create",
                     "apple",
-                    "pulse-ios",
+                    "pulse-mac",
                     "--output-dir",
                     tmpdir,
+                    "--platform",
+                    "macos",
                     "--bundle-identifier",
-                    "com.example.pulse",
+                    "com.example.pulsemac",
                     "--organization-name",
                     "Example Labs",
                     "--development-team",
                     "ABCDE12345",
                 ]
             )
-            project_dir = Path(tmpdir) / "pulse-ios"
+            project_dir = Path(tmpdir) / "pulse-mac"
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
             makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
             tuist_config = (project_dir / "Tuist.swift").read_text(encoding="utf-8")
@@ -158,17 +160,21 @@ class CLITestCase(unittest.TestCase):
             ).read_text(encoding="utf-8")
 
             self.assertTrue(project_dir.exists())
-            self.assertIn("Created apple project: pulse-ios", output)
+            self.assertIn("Created apple project: pulse-mac", output)
             self.assertIn("make bootstrap", output)
             self.assertIn("Tuist", readme)
+            self.assertIn("Target platform: `macOS`", readme)
             self.assertIn("generate:", makefile)
             self.assertIn("tuist generate --no-open", makefile)
-            self.assertIn('fullHandle: "example-labs/pulse-ios"', tuist_config)
-            self.assertIn('bundleId: "com.example.pulse"', project_swift)
-            self.assertIn('deploymentTargets: .iOS("17.0")', project_swift)
+            self.assertIn("platform=macOS", makefile)
+            self.assertIn("let config = Config(", tuist_config)
+            self.assertNotIn("fullHandle:", tuist_config)
+            self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
+            self.assertIn("destinations: .macOS", project_swift)
+            self.assertIn('deploymentTargets: .macOS("14.0")', project_swift)
             self.assertIn("brew bundle", bootstrap)
             self.assertIn("enum BiucingTheme", design_system)
-            self.assertIn("@testable import PulseIos", app_tests)
+            self.assertIn("@testable import PulseMac", app_tests)
 
 
 if __name__ == "__main__":

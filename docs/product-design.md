@@ -97,6 +97,13 @@ Default stack:
 - Swift Package Manager
 - fastlane
 
+Supported platforms:
+
+- iOS
+- macOS
+- watchOS
+- tvOS
+
 Expected output:
 
 - a repo-level `Tuist.swift` and `Workspace.swift`;

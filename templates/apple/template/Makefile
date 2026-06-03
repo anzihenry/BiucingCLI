@@ -19,14 +19,14 @@ build:
 	xcodebuild \
 		-workspace {{PROJECT_NAME}}.xcworkspace \
 		-scheme {{SWIFT_MODULE_NAME}} \
-		-destination 'platform=iOS Simulator,name=iPhone 16' \
+		-destination '{{XCODEBUILD_DESTINATION}}' \
 		build
 
 test:
 	xcodebuild \
 		-workspace {{PROJECT_NAME}}.xcworkspace \
 		-scheme {{SWIFT_MODULE_NAME}} \
-		-destination 'platform=iOS Simulator,name=iPhone 16' \
+		-destination '{{XCODEBUILD_DESTINATION}}' \
 		test
 
 lint:

@@ -13,6 +13,16 @@
       "default_from": "project_name"
     },
     {
+      "name": "apple_platform",
+      "required": false,
+      "default": "ios"
+    },
+    {
+      "name": "apple_platform_name",
+      "required": false,
+      "default": "iOS"
+    },
+    {
       "name": "bundle_identifier",
       "required": true,
       "prompt": "Bundle identifier: "
@@ -23,16 +33,12 @@
       "default": "Example Team"
     },
     {
-      "name": "organization_slug",
-      "required": false
-    },
-    {
       "name": "development_team",
       "required": false,
       "default": "DEVELOPMENT_TEAM_ID"
     },
     {
-      "name": "ios_minimum_version",
+      "name": "minimum_os_version",
       "required": false,
       "default": "17.0"
     },

@@ -64,6 +64,7 @@ Build `biucing create apple <project-name>`.
 Expected behavior:
 
 - generate a Tuist-based Apple app starter;
+- allow choosing `ios`, `macos`, `watchos`, or `tvos`;
 - include `Brewfile`, `.mise.toml`, `Makefile`, and bootstrap scripts;
 - generate `Tuist.swift`, `Workspace.swift`, and `App/Project.swift`;
 - wire a minimal SwiftUI app target plus unit tests;

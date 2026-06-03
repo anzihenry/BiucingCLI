@@ -17,10 +17,10 @@ let project = Project(
     targets: [
         .target(
             name: appName,
-            destinations: .iOS,
+            destinations: {{TUIST_DESTINATIONS}},
             product: .app,
             bundleId: "{{BUNDLE_IDENTIFIER}}",
-            deploymentTargets: .iOS("{{IOS_MINIMUM_VERSION}}"),
+            deploymentTargets: {{TUIST_DEPLOYMENT_TARGETS}},
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [:],
@@ -35,7 +35,7 @@ let project = Project(
         ),
         .target(
             name: "\(appName)Tests",
-            destinations: .iOS,
+            destinations: {{TUIST_DESTINATIONS}},
             product: .unitTests,
             bundleId: "{{BUNDLE_IDENTIFIER}}.tests",
             infoPlist: .default,
@@ -49,14 +49,14 @@ let project = Project(
         .scheme(
             name: appName,
             shared: true,
-            buildAction: .buildAction(targets: [appName]),
+            buildAction: .buildAction(targets: [.target(appName)]),
             testAction: .targets(
                 [
-                    "\(appName)Tests"
+                    .testableTarget(target: .target("\(appName)Tests"))
                 ],
                 options: .options(coverage: true)
             ),
-            runAction: .runAction(executable: appName)
+            runAction: .runAction(executable: .target(appName))
         )
     ]
 )
