@@ -32,34 +32,38 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
         "ios": {
             "apple_platform": "ios",
             "apple_platform_name": "iOS",
-            "minimum_os_version": "17.0",
+            "minimum_os_version": "26.0",
             "tuist_destinations": ".iOS",
             "tuist_deployment_targets": '.iOS("{{MINIMUM_OS_VERSION}}")',
             "xcodebuild_destination": "platform=iOS Simulator,name=iPhone 16",
+            "swiftpm_supported_platform": '.iOS("{{MINIMUM_OS_VERSION}}")',
         },
         "macos": {
             "apple_platform": "macos",
             "apple_platform_name": "macOS",
-            "minimum_os_version": "14.0",
+            "minimum_os_version": "26.0",
             "tuist_destinations": ".macOS",
             "tuist_deployment_targets": '.macOS("{{MINIMUM_OS_VERSION}}")',
             "xcodebuild_destination": "platform=macOS",
+            "swiftpm_supported_platform": '.macOS("{{MINIMUM_OS_VERSION}}")',
         },
         "watchos": {
             "apple_platform": "watchos",
             "apple_platform_name": "watchOS",
-            "minimum_os_version": "10.0",
+            "minimum_os_version": "26.0",
             "tuist_destinations": ".watchOS",
             "tuist_deployment_targets": '.watchOS("{{MINIMUM_OS_VERSION}}")',
             "xcodebuild_destination": "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)",
+            "swiftpm_supported_platform": '.watchOS("{{MINIMUM_OS_VERSION}}")',
         },
         "tvos": {
             "apple_platform": "tvos",
             "apple_platform_name": "tvOS",
-            "minimum_os_version": "17.0",
+            "minimum_os_version": "26.0",
             "tuist_destinations": ".tvOS",
             "tuist_deployment_targets": '.tvOS("{{MINIMUM_OS_VERSION}}")',
             "xcodebuild_destination": "platform=tvOS Simulator,name=Apple TV",
+            "swiftpm_supported_platform": '.tvOS("{{MINIMUM_OS_VERSION}}")',
         },
     }
     if requested not in supported:
@@ -70,6 +74,9 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
     resolved = dict(supported[requested])
     resolved["minimum_os_version"] = minimum_os_version or resolved["minimum_os_version"]
     resolved["tuist_deployment_targets"] = resolved["tuist_deployment_targets"].replace(
+        "{{MINIMUM_OS_VERSION}}", resolved["minimum_os_version"]
+    )
+    resolved["swiftpm_supported_platform"] = resolved["swiftpm_supported_platform"].replace(
         "{{MINIMUM_OS_VERSION}}", resolved["minimum_os_version"]
     )
     return resolved
@@ -166,6 +173,7 @@ def create_project(args: argparse.Namespace) -> str:
             "tuist_destinations": apple_values.get("tuist_destinations"),
             "tuist_deployment_targets": apple_values.get("tuist_deployment_targets"),
             "xcodebuild_destination": apple_values.get("xcodebuild_destination"),
+            "swiftpm_supported_platform": apple_values.get("swiftpm_supported_platform"),
         },
     )
     values.update({key: value for key, value in apple_values.items() if value is not None})

@@ -151,6 +151,12 @@ class CLITestCase(unittest.TestCase):
                 project_dir
                 / "Packages"
                 / "DesignSystem"
+                / "Package.swift"
+            ).read_text(encoding="utf-8")
+            design_system_theme = (
+                project_dir
+                / "Packages"
+                / "DesignSystem"
                 / "Sources"
                 / "DesignSystem"
                 / "Theme.swift"
@@ -171,9 +177,10 @@ class CLITestCase(unittest.TestCase):
             self.assertNotIn("fullHandle:", tuist_config)
             self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
-            self.assertIn('deploymentTargets: .macOS("14.0")', project_swift)
+            self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
             self.assertIn("brew bundle", bootstrap)
-            self.assertIn("enum BiucingTheme", design_system)
+            self.assertIn('.macOS("26.0")', design_system)
+            self.assertIn("enum BiucingTheme", design_system_theme)
             self.assertIn("@testable import PulseMac", app_tests)
 
 

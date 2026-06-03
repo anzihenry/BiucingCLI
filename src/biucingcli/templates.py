@@ -119,6 +119,7 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{TUIST_DESTINATIONS}}": values.get("tuist_destinations", ""),
         "{{TUIST_DEPLOYMENT_TARGETS}}": values.get("tuist_deployment_targets", ""),
         "{{XCODEBUILD_DESTINATION}}": values.get("xcodebuild_destination", ""),
+        "{{SWIFTPM_SUPPORTED_PLATFORM}}": values.get("swiftpm_supported_platform", ""),
     }
 
 

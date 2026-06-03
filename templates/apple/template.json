@@ -40,7 +40,7 @@
     {
       "name": "minimum_os_version",
       "required": false,
-      "default": "17.0"
+      "default": "26.0"
     },
     {
       "name": "swift_module_name",
