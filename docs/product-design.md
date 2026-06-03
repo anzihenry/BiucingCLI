@@ -67,8 +67,8 @@ Default stack:
 
 Expected output:
 
-- basic app entry files;
-- restrained folder structure for components, pages, hooks, and services;
+- app entry files that run out of the box;
+- restrained folder structure for components, pages, hooks, services, and shared types;
 - minimal configuration files;
 - a useful README.
 
@@ -84,7 +84,8 @@ Expected output:
 - `cmd/server` entrypoint;
 - `internal` packages for handler, service, repository, router, model, and config;
 - base config file;
-- minimal README and test placeholder.
+- Docker build files;
+- minimal README and HTTP test coverage.
 
 ### `microservice`
 

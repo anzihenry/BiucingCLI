@@ -8,6 +8,7 @@ from pathlib import Path
 from biucingcli.templates import load_template
 from biucingcli.templates import load_templates
 from biucingcli.templates import render_template
+from biucingcli.templates import render_text
 from biucingcli.templates import resolve_variables
 
 
@@ -89,7 +90,7 @@ def create_project(args: argparse.Namespace) -> str:
         "Next steps:",
         f"  cd {args.project_name}",
     ]
-    lines.extend(f"  {step}" for step in definition.next_steps)
+    lines.extend(f"  {render_text(step, values)}" for step in definition.next_steps)
     return "\n".join(lines)
 
 

@@ -80,6 +80,7 @@ Suggested output:
 ```text
 my-app/
   README.md
+  index.html
   package.json
   tsconfig.json
   vite.config.ts
@@ -89,6 +90,7 @@ my-app/
     main.tsx
     App.tsx
     index.css
+    types/
     components/
     pages/
     hooks/
@@ -108,7 +110,10 @@ Suggested output:
 
 ```text
 user-service/
+  .dockerignore
   README.md
+  Dockerfile
+  Makefile
   go.mod
   .gitignore
   cmd/

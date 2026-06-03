@@ -25,6 +25,8 @@
   ],
   "next_steps": [
     "go mod tidy",
-    "go run ./cmd/server"
+    "go test ./...",
+    "go run ./cmd/server",
+    "docker build -t {{SERVICE_NAME}} ."
   ]
 }

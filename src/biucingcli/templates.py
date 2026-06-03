@@ -112,6 +112,14 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
     }
 
 
+def render_text(text: str, values: dict[str, str]) -> str:
+    """Replace placeholders in a text snippet."""
+    content = text
+    for placeholder, value in placeholder_map(values).items():
+        content = content.replace(placeholder, value)
+    return content
+
+
 def render_template(
     definition: TemplateDefinition,
     values: dict[str, str],
@@ -122,7 +130,6 @@ def render_template(
         raise FileExistsError(f"Target directory already exists: {target_dir}")
 
     shutil.copytree(definition.template_dir, target_dir)
-    replacements = placeholder_map(values)
 
     for path in target_dir.rglob("*"):
         if not path.is_file():
@@ -133,6 +140,4 @@ def render_template(
         except UnicodeDecodeError:
             continue
 
-        for placeholder, value in replacements.items():
-            content = content.replace(placeholder, value)
-        path.write_text(content, encoding="utf-8")
+        path.write_text(render_text(content, values), encoding="utf-8")

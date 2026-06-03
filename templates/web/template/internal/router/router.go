@@ -1,18 +1,28 @@
 package router
 
-import (
-	"net/http"
+import "{{MODULE_NAME}}/internal/config"
+import "{{MODULE_NAME}}/internal/handler"
+import "{{MODULE_NAME}}/internal/repository"
+import "{{MODULE_NAME}}/internal/service"
 
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
-func New() *gin.Engine {
+func New(cfg config.Config) *gin.Engine {
 	engine := gin.Default()
-	engine.GET("/healthz", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"service": "{{SERVICE_NAME}}",
-			"status":  "ok",
-		})
-	})
+
+	healthService := service.NewHealthService(cfg.Service.Name)
+	healthHandler := handler.NewHealthHandler(healthService)
+	healthHandler.RegisterRoutes(engine)
+
+	apiGroup := engine.Group("/api/v1")
+	pingService := service.NewPingService(cfg.Service.Name)
+	pingHandler := handler.NewPingHandler(pingService)
+	pingHandler.RegisterRoutes(apiGroup)
+
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+	userHandler.RegisterRoutes(apiGroup)
+
 	return engine
 }
