@@ -14,8 +14,9 @@ The current stack focus is:
 
 - `Frontend`: React + TypeScript
 - `Backend Web Service`: Go + Gin
+- `Apple`: Swift + Tuist + SwiftPM
 - `Serialization`: Protobuf
-- `Mobile`: Swift and Kotlin, later
+- `Mobile`: Kotlin, later
 
 ## Problem
 
@@ -87,6 +88,23 @@ Expected output:
 - Docker build files;
 - minimal README and HTTP test coverage.
 
+### `apple`
+
+Default stack:
+
+- Swift
+- Tuist
+- Swift Package Manager
+- fastlane
+
+Expected output:
+
+- a repo-level `Tuist.swift` and `Workspace.swift`;
+- an `App/Project.swift` manifest with app and test targets;
+- bootstrap files such as `Brewfile`, `.mise.toml`, `Makefile`, and `scripts/bootstrap`;
+- at least one internal package under `Packages/`;
+- a README that explains the local environment workflow.
+
 ### `microservice`
 
 Planned later:
@@ -118,5 +136,5 @@ Later versions can add:
 
 - optional template profiles such as `gin` or `protobuf`;
 - a microservice starter with code generation flow;
-- iOS and Android starters based on Swift and Kotlin;
+- Android starters based on Kotlin;
 - richer initialization flags once the core templates are proven.

@@ -1,0 +1,3 @@
+app_identifier("{{BUNDLE_IDENTIFIER}}")
+apple_id("developer@example.com")
+team_id("{{DEVELOPMENT_TEAM}}")

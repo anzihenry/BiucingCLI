@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEVELOPER_DIR_PATH="$(xcode-select -p)"
+echo "Using developer directory: ${DEVELOPER_DIR_PATH}"
+xcodebuild -version

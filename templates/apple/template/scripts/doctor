@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xcode-select -p >/dev/null
+tuist version >/dev/null
+swift --version >/dev/null
+echo "Environment looks ready."

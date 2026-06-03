@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+./scripts/setup-xcode
+brew bundle
+mise install
+tuist install
+tuist generate --no-open
+./scripts/doctor

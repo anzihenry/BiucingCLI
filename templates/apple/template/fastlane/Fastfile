@@ -1,0 +1,15 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Run a beta pipeline"
+  lane :beta do
+    sh("make generate")
+    sh("make test")
+  end
+
+  desc "Run a release pipeline"
+  lane :release do
+    sh("make generate")
+    sh("make build")
+  end
+end

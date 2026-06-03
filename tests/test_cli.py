@@ -26,6 +26,7 @@ class CLITestCase(unittest.TestCase):
         output = self.run_cli([])
 
         self.assertIn("Available templates:", output)
+        self.assertIn("apple", output)
         self.assertIn("frontend", output)
         self.assertIn("web", output)
 
@@ -118,6 +119,56 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("ListUsers() []model.User", user_service)
             self.assertIn("Ada Lovelace", user_repository)
             self.assertIn("type User struct", user_model)
+
+    def test_create_apple_renders_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "apple",
+                    "pulse-ios",
+                    "--output-dir",
+                    tmpdir,
+                    "--bundle-identifier",
+                    "com.example.pulse",
+                    "--organization-name",
+                    "Example Labs",
+                    "--development-team",
+                    "ABCDE12345",
+                ]
+            )
+            project_dir = Path(tmpdir) / "pulse-ios"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
+            tuist_config = (project_dir / "Tuist.swift").read_text(encoding="utf-8")
+            project_swift = (project_dir / "App" / "Project.swift").read_text(
+                encoding="utf-8"
+            )
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            design_system = (
+                project_dir
+                / "Packages"
+                / "DesignSystem"
+                / "Sources"
+                / "DesignSystem"
+                / "Theme.swift"
+            ).read_text(encoding="utf-8")
+            app_tests = (
+                project_dir / "App" / "Targets" / "AppTests" / "Sources" / "AppTests.swift"
+            ).read_text(encoding="utf-8")
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created apple project: pulse-ios", output)
+            self.assertIn("make bootstrap", output)
+            self.assertIn("Tuist", readme)
+            self.assertIn("generate:", makefile)
+            self.assertIn("tuist generate --no-open", makefile)
+            self.assertIn('fullHandle: "example-labs/pulse-ios"', tuist_config)
+            self.assertIn('bundleId: "com.example.pulse"', project_swift)
+            self.assertIn('deploymentTargets: .iOS("17.0")', project_swift)
+            self.assertIn("brew bundle", bootstrap)
+            self.assertIn("enum BiucingTheme", design_system)
+            self.assertIn("@testable import PulseIos", app_tests)
 
 
 if __name__ == "__main__":

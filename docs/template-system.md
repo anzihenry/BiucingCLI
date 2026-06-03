@@ -62,6 +62,11 @@ Suggested placeholders:
 - `{{MODULE_NAME}}`
 - `{{SERVICE_NAME}}`
 - `{{HTTP_PORT}}`
+- `{{BUNDLE_IDENTIFIER}}`
+- `{{IOS_MINIMUM_VERSION}}`
+- `{{DEVELOPMENT_TEAM}}`
+- `{{ORGANIZATION_NAME}}`
+- `{{SWIFT_MODULE_NAME}}`
 
 This keeps template files readable and avoids introducing a heavy rendering layer too early.
 
@@ -129,6 +134,52 @@ user-service/
   configs/
     config.yaml
   tests/
+```
+
+### `apple`
+
+Core variables:
+
+- `project_name`
+- `display_name`
+- `bundle_identifier`
+- `organization_name`
+- `development_team`
+- `ios_minimum_version`
+- `swift_module_name`
+
+Suggested output:
+
+```text
+my-ios-app/
+  README.md
+  Brewfile
+  .mise.toml
+  Makefile
+  Tuist.swift
+  Workspace.swift
+  App/
+    Project.swift
+    Config/
+      XCConfig/
+      ProjectDescriptionHelpers/
+    Targets/
+      App/
+        Sources/
+        Resources/
+      AppTests/
+        Sources/
+  Packages/
+    DesignSystem/
+      Package.swift
+      Sources/
+  fastlane/
+    Fastfile
+    Appfile
+  scripts/
+    bootstrap
+    doctor
+    setup-xcode
 ```
 
 ## CLI Behavior

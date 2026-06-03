@@ -12,6 +12,24 @@ from biucingcli.templates import render_text
 from biucingcli.templates import resolve_variables
 
 
+def default_display_name(project_name: str) -> str:
+    """Return a human-friendly display name from a directory name."""
+    return project_name.replace("-", " ").replace("_", " ").title()
+
+
+def default_swift_module_name(project_name: str) -> str:
+    """Return a Swift-safe module name derived from a directory name."""
+    parts = [part for part in project_name.replace("_", "-").split("-") if part]
+    if not parts:
+        return "App"
+    return "".join(part[:1].upper() + part[1:] for part in parts)
+
+
+def slugify(value: str) -> str:
+    """Return a simple lowercase slug for identifiers."""
+    return "-".join(part for part in value.lower().replace("_", "-").split() if part)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
     parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
@@ -31,6 +49,11 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--module-name", help="Go module name for web projects.")
     create_parser.add_argument("--service-name", help="Service name for web projects.")
     create_parser.add_argument("--http-port", help="HTTP port for web projects.")
+    create_parser.add_argument("--bundle-identifier", help="Apple app bundle identifier.")
+    create_parser.add_argument("--ios-minimum-version", help="Minimum iOS version.")
+    create_parser.add_argument("--development-team", help="Apple development team ID.")
+    create_parser.add_argument("--organization-name", help="Organization or team name.")
+    create_parser.add_argument("--swift-module-name", help="Swift module name for app targets.")
     return parser
 
 
@@ -72,11 +95,18 @@ def create_project(args: argparse.Namespace) -> str:
         definition,
         {
             "project_name": args.project_name,
-            "display_name": args.display_name or args.project_name.replace("-", " ").title(),
+            "display_name": args.display_name or default_display_name(args.project_name),
             "package_name": args.package_name or args.project_name,
             "module_name": args.module_name,
             "service_name": args.service_name,
             "http_port": args.http_port,
+            "bundle_identifier": args.bundle_identifier,
+            "ios_minimum_version": args.ios_minimum_version,
+            "development_team": args.development_team,
+            "organization_name": args.organization_name,
+            "organization_slug": slugify(args.organization_name or "example-team"),
+            "swift_module_name": args.swift_module_name
+            or default_swift_module_name(args.project_name),
         },
     )
 

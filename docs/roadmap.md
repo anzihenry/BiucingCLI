@@ -57,6 +57,18 @@ Expected behavior:
 - define a clean code generation path;
 - keep the template smaller than a full platform starter.
 
+## Phase 6: Apple Starter
+
+Build `biucing create apple <project-name>`.
+
+Expected behavior:
+
+- generate a Tuist-based Apple app starter;
+- include `Brewfile`, `.mise.toml`, `Makefile`, and bootstrap scripts;
+- generate `Tuist.swift`, `Workspace.swift`, and `App/Project.swift`;
+- wire a minimal SwiftUI app target plus unit tests;
+- include at least one internal Swift package for shared code.
+
 ## Success Criteria
 
 - A user can create a project they would realistically keep using.

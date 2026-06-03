@@ -1,0 +1,8 @@
+brew "mise"
+brew "tuist"
+brew "xcodes"
+brew "swiftlint"
+brew "swiftformat"
+brew "xcbeautify"
+brew "fastlane"
+brew "gh"

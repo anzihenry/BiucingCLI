@@ -39,3 +39,4 @@ This repository currently contains the new product definition and a minimal CLI 
 - [Product Design](docs/product-design.md)
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)
+- [Apple Team Environment Standard](docs/apple-team-environment-standard.md)

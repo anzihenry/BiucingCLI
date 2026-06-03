@@ -1,0 +1,10 @@
+.build
+.bundle
+.cache
+.mise
+DerivedData
+Tuist/.cache
+Tuist/Dependencies
+*.xcodeproj
+*.xcworkspace
+xcuserdata

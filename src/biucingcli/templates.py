@@ -109,6 +109,12 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{MODULE_NAME}}": values.get("module_name", ""),
         "{{SERVICE_NAME}}": values.get("service_name", ""),
         "{{HTTP_PORT}}": values.get("http_port", ""),
+        "{{BUNDLE_IDENTIFIER}}": values.get("bundle_identifier", ""),
+        "{{IOS_MINIMUM_VERSION}}": values.get("ios_minimum_version", ""),
+        "{{DEVELOPMENT_TEAM}}": values.get("development_team", ""),
+        "{{ORGANIZATION_NAME}}": values.get("organization_name", ""),
+        "{{ORGANIZATION_SLUG}}": values.get("organization_slug", ""),
+        "{{SWIFT_MODULE_NAME}}": values.get("swift_module_name", ""),
     }
 
 

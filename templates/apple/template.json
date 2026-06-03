@@ -1,0 +1,50 @@
+{
+  "name": "apple",
+  "description": "Swift + Tuist Apple app starter for mid-sized teams",
+  "stack": ["Swift", "Tuist", "SwiftPM", "fastlane"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "display_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "bundle_identifier",
+      "required": true,
+      "prompt": "Bundle identifier: "
+    },
+    {
+      "name": "organization_name",
+      "required": false,
+      "default": "Example Team"
+    },
+    {
+      "name": "organization_slug",
+      "required": false
+    },
+    {
+      "name": "development_team",
+      "required": false,
+      "default": "DEVELOPMENT_TEAM_ID"
+    },
+    {
+      "name": "ios_minimum_version",
+      "required": false,
+      "default": "17.0"
+    },
+    {
+      "name": "swift_module_name",
+      "required": false
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make generate",
+    "make test",
+    "open {{PROJECT_NAME}}.xcworkspace"
+  ]
+}
