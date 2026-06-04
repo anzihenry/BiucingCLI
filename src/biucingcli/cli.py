@@ -106,9 +106,9 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--output-dir", default=".", help="Base directory for generation.")
     create_parser.add_argument("--display-name", help="Display name for frontend projects.")
     create_parser.add_argument("--package-name", help="Package name for frontend projects.")
-    create_parser.add_argument("--module-name", help="Go module name for web projects.")
-    create_parser.add_argument("--service-name", help="Service name for web projects.")
-    create_parser.add_argument("--http-port", help="HTTP port for web projects.")
+    create_parser.add_argument("--module-name", help="Go module name for web service projects.")
+    create_parser.add_argument("--service-name", help="Service name for web service projects.")
+    create_parser.add_argument("--http-port", help="HTTP port for web service projects.")
     create_parser.add_argument(
         "--platform",
         choices=["ios", "macos", "watchos", "tvos"],

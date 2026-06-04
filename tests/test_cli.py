@@ -32,12 +32,12 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("android", output)
         self.assertIn("apple", output)
         self.assertIn("frontend", output)
-        self.assertIn("web", output)
+        self.assertIn("web-service", output)
 
     def test_info_prints_template_details(self):
-        output = self.run_cli(["info", "web"])
+        output = self.run_cli(["info", "web-service"])
 
-        self.assertIn("Template: web", output)
+        self.assertIn("Template: web-service", output)
         self.assertIn("Go, Gin", output)
         self.assertIn("module_name", output)
 
@@ -326,17 +326,27 @@ class CLITestCase(unittest.TestCase):
     def test_create_web_prompts_for_module_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = self.run_cli(
-                ["create", "web", "user-service", "--output-dir", tmpdir],
+                ["create", "web-service", "user-service", "--output-dir", tmpdir],
                 stdin_values=["github.com/example/user-service"],
             )
             project_dir = Path(tmpdir) / "user-service"
             main_go = (project_dir / "cmd" / "server" / "main.go").read_text(encoding="utf-8")
             dockerfile = (project_dir / "Dockerfile").read_text(encoding="utf-8")
+            compose_yaml = (project_dir / "compose.yaml").read_text(encoding="utf-8")
+            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            brewfile = (project_dir / "Brewfile").read_text(encoding="utf-8")
+            mise_toml = (project_dir / ".mise.toml").read_text(encoding="utf-8")
+            go_sum = (project_dir / "go.sum").read_text(encoding="utf-8")
             config_go = (project_dir / "internal" / "config" / "config.go").read_text(
                 encoding="utf-8"
             )
+            config_test = (
+                project_dir / "internal" / "config" / "config_test.go"
+            ).read_text(encoding="utf-8")
             test_file = (project_dir / "tests" / "server_test.go").read_text(encoding="utf-8")
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
             ping_handler = (project_dir / "internal" / "handler" / "ping.go").read_text(
                 encoding="utf-8"
             )
@@ -357,23 +367,68 @@ class CLITestCase(unittest.TestCase):
             )
 
             self.assertTrue(project_dir.exists())
-            self.assertIn("Created web project: user-service", output)
-            self.assertIn("go mod tidy", output)
-            self.assertIn("docker build -t user-service .", output)
+            self.assertIn("Created web-service project: user-service", output)
+            self.assertIn("make bootstrap", output)
+            self.assertIn("make doctor", output)
+            self.assertIn("make lint", output)
+            self.assertIn("make verify", output)
+            self.assertIn("make docker-build", output)
+            self.assertIn("make docker-run", output)
             self.assertIn("github.com/example/user-service", main_go)
+            self.assertIn("ARG BUILDER_IMAGE=golang:1.22-alpine", dockerfile)
+            self.assertIn("ARG RUNTIME_IMAGE=alpine:3.20", dockerfile)
+            self.assertIn("GOOS=linux GOARCH=${TARGETARCH:-amd64}", dockerfile)
             self.assertIn("EXPOSE 8080", dockerfile)
-            self.assertIn("Docker", readme)
+            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.22-alpine}", compose_yaml)
+            self.assertIn("RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}", compose_yaml)
+            self.assertIn("image: user-service:latest", compose_yaml)
+            self.assertIn('- "8080:8080"', compose_yaml)
+            self.assertIn("DOCKER_VARIANT ?=alpine", makefile)
+            self.assertIn("DOCKER_PLATFORM ?=linux/arm64", makefile)
+            self.assertIn("public.ecr.aws/docker/library/ubuntu:26.04", makefile)
+            self.assertIn("IMAGE ?=$(APP_NAME)", makefile)
+            self.assertIn("--build-arg BUILDER_IMAGE=$(BUILDER_IMAGE)", makefile)
+            self.assertIn("--build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE)", makefile)
+            self.assertIn("docker run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)", makefile)
+            self.assertIn("docker push $(IMAGE_REF)", makefile)
+            self.assertIn("make bootstrap", readme)
+            self.assertIn("make lint", readme)
+            self.assertIn("make verify", readme)
+            self.assertIn("make docker-run", readme)
+            self.assertIn("make docker-build DOCKER_VARIANT=ubuntu", readme)
+            self.assertIn("make docker-build DOCKER_VARIANT=ubuntu IMAGE=user-service-ubuntu TAG=dev", readme)
+            self.assertIn("make docker-run IMAGE=user-service-ubuntu TAG=dev HOST_PORT=8080", readme)
+            self.assertIn("starts whatever image tag you last built", readme)
+            self.assertIn("DOCKER_VARIANT=ubuntu", readme)
+            self.assertIn("public.ecr.aws/docker/library/golang:1.22", readme)
+            self.assertIn("make docker-push IMAGE=registry.example.com/user-service TAG=0.1.0", readme)
+            self.assertIn("docker compose up --build", readme)
+            self.assertIn("scripts/bootstrap", readme)
+            self.assertIn('brew "golangci-lint"', brewfile)
+            self.assertIn('go = "1.22.0"', mise_toml)
+            self.assertIn("github.com/gin-gonic/gin v1.10.0", go_sum)
             self.assertIn("yaml.Unmarshal", config_go)
+            self.assertIn("TestLoadDefaultConfig", config_test)
+            self.assertIn("TestLoadUsesConfigFileOverride", config_test)
             self.assertIn("TestHealthz", test_file)
             self.assertIn("TestPing", test_file)
             self.assertIn("TestListUsers", test_file)
             self.assertIn("TestGetUser", test_file)
+            self.assertIn("go mod tidy", bootstrap)
+            self.assertIn("./scripts/doctor", bootstrap)
+            self.assertIn("go.sum is missing", doctor)
+            self.assertIn("service.port must be between 1 and 65535", doctor)
+            self.assertIn("go test ./internal/config -run TestLoadDefaultConfig", doctor)
+            self.assertIn("golangci-lint: not installed", doctor)
+            self.assertIn("Environment looks ready.", doctor)
             self.assertIn('group.GET("/ping"', ping_handler)
             self.assertIn('Message: "pong"', ping_service)
             self.assertIn('group.GET("/users"', user_handler)
             self.assertIn("ListUsers() []model.User", user_service)
             self.assertIn("Ada Lovelace", user_repository)
             self.assertIn("type User struct", user_model)
+            self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
 
     def test_create_apple_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -73,7 +73,7 @@ Expected output:
 - minimal configuration files;
 - a useful README.
 
-### `web`
+### `web-service`
 
 Default stack:
 
@@ -119,7 +119,7 @@ Planned later:
 - Go
 - Protobuf
 
-This template should come after `frontend` and `web` feel solid, because protobuf generation and service conventions add complexity quickly.
+This template should come after `frontend` and `web-service` feel solid, because protobuf generation and service conventions add complexity quickly.
 
 ## What BiucingCLI Is Not
 

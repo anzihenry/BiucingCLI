@@ -9,7 +9,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:
 
 - `frontend`: React + TypeScript
-- `web`: Go + Gin
+- `web-service`: Go + Gin
 - `microservice`: planned later, with Go + Protobuf
 
 The value is not broad ecosystem coverage. The value is generating starters that are restrained, readable, and worth using as a real base.
@@ -25,9 +25,9 @@ The value is not broad ecosystem coverage. The value is generating starters that
 ```bash
 biucing list
 biucing info frontend
-biucing info web
+biucing info web-service
 biucing create frontend my-app
-biucing create web user-service
+biucing create web-service user-service
 ```
 
 ## Project Status
@@ -46,6 +46,7 @@ Local Android validation status:
 - [Product Design](docs/product-design.md)
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)
+- [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
 - [Android Team Environment Standard](docs/android-team-environment-standard.md)
 - [Android Template Design](docs/android-template-design.md)

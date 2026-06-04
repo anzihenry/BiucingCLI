@@ -14,7 +14,7 @@ templates/
     template.json
     template/
       ...
-  web/
+  web-service/
     template.json
     template/
       ...
@@ -34,7 +34,7 @@ Suggested shape:
 
 ```json
 {
-  "name": "web",
+  "name": "web-service",
   "description": "Go + Gin web service starter",
   "stack": ["Go", "Gin"],
   "variables": [
@@ -116,7 +116,7 @@ my-app/
     services/
 ```
 
-### `web`
+### `web-service`
 
 Core variables:
 

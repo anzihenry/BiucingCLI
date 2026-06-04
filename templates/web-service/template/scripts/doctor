@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v go >/dev/null 2>&1; then
+  echo "go is not installed or not on PATH."
+  exit 1
+fi
+
+go_version="$(go env GOVERSION)"
+echo "Go toolchain: $go_version"
+
+if [[ -z "${GOCACHE:-}" ]]; then
+  export GOCACHE="$(pwd)/.cache/go-build"
+fi
+mkdir -p "$GOCACHE"
+
+if [[ ! -f "./go.mod" ]]; then
+  echo "go.mod is missing."
+  exit 1
+fi
+
+if [[ ! -f "./go.sum" ]]; then
+  echo "go.sum is missing."
+  echo "Run 'go mod tidy' or './scripts/bootstrap' to resolve dependencies first."
+  exit 1
+fi
+
+if [[ ! -f "./configs/config.yaml" ]]; then
+  echo "configs/config.yaml is missing."
+  exit 1
+fi
+
+if ! grep -q "name:" ./configs/config.yaml; then
+  echo "configs/config.yaml must define service.name."
+  exit 1
+fi
+
+if ! grep -q "port:" ./configs/config.yaml; then
+  echo "configs/config.yaml must define service.port."
+  exit 1
+fi
+
+service_name="$(sed -n 's/^  name: //p' ./configs/config.yaml | head -n 1)"
+service_port="$(sed -n 's/^  port: //p' ./configs/config.yaml | head -n 1)"
+
+if [[ -z "$service_name" ]]; then
+  echo "configs/config.yaml service.name must not be empty."
+  exit 1
+fi
+
+if [[ ! "$service_port" =~ ^[0-9]+$ ]]; then
+  echo "configs/config.yaml service.port must be a numeric string."
+  exit 1
+fi
+
+if (( service_port < 1 || service_port > 65535 )); then
+  echo "configs/config.yaml service.port must be between 1 and 65535."
+  exit 1
+fi
+
+if ! go list -m >/dev/null 2>&1; then
+  echo "go.mod does not define a valid module."
+  exit 1
+fi
+
+if ! CONFIG_FILE=./configs/config.yaml go test ./internal/config -run TestLoadDefaultConfig -count=1 >/dev/null; then
+  echo "config loader could not read configs/config.yaml successfully."
+  exit 1
+fi
+
+if command -v golangci-lint >/dev/null 2>&1; then
+  echo "golangci-lint: available"
+else
+  echo "golangci-lint: not installed; make lint and make verify will be unavailable."
+fi
+
+if command -v docker >/dev/null 2>&1; then
+  echo "Docker: available"
+else
+  echo "Docker: not installed; container workflows will be unavailable."
+fi
+
+echo "Environment looks ready."

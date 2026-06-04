@@ -1,0 +1,13 @@
+services:
+  {{SERVICE_NAME}}:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.22-alpine}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
+    image: {{SERVICE_NAME}}:latest
+    ports:
+      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+    environment:
+      CONFIG_FILE: /app/configs/config.yaml

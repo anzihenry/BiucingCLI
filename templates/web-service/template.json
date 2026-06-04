@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "web-service",
   "description": "Go + Gin web service starter",
   "stack": ["Go", "Gin"],
   "variables": [
@@ -24,9 +24,13 @@
     }
   ],
   "next_steps": [
-    "go mod tidy",
-    "go test ./...",
-    "go run ./cmd/server",
-    "docker build -t {{SERVICE_NAME}} ."
+    "make bootstrap",
+    "make doctor",
+    "make lint",
+    "make test",
+    "make verify",
+    "make run",
+    "make docker-build",
+    "make docker-run"
   ]
 }

@@ -8,11 +8,11 @@ The intent is not to generate every possible Android architecture. The intent is
 
 ## Position in Product Scope
 
-The `android` template should be treated as a later-stage template, after the current `frontend`, `web`, and `apple` template system feels stable.
+The `android` template should be treated as a later-stage template, after the current `frontend`, `web-service`, and `apple` template system feels stable.
 
 Why:
 
-- Android introduces more environment surface than `frontend` or `web`;
+- Android introduces more environment surface than `frontend` or `web-service`;
 - the template needs to coordinate `Gradle`, Android SDK expectations, emulator guidance, and signing boundaries;
 - the CLI currently supports simple placeholder replacement only, so the first Android template should stay intentionally small.
 

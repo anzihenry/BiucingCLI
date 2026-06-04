@@ -26,9 +26,9 @@ Expected behavior:
 - replace a few core variables such as project and package name;
 - produce a restrained folder structure and README.
 
-## Phase 3: `web` Template
+## Phase 3: `web-service` Template
 
-Build `biucing create web <project-name>`.
+Build `biucing create web-service <project-name>`.
 
 Expected behavior:
 

@@ -1,0 +1,5 @@
+brew "mise"
+brew "go"
+brew "golangci-lint"
+brew "gh"
+brew "jq"
