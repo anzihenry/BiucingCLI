@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -f "./gradle/wrapper/gradle-wrapper.jar" ]]; then
+  echo "Gradle wrapper jar already present."
+  exit 0
+fi
+
+if ! command -v gradle >/dev/null 2>&1; then
+  echo "Gradle is required once to generate gradle-wrapper.jar."
+  echo "Install Gradle, run 'make wrapper', then commit gradle/wrapper/gradle-wrapper.jar."
+  exit 1
+fi
+
+gradle wrapper --gradle-version 8.10.2
+echo "Generated Gradle wrapper files. Commit gradle/wrapper/gradle-wrapper.jar."

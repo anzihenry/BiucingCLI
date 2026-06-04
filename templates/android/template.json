@@ -1,0 +1,76 @@
+{
+  "name": "android",
+  "description": "Kotlin Android app starter for mid-sized teams",
+  "stack": ["Kotlin", "Android", "Gradle", "Jetpack Compose", "fastlane"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "display_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "package_name",
+      "required": true,
+      "prompt": "Android package name: "
+    },
+    {
+      "name": "application_id",
+      "required": false,
+      "default_from": "package_name"
+    },
+    {
+      "name": "organization_name",
+      "required": false,
+      "default": "Example Team"
+    },
+    {
+      "name": "compile_sdk",
+      "required": false,
+      "default": "35"
+    },
+    {
+      "name": "min_sdk",
+      "required": false,
+      "default": "26"
+    },
+    {
+      "name": "target_sdk",
+      "required": false,
+      "default": "35"
+    },
+    {
+      "name": "version_code",
+      "required": false,
+      "default": "1"
+    },
+    {
+      "name": "version_name",
+      "required": false,
+      "default": "1.0.0"
+    },
+    {
+      "name": "java_version",
+      "required": false,
+      "default": "17"
+    },
+    {
+      "name": "android_namespace",
+      "required": false,
+      "default_from": "package_name"
+    },
+    {
+      "name": "kotlin_module_name",
+      "required": false
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make build",
+    "make test",
+    "open -a \"Android Studio\" ."
+  ]
+}

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}" ]]; then
+  echo "ANDROID_HOME or ANDROID_SDK_ROOT must be set."
+  exit 1
+fi
+
+echo "Using Android SDK at ${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
+if command -v sdkmanager >/dev/null 2>&1; then
+  echo "sdkmanager is available."
+else
+  echo "sdkmanager not found in PATH; install Android cmdline-tools for full SDK management."
+fi
+if command -v emulator >/dev/null 2>&1; then
+  echo "emulator is available."
+else
+  echo "emulator not found in PATH; Android Studio may still manage AVDs via its bundled tools."
+fi
+if [[ ! -d "${ANDROID_HOME:-${ANDROID_SDK_ROOT}}/platform-tools" ]]; then
+  echo "Android SDK platform-tools are missing."
+  exit 1
+fi

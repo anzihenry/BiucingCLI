@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import stat
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -109,6 +110,15 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{MODULE_NAME}}": values.get("module_name", ""),
         "{{SERVICE_NAME}}": values.get("service_name", ""),
         "{{HTTP_PORT}}": values.get("http_port", ""),
+        "{{APPLICATION_ID}}": values.get("application_id", ""),
+        "{{ANDROID_NAMESPACE}}": values.get("android_namespace", ""),
+        "{{COMPILE_SDK}}": values.get("compile_sdk", ""),
+        "{{MIN_SDK}}": values.get("min_sdk", ""),
+        "{{TARGET_SDK}}": values.get("target_sdk", ""),
+        "{{VERSION_CODE}}": values.get("version_code", ""),
+        "{{VERSION_NAME}}": values.get("version_name", ""),
+        "{{JAVA_VERSION}}": values.get("java_version", ""),
+        "{{KOTLIN_MODULE_NAME}}": values.get("kotlin_module_name", ""),
         "{{APPLE_PLATFORM}}": values.get("apple_platform", ""),
         "{{APPLE_PLATFORM_NAME}}": values.get("apple_platform_name", ""),
         "{{BUNDLE_IDENTIFIER}}": values.get("bundle_identifier", ""),
@@ -152,3 +162,6 @@ def render_template(
             continue
 
         path.write_text(render_text(content, values), encoding="utf-8")
+        if path.name == "gradlew" or "scripts" in path.parts:
+            current_mode = path.stat().st_mode
+            path.chmod(current_mode | stat.S_IXUSR)

@@ -1,0 +1,15 @@
+default_platform(:android)
+
+platform :android do
+  desc "Run a beta pipeline"
+  lane :beta do
+    sh("make build")
+    sh("make test")
+  end
+
+  desc "Run a release pipeline"
+  lane :release do
+    sh("make lint")
+    sh("make build")
+  end
+end

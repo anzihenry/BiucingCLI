@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+java -version >/dev/null
+adb version >/dev/null
+sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+if [[ -z "$sdk_root" ]]; then
+  echo "ANDROID_HOME or ANDROID_SDK_ROOT must be set."
+  exit 1
+fi
+
+if [[ ! -x "./gradlew" ]]; then
+  echo "./gradlew must be executable."
+  exit 1
+fi
+
+if [[ ! -f "./gradle/wrapper/gradle-wrapper.jar" ]]; then
+  echo "gradle-wrapper.jar is missing."
+  echo "Restore the committed wrapper files or run 'make wrapper' to regenerate them."
+  exit 1
+fi
+
+echo "ANDROID_HOME=$sdk_root"
+echo "Environment looks ready."

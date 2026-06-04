@@ -62,6 +62,15 @@ Suggested placeholders:
 - `{{MODULE_NAME}}`
 - `{{SERVICE_NAME}}`
 - `{{HTTP_PORT}}`
+- `{{APPLICATION_ID}}`
+- `{{ANDROID_NAMESPACE}}`
+- `{{COMPILE_SDK}}`
+- `{{MIN_SDK}}`
+- `{{TARGET_SDK}}`
+- `{{VERSION_CODE}}`
+- `{{VERSION_NAME}}`
+- `{{JAVA_VERSION}}`
+- `{{KOTLIN_MODULE_NAME}}`
 - `{{BUNDLE_IDENTIFIER}}`
 - `{{MINIMUM_OS_VERSION}}`
 - `{{DEVELOPMENT_TEAM}}`
@@ -186,6 +195,64 @@ my-apple-app/
     bootstrap
     doctor
     setup-xcode
+```
+
+### `android`
+
+Core variables:
+
+- `project_name`
+- `display_name`
+- `package_name`
+- `application_id`
+- `compile_sdk`
+- `min_sdk`
+- `target_sdk`
+- `version_code`
+- `version_name`
+- `java_version`
+
+Suggested output:
+
+```text
+my-android-app/
+  README.md
+  Brewfile
+  .mise.toml
+  Makefile
+  settings.gradle.kts
+  build.gradle.kts
+  gradle.properties
+  app/
+    build.gradle.kts
+    src/
+      main/
+        AndroidManifest.xml
+        java/
+        res/
+      test/
+      androidTest/
+  core/
+    designsystem/
+      build.gradle.kts
+      src/
+    model/
+      build.gradle.kts
+      src/
+  feature/
+    home/
+      build.gradle.kts
+      src/
+  fastlane/
+    Fastfile
+    Appfile
+  gradle/
+    libs.versions.toml
+    wrapper/
+  scripts/
+    bootstrap
+    doctor
+    setup-android-sdk
 ```
 
 ## CLI Behavior

@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 import tempfile
 import unittest
@@ -8,7 +9,9 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from biucingcli.cli import default_kotlin_module_name
 from biucingcli.cli import main
+from biucingcli.templates import render_text
 
 
 class CLITestCase(unittest.TestCase):
@@ -26,6 +29,7 @@ class CLITestCase(unittest.TestCase):
         output = self.run_cli([])
 
         self.assertIn("Available templates:", output)
+        self.assertIn("android", output)
         self.assertIn("apple", output)
         self.assertIn("frontend", output)
         self.assertIn("web", output)
@@ -36,6 +40,200 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Template: web", output)
         self.assertIn("Go, Gin", output)
         self.assertIn("module_name", output)
+
+    def test_info_prints_android_template_details(self):
+        output = self.run_cli(["info", "android"])
+
+        self.assertIn("Template: android", output)
+        self.assertIn("Kotlin, Android, Gradle, Jetpack Compose, fastlane", output)
+        self.assertIn("package_name", output)
+        self.assertIn("compile_sdk", output)
+
+    def test_create_android_renders_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "android",
+                    "demo-android",
+                    "--output-dir",
+                    tmpdir,
+                    "--package-name",
+                    "com.example.demoandroid",
+                    "--application-id",
+                    "com.example.demoandroid.app",
+                    "--compile-sdk",
+                    "35",
+                    "--min-sdk",
+                    "26",
+                    "--target-sdk",
+                    "35",
+                    "--version-code",
+                    "7",
+                    "--version-name",
+                    "1.2.3",
+                    "--java-version",
+                    "17",
+                    "--android-namespace",
+                    "com.example.demoandroid",
+                    "--kotlin-module-name",
+                    "DemoAndroid",
+                ]
+            )
+            project_dir = Path(tmpdir) / "demo-android"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            settings_gradle = (project_dir / "settings.gradle.kts").read_text(encoding="utf-8")
+            app_build = (project_dir / "app" / "build.gradle.kts").read_text(encoding="utf-8")
+            manifest = (
+                project_dir / "app" / "src" / "main" / "AndroidManifest.xml"
+            ).read_text(encoding="utf-8")
+            main_activity = (
+                project_dir / "app" / "src" / "main" / "java" / "app" / "MainActivity.kt"
+            ).read_text(encoding="utf-8")
+            home_route = (
+                project_dir / "feature" / "home" / "src" / "main" / "java" / "home" / "HomeRoute.kt"
+            ).read_text(encoding="utf-8")
+            theme = (
+                project_dir
+                / "core"
+                / "designsystem"
+                / "src"
+                / "main"
+                / "java"
+                / "designsystem"
+                / "Theme.kt"
+            ).read_text(encoding="utf-8")
+            appfile = (project_dir / "fastlane" / "Appfile").read_text(encoding="utf-8")
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
+            sync_wrapper = (
+                project_dir / "scripts" / "sync-gradle-wrapper"
+            ).read_text(encoding="utf-8")
+            gradlew = (project_dir / "gradlew").read_text(encoding="utf-8")
+            generated_files = {
+                path.relative_to(project_dir).as_posix()
+                for path in project_dir.rglob("*")
+                if path.is_file()
+            }
+            expected_files = {
+                ".gitignore",
+                ".mise.toml",
+                "Brewfile",
+                "Makefile",
+                "README.md",
+                "app/build.gradle.kts",
+                "app/proguard-rules.pro",
+                "app/src/main/AndroidManifest.xml",
+                "app/src/main/java/app/MainActivity.kt",
+                "app/src/main/res/values/strings.xml",
+                "app/src/main/res/values/themes.xml",
+                "app/src/test/java/app/AppSmokeTest.kt",
+                "build.gradle.kts",
+                "core/designsystem/build.gradle.kts",
+                "core/designsystem/src/main/java/designsystem/Theme.kt",
+                "core/model/build.gradle.kts",
+                "core/model/src/main/java/model/Greeting.kt",
+                "core/model/src/test/java/model/GreetingTest.kt",
+                "fastlane/Appfile",
+                "fastlane/Fastfile",
+                "feature/home/build.gradle.kts",
+                "feature/home/src/main/java/home/HomeRoute.kt",
+                "gradle.properties",
+                "gradle/libs.versions.toml",
+                "gradle/wrapper/gradle-wrapper.properties",
+                "gradlew",
+                "gradlew.bat",
+                "scripts/bootstrap",
+                "scripts/doctor",
+                "scripts/setup-android-sdk",
+                "scripts/sync-gradle-wrapper",
+                "settings.gradle.kts",
+            }
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created android project: demo-android", output)
+            self.assertIn("make bootstrap", output)
+            self.assertIn('open -a "Android Studio" .', output)
+            self.assertIn("Application ID: `com.example.demoandroid.app`", readme)
+            self.assertIn('rootProject.name = "demo-android"', settings_gradle)
+            self.assertIn('include(":feature:home")', settings_gradle)
+            self.assertIn('namespace = "com.example.demoandroid"', app_build)
+            self.assertIn('applicationId = "com.example.demoandroid.app"', app_build)
+            self.assertIn('versionCode = 7', app_build)
+            self.assertIn('versionName = "1.2.3"', app_build)
+            self.assertIn('android:label="Demo Android"', manifest)
+            self.assertIn('android:theme="@style/Theme.DemoAndroid"', manifest)
+            self.assertIn("package com.example.demoandroid", main_activity)
+            self.assertIn("BiucingTheme", main_activity)
+            self.assertIn("package com.example.demoandroid.feature.home", home_route)
+            self.assertIn('title = "Demo Android"', home_route)
+            self.assertIn("fun BiucingTheme", theme)
+            self.assertIn('package_name("com.example.demoandroid.app")', appfile)
+            self.assertIn("./scripts/setup-android-sdk", bootstrap)
+            self.assertNotIn("./scripts/sync-gradle-wrapper", bootstrap)
+            self.assertIn("gradle-wrapper.jar is missing", doctor)
+            self.assertIn("gradle wrapper --gradle-version 8.10.2", sync_wrapper)
+            self.assertIn('-jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"', gradlew)
+            self.assertTrue(expected_files.issubset(generated_files))
+            self.assertIn("gradle/wrapper/gradle-wrapper.jar", generated_files)
+            self.assertTrue(os.access(project_dir / "gradlew", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "sync-gradle-wrapper", os.X_OK))
+
+    def test_create_android_prompts_for_package_name(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                ["create", "android", "prompt-android", "--output-dir", tmpdir],
+                stdin_values=["com.example.promptandroid"],
+            )
+            project_dir = Path(tmpdir) / "prompt-android"
+            app_build = (project_dir / "app" / "build.gradle.kts").read_text(encoding="utf-8")
+
+            self.assertIn("Created android project: prompt-android", output)
+            self.assertIn('namespace = "com.example.promptandroid"', app_build)
+
+    def test_default_kotlin_module_name_derives_pascal_case(self):
+        self.assertEqual(default_kotlin_module_name("demo-android_app"), "DemoAndroidApp")
+        self.assertEqual(default_kotlin_module_name(""), "App")
+
+    def test_render_text_replaces_android_placeholders(self):
+        rendered = render_text(
+            "\n".join(
+                [
+                    "applicationId = {{APPLICATION_ID}}",
+                    "namespace = {{ANDROID_NAMESPACE}}",
+                    "compileSdk = {{COMPILE_SDK}}",
+                    "minSdk = {{MIN_SDK}}",
+                    "targetSdk = {{TARGET_SDK}}",
+                    "versionCode = {{VERSION_CODE}}",
+                    "versionName = {{VERSION_NAME}}",
+                    "javaVersion = {{JAVA_VERSION}}",
+                    "moduleName = {{KOTLIN_MODULE_NAME}}",
+                ]
+            ),
+            {
+                "application_id": "com.example.demoandroid",
+                "android_namespace": "com.example.demoandroid",
+                "compile_sdk": "35",
+                "min_sdk": "26",
+                "target_sdk": "35",
+                "version_code": "1",
+                "version_name": "1.0.0",
+                "java_version": "17",
+                "kotlin_module_name": "DemoAndroid",
+            },
+        )
+
+        self.assertIn("applicationId = com.example.demoandroid", rendered)
+        self.assertIn("namespace = com.example.demoandroid", rendered)
+        self.assertIn("compileSdk = 35", rendered)
+        self.assertIn("minSdk = 26", rendered)
+        self.assertIn("targetSdk = 35", rendered)
+        self.assertIn("versionCode = 1", rendered)
+        self.assertIn("versionName = 1.0.0", rendered)
+        self.assertIn("javaVersion = 17", rendered)
+        self.assertIn("moduleName = DemoAndroid", rendered)
 
     def test_create_frontend_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:

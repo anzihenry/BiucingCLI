@@ -34,9 +34,18 @@ biucing create web user-service
 
 This repository currently contains the new product definition and a minimal CLI shell. The first implementation target is `biucing create`, backed by a small internal template system.
 
+Local Android validation status:
+
+- the Android starter now includes a committed Gradle wrapper;
+- the generated Android project has passed a real `./gradlew assembleDebug` smoke build;
+- the maintainer workstation has one validated emulator target retained as `Biucing_API_35`.
+
 ## Design Docs
 
+- Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
 - [Product Design](docs/product-design.md)
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
+- [Android Team Environment Standard](docs/android-team-environment-standard.md)
+- [Android Template Design](docs/android-template-design.md)

@@ -25,6 +25,14 @@ def default_swift_module_name(project_name: str) -> str:
     return "".join(part[:1].upper() + part[1:] for part in parts)
 
 
+def default_kotlin_module_name(project_name: str) -> str:
+    """Return a Kotlin-safe module name derived from a directory name."""
+    parts = [part for part in project_name.replace("_", "-").split("-") if part]
+    if not parts:
+        return "App"
+    return "".join(part[:1].upper() + part[1:] for part in parts)
+
+
 def apple_platform_config(platform: str | None, minimum_os_version: str | None) -> dict[str, str]:
     """Return derived Apple platform values for template rendering."""
     requested = (platform or "ios").lower()
@@ -111,6 +119,15 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--development-team", help="Apple development team ID.")
     create_parser.add_argument("--organization-name", help="Organization or team name.")
     create_parser.add_argument("--swift-module-name", help="Swift module name for app targets.")
+    create_parser.add_argument("--application-id", help="Android application ID.")
+    create_parser.add_argument("--compile-sdk", help="Android compile SDK version.")
+    create_parser.add_argument("--min-sdk", help="Android minimum SDK version.")
+    create_parser.add_argument("--target-sdk", help="Android target SDK version.")
+    create_parser.add_argument("--version-code", help="Android version code.")
+    create_parser.add_argument("--version-name", help="Android version name.")
+    create_parser.add_argument("--java-version", help="Java version for Android builds.")
+    create_parser.add_argument("--android-namespace", help="Android namespace.")
+    create_parser.add_argument("--kotlin-module-name", help="Kotlin module name for Android code.")
     return parser
 
 
@@ -158,7 +175,8 @@ def create_project(args: argparse.Namespace) -> str:
         {
             "project_name": args.project_name,
             "display_name": args.display_name or default_display_name(args.project_name),
-            "package_name": args.package_name or args.project_name,
+            "package_name": args.package_name
+            or (args.project_name if args.template == "frontend" else None),
             "module_name": args.module_name,
             "service_name": args.service_name,
             "http_port": args.http_port,
@@ -174,6 +192,16 @@ def create_project(args: argparse.Namespace) -> str:
             "tuist_deployment_targets": apple_values.get("tuist_deployment_targets"),
             "xcodebuild_destination": apple_values.get("xcodebuild_destination"),
             "swiftpm_supported_platform": apple_values.get("swiftpm_supported_platform"),
+            "application_id": args.application_id,
+            "compile_sdk": args.compile_sdk,
+            "min_sdk": args.min_sdk,
+            "target_sdk": args.target_sdk,
+            "version_code": args.version_code,
+            "version_name": args.version_name,
+            "java_version": args.java_version,
+            "android_namespace": args.android_namespace,
+            "kotlin_module_name": args.kotlin_module_name
+            or default_kotlin_module_name(args.project_name),
         },
     )
     values.update({key: value for key, value in apple_values.items() if value is not None})

@@ -1,0 +1,6 @@
+brew "mise"
+brew "android-platform-tools"
+brew "openjdk@{{JAVA_VERSION}}"
+brew "fastlane"
+brew "gh"
+brew "jq"

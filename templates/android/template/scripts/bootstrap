@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v brew >/dev/null 2>&1; then
+  brew bundle
+else
+  echo "brew not found; skipping Brewfile install."
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  mise install
+else
+  echo "mise not found; skipping runtime install."
+fi
+
+./scripts/setup-android-sdk
+./scripts/doctor
