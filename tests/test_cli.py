@@ -244,6 +244,28 @@ class CLITestCase(unittest.TestCase):
             package_json = (project_dir / "package.json").read_text(encoding="utf-8")
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
             index_html = (project_dir / "index.html").read_text(encoding="utf-8")
+            eslint_config = (project_dir / "eslint.config.js").read_text(encoding="utf-8")
+            prettier_config = (project_dir / ".prettierrc.json").read_text(encoding="utf-8")
+            env_example = (project_dir / ".env.example").read_text(encoding="utf-8")
+            vite_config = (project_dir / "vite.config.ts").read_text(encoding="utf-8")
+            app_test = (project_dir / "src" / "App.test.tsx").read_text(encoding="utf-8")
+            app_file = (project_dir / "src" / "App.tsx").read_text(encoding="utf-8")
+            env_config = (project_dir / "src" / "config" / "env.ts").read_text(encoding="utf-8")
+            playwright_config = (
+                project_dir / "playwright.smoke.config.ts"
+            ).read_text(encoding="utf-8")
+            browser_smoke_test = (
+                project_dir / "tests" / "browser-smoke.spec.ts"
+            ).read_text(encoding="utf-8")
+            app_router = (
+                project_dir / "src" / "router" / "AppRouter.tsx"
+            ).read_text(encoding="utf-8")
+            api_client = (
+                project_dir / "src" / "services" / "api" / "client.ts"
+            ).read_text(encoding="utf-8")
+            test_setup = (
+                project_dir / "src" / "test" / "setup.ts"
+            ).read_text(encoding="utf-8")
             home_page = (project_dir / "src" / "pages" / "HomePage.tsx").read_text(
                 encoding="utf-8"
             )
@@ -257,13 +279,48 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(project_dir.exists())
             self.assertTrue((project_dir / "package.json").exists())
             self.assertIn("Created frontend project: demo-app", output)
-            self.assertIn("npm install", output)
+            self.assertIn("corepack enable pnpm", output)
+            self.assertIn("pnpm install", output)
+            self.assertIn("pnpm dev", output)
             self.assertIn("demo-app", package_json)
+            self.assertIn('"packageManager": "pnpm@9.9.0"', package_json)
+            self.assertIn('"node": ">=20.0.0"', package_json)
+            self.assertIn("react-router-dom", package_json)
+            self.assertIn('"lint": "eslint ."', package_json)
             self.assertIn('"typecheck": "tsc --noEmit"', package_json)
+            self.assertIn('"test": "vitest run"', package_json)
+            self.assertIn('"test:watch": "vitest"', package_json)
+            self.assertIn('"browser:install": "playwright install chromium"', package_json)
+            self.assertIn('"browser:smoke": "playwright test -c playwright.smoke.config.ts"', package_json)
+            self.assertIn('"format": "prettier --write ."', package_json)
             self.assertIn("Project Layout", readme)
+            self.assertIn("Quality Checks", readme)
+            self.assertIn("Runtime Configuration", readme)
+            self.assertIn("Package Manager", readme)
+            self.assertIn("pnpm test", readme)
+            self.assertIn("pnpm browser:smoke", readme)
             self.assertIn("<title>Demo App</title>", index_html)
+            self.assertIn("react-refresh/only-export-components", eslint_config)
+            self.assertIn('"trailingComma": "all"', prettier_config)
+            self.assertIn("VITE_API_BASE_URL=http://localhost:8080", env_example)
+            self.assertIn('environment: "jsdom"', vite_config)
+            self.assertIn('include: ["src/**/*.test.{ts,tsx}"]', vite_config)
+            self.assertIn("await getProjectOverview()", app_test)
+            self.assertIn('from "vitest"', app_test)
+            self.assertIn("toBeInTheDocument", app_test)
+            self.assertIn("AppRouter", app_file)
+            self.assertIn("apiBaseUrl", env_config)
+            self.assertIn("pnpm exec vite", playwright_config)
+            self.assertIn('baseURL: "http://127.0.0.1:4173"', playwright_config)
+            self.assertIn('name: "Demo App"', browser_smoke_test)
+            self.assertIn("browser-smoke-homepage.png", browser_smoke_test)
+            self.assertIn("createBrowserRouter", app_router)
+            self.assertIn("v7_startTransition", app_router)
+            self.assertIn("VITE_API_BASE_URL is not configured", api_client)
+            self.assertIn("@testing-library/jest-dom/vitest", test_setup)
             self.assertIn("useProjectOverview", home_page)
             self.assertIn('title: "Demo App"', overview_service)
+            self.assertIn("getProjectOverviewFallback", overview_service)
             self.assertIn("export type ProjectOverview", overview_type)
 
     def test_create_web_prompts_for_module_name(self):

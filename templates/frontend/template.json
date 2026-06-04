@@ -19,7 +19,8 @@
     }
   ],
   "next_steps": [
-    "npm install",
-    "npm run dev"
+    "corepack enable pnpm",
+    "pnpm install",
+    "pnpm dev"
   ]
 }

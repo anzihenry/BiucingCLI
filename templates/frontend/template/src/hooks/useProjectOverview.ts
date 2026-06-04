@@ -7,7 +7,17 @@ export function useProjectOverview() {
   const [overview, setOverview] = useState<ProjectOverview | null>(null);
 
   useEffect(() => {
-    setOverview(getProjectOverview());
+    let isMounted = true;
+
+    void getProjectOverview().then((data) => {
+      if (isMounted) {
+        setOverview(data);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return overview;

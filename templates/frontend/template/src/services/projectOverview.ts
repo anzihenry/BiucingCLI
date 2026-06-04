@@ -1,6 +1,8 @@
+import { env } from "../config/env";
+import { getJson } from "./api/client";
 import type { ProjectOverview } from "../types/projectOverview";
 
-export function getProjectOverview(): ProjectOverview {
+export function getProjectOverviewFallback(): ProjectOverview {
   return {
     title: "{{DISPLAY_NAME}}",
     description:
@@ -22,4 +24,16 @@ export function getProjectOverview(): ProjectOverview {
       { id: "note_03", title: "Promote components only when reused", status: "Reminder" },
     ],
   };
+}
+
+export async function getProjectOverview(): Promise<ProjectOverview> {
+  if (!env.apiBaseUrl) {
+    return getProjectOverviewFallback();
+  }
+
+  try {
+    return await getJson<ProjectOverview>("/project-overview");
+  } catch {
+    return getProjectOverviewFallback();
+  }
 }
