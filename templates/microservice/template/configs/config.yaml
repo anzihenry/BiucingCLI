@@ -1,0 +1,11 @@
+service:
+  name: {{SERVICE_NAME}}
+  http_port: {{HTTP_PORT}}
+  grpc_port: {{GRPC_PORT}}
+
+telemetry:
+  otlp_http_endpoint: {{OTEL_EXPORTER_ENDPOINT}}
+
+store:
+  driver: {{DEPENDENCY_STORE}}
+  dsn: {{DEPENDENCY_STORE_DSN}}

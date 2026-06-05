@@ -32,6 +32,7 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("android", output)
         self.assertIn("apple", output)
         self.assertIn("frontend", output)
+        self.assertIn("microservice", output)
         self.assertIn("web-service", output)
 
     def test_info_prints_template_details(self):
@@ -48,6 +49,14 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Kotlin, Android, Gradle, Jetpack Compose, fastlane", output)
         self.assertIn("package_name", output)
         self.assertIn("compile_sdk", output)
+
+    def test_info_prints_microservice_template_details(self):
+        output = self.run_cli(["info", "microservice"])
+
+        self.assertIn("Template: microservice", output)
+        self.assertIn("Go, Gin, Protobuf, Buf, Docker Compose, OpenTelemetry", output)
+        self.assertIn("proto_package", output)
+        self.assertIn("grpc_port", output)
 
     def test_create_android_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -235,6 +244,38 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("javaVersion = 17", rendered)
         self.assertIn("moduleName = DemoAndroid", rendered)
 
+    def test_render_text_replaces_microservice_placeholders(self):
+        rendered = render_text(
+            "\n".join(
+                [
+                    "grpcPort = {{GRPC_PORT}}",
+                    "protoPackage = {{PROTO_PACKAGE}}",
+                    "store = {{DEPENDENCY_STORE}}",
+                    "image = {{DEPENDENCY_STORE_IMAGE}}",
+                    "dsn = {{DEPENDENCY_STORE_DSN}}",
+                    "collector = {{OTEL_EXPORTER_ENDPOINT}}",
+                ]
+            ),
+            {
+                "grpc_port": "9090",
+                "proto_package": "user.v1",
+                "dependency_store": "postgres",
+                "dependency_store_image": "postgres:16-alpine",
+                "dependency_store_dsn": "postgres://postgres:postgres@localhost:5432/user-service?sslmode=disable",
+                "otel_exporter_endpoint": "http://localhost:4318",
+            },
+        )
+
+        self.assertIn("grpcPort = 9090", rendered)
+        self.assertIn("protoPackage = user.v1", rendered)
+        self.assertIn("store = postgres", rendered)
+        self.assertIn("image = postgres:16-alpine", rendered)
+        self.assertIn(
+            "dsn = postgres://postgres:postgres@localhost:5432/user-service?sslmode=disable",
+            rendered,
+        )
+        self.assertIn("collector = http://localhost:4318", rendered)
+
     def test_create_frontend_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = self.run_cli(
@@ -322,6 +363,135 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('title: "Demo App"', overview_service)
             self.assertIn("getProjectOverviewFallback", overview_service)
             self.assertIn("export type ProjectOverview", overview_type)
+
+    def test_create_microservice_renders_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "microservice",
+                    "user-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/user-service",
+                    "--proto-package",
+                    "user.v1",
+                    "--grpc-port",
+                    "9191",
+                    "--dependency-store",
+                    "redis",
+                    "--otel-exporter-endpoint",
+                    "http://localhost:14318",
+                ]
+            )
+            project_dir = Path(tmpdir) / "user-service"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
+            dockerfile = (project_dir / "Dockerfile").read_text(encoding="utf-8")
+            compose_yaml = (project_dir / "deploy" / "compose.yaml").read_text(encoding="utf-8")
+            config_yaml = (project_dir / "configs" / "config.yaml").read_text(encoding="utf-8")
+            proto_file = (
+                project_dir / "api" / "proto" / "service" / "v1" / "service.proto"
+            ).read_text(encoding="utf-8")
+            buf_yaml = (project_dir / "api" / "buf.yaml").read_text(encoding="utf-8")
+            buf_gen = (project_dir / "api" / "buf.gen.yaml").read_text(encoding="utf-8")
+            go_sum = (project_dir / "go.sum").read_text(encoding="utf-8")
+            mise_toml = (project_dir / ".mise.toml").read_text(encoding="utf-8")
+            go_mod = (project_dir / "go.mod").read_text(encoding="utf-8")
+            main_go = (project_dir / "cmd" / "server" / "main.go").read_text(encoding="utf-8")
+            telemetry_go = (
+                project_dir / "internal" / "telemetry" / "telemetry.go"
+            ).read_text(encoding="utf-8")
+            grpc_transport = (
+                project_dir / "internal" / "transport" / "grpc.go"
+            ).read_text(encoding="utf-8")
+            config_go = (project_dir / "internal" / "config" / "config.go").read_text(
+                encoding="utf-8"
+            )
+            config_test = (
+                project_dir / "internal" / "config" / "config_test.go"
+            ).read_text(encoding="utf-8")
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            server_test = (project_dir / "tests" / "server_test.go").read_text(
+                encoding="utf-8"
+            )
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created microservice project: user-service", output)
+            self.assertIn("make proto", output)
+            self.assertIn("make up", output)
+            self.assertIn("OpenTelemetry", readme)
+            self.assertIn("Proto package: `user.v1`", readme)
+            self.assertIn("Local dependency store: `redis`", readme)
+            self.assertIn("make verify", readme)
+            self.assertIn("docker compose -f $(COMPOSE_FILE) up --build", makefile)
+            self.assertIn("buf generate ./api", makefile)
+            self.assertIn("buf lint ./api", makefile)
+            self.assertIn("HOST_GRPC_PORT ?=9191", makefile)
+            self.assertIn("BUILDER_IMAGE ?= golang:1.25-alpine", makefile)
+            self.assertIn("EXPOSE 9191", dockerfile)
+            self.assertIn("ARG BUILDER_IMAGE=golang:1.25-alpine", dockerfile)
+            self.assertIn('image: user-service:latest', compose_yaml)
+            self.assertIn('- "9191:9191"', compose_yaml)
+            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.25-alpine}", compose_yaml)
+            self.assertIn("STORE_DSN: redis://redis:6379/0", compose_yaml)
+            self.assertIn("image: redis:7-alpine", compose_yaml)
+            self.assertNotIn("POSTGRES_PASSWORD", compose_yaml)
+            self.assertIn("driver: redis", config_yaml)
+            self.assertIn("dsn: redis://localhost:6379/0", config_yaml)
+            self.assertIn("otlp_http_endpoint: http://localhost:14318", config_yaml)
+            self.assertIn("package user.v1;", proto_file)
+            self.assertIn('option go_package = "github.com/example/user-service/api/gen/go/service/v1;servicev1";', proto_file)
+            self.assertIn("service UserServiceService", proto_file)
+            self.assertIn("version: v2", buf_yaml)
+            self.assertIn("remote: buf.build/protocolbuffers/go", buf_gen)
+            self.assertIn("remote: buf.build/grpc/go", buf_gen)
+            self.assertIn('go = "1.25.0"', mise_toml)
+            self.assertIn("go 1.25.0", go_mod)
+            self.assertIn("go.opentelemetry.io/otel v1.43.0", go_sum)
+            self.assertIn("telemetry.Setup", main_go)
+            self.assertIn('log.Printf("starting %s gRPC server on :%s"', main_go)
+            self.assertIn("otlptracehttp.New", telemetry_go)
+            self.assertIn("semconv.ServiceName(serviceName)", telemetry_go)
+            self.assertIn("grpc.NewServer()", grpc_transport)
+            self.assertIn("healthpb.RegisterHealthServer", grpc_transport)
+            self.assertIn('cfg.Store.Driver = "redis"', config_go)
+            self.assertIn('cfg.Telemetry.OTLPHTTPEndpoint = "http://localhost:14318"', config_go)
+            self.assertIn("TestLoadUsesEnvironmentOverrides", config_test)
+            self.assertIn("buf is not installed or not on PATH.", doctor)
+            self.assertIn("service.grpc_port must be between 1 and 65535", doctor)
+            self.assertIn("go mod tidy", bootstrap)
+            self.assertIn("buf is not available on PATH.", bootstrap)
+            self.assertIn("TestHealthz", server_test)
+            self.assertIn("TestPing", server_test)
+            self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
+
+    def test_create_microservice_prompts_for_proto_package(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "microservice",
+                    "prompt-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/prompt-service",
+                ],
+                stdin_values=["prompt.v1"],
+            )
+            project_dir = Path(tmpdir) / "prompt-service"
+            proto_file = (
+                project_dir / "api" / "proto" / "service" / "v1" / "service.proto"
+            ).read_text(encoding="utf-8")
+            compose_yaml = (project_dir / "deploy" / "compose.yaml").read_text(encoding="utf-8")
+
+            self.assertIn("Created microservice project: prompt-service", output)
+            self.assertIn("package prompt.v1;", proto_file)
+            self.assertIn("POSTGRES_DB: prompt-service", compose_yaml)
 
     def test_create_web_prompts_for_module_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:

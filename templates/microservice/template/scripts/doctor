@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v go >/dev/null 2>&1; then
+  echo "go is not installed or not on PATH."
+  exit 1
+fi
+
+if ! command -v buf >/dev/null 2>&1; then
+  echo "buf is not installed or not on PATH."
+  exit 1
+fi
+
+go_version="$(go env GOVERSION)"
+echo "Go toolchain: $go_version"
+echo "Buf: available"
+
+if [[ -z "${GOCACHE:-}" ]]; then
+  export GOCACHE="$(pwd)/.cache/go-build"
+fi
+mkdir -p "$GOCACHE"
+
+if [[ ! -f "./go.mod" ]]; then
+  echo "go.mod is missing."
+  exit 1
+fi
+
+if [[ ! -f "./configs/config.yaml" ]]; then
+  echo "configs/config.yaml is missing."
+  exit 1
+fi
+
+if [[ ! -f "./api/buf.yaml" ]]; then
+  echo "api/buf.yaml is missing."
+  exit 1
+fi
+
+if [[ ! -f "./api/buf.gen.yaml" ]]; then
+  echo "api/buf.gen.yaml is missing."
+  exit 1
+fi
+
+if [[ ! -f "./api/proto/service/v1/service.proto" ]]; then
+  echo "api/proto/service/v1/service.proto is missing."
+  exit 1
+fi
+
+if ! grep -q "name:" ./configs/config.yaml; then
+  echo "configs/config.yaml must define service.name."
+  exit 1
+fi
+
+if ! grep -q "http_port:" ./configs/config.yaml; then
+  echo "configs/config.yaml must define service.http_port."
+  exit 1
+fi
+
+if ! grep -q "grpc_port:" ./configs/config.yaml; then
+  echo "configs/config.yaml must define service.grpc_port."
+  exit 1
+fi
+
+service_name="$(sed -n 's/^  name: //p' ./configs/config.yaml | head -n 1)"
+http_port="$(sed -n 's/^  http_port: //p' ./configs/config.yaml | head -n 1)"
+grpc_port="$(sed -n 's/^  grpc_port: //p' ./configs/config.yaml | head -n 1)"
+
+if [[ -z "$service_name" ]]; then
+  echo "configs/config.yaml service.name must not be empty."
+  exit 1
+fi
+
+if [[ ! "$http_port" =~ ^[0-9]+$ ]]; then
+  echo "configs/config.yaml service.http_port must be a numeric string."
+  exit 1
+fi
+
+if [[ ! "$grpc_port" =~ ^[0-9]+$ ]]; then
+  echo "configs/config.yaml service.grpc_port must be a numeric string."
+  exit 1
+fi
+
+if (( http_port < 1 || http_port > 65535 )); then
+  echo "configs/config.yaml service.http_port must be between 1 and 65535."
+  exit 1
+fi
+
+if (( grpc_port < 1 || grpc_port > 65535 )); then
+  echo "configs/config.yaml service.grpc_port must be between 1 and 65535."
+  exit 1
+fi
+
+if ! go list -m >/dev/null 2>&1; then
+  echo "go.mod does not define a valid module."
+  exit 1
+fi
+
+if ! CONFIG_FILE=./configs/config.yaml go test ./internal/config -run TestLoadDefaultConfig -count=1 >/dev/null; then
+  echo "config loader could not read configs/config.yaml successfully."
+  exit 1
+fi
+
+if command -v golangci-lint >/dev/null 2>&1; then
+  echo "golangci-lint: available"
+else
+  echo "golangci-lint: not installed; make lint and make verify will be unavailable."
+fi
+
+if command -v docker >/dev/null 2>&1; then
+  echo "Docker: available"
+else
+  echo "Docker: not installed; compose workflows will be unavailable."
+fi
+
+echo "Environment looks ready."

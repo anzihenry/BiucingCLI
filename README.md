@@ -10,7 +10,7 @@ BiucingCLI focuses on a small set of templates that match the maintainer's real 
 
 - `frontend`: React + TypeScript
 - `web-service`: Go + Gin
-- `microservice`: planned later, with Go + Protobuf
+- `microservice`: Go + Protobuf + Buf + Compose
 
 The value is not broad ecosystem coverage. The value is generating starters that are restrained, readable, and worth using as a real base.
 
@@ -26,13 +26,15 @@ The value is not broad ecosystem coverage. The value is generating starters that
 biucing list
 biucing info frontend
 biucing info web-service
+biucing info microservice
 biucing create frontend my-app
 biucing create web-service user-service
+biucing create microservice user-service
 ```
 
 ## Project Status
 
-This repository currently contains the new product definition and a minimal CLI shell. The first implementation target is `biucing create`, backed by a small internal template system.
+This repository contains a small internal template system with practical starters for frontend, web-service, apple, android, and microservice flows.
 
 Local Android validation status:
 
@@ -47,6 +49,8 @@ Local Android validation status:
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)
 - [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
+- [Microservice Team Environment Standard](docs/microservice-team-environment-standard.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
 - [Android Team Environment Standard](docs/android-team-environment-standard.md)
 - [Android Template Design](docs/android-template-design.md)
+- [Microservice Template Design](docs/microservice-template-design.md)

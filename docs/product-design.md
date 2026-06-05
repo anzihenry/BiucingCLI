@@ -114,12 +114,20 @@ Expected output:
 
 ### `microservice`
 
-Planned later:
+Default stack:
 
 - Go
 - Protobuf
+- Buf
+- Docker Compose
+- OpenTelemetry
 
-This template should come after `frontend` and `web-service` feel solid, because protobuf generation and service conventions add complexity quickly.
+Expected output:
+
+- a Go service starter with protobuf contract scaffolding;
+- `Buf` configuration and a reproducible generation path;
+- a local compose flow for the service, one dependency, and an OpenTelemetry Collector;
+- a README that explains `make proto`, `make run`, and `make up`.
 
 ## What BiucingCLI Is Not
 
@@ -142,6 +150,5 @@ The first usable version should support a local-only workflow:
 Later versions can add:
 
 - optional template profiles such as `gin` or `protobuf`;
-- a microservice starter with code generation flow;
 - Android starters based on Kotlin;
 - richer initialization flags once the core templates are proven.

@@ -1,0 +1,7 @@
+brew "buf"
+brew "docker"
+brew "go"
+brew "golangci-lint"
+brew "grpcurl"
+brew "jq"
+brew "mise"

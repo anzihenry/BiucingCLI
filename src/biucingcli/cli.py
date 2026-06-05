@@ -90,6 +90,41 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
     return resolved
 
 
+def microservice_dependency_config(store: str | None, service_name: str) -> dict[str, str]:
+    """Return derived local dependency values for the microservice template."""
+    selected = (store or "postgres").lower()
+    supported = {
+        "postgres": {
+            "dependency_store": "postgres",
+            "dependency_store_image": "postgres:16-alpine",
+            "dependency_store_port": "5432",
+            "dependency_store_dsn": f"postgres://postgres:postgres@localhost:5432/{service_name}?sslmode=disable",
+            "dependency_store_container_dsn": (
+                f"postgres://postgres:postgres@postgres:5432/{service_name}?sslmode=disable"
+            ),
+            "dependency_store_env_block": "\n".join(
+                [
+                    "    environment:",
+                    f"      POSTGRES_DB: {service_name}",
+                    "      POSTGRES_USER: postgres",
+                    "      POSTGRES_PASSWORD: postgres",
+                ]
+            ),
+        },
+        "redis": {
+            "dependency_store": "redis",
+            "dependency_store_image": "redis:7-alpine",
+            "dependency_store_port": "6379",
+            "dependency_store_dsn": "redis://localhost:6379/0",
+            "dependency_store_container_dsn": "redis://redis:6379/0",
+            "dependency_store_env_block": "",
+        },
+    }
+    if selected not in supported:
+        raise ValueError("Unsupported dependency store. Expected one of: postgres, redis")
+    return dict(supported[selected])
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
     parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
@@ -109,6 +144,17 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--module-name", help="Go module name for web service projects.")
     create_parser.add_argument("--service-name", help="Service name for web service projects.")
     create_parser.add_argument("--http-port", help="HTTP port for web service projects.")
+    create_parser.add_argument("--grpc-port", help="gRPC port for microservice projects.")
+    create_parser.add_argument("--proto-package", help="Proto package for microservice projects.")
+    create_parser.add_argument(
+        "--dependency-store",
+        choices=["postgres", "redis"],
+        help="Local dependency store for microservice projects.",
+    )
+    create_parser.add_argument(
+        "--otel-exporter-endpoint",
+        help="OpenTelemetry exporter endpoint for microservice projects.",
+    )
     create_parser.add_argument(
         "--platform",
         choices=["ios", "macos", "watchos", "tvos"],
@@ -165,6 +211,11 @@ def format_template_info(template_name: str) -> str:
 def create_project(args: argparse.Namespace) -> str:
     """Generate a project and return the output message."""
     definition = load_template(args.template)
+    microservice_values = (
+        microservice_dependency_config(args.dependency_store, args.service_name or args.project_name)
+        if args.template == "microservice"
+        else {}
+    )
     apple_values = (
         apple_platform_config(args.platform, args.minimum_os_version)
         if args.template == "apple"
@@ -179,7 +230,20 @@ def create_project(args: argparse.Namespace) -> str:
             or (args.project_name if args.template == "frontend" else None),
             "module_name": args.module_name,
             "service_name": args.service_name,
+            "service_type_name": default_swift_module_name(args.project_name),
             "http_port": args.http_port,
+            "grpc_port": args.grpc_port,
+            "proto_package": args.proto_package,
+            "dependency_store": microservice_values.get("dependency_store"),
+            "dependency_store_image": microservice_values.get("dependency_store_image"),
+            "dependency_store_port": microservice_values.get("dependency_store_port"),
+            "dependency_store_dsn": microservice_values.get("dependency_store_dsn"),
+            "dependency_store_container_dsn": microservice_values.get(
+                "dependency_store_container_dsn"
+            ),
+            "dependency_store_env_block": microservice_values.get("dependency_store_env_block"),
+            "otel_exporter_endpoint": args.otel_exporter_endpoint
+            or "http://localhost:4318",
             "apple_platform": apple_values.get("apple_platform"),
             "apple_platform_name": apple_values.get("apple_platform_name"),
             "bundle_identifier": args.bundle_identifier,
@@ -204,7 +268,13 @@ def create_project(args: argparse.Namespace) -> str:
             or default_kotlin_module_name(args.project_name),
         },
     )
+    values.update(
+        {
+            "service_type_name": default_swift_module_name(args.project_name),
+        }
+    )
     values.update({key: value for key, value in apple_values.items() if value is not None})
+    values.update({key: value for key, value in microservice_values.items() if value is not None})
 
     target_dir = Path(args.output_dir).resolve() / args.project_name
     render_template(definition, values, target_dir)

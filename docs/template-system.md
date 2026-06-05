@@ -197,6 +197,50 @@ my-apple-app/
     setup-xcode
 ```
 
+### `microservice`
+
+Core variables:
+
+- `project_name`
+- `module_name`
+- `service_name`
+- `proto_package`
+- `http_port`
+- `grpc_port`
+
+Suggested output:
+
+```text
+my-microservice/
+  README.md
+  Brewfile
+  .mise.toml
+  Makefile
+  Dockerfile
+  cmd/
+    server/
+  internal/
+    config/
+    handler/
+    service/
+    repository/
+    transport/
+    telemetry/
+  api/
+    proto/
+    buf.yaml
+    buf.gen.yaml
+    gen/
+  configs/
+    config.yaml
+  deploy/
+    compose.yaml
+    otel-collector.yaml
+  scripts/
+    bootstrap
+    doctor
+```
+
 ### `android`
 
 Core variables:

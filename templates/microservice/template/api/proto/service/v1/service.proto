@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package {{PROTO_PACKAGE}};
+
+option go_package = "{{MODULE_NAME}}/api/gen/go/service/v1;servicev1";
+
+service {{SERVICE_TYPE_NAME}}Service {
+  rpc Ping(PingRequest) returns (PingResponse);
+}
+
+message PingRequest {
+  string request_id = 1;
+}
+
+message PingResponse {
+  string message = 1;
+  string service = 2;
+}

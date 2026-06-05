@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v brew >/dev/null 2>&1; then
+  brew bundle
+else
+  echo "brew not found; skipping Brewfile install."
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  mise install
+else
+  echo "mise not found; skipping runtime install."
+fi
+
+if ! command -v go >/dev/null 2>&1; then
+  echo "go is not available on PATH."
+  echo "Install Go with Homebrew or activate it through mise, then rerun ./scripts/bootstrap."
+  exit 1
+fi
+
+if ! command -v buf >/dev/null 2>&1; then
+  echo "buf is not available on PATH."
+  echo "Install Buf with Homebrew or activate it through mise, then rerun ./scripts/bootstrap."
+  exit 1
+fi
+
+go mod tidy
+./scripts/doctor

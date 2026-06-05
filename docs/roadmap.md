@@ -54,8 +54,10 @@ Build `biucing create microservice <project-name>`.
 Expected behavior:
 
 - generate a Go starter shaped for protobuf-based services;
-- define a clean code generation path;
-- keep the template smaller than a full platform starter.
+- define a clean `Buf`-based code generation path;
+- include local compose orchestration for the service and one dependency;
+- include a baseline OpenTelemetry development path;
+- keep the template smaller than a full internal platform starter.
 
 ## Phase 6: Apple Starter
 

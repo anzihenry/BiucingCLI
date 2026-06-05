@@ -1,0 +1,54 @@
+{
+  "name": "microservice",
+  "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+  "stack": ["Go", "Gin", "Protobuf", "Buf", "Docker Compose", "OpenTelemetry"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "module_name",
+      "required": true,
+      "prompt": "Go module name: "
+    },
+    {
+      "name": "service_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "proto_package",
+      "required": true,
+      "prompt": "Proto package: "
+    },
+    {
+      "name": "http_port",
+      "required": false,
+      "default": "8080"
+    },
+    {
+      "name": "grpc_port",
+      "required": false,
+      "default": "9090"
+    },
+    {
+      "name": "dependency_store",
+      "required": false,
+      "default": "postgres"
+    },
+    {
+      "name": "otel_exporter_endpoint",
+      "required": false,
+      "default": "http://localhost:4318"
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make doctor",
+    "make proto",
+    "make test",
+    "make run",
+    "make up"
+  ]
+}

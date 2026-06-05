@@ -1,0 +1,34 @@
+services:
+  {{SERVICE_NAME}}:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.25-alpine}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
+    image: {{SERVICE_NAME}}:latest
+    ports:
+      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+      - "{{GRPC_PORT}}:{{GRPC_PORT}}"
+    environment:
+      CONFIG_FILE: /app/configs/config.yaml
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      STORE_DSN: {{DEPENDENCY_STORE_CONTAINER_DSN}}
+    depends_on:
+      - {{DEPENDENCY_STORE}}
+      - otel-collector
+
+  {{DEPENDENCY_STORE}}:
+    image: {{DEPENDENCY_STORE_IMAGE}}
+{{DEPENDENCY_STORE_ENV_BLOCK}}
+    ports:
+      - "{{DEPENDENCY_STORE_PORT}}:{{DEPENDENCY_STORE_PORT}}"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
