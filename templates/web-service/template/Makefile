@@ -12,10 +12,10 @@ export GOCACHE
 export GOLANGCI_LINT_CACHE
 
 ifeq ($(DOCKER_VARIANT),ubuntu)
-BUILDER_IMAGE ?= public.ecr.aws/docker/library/golang:1.22
+BUILDER_IMAGE ?= public.ecr.aws/docker/library/golang:1.26
 RUNTIME_IMAGE ?= public.ecr.aws/docker/library/ubuntu:26.04
 else
-BUILDER_IMAGE ?= golang:1.22-alpine
+BUILDER_IMAGE ?= golang:1.26-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 

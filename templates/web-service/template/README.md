@@ -90,11 +90,11 @@ docker compose up --build
 
 The Docker defaults are:
 
-- `DOCKER_VARIANT=alpine`: `golang:1.22-alpine` + `alpine:3.20`
-- `DOCKER_VARIANT=ubuntu`: `public.ecr.aws/docker/library/golang:1.22` + `public.ecr.aws/docker/library/ubuntu:26.04`
+- `DOCKER_VARIANT=alpine`: `golang:1.26-alpine` + `alpine:3.20`
+- `DOCKER_VARIANT=ubuntu`: `public.ecr.aws/docker/library/golang:1.26` + `public.ecr.aws/docker/library/ubuntu:26.04`
 
 You can also override the exact images directly:
 
 ```bash
-make docker-build BUILDER_IMAGE=public.ecr.aws/docker/library/golang:1.22 RUNTIME_IMAGE=public.ecr.aws/docker/library/ubuntu:26.04
+make docker-build BUILDER_IMAGE=public.ecr.aws/docker/library/golang:1.26 RUNTIME_IMAGE=public.ecr.aws/docker/library/ubuntu:26.04
 ```
