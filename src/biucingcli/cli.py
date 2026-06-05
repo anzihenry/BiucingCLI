@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from biucingcli import __version__
 from biucingcli.templates import load_template
 from biucingcli.templates import load_templates
 from biucingcli.templates import render_template
@@ -128,6 +129,12 @@ def microservice_dependency_config(store: str | None, service_name: str) -> dict
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
     parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+        help="Show the installed BiucingCLI version.",
+    )
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser("list", help="List available templates.")

@@ -4,6 +4,16 @@ BiucingCLI is a scaffold generator for independent developers who want practical
 
 The project is being restarted from a clean slate with a narrower goal: generate useful project skeletons, not an all-purpose agent workflow.
 
+## Version
+
+The current repository release target is `0.1.0`.
+
+```bash
+biucing --version
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for the initial release summary.
+
 ## Product Direction
 
 BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:

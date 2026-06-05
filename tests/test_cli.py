@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
 
@@ -57,6 +58,18 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Go, Gin, Protobuf, Buf, Docker Compose, OpenTelemetry", output)
         self.assertIn("proto_package", output)
         self.assertIn("grpc_port", output)
+
+    def test_version_prints_cli_version(self):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+
+        with self.assertRaises(SystemExit) as excinfo:
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                main(["--version"])
+
+        self.assertEqual(excinfo.exception.code, 0)
+        self.assertEqual(stdout.getvalue(), "biucing 0.1.0\n")
+        self.assertEqual(stderr.getvalue(), "")
 
     def test_create_android_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
