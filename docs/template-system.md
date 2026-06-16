@@ -98,8 +98,14 @@ Suggested output:
 
 ```text
 my-app/
+  .dockerignore
   README.md
+  Dockerfile
+  Dockerfile.dev
+  Makefile
+  compose.dev.yaml
   index.html
+  nginx.conf
   package.json
   tsconfig.json
   vite.config.ts
@@ -130,9 +136,12 @@ Suggested output:
 ```text
 user-service/
   .dockerignore
+  .air.toml
   README.md
   Dockerfile
+  Dockerfile.dev
   Makefile
+  compose.dev.yaml
   go.mod
   .gitignore
   cmd/
@@ -212,11 +221,15 @@ Suggested output:
 
 ```text
 my-microservice/
+  .air.toml
+  .dockerignore
   README.md
   Brewfile
   .mise.toml
   Makefile
   Dockerfile
+  Dockerfile.dev
+  compose.dev.yaml
   cmd/
     server/
   internal/

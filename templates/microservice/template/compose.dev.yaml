@@ -1,0 +1,42 @@
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /workspace
+    command: air -c .air.toml
+    environment:
+      CONFIG_FILE: /workspace/configs/config.yaml
+      GOCACHE: /workspace/.cache/go-build
+      GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      STORE_DSN: {{DEPENDENCY_STORE_CONTAINER_DSN}}
+    depends_on:
+      - {{DEPENDENCY_STORE}}
+      - otel-collector
+    ports:
+      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+      - "{{GRPC_PORT}}:{{GRPC_PORT}}"
+    volumes:
+      - .:/workspace
+      - microservice-go-build:/workspace/.cache/go-build
+      - microservice-golangci-lint:/workspace/.cache/golangci-lint
+
+  {{DEPENDENCY_STORE}}:
+    image: {{DEPENDENCY_STORE_IMAGE}}
+{{DEPENDENCY_STORE_ENV_BLOCK}}
+    ports:
+      - "{{DEPENDENCY_STORE_PORT}}:{{DEPENDENCY_STORE_PORT}}"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.126.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./deploy/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  microservice-go-build:
+  microservice-golangci-lint:

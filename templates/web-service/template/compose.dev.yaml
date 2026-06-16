@@ -1,0 +1,21 @@
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /workspace
+    command: air -c .air.toml
+    environment:
+      CONFIG_FILE: /workspace/configs/config.yaml
+      GOCACHE: /workspace/.cache/go-build
+      GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
+    ports:
+      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+    volumes:
+      - .:/workspace
+      - web-service-go-build:/workspace/.cache/go-build
+      - web-service-golangci-lint:/workspace/.cache/golangci-lint
+
+volumes:
+  web-service-go-build:
+  web-service-golangci-lint:

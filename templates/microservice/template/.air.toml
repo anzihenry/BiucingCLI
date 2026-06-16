@@ -1,0 +1,11 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/server ./cmd/server"
+bin = "./tmp/server"
+exclude_dir = [".git", ".cache", "bin", "tmp"]
+include_ext = ["go", "yaml", "proto"]
+
+[log]
+time = true

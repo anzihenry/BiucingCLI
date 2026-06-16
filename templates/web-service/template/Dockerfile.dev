@@ -1,0 +1,30 @@
+FROM golang:1.26-bookworm
+
+WORKDIR /workspace
+
+ARG AIR_VERSION=1.65.3
+ARG GOLANGCI_LINT_VERSION=2.12.2
+ARG TARGETARCH
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bash ca-certificates curl git make tar \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    case "${TARGETARCH}" in \
+      arm64) air_arch="arm64"; golangci_arch="arm64" ;; \
+      amd64) air_arch="amd64"; golangci_arch="amd64" ;; \
+      *) echo "Unsupported TARGETARCH: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/air-verse/air/releases/download/v${AIR_VERSION}/air_${AIR_VERSION}_linux_${air_arch}.tar.gz" \
+      | tar -xz -C /usr/local/bin air; \
+    curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${golangci_arch}.tar.gz" \
+      | tar -xz -C /tmp; \
+    mv "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${golangci_arch}/golangci-lint" /usr/local/bin/golangci-lint; \
+    rm -rf /tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${golangci_arch}
+
+ENV PATH="/go/bin:${PATH}"
+ENV GOCACHE=/workspace/.cache/go-build
+ENV GOLANGCI_LINT_CACHE=/workspace/.cache/golangci-lint
+
+CMD ["air", "-c", ".air.toml"]

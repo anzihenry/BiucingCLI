@@ -45,10 +45,9 @@
   ],
   "next_steps": [
     "make bootstrap",
-    "make doctor",
-    "make proto",
-    "make test",
-    "make run",
-    "make up"
+    "make dev",
+    "make verify",
+    "make up",
+    "make docker-build"
   ]
 }

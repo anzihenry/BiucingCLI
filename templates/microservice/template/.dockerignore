@@ -1,4 +1,5 @@
-.git
-.cache
-bin
-tmp
+.git/
+.cache/
+bin/
+tmp/
+.DS_Store

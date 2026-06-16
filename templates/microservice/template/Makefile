@@ -6,6 +6,8 @@ HTTP_PORT ?={{HTTP_PORT}}
 GRPC_PORT ?={{GRPC_PORT}}
 HOST_HTTP_PORT ?={{HTTP_PORT}}
 HOST_GRPC_PORT ?={{GRPC_PORT}}
+DEV_COMPOSE_FILE ?=compose.dev.yaml
+DEV_SERVICE ?=app-dev
 DOCKER_VARIANT ?=alpine
 DOCKER_PLATFORM ?=linux/arm64
 COMPOSE_FILE ?=deploy/compose.yaml
@@ -22,61 +24,48 @@ BUILDER_IMAGE ?= golang:1.26-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 
-.PHONY: bootstrap doctor tidy proto lint test verify run up down logs build docker-build docker-run
+.PHONY: bootstrap doctor dev dev-shell tidy proto lint test verify run up down logs build docker-build docker-run
 
 bootstrap:
-	./scripts/bootstrap
+	docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
 doctor:
-	./scripts/doctor
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
+
+dev:
+	docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) {{DEPENDENCY_STORE}} otel-collector
+
+dev-shell:
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash
 
 tidy:
-	@mkdir -p "$(GOCACHE)"
-	go mod tidy
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go mod tidy
 
 proto:
-	@if ! command -v buf >/dev/null 2>&1; then \
-		echo "buf is not installed. Run ./scripts/bootstrap or install it via Brewfile."; \
-		exit 1; \
-	fi
-	buf generate ./api
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) buf generate ./api
 
 lint:
-	@if ! command -v buf >/dev/null 2>&1; then \
-		echo "buf is not installed. Run ./scripts/bootstrap or install it via Brewfile."; \
-		exit 1; \
-	fi
-	@if ! command -v golangci-lint >/dev/null 2>&1; then \
-		echo "golangci-lint is not installed. Run ./scripts/bootstrap or install it via Brewfile."; \
-		exit 1; \
-	fi
-	@mkdir -p "$(GOCACHE)"
-	@mkdir -p "$(GOLANGCI_LINT_CACHE)"
-	buf lint ./api
-	golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "buf lint ./api && golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./..."
 
 test:
-	@mkdir -p "$(GOCACHE)"
-	go test ./...
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
 
 verify: doctor proto lint test
 
 run:
-	@mkdir -p "$(GOCACHE)"
-	go run ./cmd/server
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE)
 
 up:
-	docker compose -f $(COMPOSE_FILE) up --build
+	docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) {{DEPENDENCY_STORE}} otel-collector
 
 down:
-	docker compose -f $(COMPOSE_FILE) down --remove-orphans
+	docker compose -f $(DEV_COMPOSE_FILE) down --remove-orphans
 
 logs:
-	docker compose -f $(COMPOSE_FILE) logs -f
+	docker compose -f $(DEV_COMPOSE_FILE) logs -f
 
 build:
-	@mkdir -p "$(GOCACHE)"
-	go build -o bin/$(APP_NAME) ./cmd/server
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
 
 docker-build:
 	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) -t $(IMAGE_REF) .

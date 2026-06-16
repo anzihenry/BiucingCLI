@@ -19,8 +19,9 @@
     }
   ],
   "next_steps": [
-    "corepack enable pnpm",
-    "pnpm install",
-    "pnpm dev"
+    "make dev",
+    "make test",
+    "make docker-build",
+    "make docker-run"
   ]
 }

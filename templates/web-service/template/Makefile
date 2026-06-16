@@ -4,6 +4,8 @@ TAG ?=latest
 IMAGE_REF := $(IMAGE):$(TAG)
 CONTAINER_PORT ?={{HTTP_PORT}}
 HOST_PORT ?={{HTTP_PORT}}
+DEV_COMPOSE_FILE ?=compose.dev.yaml
+DEV_SERVICE ?=app-dev
 DOCKER_VARIANT ?=alpine
 DOCKER_PLATFORM ?=linux/arm64
 GOCACHE ?= $(CURDIR)/.cache/go-build
@@ -19,40 +21,36 @@ BUILDER_IMAGE ?= golang:1.26-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 
-.PHONY: bootstrap doctor tidy lint test verify run build docker-build docker-run docker-push
+.PHONY: bootstrap doctor dev dev-shell tidy lint test verify run build docker-build docker-run docker-push
 
 bootstrap:
-	./scripts/bootstrap
+	docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
 doctor:
-	./scripts/doctor
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
+
+dev:
+	docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
+
+dev-shell:
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash
 
 tidy:
-	@mkdir -p "$(GOCACHE)"
-	go mod tidy
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go mod tidy
 
 lint:
-	@if ! command -v golangci-lint >/dev/null 2>&1; then \
-		echo "golangci-lint is not installed. Run ./scripts/bootstrap or install it via Brewfile."; \
-		exit 1; \
-	fi
-	@mkdir -p "$(GOCACHE)"
-	@mkdir -p "$(GOLANGCI_LINT_CACHE)"
-	golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...
 
 test:
-	@mkdir -p "$(GOCACHE)"
-	go test ./...
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
 
 verify: doctor lint test
 
 run:
-	@mkdir -p "$(GOCACHE)"
-	go run ./cmd/server
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE)
 
 build:
-	@mkdir -p "$(GOCACHE)"
-	go build -o bin/$(APP_NAME) ./cmd/server
+	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
 
 docker-build:
 	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) -t $(IMAGE_REF) .

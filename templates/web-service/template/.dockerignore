@@ -1,6 +1,5 @@
-.git
-.gitignore
-bin
-dist
-coverage.out
-README.md
+.git/
+.cache/
+bin/
+tmp/
+.DS_Store

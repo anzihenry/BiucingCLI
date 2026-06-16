@@ -25,11 +25,8 @@
   ],
   "next_steps": [
     "make bootstrap",
-    "make doctor",
-    "make lint",
-    "make test",
+    "make dev",
     "make verify",
-    "make run",
     "make docker-build",
     "make docker-run"
   ]
