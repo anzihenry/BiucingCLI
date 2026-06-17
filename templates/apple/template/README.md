@@ -63,5 +63,6 @@ make beta
 - `Workspace.swift` defines the generated workspace composition.
 - `App/Project.swift` is the source of truth for the app target graph.
 - `Packages/DesignSystem` is a local Swift package consumed by the app target.
+- `AppTests` includes starter examples for a small view-model test and a mocked service dependency.
 - `make doctor` is the fastest way to catch missing Xcode, Tuist, fastlane, or simulator setup before native commands fail later.
 - Generated `.xcodeproj` and `.xcworkspace` files should not be edited manually.

@@ -740,6 +740,12 @@ class CLITestCase(unittest.TestCase):
             project_swift = (project_dir / "App" / "Project.swift").read_text(
                 encoding="utf-8"
             )
+            home_view = (
+                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeView.swift"
+            ).read_text(encoding="utf-8")
+            home_view_model = (
+                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeViewModel.swift"
+            ).read_text(encoding="utf-8")
             bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
             doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
             design_system = (
@@ -772,6 +778,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make format", readme)
             self.assertIn("simulator/runtime visibility", readme)
             self.assertIn("warning-only signal for macOS starters", readme)
+            self.assertIn("small view-model test", readme)
+            self.assertIn("mocked service dependency", readme)
             self.assertIn("generate:", makefile)
             self.assertIn("tuist generate --no-open", makefile)
             self.assertIn("platform=macOS", makefile)
@@ -787,6 +795,11 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
             self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
+            self.assertIn("private let viewModel = HomeViewModel(", home_view)
+            self.assertIn('Text("Release Checklist")', home_view)
+            self.assertIn("struct HomeViewModel", home_view_model)
+            self.assertIn("protocol ReleaseChecklistProviding", home_view_model)
+            self.assertIn("func releaseChecklist() -> [String]", home_view_model)
             self.assertIn("brew bundle", bootstrap)
             self.assertIn("Apple environment doctor", doctor)
             self.assertIn('platform_name="macOS"', doctor)
@@ -801,7 +814,11 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Doctor completed with", doctor)
             self.assertIn('.macOS("26.0")', design_system)
             self.assertIn("enum BiucingTheme", design_system_theme)
+            self.assertIn("sectionTitleFont", design_system_theme)
             self.assertIn("@testable import PulseMac", app_tests)
+            self.assertIn("func testHomeViewModelBuildsOverviewFacts()", app_tests)
+            self.assertIn("func testHomeViewModelUsesMockChecklistProvider()", app_tests)
+            self.assertIn("private struct MockReleaseChecklistProvider", app_tests)
 
 
 if __name__ == "__main__":
