@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import {{PACKAGE_NAME}}.core.model.Greeting
 
 @Composable
+@Suppress("ktlint:standard:function-naming")
 fun HomeRoute() {
     val greeting = Greeting(
         title = "{{DISPLAY_NAME}}",

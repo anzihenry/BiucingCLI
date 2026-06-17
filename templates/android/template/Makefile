@@ -27,7 +27,7 @@ lint:
 	./gradlew lint
 
 format:
-	@echo "Formatting task is not configured in the starter yet."
+	./gradlew spotlessApply
 
 install-debug:
 	./gradlew installDebug

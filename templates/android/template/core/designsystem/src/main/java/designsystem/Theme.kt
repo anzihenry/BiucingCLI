@@ -9,6 +9,7 @@ private val LightColors = lightColorScheme()
 private val DarkColors = darkColorScheme()
 
 @Composable
+@Suppress("ktlint:standard:function-naming")
 fun BiucingTheme(
     darkTheme: Boolean = false,
     content: @Composable () -> Unit,

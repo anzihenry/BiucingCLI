@@ -138,6 +138,7 @@ class CLITestCase(unittest.TestCase):
                 if path.is_file()
             }
             expected_files = {
+                ".editorconfig",
                 ".gitignore",
                 ".mise.toml",
                 "Brewfile",
@@ -175,9 +176,15 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(project_dir.exists())
             self.assertIn("Created android project: demo-android", output)
             self.assertIn("make bootstrap", output)
+            self.assertIn("make format", output)
             self.assertIn('open -a "Android Studio" .', output)
             self.assertIn("Application ID: `com.example.demoandroid.app`", readme)
+            self.assertIn("make format", readme)
             self.assertIn('rootProject.name = "demo-android"', settings_gradle)
+            self.assertIn('alias(libs.plugins.spotless)', (project_dir / "build.gradle.kts").read_text(encoding="utf-8"))
+            self.assertIn('ktlint = "1.8.0"', (project_dir / "gradle" / "libs.versions.toml").read_text(encoding="utf-8"))
+            self.assertIn('spotless = "8.7.0"', (project_dir / "gradle" / "libs.versions.toml").read_text(encoding="utf-8"))
+            self.assertIn("ktlint(libs.versions.ktlint.get())", (project_dir / "build.gradle.kts").read_text(encoding="utf-8"))
             self.assertIn('include(":feature:home")', settings_gradle)
             self.assertIn('namespace = "com.example.demoandroid"', app_build)
             self.assertIn('applicationId = "com.example.demoandroid.app"', app_build)
@@ -194,6 +201,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("./scripts/setup-android-sdk", bootstrap)
             self.assertNotIn("./scripts/sync-gradle-wrapper", bootstrap)
             self.assertIn("gradle-wrapper.jar is missing", doctor)
+            self.assertIn("./gradlew spotlessApply", (project_dir / "Makefile").read_text(encoding="utf-8"))
             self.assertIn("gradle wrapper --gradle-version 8.10.2", sync_wrapper)
             self.assertIn('-jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"', gradlew)
             self.assertTrue(expected_files.issubset(generated_files))
