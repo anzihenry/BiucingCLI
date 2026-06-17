@@ -30,10 +30,10 @@ test:
 		test
 
 lint:
-	swiftlint
+	swiftlint lint --cache-path .swiftlint-cache
 
 format:
-	swiftformat .
+	swiftformat . --cache .swiftformat.cache
 
 beta:
 	fastlane beta

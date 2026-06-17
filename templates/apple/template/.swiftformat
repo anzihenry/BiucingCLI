@@ -1,0 +1,10 @@
+--swiftversion 6
+--indent 4
+--linebreaks lf
+--disable trailingCommas
+--wraparguments before-first
+--wrapcollections before-first
+--closingparen balanced
+--stripunusedargs closure-only
+--self remove
+--maxwidth 120

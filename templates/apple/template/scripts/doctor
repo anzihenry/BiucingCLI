@@ -4,4 +4,6 @@ set -euo pipefail
 xcode-select -p >/dev/null
 tuist version >/dev/null
 swift --version >/dev/null
+swiftlint version >/dev/null
+swiftformat --version >/dev/null
 echo "Environment looks ready."

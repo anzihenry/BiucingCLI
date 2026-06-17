@@ -1,5 +1,5 @@
-import XCTest
 @testable import {{SWIFT_MODULE_NAME}}
+import XCTest
 
 final class AppTests: XCTestCase {
     func testExample() {

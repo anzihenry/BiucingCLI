@@ -50,6 +50,7 @@
   "next_steps": [
     "make bootstrap",
     "make generate",
+    "make lint",
     "make test",
     "open {{PROJECT_NAME}}.xcworkspace"
   ]

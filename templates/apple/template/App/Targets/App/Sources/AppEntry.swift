@@ -1,5 +1,5 @@
-import SwiftUI
 import DesignSystem
+import SwiftUI
 
 @main
 struct {{SWIFT_MODULE_NAME}}App: App {

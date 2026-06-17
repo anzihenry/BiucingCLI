@@ -704,10 +704,17 @@ class CLITestCase(unittest.TestCase):
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
             makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
             tuist_config = (project_dir / "Tuist.swift").read_text(encoding="utf-8")
+            swiftlint_config = (project_dir / ".swiftlint.yml").read_text(
+                encoding="utf-8"
+            )
+            swiftformat_config = (project_dir / ".swiftformat").read_text(
+                encoding="utf-8"
+            )
             project_swift = (project_dir / "App" / "Project.swift").read_text(
                 encoding="utf-8"
             )
             bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
             design_system = (
                 project_dir
                 / "Packages"
@@ -729,17 +736,29 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(project_dir.exists())
             self.assertIn("Created apple project: pulse-mac", output)
             self.assertIn("make bootstrap", output)
+            self.assertIn("make lint", output)
             self.assertIn("Tuist", readme)
             self.assertIn("Target platform: `macOS`", readme)
+            self.assertIn("make lint", readme)
+            self.assertIn("make format", readme)
             self.assertIn("generate:", makefile)
             self.assertIn("tuist generate --no-open", makefile)
             self.assertIn("platform=macOS", makefile)
+            self.assertIn("swiftlint lint --cache-path .swiftlint-cache", makefile)
+            self.assertIn("swiftformat . --cache .swiftformat.cache", makefile)
+            self.assertIn("included:", swiftlint_config)
+            self.assertIn("modifier_order", swiftlint_config)
+            self.assertIn("--swiftversion 6", swiftformat_config)
+            self.assertIn("--disable trailingCommas", swiftformat_config)
+            self.assertIn("--maxwidth 120", swiftformat_config)
             self.assertIn("let config = Config(", tuist_config)
             self.assertNotIn("fullHandle:", tuist_config)
             self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
             self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
             self.assertIn("brew bundle", bootstrap)
+            self.assertIn("swiftlint version >/dev/null", doctor)
+            self.assertIn("swiftformat --version >/dev/null", doctor)
             self.assertIn('.macOS("26.0")', design_system)
             self.assertIn("enum BiucingTheme", design_system_theme)
             self.assertIn("@testable import PulseMac", app_tests)
