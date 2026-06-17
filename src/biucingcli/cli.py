@@ -91,6 +91,159 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
     return resolved
 
 
+def apple_platform_snippets(values: dict[str, str]) -> dict[str, str]:
+    """Return platform-specific Apple template snippets using resolved values."""
+    platform = values.get("apple_platform", "ios")
+    display_name = values.get("display_name", "App")
+
+    if platform == "macos":
+        return {
+            "apple_scene_body": "\n".join(
+                [
+                    f'        WindowGroup("{display_name}") {{',
+                    "            HomeView()",
+                    "        }",
+                    "        .defaultSize(width: 1100, height: 720)",
+                ]
+            ),
+            "apple_home_body": "\n".join(
+                [
+                    "    var body: some View {",
+                    "        NavigationSplitView {",
+                    '            List {',
+                    '                Section("Workspace") {',
+                    '                    Label("Overview", systemImage: "sidebar.left")',
+                    '                    Label("Release Checklist", systemImage: "checkmark.circle")',
+                    "                }",
+                    "            }",
+                    "            .navigationSplitViewColumnWidth(min: 220, ideal: 240)",
+                    "        } detail: {",
+                    "            ScrollView {",
+                    "                VStack(alignment: .leading, spacing: 20) {",
+                    "                    Text(viewModel.title)",
+                    "                        .font(BiucingTheme.titleFont)",
+                    "",
+                    "                    Text(viewModel.subtitle)",
+                    "                        .font(BiucingTheme.bodyFont)",
+                    "                        .foregroundStyle(.secondary)",
+                    "",
+                    '                    GroupBox("Project Summary") {',
+                    "                        VStack(alignment: .leading, spacing: 8) {",
+                    "                            ForEach(viewModel.facts, id: \\.label) { fact in",
+                    '                                Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
+                    "                            }",
+                    "                        }",
+                    "                        .font(BiucingTheme.captionFont)",
+                    "                    }",
+                    "",
+                    '                    GroupBox("Release Checklist") {',
+                    "                        VStack(alignment: .leading, spacing: 8) {",
+                    "                            ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
+                    '                                Label(item, systemImage: "checkmark.circle")',
+                    "                            }",
+                    "                        }",
+                    "                        .font(BiucingTheme.captionFont)",
+                    "                    }",
+                    "                }",
+                    "                .frame(maxWidth: 680, alignment: .leading)",
+                    "                .padding(24)",
+                    "            }",
+                    '            .navigationTitle("Overview")',
+                    "        }",
+                    "    }",
+                ]
+            ),
+            "apple_platform_output_note": (
+                "macOS starters use a split-view workspace with a fixed desktop window size."
+            ),
+        }
+
+    if platform == "ios":
+        return {
+            "apple_scene_body": "\n".join(
+                [
+                    "        WindowGroup {",
+                    "            HomeView()",
+                    "        }",
+                ]
+            ),
+            "apple_home_body": "\n".join(
+                [
+                    "    var body: some View {",
+                    "        NavigationStack {",
+                    "            List {",
+                    '                Section("Project Summary") {',
+                    "                    ForEach(viewModel.facts, id: \\.label) { fact in",
+                    '                        Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
+                    "                    }",
+                    "                }",
+                    "",
+                    '                Section("Release Checklist") {',
+                    "                    ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
+                    '                        Label(item, systemImage: "checkmark.circle")',
+                    "                    }",
+                    "                }",
+                    "            }",
+                    "            .listStyle(.insetGrouped)",
+                    '            .navigationTitle("Starter Overview")',
+                    "        }",
+                    "    }",
+                ]
+            ),
+            "apple_platform_output_note": (
+                "iOS starters use a stacked overview screen tuned for simulator-first mobile flows."
+            ),
+        }
+
+    return {
+        "apple_scene_body": "\n".join(
+            [
+                "        WindowGroup {",
+                "            HomeView()",
+                "        }",
+            ]
+        ),
+        "apple_home_body": "\n".join(
+            [
+                "    var body: some View {",
+                "        NavigationStack {",
+                "            VStack(alignment: .leading, spacing: 16) {",
+                "                Text(viewModel.title)",
+                "                    .font(BiucingTheme.titleFont)",
+                "",
+                "                Text(viewModel.subtitle)",
+                "                    .font(BiucingTheme.bodyFont)",
+                "                    .foregroundStyle(.secondary)",
+                "",
+                "                VStack(alignment: .leading, spacing: 8) {",
+                "                    ForEach(viewModel.facts, id: \\.label) { fact in",
+                '                        Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
+                "                    }",
+                "                }",
+                "                .font(BiucingTheme.captionFont)",
+                "",
+                "                VStack(alignment: .leading, spacing: 8) {",
+                '                    Text("Release Checklist")',
+                "                        .font(BiucingTheme.sectionTitleFont)",
+                "",
+                "                    ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
+                '                        Label(item, systemImage: "checkmark.circle")',
+                "                    }",
+                "                }",
+                "                .font(BiucingTheme.captionFont)",
+                "            }",
+                "            .padding(24)",
+                '            .navigationTitle("Overview")',
+                "        }",
+                "    }",
+            ]
+        ),
+        "apple_platform_output_note": (
+            f"{values.get('apple_platform_name', 'Apple')} starters currently keep the shared overview layout."
+        ),
+    }
+
+
 def microservice_dependency_config(store: str | None, service_name: str) -> dict[str, str]:
     """Return derived local dependency values for the microservice template."""
     selected = (store or "postgres").lower()
@@ -280,6 +433,8 @@ def create_project(args: argparse.Namespace) -> str:
             "service_type_name": default_swift_module_name(args.project_name),
         }
     )
+    if args.template == "apple":
+        values.update(apple_platform_snippets(values))
     values.update({key: value for key, value in apple_values.items() if value is not None})
     values.update({key: value for key, value in microservice_values.items() if value is not None})
 

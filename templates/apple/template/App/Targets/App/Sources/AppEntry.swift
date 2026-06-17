@@ -4,8 +4,6 @@ import SwiftUI
 @main
 struct {{SWIFT_MODULE_NAME}}App: App {
     var body: some Scene {
-        WindowGroup {
-            HomeView()
-        }
+{{APPLE_SCENE_BODY}}
     }
 }

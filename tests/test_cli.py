@@ -813,6 +813,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make format", readme)
             self.assertIn("simulator/runtime visibility", readme)
             self.assertIn("warning-only signal for macOS starters", readme)
+            self.assertIn("split-view workspace", readme)
             self.assertIn("small view-model test", readme)
             self.assertIn("mocked service dependency", readme)
             self.assertIn("generate:", makefile)
@@ -830,8 +831,13 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
             self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
+            self.assertIn('WindowGroup("Pulse Mac")', (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
+            self.assertIn(".defaultSize(width: 1100, height: 720)", (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
             self.assertIn("private let viewModel = HomeViewModel(", home_view)
-            self.assertIn('Text("Release Checklist")', home_view)
+            self.assertIn("NavigationSplitView", home_view)
+            self.assertIn('Section("Workspace")', home_view)
+            self.assertIn('GroupBox("Project Summary")', home_view)
+            self.assertIn('GroupBox("Release Checklist")', home_view)
             self.assertIn("struct HomeViewModel", home_view_model)
             self.assertIn("protocol ReleaseChecklistProviding", home_view_model)
             self.assertIn("func releaseChecklist() -> [String]", home_view_model)
@@ -854,6 +860,51 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("func testHomeViewModelBuildsOverviewFacts()", app_tests)
             self.assertIn("func testHomeViewModelUsesMockChecklistProvider()", app_tests)
             self.assertIn("private struct MockReleaseChecklistProvider", app_tests)
+
+    def test_create_apple_ios_renders_platform_specific_output(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "apple",
+                    "pulse-ios",
+                    "--output-dir",
+                    tmpdir,
+                    "--platform",
+                    "ios",
+                    "--bundle-identifier",
+                    "com.example.pulseios",
+                    "--organization-name",
+                    "Example Labs",
+                    "--development-team",
+                    "ABCDE12345",
+                ]
+            )
+            project_dir = Path(tmpdir) / "pulse-ios"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            project_swift = (project_dir / "App" / "Project.swift").read_text(
+                encoding="utf-8"
+            )
+            app_entry = (
+                project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift"
+            ).read_text(encoding="utf-8")
+            home_view = (
+                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeView.swift"
+            ).read_text(encoding="utf-8")
+
+            self.assertIn("Created apple project: pulse-ios", output)
+            self.assertIn("make doctor", output)
+            self.assertIn("Target platform: `iOS`", readme)
+            self.assertIn("stacked overview screen", readme)
+            self.assertIn("destinations: .iOS", project_swift)
+            self.assertIn('deploymentTargets: .iOS("26.0")', project_swift)
+            self.assertIn("WindowGroup {", app_entry)
+            self.assertNotIn(".defaultSize(", app_entry)
+            self.assertIn("NavigationStack", home_view)
+            self.assertIn('Section("Project Summary")', home_view)
+            self.assertIn(".listStyle(.insetGrouped)", home_view)
+            self.assertIn('navigationTitle("Starter Overview")', home_view)
+            self.assertNotIn("NavigationSplitView", home_view)
 
 
 if __name__ == "__main__":

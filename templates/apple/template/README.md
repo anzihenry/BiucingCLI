@@ -65,4 +65,5 @@ make beta
 - `Packages/DesignSystem` is a local Swift package consumed by the app target.
 - `AppTests` includes starter examples for a small view-model test and a mocked service dependency.
 - `make doctor` is the fastest way to catch missing Xcode, Tuist, fastlane, or simulator setup before native commands fail later.
+- `{{APPLE_PLATFORM_OUTPUT_NOTE}}`
 - Generated `.xcodeproj` and `.xcworkspace` files should not be edited manually.
