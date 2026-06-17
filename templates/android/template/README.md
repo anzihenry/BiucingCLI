@@ -53,12 +53,15 @@ make doctor
 make format
 make build
 make test
+make test-ui
 make lint
 make install-debug
 make beta
 ```
 
 `make doctor` validates the active JDK, Android SDK root, `cmdline-tools/latest`, `adb`, emulator/AVD visibility, and the committed Gradle wrapper before you spend time on Gradle builds.
+`make test-ui` runs `connectedDebugAndroidTest`, so boot an emulator or connect a device first. AVDs created through Android Studio Device Manager work well for the generated Compose smoke test.
+If `adb devices` reports `unauthorized`, accept the host key prompt on the emulator or restart adb before re-running `make test-ui`.
 
 ## Notes
 
@@ -66,6 +69,7 @@ make beta
 - `gradle/libs.versions.toml` is the source of truth for plugin and dependency versions.
 - `.editorconfig` defines the baseline formatting behavior shared by Kotlin and Gradle Kotlin DSL files.
 - `make doctor` is the fastest way to catch missing SDK, JDK, or emulator setup before `make build` and `make test`.
+- `app/src/androidTest/` contains a starter Compose UI smoke test for the generated home screen.
 - `app/` should stay focused on app shell concerns.
 - `feature/home` demonstrates how to add a user-facing feature module.
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.

@@ -73,6 +73,7 @@
     "make format",
     "make build",
     "make test",
+    "make test-ui",
     "open -a \"Android Studio\" ."
   ]
 }
