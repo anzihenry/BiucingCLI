@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
+import {{PACKAGE_NAME}}.core.designsystem.AppSectionCard
+import {{PACKAGE_NAME}}.core.designsystem.BiucingSpacing
+import {{PACKAGE_NAME}}.core.designsystem.StatusBadge
 import {{PACKAGE_NAME}}.core.network.DefaultAppEnvironmentProvider
 
 @Composable
@@ -13,14 +15,21 @@ import {{PACKAGE_NAME}}.core.network.DefaultAppEnvironmentProvider
 fun SettingsRoute() {
     val environment = DefaultAppEnvironmentProvider().environment()
 
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = "Release channel: ${environment.releaseChannel}",
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Text(
-            text = "API base URL: ${environment.apiBaseUrl}",
-            style = MaterialTheme.typography.bodyMedium,
-        )
+    AppSectionCard(
+        title = "Environment",
+        eyebrow = "Shared Config",
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(BiucingSpacing.small)) {
+            StatusBadge(text = "Release channel: ${environment.releaseChannel}")
+            Text(
+                text = "API base URL: ${environment.apiBaseUrl}",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = "Dark theme colors and reusable section cards live in core/designsystem.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
