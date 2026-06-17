@@ -1,24 +1,125 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-java -version >/dev/null
-adb version >/dev/null
+failures=0
+warnings=0
+
+pass() {
+  echo "[pass] $1"
+}
+
+warn() {
+  echo "[warn] $1"
+  warnings=$((warnings + 1))
+}
+
+fail() {
+  echo "[fail] $1"
+  failures=$((failures + 1))
+}
+
 sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+java_cmd=""
+
+echo "Android environment doctor"
+
+if [[ -n "${JAVA_HOME:-}" ]]; then
+  if [[ -x "${JAVA_HOME}/bin/java" ]]; then
+    java_cmd="${JAVA_HOME}/bin/java"
+    pass "JAVA_HOME is set to ${JAVA_HOME}"
+  else
+    fail "JAVA_HOME is set to ${JAVA_HOME}, but ${JAVA_HOME}/bin/java is not executable. Point JAVA_HOME at a JDK, for example Java {{JAVA_VERSION}}."
+  fi
+fi
+
+if [[ -z "$java_cmd" ]]; then
+  if command -v java >/dev/null 2>&1; then
+    java_cmd="$(command -v java)"
+    pass "java is available at ${java_cmd}"
+  else
+    fail "java is not available. Install a JDK and export JAVA_HOME before running Gradle."
+  fi
+fi
+
+if [[ -n "$java_cmd" ]]; then
+  java_version="$("$java_cmd" -version 2>&1 | head -n 1)"
+  echo "java: ${java_version}"
+fi
+
+if [[ -n "${ANDROID_HOME:-}" && -n "${ANDROID_SDK_ROOT:-}" && "${ANDROID_HOME}" != "${ANDROID_SDK_ROOT}" ]]; then
+  warn "ANDROID_HOME (${ANDROID_HOME}) and ANDROID_SDK_ROOT (${ANDROID_SDK_ROOT}) differ. Prefer pointing both to the same SDK root."
+fi
+
 if [[ -z "$sdk_root" ]]; then
-  echo "ANDROID_HOME or ANDROID_SDK_ROOT must be set."
-  exit 1
+  fail "ANDROID_HOME or ANDROID_SDK_ROOT must be set. Example: export ANDROID_HOME=\$HOME/Library/Android/sdk"
+else
+  if [[ -d "$sdk_root" ]]; then
+    pass "Android SDK root found at ${sdk_root}"
+  else
+    fail "Android SDK root ${sdk_root} does not exist. Install the SDK from Android Studio and update ANDROID_HOME or ANDROID_SDK_ROOT."
+  fi
+fi
+
+cmdline_tools_root="${sdk_root}/cmdline-tools/latest"
+if [[ -n "$sdk_root" ]]; then
+  if [[ -x "${cmdline_tools_root}/bin/sdkmanager" ]]; then
+    pass "cmdline-tools/latest is installed at ${cmdline_tools_root}"
+  else
+    fail "Missing ${cmdline_tools_root}/bin/sdkmanager. Install Android cmdline-tools and ensure the SDK keeps a real cmdline-tools/latest directory."
+  fi
+fi
+
+adb_cmd=""
+if [[ -n "$sdk_root" && -x "${sdk_root}/platform-tools/adb" ]]; then
+  adb_cmd="${sdk_root}/platform-tools/adb"
+elif command -v adb >/dev/null 2>&1; then
+  adb_cmd="$(command -v adb)"
+fi
+
+if [[ -n "$adb_cmd" ]]; then
+  adb_version="$("$adb_cmd" version 2>&1 | head -n 1)"
+  pass "adb is available at ${adb_cmd}"
+  echo "adb: ${adb_version}"
+else
+  fail "adb is not available. Install Android SDK platform-tools and add them to PATH."
+fi
+
+emulator_cmd=""
+if [[ -n "$sdk_root" && -x "${sdk_root}/emulator/emulator" ]]; then
+  emulator_cmd="${sdk_root}/emulator/emulator"
+elif command -v emulator >/dev/null 2>&1; then
+  emulator_cmd="$(command -v emulator)"
+fi
+
+if [[ -n "$emulator_cmd" ]]; then
+  avd_output="$("$emulator_cmd" -list-avds 2>&1 || true)"
+  if [[ -n "$avd_output" ]]; then
+    avd_count="$(printf '%s\n' "$avd_output" | sed '/^$/d' | wc -l | tr -d ' ')"
+    pass "Emulator command is available and found ${avd_count} AVD(s)"
+  else
+    warn "Emulator command is available, but no AVDs were found. Create one in Android Studio Device Manager before running UI tests."
+  fi
+else
+  warn "emulator is not available on PATH or under the SDK root. Device Manager in Android Studio may still work, but command-line emulator checks are unavailable."
 fi
 
 if [[ ! -x "./gradlew" ]]; then
-  echo "./gradlew must be executable."
-  exit 1
+  fail "./gradlew must be executable. Restore the committed launcher script or run 'chmod +x ./gradlew'."
 fi
 
 if [[ ! -f "./gradle/wrapper/gradle-wrapper.jar" ]]; then
-  echo "gradle-wrapper.jar is missing."
-  echo "Restore the committed wrapper files or run 'make wrapper' to regenerate them."
+  fail "gradle-wrapper.jar is missing. Restore the committed wrapper files or run 'make wrapper' to regenerate them."
+else
+  pass "Gradle wrapper files are present"
+fi
+
+if (( failures > 0 )); then
+  echo "Doctor found ${failures} issue(s) and ${warnings} warning(s)."
   exit 1
 fi
 
-echo "ANDROID_HOME=$sdk_root"
-echo "Environment looks ready."
+if (( warnings > 0 )); then
+  echo "Doctor completed with ${warnings} warning(s)."
+else
+  echo "Environment looks ready."
+fi
