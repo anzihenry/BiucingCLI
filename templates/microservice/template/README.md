@@ -59,6 +59,8 @@ make docker-run
 - `scripts/doctor`: local environment checks
 - `make proto`: generate protobuf code through `Buf` inside Docker
 - `make verify`: run doctor, proto generation, lint, and tests together inside Docker
+- the development image prewarms `go mod download`; the first `make proto` may still fetch remote Buf plugin artifacts when the cache is empty
+- `GOPROXY` and `GOSUMDB` can be overridden on `make bootstrap`, `make dev`, `make up`, and `make docker-build` when your network needs a different Go module proxy or checksum policy
 
 ## Runtime Defaults
 

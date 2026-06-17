@@ -1,79 +1,53 @@
 # Roadmap
 
-## Phase 0: Reset
+## Shipped
 
-- Clear the old implementation.
-- Narrow the project down to a scaffold generator.
-- Rebuild the docs around a small, focused template system.
+### 0.1.0 - Scaffold Generator Baseline
 
-## Phase 1: Template Metadata
+- established the metadata-driven template system;
+- shipped `biucing list`, `biucing info`, `biucing create`, and `biucing --version`;
+- shipped five starters: `frontend`, `web-service`, `microservice`, `apple`, and `android`;
+- aligned the repo around a focused scaffold-generator product direction.
 
-Build the internal template model.
+### 0.2.0 - Template Maturity Expansion
 
-Expected behavior:
+- fully Dockerized the `frontend`, `web-service`, and `microservice` starters for local development and runtime packaging;
+- expanded the Apple starter into a stronger Tuist + SwiftPM baseline with platform-aware output and better doctor/lint/release guidance;
+- expanded the Android starter into a more complete Kotlin + Compose baseline with a committed Gradle wrapper, stronger doctor checks, UI smoke coverage, and release-signing placeholders;
+- validated generated starters repeatedly with real build and test workflows.
 
-- each template has a metadata file;
-- metadata describes stack, variables, and next steps;
-- CLI commands can read one source of truth for `list`, `info`, and `create`.
+## Next
 
-## Phase 2: `frontend` Template
+### 0.3.0 - Productize The Generator
 
-Build `biucing create frontend <project-name>`.
+Primary direction:
 
-Expected behavior:
+- keep the current five-template strategy stable;
+- improve BiucingCLI itself as a product, not just the generated templates;
+- make the generator easier to inspect, script, validate, and trust in repeated use.
 
-- generate a React + TypeScript starter;
-- replace a few core variables such as project and package name;
-- produce a restrained folder structure and README.
+Planned workstreams:
 
-## Phase 3: `web-service` Template
+- CLI experience hardening:
+  add better inspection and machine-readable output around template discovery and creation.
+- Template metadata evolution:
+  extend metadata so the CLI can explain maturity, platform support, validation status, and operating assumptions.
+- Verification productization:
+  standardize how the repo proves template quality across Python tests and generated-project smoke checks.
+- Release readiness:
+  make version planning, changelog preparation, and release evidence easier to maintain from the repo.
 
-Build `biucing create web-service <project-name>`.
+### Candidate 0.3.0 Outcomes
 
-Expected behavior:
+- `biucing list` and `biucing info` can serve both humans and scripts cleanly.
+- `biucing create` is more predictable in unattended and repeatable workflows.
+- each template exposes clearer maturity signals and supported workflows.
+- the repo has a cleaner release plan and verification matrix for future versions.
 
-- generate a Go + Gin web service starter;
-- prompt for `module_name` if missing;
-- replace service name and default port;
-- produce a clear backend layout with `cmd/server` and `internal` packages.
+## Deferred
 
-## Phase 4: CLI Experience
+These are intentionally not the center of `0.3.0` unless the roadmap changes:
 
-Build `biucing list` and `biucing info <template>`.
-
-Expected behavior:
-
-- show available templates clearly;
-- explain what each template is for;
-- describe generated structure and basic next steps.
-
-## Phase 5: Microservice Starter
-
-Build `biucing create microservice <project-name>`.
-
-Expected behavior:
-
-- generate a Go starter shaped for protobuf-based services;
-- define a clean `Buf`-based code generation path;
-- include local compose orchestration for the service and one dependency;
-- include a baseline OpenTelemetry development path;
-- keep the template smaller than a full internal platform starter.
-
-## Phase 6: Apple Starter
-
-Build `biucing create apple <project-name>`.
-
-Expected behavior:
-
-- generate a Tuist-based Apple app starter;
-- allow choosing `ios`, `macos`, `watchos`, or `tvos`;
-- include `Brewfile`, `.mise.toml`, `Makefile`, and bootstrap scripts;
-- generate `Tuist.swift`, `Workspace.swift`, and `App/Project.swift`;
-- wire a minimal SwiftUI app target plus unit tests;
-- include at least one internal Swift package for shared code.
-
-## Success Criteria
-
-- A user can create a project they would realistically keep using.
-- Templates reflect the maintainer's real stack instead of generic breadth.
-- Generated output is small enough to understand and strong enough to build on.
+- broad new template categories;
+- a heavy external templating engine;
+- turning BiucingCLI into a generalized platform or workflow orchestrator.

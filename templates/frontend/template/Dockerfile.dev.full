@@ -30,4 +30,9 @@ ENV CI=1
 ENV PNPM_STORE_DIR=/pnpm-store
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
+COPY package.json ./
+RUN pnpm install --no-frozen-lockfile \
+    && pnpm exec playwright install chromium \
+    && rm -rf node_modules
+
 CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173"]

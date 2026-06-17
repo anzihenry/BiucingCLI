@@ -78,6 +78,7 @@ Local Apple validation status:
 ## Design Docs
 
 - Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
+- [0.3.0 Plan](docs/0.3.0-plan.md)
 - [Product Design](docs/product-design.md)
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)

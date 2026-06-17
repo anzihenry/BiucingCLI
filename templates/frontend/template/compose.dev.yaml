@@ -2,19 +2,23 @@ services:
   frontend-dev:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}
     working_dir: /workspace
-    command: bash -lc "pnpm install && pnpm dev --host 0.0.0.0 --port 5173 --strictPort"
+    command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173 --strictPort"
     environment:
       CHOKIDAR_USEPOLLING: "true"
+      PNPM_STORE_DIR: /pnpm-store
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
     ports:
       - "5173:5173"
     volumes:
       - .:/workspace
       - frontend-node-modules:/workspace/node_modules
-      - frontend-pnpm-store:/root/.local/share/pnpm/store
+      - frontend-pnpm-store:/pnpm-store
+      - frontend-playwright-cache:/ms-playwright
 
 volumes:
   frontend-node-modules:
   frontend-pnpm-store:
+  frontend-playwright-cache:

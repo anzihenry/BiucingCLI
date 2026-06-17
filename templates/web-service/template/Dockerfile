@@ -5,8 +5,21 @@ FROM ${BUILDER_IMAGE} AS builder
 
 WORKDIR /app
 
+ARG GOPROXY=https://proxy.golang.org,direct
+ARG GOSUMDB=sum.golang.org
+ENV GOPROXY=${GOPROXY}
+ENV GOSUMDB=${GOSUMDB}
+
 COPY go.mod ./
-RUN go mod download
+RUN set -eux; \
+    attempt=1; \
+    until go mod download; do \
+      if [ "$attempt" -ge 3 ]; then \
+        exit 1; \
+      fi; \
+      attempt=$((attempt + 1)); \
+      sleep 5; \
+    done
 
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -o /out/server ./cmd/server

@@ -433,6 +433,9 @@ class CLITestCase(unittest.TestCase):
             makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
             dockerfile = (project_dir / "Dockerfile").read_text(encoding="utf-8")
             dockerfile_dev = (project_dir / "Dockerfile.dev").read_text(encoding="utf-8")
+            dockerfile_dev_full = (
+                project_dir / "Dockerfile.dev.full"
+            ).read_text(encoding="utf-8")
             compose_dev = (project_dir / "compose.dev.yaml").read_text(encoding="utf-8")
             nginx_conf = (project_dir / "nginx.conf").read_text(encoding="utf-8")
             dockerignore = (project_dir / ".dockerignore").read_text(encoding="utf-8")
@@ -490,20 +493,55 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Package Manager", readme)
             self.assertIn("make dev", readme)
             self.assertIn("make browser-smoke", readme)
+            self.assertIn("The default development image stays relatively light", readme)
+            self.assertIn("make bootstrap-full", readme)
+            self.assertIn("DEV_DOCKERFILE=Dockerfile.dev.full make dev", readme)
             self.assertIn("<title>Demo App</title>", index_html)
-            self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)", makefile)
-            self.assertIn('bash -lc "pnpm install && pnpm browser:install"', makefile)
-            self.assertIn('bash -lc "pnpm install && pnpm browser:smoke"', makefile)
+            self.assertIn("DEV_DOCKERFILE ?=Dockerfile.dev", makefile)
+            self.assertIn(
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
+                makefile,
+            )
+            self.assertIn(
+                "DEV_DOCKERFILE=Dockerfile.dev.full docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
+                makefile,
+            )
+            self.assertIn(
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)",
+                makefile,
+            )
+            self.assertIn(
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:install",
+                makefile,
+            )
+            self.assertIn(
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke",
+                makefile,
+            )
             self.assertIn("docker build -t $(IMAGE_REF) .", makefile)
             self.assertIn("FROM node:20-alpine AS builder", dockerfile)
             self.assertIn("FROM nginx:1.27-alpine", dockerfile)
             self.assertIn("COPY --from=builder /app/dist /usr/share/nginx/html", dockerfile)
             self.assertIn("FROM node:20-bookworm", dockerfile_dev)
-            self.assertIn("PLAYWRIGHT_BROWSERS_PATH=/workspace/.cache/ms-playwright", dockerfile_dev)
-            self.assertIn("pnpm dev --host 0.0.0.0 --port 5173", dockerfile_dev)
+            self.assertIn("PNPM_STORE_DIR=/pnpm-store", dockerfile_dev)
+            self.assertIn("PLAYWRIGHT_BROWSERS_PATH=/ms-playwright", dockerfile_dev)
+            self.assertIn(
+                'CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173"]',
+                dockerfile_dev,
+            )
+            self.assertIn("FROM node:20-bookworm", dockerfile_dev_full)
+            self.assertIn("COPY package.json ./", dockerfile_dev_full)
+            self.assertIn("pnpm install --no-frozen-lockfile", dockerfile_dev_full)
+            self.assertIn("pnpm exec playwright install chromium", dockerfile_dev_full)
             self.assertIn("frontend-dev", compose_dev)
-            self.assertIn("pnpm install && pnpm dev --host 0.0.0.0 --port 5173 --strictPort", compose_dev)
+            self.assertIn("dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}", compose_dev)
+            self.assertIn(
+                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173 --strictPort"',
+                compose_dev,
+            )
             self.assertIn("frontend-node-modules", compose_dev)
+            self.assertIn("frontend-pnpm-store", compose_dev)
+            self.assertIn("frontend-playwright-cache", compose_dev)
             self.assertIn("try_files $uri $uri/ /index.html;", nginx_conf)
             self.assertIn("node_modules/", dockerignore)
             self.assertIn("dist/", dockerignore)
@@ -599,6 +637,12 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Proto package: `user.v1`", readme)
             self.assertIn("Local dependency store: `redis`", readme)
             self.assertIn("make verify", readme)
+            self.assertIn(
+                "the first `make proto` may still fetch remote Buf plugin artifacts",
+                readme,
+            )
+            self.assertIn("GOPROXY", readme)
+            self.assertIn("GOSUMDB", readme)
             self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) redis otel-collector", makefile)
             self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) buf generate ./api", makefile)
             self.assertIn('bash -lc "buf lint ./api && golangci-lint run', makefile)
@@ -608,10 +652,16 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("ARG BUILDER_IMAGE=golang:1.26-alpine", dockerfile)
             self.assertIn("ARG BUF_VERSION=1.70.0", dockerfile_dev)
             self.assertIn("ARG GOLANGCI_LINT_VERSION=2.12.2", dockerfile_dev)
+            self.assertIn("ARG GOPROXY=https://proxy.golang.org,direct", dockerfile_dev)
+            self.assertIn("ARG GOSUMDB=sum.golang.org", dockerfile_dev)
             self.assertIn("buf-Linux-${buf_arch}.tar.gz", dockerfile_dev)
             self.assertIn("golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${golangci_arch}.tar.gz", dockerfile_dev)
+            self.assertIn("COPY go.mod go.sum ./", dockerfile_dev)
+            self.assertIn("until go mod download; do", dockerfile_dev)
             self.assertIn('CMD ["air", "-c", ".air.toml"]', dockerfile_dev)
             self.assertIn("app-dev", compose_dev)
+            self.assertIn("GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}", compose_dev)
+            self.assertIn("GOSUMDB: ${GOSUMDB:-sum.golang.org}", compose_dev)
             self.assertIn("otel/opentelemetry-collector-contrib:0.126.0", compose_dev)
             self.assertIn("STORE_DSN: redis://redis:6379/0", compose_dev)
             self.assertIn('cmd = "go build -o ./tmp/server ./cmd/server"', air_toml)
@@ -742,20 +792,30 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('- "8080:8080"', compose_yaml)
             self.assertIn("DOCKER_VARIANT ?=alpine", makefile)
             self.assertIn("DOCKER_PLATFORM ?=linux/arm64", makefile)
+            self.assertIn("GOPROXY ?=https://proxy.golang.org,direct", makefile)
+            self.assertIn("GOSUMDB ?=sum.golang.org", makefile)
             self.assertIn("DEV_COMPOSE_FILE ?=compose.dev.yaml", makefile)
-            self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)", makefile)
+            self.assertIn("GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)", makefile)
             self.assertIn("public.ecr.aws/docker/library/golang:1.26", makefile)
             self.assertIn("public.ecr.aws/docker/library/ubuntu:26.04", makefile)
             self.assertIn("IMAGE ?=$(APP_NAME)", makefile)
             self.assertIn("--build-arg BUILDER_IMAGE=$(BUILDER_IMAGE)", makefile)
             self.assertIn("--build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE)", makefile)
+            self.assertIn("--build-arg GOPROXY=$(GOPROXY)", makefile)
+            self.assertIn("--build-arg GOSUMDB=$(GOSUMDB)", makefile)
             self.assertIn("docker run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)", makefile)
             self.assertIn("docker push $(IMAGE_REF)", makefile)
             self.assertIn("ARG AIR_VERSION=1.65.3", dockerfile_dev)
             self.assertIn("ARG GOLANGCI_LINT_VERSION=2.12.2", dockerfile_dev)
+            self.assertIn("ARG GOPROXY=https://proxy.golang.org,direct", dockerfile_dev)
+            self.assertIn("ARG GOSUMDB=sum.golang.org", dockerfile_dev)
             self.assertIn("air_${AIR_VERSION}_linux_${air_arch}.tar.gz", dockerfile_dev)
             self.assertIn("golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${golangci_arch}.tar.gz", dockerfile_dev)
+            self.assertIn("COPY go.mod go.sum ./", dockerfile_dev)
+            self.assertIn("until go mod download; do", dockerfile_dev)
             self.assertIn("app-dev", compose_dev)
+            self.assertIn("GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}", compose_dev)
+            self.assertIn("GOSUMDB: ${GOSUMDB:-sum.golang.org}", compose_dev)
             self.assertIn("command: air -c .air.toml", compose_dev)
             self.assertIn('cmd = "go build -o ./tmp/server ./cmd/server"', air_toml)
             self.assertIn(".cache/", dockerignore)
@@ -769,6 +829,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make docker-build DOCKER_VARIANT=ubuntu IMAGE=user-service-ubuntu TAG=dev", readme)
             self.assertIn("make docker-run IMAGE=user-service-ubuntu TAG=dev HOST_PORT=8080", readme)
             self.assertIn("starts whatever image tag you last built", readme)
+            self.assertIn("prewarms `go mod download`", readme)
+            self.assertIn("GOPROXY", readme)
+            self.assertIn("GOSUMDB", readme)
             self.assertIn("DOCKER_VARIANT=ubuntu", readme)
             self.assertIn("public.ecr.aws/docker/library/golang:1.26", readme)
             self.assertIn("make docker-push IMAGE=registry.example.com/user-service TAG=0.1.0", readme)

@@ -8,6 +8,8 @@ DEV_COMPOSE_FILE ?=compose.dev.yaml
 DEV_SERVICE ?=app-dev
 DOCKER_VARIANT ?=alpine
 DOCKER_PLATFORM ?=linux/arm64
+GOPROXY ?=https://proxy.golang.org,direct
+GOSUMDB ?=sum.golang.org
 GOCACHE ?= $(CURDIR)/.cache/go-build
 GOLANGCI_LINT_CACHE ?= $(CURDIR)/.cache/golangci-lint
 export GOCACHE
@@ -24,13 +26,13 @@ endif
 .PHONY: bootstrap doctor dev dev-shell tidy lint test verify run build docker-build docker-run docker-push
 
 bootstrap:
-	docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
+	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
 doctor:
 	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
 
 dev:
-	docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
+	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
 
 dev-shell:
 	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash
@@ -53,7 +55,7 @@ build:
 	docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
 
 docker-build:
-	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) -t $(IMAGE_REF) .
+	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) --build-arg GOPROXY=$(GOPROXY) --build-arg GOSUMDB=$(GOSUMDB) -t $(IMAGE_REF) .
 
 docker-run:
 	docker run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)

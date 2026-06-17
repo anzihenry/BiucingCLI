@@ -56,6 +56,8 @@ The service reads configuration from `configs/config.yaml` by default.
 - `scripts/doctor`: local environment checks
 - `make lint`: baseline static analysis with `golangci-lint`
 - `make verify`: run doctor, lint, and tests together inside Docker
+- the development image prewarms `go mod download` so the first Docker-based dev shell and verification flow spend less time resolving modules
+- `GOPROXY` and `GOSUMDB` can be overridden on `make bootstrap`, `make dev`, and `make docker-build` when your network needs a different module proxy or checksum policy
 
 ## Example Endpoints
 
