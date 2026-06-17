@@ -68,7 +68,7 @@ class CLITestCase(unittest.TestCase):
                 main(["--version"])
 
         self.assertEqual(excinfo.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "biucing 0.1.0\n")
+        self.assertEqual(stdout.getvalue(), "biucing 0.2.0\n")
         self.assertEqual(stderr.getvalue(), "")
 
     def test_create_android_renders_template(self):

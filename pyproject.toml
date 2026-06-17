@@ -1,6 +1,6 @@
 [project]
 name = "biucingcli"
-version = "0.1.0"
+version = "0.2.0"
 description = "A scaffold generator for independent developers built around a stable personal stack."
 readme = "README.md"
 requires-python = ">=3.11"

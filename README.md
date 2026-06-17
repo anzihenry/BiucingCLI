@@ -6,13 +6,13 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.1.0`.
+The current repository release target is `0.2.0`.
 
 ```bash
 biucing --version
 ```
 
-See [CHANGELOG.md](CHANGELOG.md) for the initial release summary.
+See [CHANGELOG.md](CHANGELOG.md) for the latest release summary.
 
 ## Product Direction
 
@@ -60,14 +60,20 @@ This repository contains a small internal template system with practical starter
 
 The current maturity split is:
 
-- `frontend`, `web-service`, and `microservice` are the most operationally complete templates today; they now support Docker-first development and runtime packaging.
-- `apple` and `android` are strong platform starters with real project structure, automation scaffolding, and validation coverage, but they intentionally follow native platform workflows instead of Docker-first local development.
+- `frontend`, `web-service`, and `microservice` are fully Dockerized for development, verification, and runtime packaging.
+- `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
 
 Local Android validation status:
 
 - the Android starter now includes a committed Gradle wrapper;
-- the generated Android project has passed a real `./gradlew assembleDebug` smoke build;
+- the generated Android project has passed real `./gradlew assembleDebug` and `./gradlew assembleRelease` verification;
 - the maintainer workstation has one validated emulator target retained as `Biucing_API_35`.
+
+Local Apple validation status:
+
+- the generated Apple starter has passed real `make generate` verification for both `iOS` and `macOS`;
+- `iOS` output now renders a mobile-specific starter structure and has passed real `make build`;
+- `macOS` output now renders a desktop-specific starter structure and has passed real `make test`.
 
 ## Design Docs
 
