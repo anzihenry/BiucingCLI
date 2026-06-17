@@ -1,3 +1,4 @@
+import AppServices
 @testable import {{SWIFT_MODULE_NAME}}
 import XCTest
 
@@ -16,10 +17,10 @@ final class AppTests: XCTestCase {
         XCTAssertEqual(
             viewModel.facts,
             [
-                HomeFact(label: "Bundle ID", systemImage: "shippingbox", value: "com.example.pulsemac"),
-                HomeFact(label: "Platform", systemImage: "app", value: "macOS"),
-                HomeFact(label: "Minimum OS", systemImage: "gear", value: "26.0"),
-                HomeFact(label: "Team", systemImage: "person.3", value: "ABCDE12345"),
+                StarterFact(label: "Bundle ID", systemImage: "shippingbox", value: "com.example.pulsemac"),
+                StarterFact(label: "Platform", systemImage: "app", value: "macOS"),
+                StarterFact(label: "Minimum OS", systemImage: "gear", value: "26.0"),
+                StarterFact(label: "Team", systemImage: "person.3", value: "ABCDE12345"),
             ]
         )
     }

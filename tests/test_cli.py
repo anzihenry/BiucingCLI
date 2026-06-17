@@ -847,6 +847,20 @@ class CLITestCase(unittest.TestCase):
                 / "DesignSystem"
                 / "Package.swift"
             ).read_text(encoding="utf-8")
+            app_services_package = (
+                project_dir
+                / "Packages"
+                / "AppServices"
+                / "Package.swift"
+            ).read_text(encoding="utf-8")
+            app_services_source = (
+                project_dir
+                / "Packages"
+                / "AppServices"
+                / "Sources"
+                / "AppServices"
+                / "StarterMetadata.swift"
+            ).read_text(encoding="utf-8")
             design_system_theme = (
                 project_dir
                 / "Packages"
@@ -877,6 +891,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("split-view workspace", readme)
             self.assertIn("small view-model test", readme)
             self.assertIn("mocked service dependency", readme)
+            self.assertIn("`Packages/AppServices` holds starter metadata", readme)
+            self.assertIn("keep UI-focused primitives in `DesignSystem`", readme)
             self.assertIn("`development_team` is written into `App/Project.swift`", readme)
             self.assertIn("`bundle_identifier` is used for the main app target", readme)
             self.assertIn("`{{BUNDLE_IDENTIFIER}}.tests`".replace("{{BUNDLE_IDENTIFIER}}", "com.example.pulsemac"), readme)
@@ -897,8 +913,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("let config = Config(", tuist_config)
             self.assertNotIn("fullHandle:", tuist_config)
             self.assertIn('bundleId: "com.example.pulsemac"', project_swift)
+            self.assertIn('.local(path: "../Packages/AppServices")', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
             self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
+            self.assertIn('.package(product: "AppServices")', project_swift)
             self.assertIn('WindowGroup("Pulse Mac")', (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
             self.assertIn(".defaultSize(width: 1100, height: 720)", (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
             self.assertIn("private let viewModel = HomeViewModel(", home_view)
@@ -907,7 +925,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('GroupBox("Project Summary")', home_view)
             self.assertIn('GroupBox("Release Checklist")', home_view)
             self.assertIn("struct HomeViewModel", home_view_model)
-            self.assertIn("protocol ReleaseChecklistProviding", home_view_model)
+            self.assertIn("import AppServices", home_view_model)
+            self.assertIn("typealias HomeFact = StarterFact", home_view_model)
+            self.assertIn("StarterFactBuilder.overviewFacts(", home_view_model)
             self.assertIn("func releaseChecklist() -> [String]", home_view_model)
             self.assertIn("brew bundle", bootstrap)
             self.assertIn("Apple environment doctor", doctor)
@@ -922,8 +942,13 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("simulator services are not ready", doctor)
             self.assertIn("Doctor completed with", doctor)
             self.assertIn('.macOS("26.0")', design_system)
+            self.assertIn('name: "AppServices"', app_services_package)
+            self.assertIn("public struct StarterFact: Equatable", app_services_source)
+            self.assertIn("public protocol ReleaseChecklistProviding", app_services_source)
+            self.assertIn("public enum StarterFactBuilder", app_services_source)
             self.assertIn("enum BiucingTheme", design_system_theme)
             self.assertIn("sectionTitleFont", design_system_theme)
+            self.assertIn("import AppServices", app_tests)
             self.assertIn('app_identifier("com.example.pulsemac")', appfile)
             self.assertIn('apple_id("developer@example.com")', appfile)
             self.assertIn('team_id("ABCDE12345")', appfile)
@@ -937,6 +962,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("@testable import PulseMac", app_tests)
             self.assertIn("func testHomeViewModelBuildsOverviewFacts()", app_tests)
             self.assertIn("func testHomeViewModelUsesMockChecklistProvider()", app_tests)
+            self.assertIn("StarterFact(label: \"Bundle ID\"", app_tests)
             self.assertIn("private struct MockReleaseChecklistProvider", app_tests)
 
     def test_create_apple_ios_renders_platform_specific_output(self):

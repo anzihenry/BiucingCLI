@@ -6,6 +6,7 @@ let project = Project(
     name: appName,
     organizationName: "{{ORGANIZATION_NAME}}",
     packages: [
+        .local(path: "../Packages/AppServices"),
         .local(path: "../Packages/DesignSystem")
     ],
     settings: .settings(
@@ -30,6 +31,7 @@ let project = Project(
             sources: ["Targets/App/Sources/**"],
             resources: ["Targets/App/Resources/**"],
             dependencies: [
+                .package(product: "AppServices"),
                 .package(product: "DesignSystem")
             ]
         ),
@@ -41,6 +43,7 @@ let project = Project(
             infoPlist: .default,
             sources: ["Targets/AppTests/Sources/**"],
             dependencies: [
+                .package(product: "AppServices"),
                 .target(name: appName)
             ]
         )
