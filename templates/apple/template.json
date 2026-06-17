@@ -49,6 +49,7 @@
   ],
   "next_steps": [
     "make bootstrap",
+    "make doctor",
     "make generate",
     "make lint",
     "make test",

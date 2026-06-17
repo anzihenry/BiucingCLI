@@ -1,9 +1,162 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-xcode-select -p >/dev/null
-tuist version >/dev/null
-swift --version >/dev/null
-swiftlint version >/dev/null
-swiftformat --version >/dev/null
-echo "Environment looks ready."
+failures=0
+warnings=0
+platform="{{APPLE_PLATFORM}}"
+platform_name="{{APPLE_PLATFORM_NAME}}"
+repo_root="$(pwd)"
+tuist_home="${repo_root}/.cache/tuist/home"
+tuist_xdg_cache="${repo_root}/.cache/tuist/xdg-cache"
+tuist_xdg_state="${repo_root}/.cache/tuist/xdg-state"
+tuist_xdg_config="${repo_root}/.cache/tuist/xdg-config"
+tuist_tmp="${repo_root}/.cache/tuist/tmp"
+
+pass() {
+  echo "[pass] $1"
+}
+
+warn() {
+  echo "[warn] $1"
+  warnings=$((warnings + 1))
+}
+
+fail() {
+  echo "[fail] $1"
+  failures=$((failures + 1))
+}
+
+echo "Apple environment doctor"
+echo "platform: ${platform_name}"
+
+developer_dir=""
+if developer_dir="$(xcode-select -p 2>/dev/null)"; then
+  pass "xcode-select points to ${developer_dir}"
+else
+  fail "xcode-select is not configured. Open Xcode once or run 'sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer'."
+fi
+
+if command -v xcodebuild >/dev/null 2>&1; then
+  xcodebuild_version="$(xcodebuild -version 2>&1 || true)"
+  if [[ "$xcodebuild_version" == Xcode* ]]; then
+    pass "xcodebuild is available"
+    echo "$xcodebuild_version" | sed -n '1,2p'
+  else
+    fail "xcodebuild is installed but not usable. Output: ${xcodebuild_version}"
+  fi
+else
+  fail "xcodebuild is not available. Install Xcode and accept the license before building."
+fi
+
+if command -v tuist >/dev/null 2>&1; then
+  mkdir -p "$tuist_home" "$tuist_xdg_cache" "$tuist_xdg_state" "$tuist_xdg_config" "$tuist_tmp"
+  tuist_version_output="$(
+    HOME="$tuist_home" \
+    XDG_CACHE_HOME="$tuist_xdg_cache" \
+    XDG_STATE_HOME="$tuist_xdg_state" \
+    XDG_CONFIG_HOME="$tuist_xdg_config" \
+    TMPDIR="$tuist_tmp" \
+    tuist version 2>&1 || true
+  )"
+  if [[ "$tuist_version_output" =~ ^[0-9] ]]; then
+    pass "tuist is available"
+    echo "tuist: ${tuist_version_output}"
+  else
+    fail "tuist is installed but not usable. Output: ${tuist_version_output}"
+  fi
+else
+  fail "tuist is not available. Run 'brew bundle' or install Tuist before generating the workspace."
+fi
+
+if command -v swift >/dev/null 2>&1; then
+  swift_version_output="$(swift --version 2>&1 || true)"
+  if [[ "$swift_version_output" == *"swift-driver version"* || "$swift_version_output" == *"Apple Swift version"* ]]; then
+    pass "swift is available"
+    echo "$swift_version_output" | head -n 1
+  else
+    fail "swift is installed but not usable. Output: ${swift_version_output}"
+  fi
+else
+  fail "swift is not available. Install Xcode command line tools before continuing."
+fi
+
+if command -v swiftlint >/dev/null 2>&1; then
+  swiftlint_version_output="$(swiftlint version 2>&1 || true)"
+  if [[ -n "$swiftlint_version_output" ]]; then
+    pass "swiftlint is available"
+    echo "swiftlint: ${swiftlint_version_output}"
+  else
+    fail "swiftlint is installed but did not return a version."
+  fi
+else
+  fail "swiftlint is not available. Run 'brew bundle' before using make lint."
+fi
+
+if command -v swiftformat >/dev/null 2>&1; then
+  swiftformat_version_output="$(swiftformat --version 2>&1 || true)"
+  if [[ -n "$swiftformat_version_output" ]]; then
+    pass "swiftformat is available"
+    echo "swiftformat: ${swiftformat_version_output}"
+  else
+    fail "swiftformat is installed but did not return a version."
+  fi
+else
+  fail "swiftformat is not available. Run 'brew bundle' before using make format."
+fi
+
+if command -v fastlane >/dev/null 2>&1; then
+  fastlane_version_output="$(fastlane --version 2>&1 || true)"
+  if [[ -n "$fastlane_version_output" ]]; then
+    pass "fastlane is available"
+    echo "$fastlane_version_output" | sed -n '1p'
+  else
+    warn "fastlane is installed but did not return version information. Beta and release automation may fail."
+  fi
+else
+  warn "fastlane is not available. Run 'brew bundle' before using make beta or make release."
+fi
+
+if command -v xcrun >/dev/null 2>&1; then
+  simctl_output="$(xcrun simctl list devices available 2>&1 || true)"
+  if [[ "$simctl_output" == *"Unable to locate device set"* || "$simctl_output" == *"CoreSimulatorService connection became invalid"* || "$simctl_output" == *"Failed to initialize simulator device set"* ]]; then
+    if [[ "$platform" == "macos" ]]; then
+      warn "xcrun simctl is installed but simulator services are not ready. macOS builds can still proceed, but iOS-family simulator workflows may fail. Output: ${simctl_output}"
+    else
+      fail "xcrun simctl could not inspect available simulators. Resolve CoreSimulator service issues before running ${platform_name} tests. Output: ${simctl_output}"
+    fi
+  elif [[ "$simctl_output" == *"=="* || -n "$(printf '%s' "$simctl_output" | sed '/^$/d')" ]]; then
+    available_devices="$(printf '%s\n' "$simctl_output" | rg -c '^    ' || true)"
+    if [[ "${available_devices:-0}" -gt 0 ]]; then
+      pass "xcrun simctl can see ${available_devices} available simulator device(s)"
+    else
+      if [[ "$platform" == "macos" ]]; then
+        warn "xcrun simctl is available, but no simulator devices were listed. macOS builds can still proceed."
+      else
+        fail "xcrun simctl is available, but no simulator devices were listed. Install a ${platform_name} runtime and create a simulator before running tests."
+      fi
+    fi
+  else
+    if [[ "$platform" == "macos" ]]; then
+      warn "xcrun simctl returned an unexpected result. macOS builds can still proceed, but simulator inspection is unreliable. Output: ${simctl_output}"
+    else
+      fail "xcrun simctl returned an unexpected result while checking simulators. Output: ${simctl_output}"
+    fi
+  fi
+else
+  if [[ "$platform" == "macos" ]]; then
+    warn "xcrun is not available, so simulator readiness could not be checked."
+  else
+    fail "xcrun is not available, so simulator readiness could not be checked for ${platform_name}."
+  fi
+fi
+
+if (( failures > 0 )); then
+  echo "Doctor found ${failures} issue(s) and ${warnings} warning(s)."
+  exit 1
+fi
+
+if (( warnings > 0 )); then
+  echo "Doctor completed with ${warnings} warning(s)."
+else
+  echo "Environment looks ready."
+fi
