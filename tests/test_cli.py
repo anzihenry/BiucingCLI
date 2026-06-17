@@ -112,11 +112,23 @@ class CLITestCase(unittest.TestCase):
             main_activity = (
                 project_dir / "app" / "src" / "main" / "java" / "app" / "MainActivity.kt"
             ).read_text(encoding="utf-8")
+            app_smoke_test = (
+                project_dir / "app" / "src" / "test" / "java" / "app" / "AppSmokeTest.kt"
+            ).read_text(encoding="utf-8")
             home_route_ui_test = (
                 project_dir / "app" / "src" / "androidTest" / "java" / "app" / "HomeRouteUiTest.kt"
             ).read_text(encoding="utf-8")
             home_route = (
                 project_dir / "feature" / "home" / "src" / "main" / "java" / "home" / "HomeRoute.kt"
+            ).read_text(encoding="utf-8")
+            settings_route = (
+                project_dir / "feature" / "settings" / "src" / "main" / "java" / "settings" / "SettingsRoute.kt"
+            ).read_text(encoding="utf-8")
+            app_environment = (
+                project_dir / "core" / "network" / "src" / "main" / "java" / "network" / "AppEnvironment.kt"
+            ).read_text(encoding="utf-8")
+            fake_environment_provider = (
+                project_dir / "core" / "testing" / "src" / "main" / "java" / "testing" / "FakeAppEnvironmentProvider.kt"
             ).read_text(encoding="utf-8")
             theme = (
                 project_dir
@@ -161,10 +173,16 @@ class CLITestCase(unittest.TestCase):
                 "core/model/build.gradle.kts",
                 "core/model/src/main/java/model/Greeting.kt",
                 "core/model/src/test/java/model/GreetingTest.kt",
+                "core/network/build.gradle.kts",
+                "core/network/src/main/java/network/AppEnvironment.kt",
+                "core/testing/build.gradle.kts",
+                "core/testing/src/main/java/testing/FakeAppEnvironmentProvider.kt",
                 "fastlane/Appfile",
                 "fastlane/Fastfile",
                 "feature/home/build.gradle.kts",
                 "feature/home/src/main/java/home/HomeRoute.kt",
+                "feature/settings/build.gradle.kts",
+                "feature/settings/src/main/java/settings/SettingsRoute.kt",
                 "gradle.properties",
                 "gradle/libs.versions.toml",
                 "gradle/wrapper/gradle-wrapper.properties",
@@ -193,6 +211,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("connectedDebugAndroidTest", readme)
             self.assertIn("adb devices", readme)
             self.assertIn("unauthorized", readme)
+            self.assertIn("`home` and `settings`", readme)
+            self.assertIn("network config", readme)
+            self.assertIn("shared fake environment provider", readme)
             self.assertIn('rootProject.name = "demo-android"', settings_gradle)
             self.assertIn('alias(libs.plugins.spotless)', (project_dir / "build.gradle.kts").read_text(encoding="utf-8"))
             self.assertIn('ktlint = "1.8.0"', (project_dir / "gradle" / "libs.versions.toml").read_text(encoding="utf-8"))
@@ -200,20 +221,34 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('androidx-test-ext = "1.2.1"', (project_dir / "gradle" / "libs.versions.toml").read_text(encoding="utf-8"))
             self.assertIn('androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }', (project_dir / "gradle" / "libs.versions.toml").read_text(encoding="utf-8"))
             self.assertIn("ktlint(libs.versions.ktlint.get())", (project_dir / "build.gradle.kts").read_text(encoding="utf-8"))
+            self.assertIn('include(":core:network")', settings_gradle)
+            self.assertIn('include(":core:testing")', settings_gradle)
             self.assertIn('include(":feature:home")', settings_gradle)
+            self.assertIn('include(":feature:settings")', settings_gradle)
             self.assertIn('namespace = "com.example.demoandroid"', app_build)
             self.assertIn('applicationId = "com.example.demoandroid.app"', app_build)
             self.assertIn('versionCode = 7', app_build)
             self.assertIn('versionName = "1.2.3"', app_build)
+            self.assertIn('implementation(project(":core:network"))', app_build)
+            self.assertIn('implementation(project(":feature:settings"))', app_build)
+            self.assertIn('testImplementation(project(":core:testing"))', app_build)
             self.assertIn('android:label="Demo Android"', manifest)
             self.assertIn('android:theme="@style/Theme.DemoAndroid"', manifest)
             self.assertIn("package com.example.demoandroid", main_activity)
             self.assertIn("BiucingTheme", main_activity)
+            self.assertIn("SettingsRoute()", main_activity)
+            self.assertIn("fakeEnvironmentProviderExposesPredictableReleaseChannel", app_smoke_test)
             self.assertIn("createAndroidComposeRule<MainActivity>()", home_route_ui_test)
             self.assertIn('onNodeWithText("Demo Android", substring = true).assertIsDisplayed()', home_route_ui_test)
             self.assertIn('onNodeWithText("Generated by BiucingCLI", substring = true).assertIsDisplayed()', home_route_ui_test)
             self.assertIn("package com.example.demoandroid.feature.home", home_route)
             self.assertIn('title = "Demo Android"', home_route)
+            self.assertIn("package com.example.demoandroid.feature.settings", settings_route)
+            self.assertIn('text = "Release channel: ${environment.releaseChannel}"', settings_route)
+            self.assertIn('text = "API base URL: ${environment.apiBaseUrl}"', settings_route)
+            self.assertIn("interface AppEnvironmentProvider", app_environment)
+            self.assertIn("class DefaultAppEnvironmentProvider", app_environment)
+            self.assertIn("class FakeAppEnvironmentProvider", fake_environment_provider)
             self.assertIn("fun BiucingTheme", theme)
             self.assertIn('package_name("com.example.demoandroid.app")', appfile)
             self.assertIn("./scripts/setup-android-sdk", bootstrap)

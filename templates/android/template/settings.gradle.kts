@@ -19,4 +19,7 @@ rootProject.name = "{{PROJECT_NAME}}"
 include(":app")
 include(":core:model")
 include(":core:designsystem")
+include(":core:network")
+include(":core:testing")
 include(":feature:home")
+include(":feature:settings")
