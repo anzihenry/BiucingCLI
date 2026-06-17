@@ -44,6 +44,7 @@ make lint
 make format
 make test
 make beta
+make release
 ```
 
 `make doctor` validates Xcode selection, `xcodebuild`, Tuist, Swift, SwiftLint, SwiftFormat, fastlane, and simulator/runtime visibility before you spend time on `make generate`, `make build`, or `make test`.
@@ -57,6 +58,25 @@ make beta
 - Formatting and linting are configured through `.swiftformat` and `.swiftlint.yml`
 - `make doctor` checks simulator readiness as a hard requirement for iOS-family starters and a warning-only signal for macOS starters.
 
+## Release Setup
+
+`development_team` is written into `App/Project.swift` as the `DEVELOPMENT_TEAM` build setting. Replace the starter value with the Apple Developer team that should sign debug, beta, and release builds for this app.
+
+`bundle_identifier` is used for the main app target, and the template automatically derives the test target as `{{BUNDLE_IDENTIFIER}}.tests`. Choose a reverse-DNS identifier that is unique inside your Apple Developer account before connecting certificates, provisioning profiles, or TestFlight flows.
+
+Before a real beta or release handoff, the team still needs to supply:
+
+- a valid Apple Developer team with signing access
+- a bundle identifier registered in the Apple Developer portal
+- certificates and provisioning profiles, whether managed manually or through `fastlane match`
+- an authenticated fastlane setup such as Apple ID session-based auth or App Store Connect API key auth
+
+The generated fastlane files intentionally stop short of managing credentials for you. They are starter automation entrypoints that the team should connect to its own signing and distribution strategy.
+
+`make beta` is the lightweight validation lane. It runs project generation plus tests and is a good default before sharing a simulator build or opening a PR.
+
+`make release` is the production-oriented lane. It runs project generation, lint, tests, and a build, but you should only connect it to TestFlight or App Store distribution after the signing inputs above are in place.
+
 ## Notes
 
 - `Tuist.swift` is the repo-wide Tuist configuration.
@@ -65,5 +85,7 @@ make beta
 - `Packages/DesignSystem` is a local Swift package consumed by the app target.
 - `AppTests` includes starter examples for a small view-model test and a mocked service dependency.
 - `make doctor` is the fastest way to catch missing Xcode, Tuist, fastlane, or simulator setup before native commands fail later.
+- `fastlane/Appfile` is the first place to replace the starter Apple ID placeholder and align the team and bundle identifier with your real account.
+- `fastlane/Fastfile` is intentionally conservative: wire signing, `match`, TestFlight upload, or App Store delivery only after the generated starter is building cleanly on your team machines.
 - `{{APPLE_PLATFORM_OUTPUT_NOTE}}`
 - Generated `.xcodeproj` and `.xcworkspace` files should not be edited manually.

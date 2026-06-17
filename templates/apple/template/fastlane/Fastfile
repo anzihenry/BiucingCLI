@@ -3,13 +3,17 @@ default_platform(:ios)
 platform :ios do
   desc "Run a beta pipeline"
   lane :beta do
+    UI.message("Beta lane assumes the generated project already builds locally and that signing decisions stay outside the starter template until your team wires them in.")
     sh("make generate")
     sh("make test")
   end
 
   desc "Run a release pipeline"
   lane :release do
+    UI.message("Release lane is a starter entrypoint. Add match, provisioning, and TestFlight/App Store delivery after you replace the Apple ID placeholder and confirm signing for {{DEVELOPMENT_TEAM}} / {{BUNDLE_IDENTIFIER}}.")
     sh("make generate")
+    sh("make lint")
+    sh("make test")
     sh("make build")
   end
 end
