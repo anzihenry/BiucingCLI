@@ -4,6 +4,58 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+import java.util.Properties
+
+fun loadLocalProperties(rootDir: java.io.File): Properties {
+    val properties = Properties()
+    val localPropertiesFile = rootDir.resolve("local.properties")
+
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use(properties::load)
+    }
+
+    return properties
+}
+
+fun Project.releaseProperty(
+    localProperties: Properties,
+    gradleKey: String,
+    envKey: String,
+): String? {
+    return providers.gradleProperty(gradleKey).orNull
+        ?: localProperties.getProperty(gradleKey)
+        ?: System.getenv(envKey)
+}
+
+val localProperties = loadLocalProperties(rootDir)
+val releaseStoreFile = project.releaseProperty(
+    localProperties,
+    "biucing.release.storeFile",
+    "BIUCING_RELEASE_STORE_FILE",
+)
+val releaseStorePassword = project.releaseProperty(
+    localProperties,
+    "biucing.release.storePassword",
+    "BIUCING_RELEASE_STORE_PASSWORD",
+)
+val releaseKeyAlias = project.releaseProperty(
+    localProperties,
+    "biucing.release.keyAlias",
+    "BIUCING_RELEASE_KEY_ALIAS",
+)
+val releaseKeyPassword = project.releaseProperty(
+    localProperties,
+    "biucing.release.keyPassword",
+    "BIUCING_RELEASE_KEY_PASSWORD",
+)
+val hasCompleteReleaseSigning =
+    listOf(
+        releaseStoreFile,
+        releaseStorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword,
+    ).all { !it.isNullOrBlank() }
+
 android {
     namespace = "{{ANDROID_NAMESPACE}}"
     compileSdk = {{COMPILE_SDK}}
@@ -22,12 +74,31 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+
         release {
             isMinifyEnabled = false
+            if (hasCompleteReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (hasCompleteReleaseSigning) {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
         }
     }
 

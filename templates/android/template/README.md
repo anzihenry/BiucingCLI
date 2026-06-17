@@ -52,16 +52,42 @@ Then commit the updated `gradle/wrapper/gradle-wrapper.jar`, `gradle-wrapper.pro
 make doctor
 make format
 make build
+./gradlew assembleRelease
 make test
 make test-ui
 make lint
 make install-debug
 make beta
+make release
 ```
 
 `make doctor` validates the active JDK, Android SDK root, `cmdline-tools/latest`, `adb`, emulator/AVD visibility, and the committed Gradle wrapper before you spend time on Gradle builds.
 `make test-ui` runs `connectedDebugAndroidTest`, so boot an emulator or connect a device first. AVDs created through Android Studio Device Manager work well for the generated Compose smoke test.
 If `adb devices` reports `unauthorized`, accept the host key prompt on the emulator or restart adb before re-running `make test-ui`.
+
+## Release Setup
+
+The generated starter treats build types like this:
+
+- `debug`: default local development build, with a `.debug` application ID suffix and `-debug` version suffix
+- `release`: production-shaped build intended for CI, beta handoff, or store preparation
+
+Release signing is optional for local generation and verification. If signing inputs are missing, `assembleRelease` still gives you an unsigned release artifact that is useful for smoke validation.
+
+To wire real signing, choose one of these paths:
+
+1. Copy the keys from `docs/release-signing.properties.example` into `local.properties`
+2. Export `BIUCING_RELEASE_STORE_FILE`, `BIUCING_RELEASE_STORE_PASSWORD`, `BIUCING_RELEASE_KEY_ALIAS`, and `BIUCING_RELEASE_KEY_PASSWORD` in CI or your shell
+
+The Gradle template also accepts the same values as Gradle properties:
+
+- `biucing.release.storeFile`
+- `biucing.release.storePassword`
+- `biucing.release.keyAlias`
+- `biucing.release.keyPassword`
+
+`make beta` is the lightweight developer lane: it runs the debug build plus tests.
+`make release` is the release-oriented lane: it runs lint, tests, and `assembleRelease`, and it is the lane that should be connected to signed distribution later.
 
 ## Notes
 
@@ -75,4 +101,5 @@ If `adb devices` reports `unauthorized`, accept the host key prompt on the emula
 - `app/` should stay focused on app shell concerns.
 - `feature/home` and `feature/settings` demonstrate how the template can scale past a single screen.
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.
-- Release signing is intentionally not configured in the local starter by default.
+- `docs/release-signing.properties.example` documents the expected signing keys without committing secrets.
+- `fastlane release` expects a signed release path eventually, but the generated template stays safe for unsigned local verification first.

@@ -1,0 +1,19 @@
+# Copy these keys into local.properties for local-only signing setup,
+# or export the matching BIUCING_RELEASE_* environment variables in CI.
+#
+# Example:
+# biucing.release.storeFile=signing/release.keystore
+# biucing.release.storePassword=change-me
+# biucing.release.keyAlias=release
+# biucing.release.keyPassword=change-me
+#
+# Environment variable equivalents:
+# BIUCING_RELEASE_STORE_FILE
+# BIUCING_RELEASE_STORE_PASSWORD
+# BIUCING_RELEASE_KEY_ALIAS
+# BIUCING_RELEASE_KEY_PASSWORD
+
+biucing.release.storeFile=signing/release.keystore
+biucing.release.storePassword=change-me
+biucing.release.keyAlias=release
+biucing.release.keyPassword=change-me

@@ -141,10 +141,14 @@ class CLITestCase(unittest.TestCase):
                 / "Theme.kt"
             ).read_text(encoding="utf-8")
             appfile = (project_dir / "fastlane" / "Appfile").read_text(encoding="utf-8")
+            fastfile = (project_dir / "fastlane" / "Fastfile").read_text(encoding="utf-8")
             bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
             doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
             sync_wrapper = (
                 project_dir / "scripts" / "sync-gradle-wrapper"
+            ).read_text(encoding="utf-8")
+            release_signing_example = (
+                project_dir / "docs" / "release-signing.properties.example"
             ).read_text(encoding="utf-8")
             gradlew = (project_dir / "gradlew").read_text(encoding="utf-8")
             generated_files = {
@@ -177,6 +181,7 @@ class CLITestCase(unittest.TestCase):
                 "core/network/src/main/java/network/AppEnvironment.kt",
                 "core/testing/build.gradle.kts",
                 "core/testing/src/main/java/testing/FakeAppEnvironmentProvider.kt",
+                "docs/release-signing.properties.example",
                 "fastlane/Appfile",
                 "fastlane/Fastfile",
                 "feature/home/build.gradle.kts",
@@ -206,6 +211,11 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make doctor", readme)
             self.assertIn("make format", readme)
             self.assertIn("make test-ui", readme)
+            self.assertIn("./gradlew assembleRelease", readme)
+            self.assertIn("debug`: default local development build", readme)
+            self.assertIn("Release signing is optional", readme)
+            self.assertIn("BIUCING_RELEASE_STORE_FILE", readme)
+            self.assertIn("make release", readme)
             self.assertIn("cmdline-tools/latest", readme)
             self.assertIn("emulator/AVD visibility", readme)
             self.assertIn("connectedDebugAndroidTest", readme)
@@ -229,6 +239,13 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('applicationId = "com.example.demoandroid.app"', app_build)
             self.assertIn('versionCode = 7', app_build)
             self.assertIn('versionName = "1.2.3"', app_build)
+            self.assertIn('applicationIdSuffix = ".debug"', app_build)
+            self.assertIn('versionNameSuffix = "-debug"', app_build)
+            self.assertIn('create("release")', app_build)
+            self.assertIn('signingConfig = signingConfigs.getByName("release")', app_build)
+            self.assertIn('biucing.release.storeFile', app_build)
+            self.assertIn('BIUCING_RELEASE_STORE_FILE', app_build)
+            self.assertIn('hasCompleteReleaseSigning', app_build)
             self.assertIn('implementation(project(":core:network"))', app_build)
             self.assertIn('implementation(project(":feature:settings"))', app_build)
             self.assertIn('testImplementation(project(":core:testing"))', app_build)
@@ -251,6 +268,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("class FakeAppEnvironmentProvider", fake_environment_provider)
             self.assertIn("fun BiucingTheme", theme)
             self.assertIn('package_name("com.example.demoandroid.app")', appfile)
+            self.assertIn("assembleRelease", fastfile)
+            self.assertIn("BIUCING_RELEASE_*", fastfile)
             self.assertIn("./scripts/setup-android-sdk", bootstrap)
             self.assertNotIn("./scripts/sync-gradle-wrapper", bootstrap)
             self.assertIn("Android environment doctor", doctor)
@@ -260,6 +279,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Emulator command is available", doctor)
             self.assertIn("gradle-wrapper.jar is missing", doctor)
             self.assertIn("Doctor found", doctor)
+            self.assertIn("biucing.release.storeFile=signing/release.keystore", release_signing_example)
+            self.assertIn("BIUCING_RELEASE_KEY_ALIAS", release_signing_example)
             self.assertIn("./gradlew spotlessApply", (project_dir / "Makefile").read_text(encoding="utf-8"))
             self.assertIn("./gradlew connectedDebugAndroidTest", (project_dir / "Makefile").read_text(encoding="utf-8"))
             self.assertIn("androidTestImplementation(libs.androidx.compose.ui.test.junit4)", app_build)

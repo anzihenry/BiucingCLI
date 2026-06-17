@@ -9,7 +9,7 @@ platform :android do
 
   desc "Run a release pipeline"
   lane :release do
-    sh("make lint")
-    sh("make build")
+    UI.message("Release lane expects signing via local.properties or BIUCING_RELEASE_* environment variables before distribution.")
+    sh("./gradlew lint test assembleRelease")
   end
 end
