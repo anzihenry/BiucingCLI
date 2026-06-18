@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 - 2026-06-19
+
+Product-hardening release for BiucingCLI itself.
+
+- expanded `template.json` so templates now expose category, tags, platforms, maturity, and validation metadata;
+- added machine-readable `--json` output for `biucing list` and `biucing info`;
+- improved `biucing create` scripting with `--set key=value` overrides and explicit non-interactive failure behavior;
+- added repo-level validation for template metadata completeness and placeholder consistency;
+- added golden coverage for `list/info` output and standardized release-checklist, verification-matrix, and `0.3.0` release-prep documentation.
+
 ## 0.2.0 - 2026-06-17
 
 Template-system expansion release for BiucingCLI.

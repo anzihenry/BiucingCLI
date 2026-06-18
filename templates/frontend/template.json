@@ -1,7 +1,22 @@
 {
   "name": "frontend",
   "description": "React + TypeScript starter for independent projects",
+  "category": "frontend",
   "stack": ["React", "TypeScript"],
+  "tags": ["web", "docker", "playwright", "vitest"],
+  "platforms": ["web"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Docker-first frontend starter with test and browser-smoke workflows."
+  },
+  "validation": {
+    "status": "real-build-verified",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real docker runtime image builds",
+      "real docker development image builds"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",
@@ -19,6 +34,7 @@
     }
   ],
   "next_steps": [
+    "make bootstrap",
     "make dev",
     "make test",
     "make docker-build",

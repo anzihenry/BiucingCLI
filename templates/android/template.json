@@ -1,7 +1,21 @@
 {
   "name": "android",
   "description": "Kotlin Android app starter for mid-sized teams",
+  "category": "native",
   "stack": ["Kotlin", "Android", "Gradle", "Jetpack Compose", "fastlane"],
+  "tags": ["android", "kotlin", "compose", "fastlane"],
+  "platforms": ["android"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Android starter with doctor, format, build, test, and UI smoke workflows."
+  },
+  "validation": {
+    "status": "generated-project-verified",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real generated project gradle build validation"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",

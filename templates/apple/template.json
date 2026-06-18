@@ -1,7 +1,21 @@
 {
   "name": "apple",
   "description": "Swift + Tuist Apple app starter for mid-sized teams",
+  "category": "native",
   "stack": ["Swift", "Tuist", "SwiftPM", "fastlane"],
+  "tags": ["apple", "swiftui", "tuist", "fastlane"],
+  "platforms": ["ios", "macos", "watchos", "tvos"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Multi-platform Apple starter with doctor, generate, lint, and test workflows."
+  },
+  "validation": {
+    "status": "generated-project-verified",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real generated project make generate/build/test validation"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",

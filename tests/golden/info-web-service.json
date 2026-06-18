@@ -1,10 +1,21 @@
 {
   "name": "web-service",
   "description": "Go + Gin web service starter",
+  "stack": [
+    "Go",
+    "Gin"
+  ],
   "category": "backend",
-  "stack": ["Go", "Gin"],
-  "tags": ["api", "docker", "go", "service"],
-  "platforms": ["linux", "container"],
+  "tags": [
+    "api",
+    "docker",
+    "go",
+    "service"
+  ],
+  "platforms": [
+    "linux",
+    "container"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Dockerized web service starter with live-reload, lint, test, and runtime image workflows."
@@ -20,22 +31,31 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "default": null,
+      "default_from": null,
+      "prompt": null
     },
     {
       "name": "module_name",
       "required": true,
+      "default": null,
+      "default_from": null,
       "prompt": "Go module name: "
     },
     {
       "name": "service_name",
       "required": false,
-      "default_from": "project_name"
+      "default": null,
+      "default_from": "project_name",
+      "prompt": null
     },
     {
       "name": "http_port",
       "required": false,
-      "default": "8080"
+      "default": "8080",
+      "default_from": null,
+      "prompt": null
     }
   ],
   "next_steps": [

@@ -1,0 +1,19 @@
+Template: web-service
+Description: Go + Gin web service starter
+Category: backend
+Platforms: linux, container
+Tags: api, docker, go, service
+Maturity: validated - Dockerized web service starter with live-reload, lint, test, and runtime image workflows.
+Validation: real-build-verified
+Stack: Go, Gin
+Variables:
+- project_name (required)
+- module_name (required)
+- service_name (optional, default_from=project_name)
+- http_port (optional, default=8080)
+Next steps:
+- make bootstrap
+- make dev
+- make verify
+- make docker-build
+- make docker-run

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from biucingcli import __version__
@@ -11,6 +12,7 @@ from biucingcli.templates import load_templates
 from biucingcli.templates import render_template
 from biucingcli.templates import render_text
 from biucingcli.templates import resolve_variables
+from biucingcli.templates import validate_templates
 
 
 def default_display_name(project_name: str) -> str:
@@ -279,6 +281,20 @@ def microservice_dependency_config(store: str | None, service_name: str) -> dict
     return dict(supported[selected])
 
 
+def parse_set_values(items: list[str]) -> dict[str, str]:
+    """Parse repeated KEY=VALUE pairs from the CLI."""
+    values: dict[str, str] = {}
+    for item in items:
+        if "=" not in item:
+            raise ValueError(f"Invalid --set value '{item}'. Expected KEY=VALUE.")
+        key, value = item.split("=", 1)
+        normalized_key = key.strip().replace("-", "_")
+        if not normalized_key:
+            raise ValueError(f"Invalid --set value '{item}'. Expected KEY=VALUE.")
+        values[normalized_key] = value
+    return values
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
     parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
@@ -290,15 +306,47 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command")
 
-    subparsers.add_parser("list", help="List available templates.")
+    list_parser = subparsers.add_parser("list", help="List available templates.")
+    list_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print template metadata as JSON.",
+    )
 
     info_parser = subparsers.add_parser("info", help="Show details about a template.")
     info_parser.add_argument("template", help="Template name.")
+    info_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print template metadata as JSON.",
+    )
+
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate template metadata and placeholder consistency."
+    )
+    validate_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print validation results as JSON.",
+    )
 
     create_parser = subparsers.add_parser("create", help="Create a new project from a template.")
     create_parser.add_argument("template", help="Template name.")
     create_parser.add_argument("project_name", help="Project directory name.")
     create_parser.add_argument("--output-dir", default=".", help="Base directory for generation.")
+    create_parser.add_argument(
+        "--set",
+        dest="set_values",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help="Set any template variable via KEY=VALUE. Can be repeated.",
+    )
+    create_parser.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Fail instead of prompting for missing required values.",
+    )
     create_parser.add_argument("--display-name", help="Display name for frontend projects.")
     create_parser.add_argument("--package-name", help="Package name for frontend projects.")
     create_parser.add_argument("--module-name", help="Go module name for web service projects.")
@@ -345,12 +393,23 @@ def format_template_summary() -> str:
     return "\n".join(lines)
 
 
+def format_template_summary_json() -> str:
+    """Return a machine-readable template list."""
+    payload = {"templates": [definition.to_dict() for definition in load_templates()]}
+    return json.dumps(payload, indent=2)
+
+
 def format_template_info(template_name: str) -> str:
     """Return a detailed view of one template."""
     definition = load_template(template_name)
     lines = [
         f"Template: {definition.name}",
         f"Description: {definition.description}",
+        f"Category: {definition.category}",
+        f"Platforms: {', '.join(definition.platforms)}",
+        f"Tags: {', '.join(definition.tags)}",
+        f"Maturity: {definition.maturity.level} - {definition.maturity.summary}",
+        f"Validation: {definition.validation.status}",
         f"Stack: {', '.join(definition.stack)}",
         "Variables:",
     ]
@@ -368,69 +427,112 @@ def format_template_info(template_name: str) -> str:
     return "\n".join(lines)
 
 
+def format_template_info_json(template_name: str) -> str:
+    """Return a machine-readable template detail payload."""
+    definition = load_template(template_name)
+    return json.dumps(definition.to_dict(), indent=2)
+
+
+def format_validation_report(errors: list[str]) -> str:
+    """Return a human-readable validation report."""
+    if not errors:
+        return "Template validation passed."
+
+    lines = ["Template validation failed:"]
+    lines.extend(f"- {error}" for error in errors)
+    return "\n".join(lines)
+
+
+def format_validation_report_json(errors: list[str]) -> str:
+    """Return a machine-readable validation report."""
+    payload = {
+        "ok": not errors,
+        "error_count": len(errors),
+        "errors": errors,
+    }
+    return json.dumps(payload, indent=2)
+
+
 def create_project(args: argparse.Namespace) -> str:
     """Generate a project and return the output message."""
     definition = load_template(args.template)
+    set_values = parse_set_values(args.set_values)
+    allowed_keys = {variable.name for variable in definition.variables}
+    unknown_keys = sorted(key for key in set_values if key not in allowed_keys)
+    if unknown_keys:
+        unknown_list = ", ".join(unknown_keys)
+        raise ValueError(f"Unknown template variable(s) for {args.template}: {unknown_list}")
+
+    requested_service_name = (
+        args.service_name or set_values.get("service_name") or args.project_name
+    )
+    requested_dependency_store = args.dependency_store or set_values.get("dependency_store")
     microservice_values = (
-        microservice_dependency_config(args.dependency_store, args.service_name or args.project_name)
+        microservice_dependency_config(requested_dependency_store, requested_service_name)
         if args.template == "microservice"
         else {}
     )
+    requested_platform = args.platform or set_values.get("apple_platform")
+    requested_minimum_os_version = args.minimum_os_version or set_values.get("minimum_os_version")
     apple_values = (
-        apple_platform_config(args.platform, args.minimum_os_version)
+        apple_platform_config(requested_platform, requested_minimum_os_version)
         if args.template == "apple"
         else {}
     )
+    provided_values: dict[str, str | None] = dict(set_values)
+    provided_values["project_name"] = args.project_name
+
+    if args.display_name is not None:
+        provided_values["display_name"] = args.display_name
+    elif "display_name" not in provided_values:
+        provided_values["display_name"] = default_display_name(args.project_name)
+
+    if args.package_name is not None:
+        provided_values["package_name"] = args.package_name
+    elif args.template == "frontend" and "package_name" not in provided_values:
+        provided_values["package_name"] = args.project_name
+
+    explicit_values = {
+        "module_name": args.module_name,
+        "service_name": args.service_name,
+        "http_port": args.http_port,
+        "grpc_port": args.grpc_port,
+        "proto_package": args.proto_package,
+        "dependency_store": args.dependency_store,
+        "otel_exporter_endpoint": args.otel_exporter_endpoint,
+        "apple_platform": requested_platform,
+        "apple_platform_name": apple_values.get("apple_platform_name"),
+        "bundle_identifier": args.bundle_identifier,
+        "minimum_os_version": requested_minimum_os_version,
+        "development_team": args.development_team,
+        "organization_name": args.organization_name,
+        "application_id": args.application_id,
+        "compile_sdk": args.compile_sdk,
+        "min_sdk": args.min_sdk,
+        "target_sdk": args.target_sdk,
+        "version_code": args.version_code,
+        "version_name": args.version_name,
+        "java_version": args.java_version,
+        "android_namespace": args.android_namespace,
+        "kotlin_module_name": args.kotlin_module_name,
+        "swift_module_name": args.swift_module_name,
+    }
+    for key, value in explicit_values.items():
+        if value is not None:
+            provided_values[key] = value
+
     values = resolve_variables(
         definition,
-        {
-            "project_name": args.project_name,
-            "display_name": args.display_name or default_display_name(args.project_name),
-            "package_name": args.package_name
-            or (args.project_name if args.template == "frontend" else None),
-            "module_name": args.module_name,
-            "service_name": args.service_name,
-            "service_type_name": default_swift_module_name(args.project_name),
-            "http_port": args.http_port,
-            "grpc_port": args.grpc_port,
-            "proto_package": args.proto_package,
-            "dependency_store": microservice_values.get("dependency_store"),
-            "dependency_store_image": microservice_values.get("dependency_store_image"),
-            "dependency_store_port": microservice_values.get("dependency_store_port"),
-            "dependency_store_dsn": microservice_values.get("dependency_store_dsn"),
-            "dependency_store_container_dsn": microservice_values.get(
-                "dependency_store_container_dsn"
-            ),
-            "dependency_store_env_block": microservice_values.get("dependency_store_env_block"),
-            "otel_exporter_endpoint": args.otel_exporter_endpoint
-            or "http://localhost:4318",
-            "apple_platform": apple_values.get("apple_platform"),
-            "apple_platform_name": apple_values.get("apple_platform_name"),
-            "bundle_identifier": args.bundle_identifier,
-            "minimum_os_version": apple_values.get("minimum_os_version"),
-            "development_team": args.development_team,
-            "organization_name": args.organization_name,
-            "swift_module_name": args.swift_module_name
-            or default_swift_module_name(args.project_name),
-            "tuist_destinations": apple_values.get("tuist_destinations"),
-            "tuist_deployment_targets": apple_values.get("tuist_deployment_targets"),
-            "xcodebuild_destination": apple_values.get("xcodebuild_destination"),
-            "swiftpm_supported_platform": apple_values.get("swiftpm_supported_platform"),
-            "application_id": args.application_id,
-            "compile_sdk": args.compile_sdk,
-            "min_sdk": args.min_sdk,
-            "target_sdk": args.target_sdk,
-            "version_code": args.version_code,
-            "version_name": args.version_name,
-            "java_version": args.java_version,
-            "android_namespace": args.android_namespace,
-            "kotlin_module_name": args.kotlin_module_name
-            or default_kotlin_module_name(args.project_name),
-        },
+        provided_values,
+        interactive=not args.non_interactive,
     )
     values.update(
         {
             "service_type_name": default_swift_module_name(args.project_name),
+            "swift_module_name": values.get("swift_module_name")
+            or default_swift_module_name(args.project_name),
+            "kotlin_module_name": values.get("kotlin_module_name")
+            or default_kotlin_module_name(args.project_name),
         }
     )
     if args.template == "apple":
@@ -462,15 +564,28 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     if args.command == "list":
-        print(format_template_summary())
+        print(format_template_summary_json() if args.json else format_template_summary())
         return
 
     if args.command == "info":
-        print(format_template_info(args.template))
+        print(format_template_info_json(args.template) if args.json else format_template_info(args.template))
+        return
+
+    if args.command == "validate":
+        errors = validate_templates()
+        if args.json:
+            print(format_validation_report_json(errors))
+        else:
+            print(format_validation_report(errors))
+        if errors:
+            parser.exit(1)
         return
 
     if args.command == "create":
-        print(create_project(args))
+        try:
+            print(create_project(args))
+        except ValueError as exc:
+            parser.exit(2, f"error: {exc}\n")
         return
 
 

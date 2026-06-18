@@ -1,7 +1,22 @@
 {
   "name": "microservice",
   "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+  "category": "backend",
   "stack": ["Go", "Gin", "Protobuf", "Buf", "Docker Compose", "OpenTelemetry"],
+  "tags": ["grpc", "otel", "protobuf", "docker", "service"],
+  "platforms": ["linux", "container"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Containerized microservice starter with gRPC, protobuf generation, and observability workflows."
+  },
+  "validation": {
+    "status": "real-build-verified",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real docker runtime image builds",
+      "real docker development image builds"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",

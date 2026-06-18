@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import sys
 import tempfile
@@ -16,6 +17,13 @@ from biucingcli.templates import render_text
 
 
 class CLITestCase(unittest.TestCase):
+    def golden_path(self, name):
+        return Path(__file__).resolve().parent / "golden" / name
+
+    def assert_matches_golden(self, name, actual):
+        expected = self.golden_path(name).read_text(encoding="utf-8")
+        self.assertEqual(actual, expected)
+
     def run_cli(self, argv, stdin_values=None):
         output = io.StringIO()
         with redirect_stdout(output):
@@ -26,22 +34,23 @@ class CLITestCase(unittest.TestCase):
                     main(argv)
         return output.getvalue()
 
+    def run_cli_failure(self, argv):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with self.assertRaises(SystemExit) as excinfo:
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                main(argv)
+        return excinfo.exception.code, stdout.getvalue(), stderr.getvalue()
+
     def test_main_defaults_to_template_summary(self):
         output = self.run_cli([])
 
-        self.assertIn("Available templates:", output)
-        self.assertIn("android", output)
-        self.assertIn("apple", output)
-        self.assertIn("frontend", output)
-        self.assertIn("microservice", output)
-        self.assertIn("web-service", output)
+        self.assert_matches_golden("list.txt", output)
 
     def test_info_prints_template_details(self):
         output = self.run_cli(["info", "web-service"])
 
-        self.assertIn("Template: web-service", output)
-        self.assertIn("Go, Gin", output)
-        self.assertIn("module_name", output)
+        self.assert_matches_golden("info-web-service.txt", output)
 
     def test_info_prints_android_template_details(self):
         output = self.run_cli(["info", "android"])
@@ -59,6 +68,29 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("proto_package", output)
         self.assertIn("grpc_port", output)
 
+    def test_list_json_prints_machine_readable_templates(self):
+        output = self.run_cli(["list", "--json"])
+
+        self.assert_matches_golden("list.json", output)
+
+    def test_info_json_prints_machine_readable_template_detail(self):
+        output = self.run_cli(["info", "web-service", "--json"])
+
+        self.assert_matches_golden("info-web-service.json", output)
+
+    def test_validate_passes_for_repo_templates(self):
+        output = self.run_cli(["validate"])
+
+        self.assertEqual(output, "Template validation passed.\n")
+
+    def test_validate_json_passes_for_repo_templates(self):
+        output = self.run_cli(["validate", "--json"])
+
+        payload = json.loads(output)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["error_count"], 0)
+        self.assertEqual(payload["errors"], [])
+
     def test_version_prints_cli_version(self):
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -68,7 +100,7 @@ class CLITestCase(unittest.TestCase):
                 main(["--version"])
 
         self.assertEqual(excinfo.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "biucing 0.2.0\n")
+        self.assertEqual(stdout.getvalue(), "biucing 0.3.0\n")
         self.assertEqual(stderr.getvalue(), "")
 
     def test_create_android_renders_template(self):
@@ -342,6 +374,29 @@ class CLITestCase(unittest.TestCase):
 
             self.assertIn("Created android project: prompt-android", output)
             self.assertIn('namespace = "com.example.promptandroid"', app_build)
+
+    def test_create_frontend_supports_set_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "frontend",
+                    "scripted-app",
+                    "--output-dir",
+                    tmpdir,
+                    "--set",
+                    "display_name=Scripted Frontend",
+                    "--set",
+                    "package_name=scripted.frontend",
+                ]
+            )
+            project_dir = Path(tmpdir) / "scripted-app"
+            package_json = (project_dir / "package.json").read_text(encoding="utf-8")
+            index_html = (project_dir / "index.html").read_text(encoding="utf-8")
+
+            self.assertIn("Created frontend project: scripted-app", output)
+            self.assertIn('"name": "scripted.frontend"', package_json)
+            self.assertIn("<title>Scripted Frontend</title>", index_html)
 
     def test_default_kotlin_module_name_derives_pascal_case(self):
         self.assertEqual(default_kotlin_module_name("demo-android_app"), "DemoAndroidApp")
@@ -726,6 +781,76 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Created microservice project: prompt-service", output)
             self.assertIn("package prompt.v1;", proto_file)
             self.assertIn("POSTGRES_DB: prompt-service", compose_yaml)
+
+    def test_create_microservice_non_interactive_fails_fast(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            code, stdout, stderr = self.run_cli_failure(
+                [
+                    "create",
+                    "microservice",
+                    "non-interactive-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/non-interactive-service",
+                    "--non-interactive",
+                ]
+            )
+
+            self.assertEqual(code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn(
+                "Missing required value for proto_package in non-interactive mode",
+                stderr,
+            )
+
+    def test_create_web_set_values_can_replace_prompt(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "web-service",
+                    "set-web-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--set",
+                    "module_name=github.com/example/set-web-service",
+                    "--set",
+                    "service_name=set-service",
+                    "--set",
+                    "http_port=9191",
+                ]
+            )
+            project_dir = Path(tmpdir) / "set-web-service"
+            main_go = (project_dir / "cmd" / "server" / "main.go").read_text(encoding="utf-8")
+            config_yaml = (project_dir / "configs" / "config.yaml").read_text(encoding="utf-8")
+
+            self.assertIn("Created web-service project: set-web-service", output)
+            self.assertIn("github.com/example/set-web-service", main_go)
+            self.assertIn("name: set-service", config_yaml)
+            self.assertIn("port: 9191", config_yaml)
+
+    def test_create_web_explicit_flag_overrides_set_value(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "web-service",
+                    "override-web-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--set",
+                    "module_name=github.com/example/wrong-web-service",
+                    "--module-name",
+                    "github.com/example/right-web-service",
+                ]
+            )
+            project_dir = Path(tmpdir) / "override-web-service"
+            main_go = (project_dir / "cmd" / "server" / "main.go").read_text(encoding="utf-8")
+
+            self.assertIn("Created web-service project: override-web-service", output)
+            self.assertIn("github.com/example/right-web-service", main_go)
+            self.assertNotIn("github.com/example/wrong-web-service", main_go)
 
     def test_create_web_prompts_for_module_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:
