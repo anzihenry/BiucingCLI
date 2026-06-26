@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.3.0`.
+The current repository release target is `0.4.0`.
 
 ```bash
 biucing --version

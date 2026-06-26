@@ -24,35 +24,23 @@
 - added repo-level validation and golden coverage so the generator surface is easier to trust and maintain;
 - prepared versioned release-planning and verification docs to make future releases easier to repeat.
 
-## Next
-
 ### 0.4.0 - Sharpen The Product, Normalize The Portfolio, Add One New Surface
-
-Primary direction:
-
-- improve generation UX so users can preview, inspect, and automate create flows more confidently;
-- make the current template family feel more intentionally aligned as one product;
-- add one carefully chosen new template surface without diluting the repo's focus.
-
-Planned workstreams:
-
-- Generator UX:
-  add preview-oriented create workflows such as dry-run, plan-style inspection, and better machine-readable generation results.
-- Template Consistency:
-  tighten the shared metadata, validation, docs, and workflow contract across the existing template family.
-- New Template Surface:
-  select and ship one new starter line that fits the current product philosophy and quality bar.
-
-### Candidate 0.4.0 Outcomes
-
+- improved generation UX with dry-run, plan-style inspection, and machine-readable create manifests;
+- tightened the shared metadata, validation, docs, and workflow contract across the template family;
+- added the new `worker` starter as a sixth template surface;
 - `biucing create` can preview what it will generate before files are written.
 - scripts can rely on a stable, machine-readable generation summary after create succeeds.
 - the current template family follows a clearer shared product contract.
 - the portfolio grows through a new `worker` starter without lowering validation quality.
 
+## Next
+
+The next release scope is not locked yet.
+Use [docs/roadmap.md](roadmap.md) together with a future version plan once `0.5.0` priorities are chosen.
+
 ## Deferred
 
-These are intentionally not the center of `0.4.0` unless the roadmap changes:
+These remain intentionally out of scope unless the roadmap changes:
 
 - several unrelated new templates in one release;
 - a heavy external templating engine;
