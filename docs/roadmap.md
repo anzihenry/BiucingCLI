@@ -16,38 +16,45 @@
 - expanded the Android starter into a more complete Kotlin + Compose baseline with a committed Gradle wrapper, stronger doctor checks, UI smoke coverage, and release-signing placeholders;
 - validated generated starters repeatedly with real build and test workflows.
 
+### 0.3.0 - Productize The Generator
+
+- expanded the CLI surface beyond create-time generation by shipping `validate` plus JSON output for `list`, `info`, and `validate`;
+- made `create` more scriptable with `--set KEY=VALUE`, `--non-interactive`, and clearer variable resolution behavior;
+- enriched template metadata so the CLI can expose category, tags, platform support, maturity, validation status, variables, and next steps;
+- added repo-level validation and golden coverage so the generator surface is easier to trust and maintain;
+- prepared versioned release-planning and verification docs to make future releases easier to repeat.
+
 ## Next
 
-### 0.3.0 - Productize The Generator
+### 0.4.0 - Sharpen The Product, Normalize The Portfolio, Add One New Surface
 
 Primary direction:
 
-- keep the current five-template strategy stable;
-- improve BiucingCLI itself as a product, not just the generated templates;
-- make the generator easier to inspect, script, validate, and trust in repeated use.
+- improve generation UX so users can preview, inspect, and automate create flows more confidently;
+- make the current template family feel more intentionally aligned as one product;
+- add one carefully chosen new template surface without diluting the repo's focus.
 
 Planned workstreams:
 
-- CLI experience hardening:
-  add better inspection and machine-readable output around template discovery and creation.
-- Template metadata evolution:
-  extend metadata so the CLI can explain maturity, platform support, validation status, and operating assumptions.
-- Verification productization:
-  standardize how the repo proves template quality across Python tests and generated-project smoke checks.
-- Release readiness:
-  make version planning, changelog preparation, and release evidence easier to maintain from the repo.
+- Generator UX:
+  add preview-oriented create workflows such as dry-run, plan-style inspection, and better machine-readable generation results.
+- Template Consistency:
+  tighten the shared metadata, validation, docs, and workflow contract across the existing template family.
+- New Template Surface:
+  select and ship one new starter line that fits the current product philosophy and quality bar.
 
-### Candidate 0.3.0 Outcomes
+### Candidate 0.4.0 Outcomes
 
-- `biucing list` and `biucing info` can serve both humans and scripts cleanly.
-- `biucing create` is more predictable in unattended and repeatable workflows.
-- each template exposes clearer maturity signals and supported workflows.
-- the repo has a cleaner release plan and verification matrix for future versions.
+- `biucing create` can preview what it will generate before files are written.
+- scripts can rely on a stable, machine-readable generation summary after create succeeds.
+- the current template family follows a clearer shared product contract.
+- the portfolio grows by one new surface without lowering validation quality.
 
 ## Deferred
 
-These are intentionally not the center of `0.3.0` unless the roadmap changes:
+These are intentionally not the center of `0.4.0` unless the roadmap changes:
 
-- broad new template categories;
+- several unrelated new templates in one release;
 - a heavy external templating engine;
+- remote registries, plugin systems, or online template marketplaces;
 - turning BiucingCLI into a generalized platform or workflow orchestrator.
