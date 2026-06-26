@@ -11,11 +11,17 @@
   },
   "validation": {
     "status": "generated-project-verified",
+    "verification_tier": "generated-project",
     "evidence": [
       "python unittest template rendering coverage",
       "real generated project gradle build validation"
     ]
   },
+  "operating_assumptions": [
+    "The starter assumes a native Android workstation flow with Gradle, emulator, and release-signing guidance.",
+    "Generated projects should expose bootstrap, doctor, format, build, test, and UI smoke workflows."
+  ],
+  "workflow_labels": ["bootstrap", "doctor", "format", "build", "test", "ui-test", "open"],
   "variables": [
     {
       "name": "project_name",

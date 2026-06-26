@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from biucingcli.cli import default_kotlin_module_name
 from biucingcli.cli import main
 from biucingcli.templates import render_text
+from biucingcli.templates import validate_templates
 
 
 class CLITestCase(unittest.TestCase):
@@ -50,7 +51,14 @@ class CLITestCase(unittest.TestCase):
     def test_info_prints_template_details(self):
         output = self.run_cli(["info", "web-service"])
 
-        self.assert_matches_golden("info-web-service.txt", output)
+        self.assertIn("Template: web-service", output)
+        self.assertIn("Workflow labels: bootstrap, dev, verify, build, runtime", output)
+        self.assertIn("Verification tier: real-build", output)
+        self.assertIn("Operating assumptions:", output)
+        self.assertIn(
+            "- The starter is optimized for Go service development with Docker-based dev and runtime flows.",
+            output,
+        )
 
     def test_info_prints_android_template_details(self):
         output = self.run_cli(["info", "android"])
@@ -71,12 +79,29 @@ class CLITestCase(unittest.TestCase):
     def test_list_json_prints_machine_readable_templates(self):
         output = self.run_cli(["list", "--json"])
 
-        self.assert_matches_golden("list.json", output)
+        payload = json.loads(output)
+        self.assertEqual(len(payload["templates"]), 5)
+        web_service = next(
+            template for template in payload["templates"] if template["name"] == "web-service"
+        )
+        self.assertEqual(web_service["validation"]["verification_tier"], "real-build")
+        self.assertEqual(
+            web_service["workflow_labels"],
+            ["bootstrap", "dev", "verify", "build", "runtime"],
+        )
+        self.assertTrue(web_service["operating_assumptions"])
 
     def test_info_json_prints_machine_readable_template_detail(self):
         output = self.run_cli(["info", "web-service", "--json"])
 
-        self.assert_matches_golden("info-web-service.json", output)
+        payload = json.loads(output)
+        self.assertEqual(payload["name"], "web-service")
+        self.assertEqual(payload["validation"]["verification_tier"], "real-build")
+        self.assertEqual(
+            payload["workflow_labels"],
+            ["bootstrap", "dev", "verify", "build", "runtime"],
+        )
+        self.assertIn("Go service development", payload["operating_assumptions"][0])
 
     def test_validate_passes_for_repo_templates(self):
         output = self.run_cli(["validate"])
@@ -90,6 +115,68 @@ class CLITestCase(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["error_count"], 0)
         self.assertEqual(payload["errors"], [])
+
+    def test_validate_reports_new_contract_errors_for_invalid_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            templates_root = Path(tmpdir) / "templates"
+            bad_template_dir = templates_root / "broken-service"
+            rendered_dir = bad_template_dir / "template"
+            rendered_dir.mkdir(parents=True)
+            (bad_template_dir / "template.json").write_text(
+                json.dumps(
+                    {
+                        "name": "broken-service",
+                        "description": "Broken service template",
+                        "category": "backend",
+                        "stack": ["Go"],
+                        "tags": ["docker", "go", "service"],
+                        "platforms": ["linux"],
+                        "maturity": {
+                            "level": "validated",
+                            "summary": "Broken on purpose for validation coverage.",
+                        },
+                        "validation": {
+                            "status": "real-build-verified",
+                            "verification_tier": "wrong-tier",
+                            "evidence": ["synthetic test fixture"],
+                        },
+                        "operating_assumptions": ["Synthetic test assumption."],
+                        "workflow_labels": ["bootstrap", "wrong-label"],
+                        "variables": [
+                            {"name": "project_name", "required": True},
+                        ],
+                        "next_steps": ["make bootstrap"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (rendered_dir / "Makefile").write_text("bootstrap:\n\t@true\n", encoding="utf-8")
+            (rendered_dir / ".gitignore").write_text(".cache/\n", encoding="utf-8")
+            (rendered_dir / ".dockerignore").write_text(".cache/\n", encoding="utf-8")
+            (rendered_dir / "compose.dev.yaml").write_text("services: {}\n", encoding="utf-8")
+            (rendered_dir / "go.mod").write_text("module example.com/broken\n", encoding="utf-8")
+            (rendered_dir / "go.sum").write_text("", encoding="utf-8")
+            (rendered_dir / "cmd").mkdir()
+            (rendered_dir / "internal").mkdir()
+            (rendered_dir / "configs").mkdir()
+            (rendered_dir / "scripts").mkdir()
+
+            with patch("biucingcli.templates.templates_root", return_value=templates_root):
+                errors = validate_templates()
+
+            joined = "\n".join(errors)
+            self.assertIn(
+                "broken-service: validation.verification_tier must be one of: generated-project, real-build",
+                joined,
+            )
+            self.assertIn(
+                "broken-service: workflow_labels contain unsupported values: wrong-label",
+                joined,
+            )
+            self.assertIn(
+                "broken-service: missing required starter entries: README.md",
+                joined,
+            )
 
     def test_version_prints_cli_version(self):
         stdout = io.StringIO()

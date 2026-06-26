@@ -26,7 +26,14 @@ Each template should contain a `template.json` file with:
 
 - template name;
 - description;
+- category;
 - stack;
+- tags;
+- platforms;
+- maturity;
+- validation;
+- operating assumptions;
+- workflow labels;
 - variable definitions;
 - next steps.
 
@@ -36,7 +43,26 @@ Suggested shape:
 {
   "name": "web-service",
   "description": "Go + Gin web service starter",
+  "category": "backend",
   "stack": ["Go", "Gin"],
+  "tags": ["api", "docker", "go", "service"],
+  "platforms": ["linux", "container"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Dockerized web service starter with live-reload, lint, test, and runtime image workflows."
+  },
+  "validation": {
+    "status": "real-build-verified",
+    "verification_tier": "real-build",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real docker runtime image builds"
+    ]
+  },
+  "operating_assumptions": [
+    "The starter is optimized for Go service development with Docker-based dev and runtime flows."
+  ],
+  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
   "variables": [
     { "name": "project_name", "required": true },
     { "name": "module_name", "required": true },
@@ -49,6 +75,50 @@ Suggested shape:
   ]
 }
 ```
+
+## Metadata Contract
+
+The current product contract treats template metadata as a first-class interface, not a loose annotation layer.
+
+At minimum, every template should define:
+
+- `name`, `description`, `category`
+- `stack`, `tags`, `platforms`
+- `maturity`
+- `validation.status`, `validation.verification_tier`, `validation.evidence`
+- `operating_assumptions`
+- `workflow_labels`
+- `variables`
+- `next_steps`
+
+### Verification Tiers
+
+`verification_tier` is used to normalize what the repo claims has been proven for a starter.
+
+Current supported values:
+
+- `generated-project`
+- `real-build`
+
+### Workflow Labels
+
+`workflow_labels` provide a small shared vocabulary across different starter families.
+
+Current supported labels:
+
+- `bootstrap`
+- `doctor`
+- `dev`
+- `test`
+- `verify`
+- `build`
+- `runtime`
+- `generate`
+- `format`
+- `release`
+- `ui-test`
+- `open`
+- `lint`
 
 ## Variable Replacement
 
@@ -83,6 +153,25 @@ Suggested placeholders:
 - `{{XCODEBUILD_DESTINATION}}`
 
 This keeps template files readable and avoids introducing a heavy rendering layer too early.
+
+## Validation Policy
+
+Repo-level validation should keep using the same source of truth as rendering.
+
+It currently checks:
+
+- metadata completeness;
+- variable-to-placeholder mapping support;
+- placeholder legality inside template files and `next_steps`;
+- template folder naming consistency;
+- family-level required starter entries.
+
+Family-level required entries are intentionally not global one-size-fits-all rules.
+They vary by starter type, for example:
+
+- web/container starters should ship `README.md`, `Makefile`, `.gitignore`, `.dockerignore`, and `compose.dev.yaml`;
+- Go backend starters should ship `go.mod`, `go.sum`, `cmd/`, `internal/`, `configs/`, and `scripts/`;
+- native starters should ship `.mise.toml`, `scripts/`, and their platform build entrypoints.
 
 ## First Version Templates
 

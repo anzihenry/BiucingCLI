@@ -11,12 +11,18 @@
   },
   "validation": {
     "status": "real-build-verified",
+    "verification_tier": "real-build",
     "evidence": [
       "python unittest template rendering coverage",
       "real docker runtime image builds",
       "real docker development image builds"
     ]
   },
+  "operating_assumptions": [
+    "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
+    "Generated projects are expected to validate protobuf, service runtime, and container packaging together."
+  ],
+  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
   "variables": [
     {
       "name": "project_name",

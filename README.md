@@ -72,6 +72,12 @@ Generator UX status:
 - `biucing create ... --json` returns a machine-readable manifest after a real generation run;
 - non-interactive create failures now report all missing required values together.
 
+Template consistency status:
+
+- template metadata now exposes verification tier, operating assumptions, and workflow labels;
+- `biucing validate` now checks the stronger metadata contract plus family-level required starter entries;
+- `biucing info <template>` now surfaces those consistency fields directly.
+
 Local Android validation status:
 
 - the Android starter now includes a committed Gradle wrapper;

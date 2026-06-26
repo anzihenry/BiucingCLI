@@ -11,11 +11,17 @@
   },
   "validation": {
     "status": "generated-project-verified",
+    "verification_tier": "generated-project",
     "evidence": [
       "python unittest template rendering coverage",
       "real generated project make generate/build/test validation"
     ]
   },
+  "operating_assumptions": [
+    "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
+    "Generated projects should keep bootstrap, doctor, generate, lint, and test workflows explicit."
+  ],
+  "workflow_labels": ["bootstrap", "doctor", "generate", "lint", "test", "open"],
   "variables": [
     {
       "name": "project_name",

@@ -56,6 +56,7 @@ class TemplateValidation:
     """User-facing validation metadata for a template."""
 
     status: str
+    verification_tier: str
     evidence: list[str]
 
     def to_dict(self) -> dict[str, object]:
@@ -75,6 +76,8 @@ class TemplateDefinition:
     platforms: list[str]
     maturity: TemplateMaturity
     validation: TemplateValidation
+    operating_assumptions: list[str]
+    workflow_labels: list[str]
     variables: list[TemplateVariable]
     next_steps: list[str]
     template_dir: Path
@@ -90,6 +93,8 @@ class TemplateDefinition:
             "platforms": self.platforms,
             "maturity": self.maturity.to_dict(),
             "validation": self.validation.to_dict(),
+            "operating_assumptions": self.operating_assumptions,
+            "workflow_labels": self.workflow_labels,
             "variables": [variable.to_dict() for variable in self.variables],
             "next_steps": self.next_steps,
         }
@@ -113,6 +118,25 @@ class VariableResolutionResult:
 
 
 PLACEHOLDER_PATTERN = re.compile(r"\{\{[A-Z0-9_]+\}\}")
+ALLOWED_VERIFICATION_TIERS = {
+    "generated-project",
+    "real-build",
+}
+ALLOWED_WORKFLOW_LABELS = {
+    "bootstrap",
+    "doctor",
+    "dev",
+    "test",
+    "verify",
+    "build",
+    "runtime",
+    "generate",
+    "format",
+    "release",
+    "ui-test",
+    "open",
+    "lint",
+}
 
 
 def project_root() -> Path:
@@ -146,6 +170,8 @@ def load_template(name: str) -> TemplateDefinition:
         platforms=data["platforms"],
         maturity=maturity,
         validation=validation,
+        operating_assumptions=data["operating_assumptions"],
+        workflow_labels=data["workflow_labels"],
         variables=variables,
         next_steps=data["next_steps"],
         template_dir=metadata_path.parent / "template",
@@ -189,15 +215,35 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
 
     if not definition.next_steps:
         errors.append(f"{definition.name}: next_steps must contain at least one entry")
+    if not definition.operating_assumptions:
+        errors.append(f"{definition.name}: operating_assumptions must contain at least one entry")
+    if not definition.workflow_labels:
+        errors.append(f"{definition.name}: workflow_labels must contain at least one entry")
 
     if not definition.maturity.level or not definition.maturity.summary:
         errors.append(f"{definition.name}: maturity.level and maturity.summary must be set")
 
     if not definition.validation.status:
         errors.append(f"{definition.name}: validation.status must not be empty")
+    if definition.validation.verification_tier not in ALLOWED_VERIFICATION_TIERS:
+        allowed_tiers = ", ".join(sorted(ALLOWED_VERIFICATION_TIERS))
+        errors.append(
+            f"{definition.name}: validation.verification_tier must be one of: {allowed_tiers}"
+        )
 
     if not definition.validation.evidence:
         errors.append(f"{definition.name}: validation.evidence must contain at least one entry")
+
+    invalid_workflow_labels = sorted(
+        label for label in definition.workflow_labels if label not in ALLOWED_WORKFLOW_LABELS
+    )
+    if invalid_workflow_labels:
+        errors.append(
+            f"{definition.name}: workflow_labels contain unsupported values: {', '.join(invalid_workflow_labels)}"
+        )
+
+    if len(definition.workflow_labels) != len(set(definition.workflow_labels)):
+        errors.append(f"{definition.name}: workflow_labels must not contain duplicates")
 
     variable_names = [variable.name for variable in definition.variables]
     duplicate_names = sorted({name for name in variable_names if variable_names.count(name) > 1})
@@ -217,6 +263,39 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
             errors.append(
                 f"{definition.name}: variable '{variable.name}' default_from unknown variable '{variable.default_from}'"
             )
+
+    return errors
+
+
+def validate_template_required_files(definition: TemplateDefinition) -> list[str]:
+    """Return family-level required file errors for a template."""
+    errors: list[str] = []
+
+    if not definition.template_dir.exists():
+        return [f"{definition.name}: template directory is missing"]
+
+    relative_entries = {
+        path.relative_to(definition.template_dir).as_posix()
+        for path in definition.template_dir.rglob("*")
+    }
+
+    required_entries = {"README.md", "Makefile", ".gitignore"}
+    if "docker" in definition.tags:
+        required_entries.update({".dockerignore", "compose.dev.yaml"})
+    if definition.category == "backend":
+        required_entries.update({"go.mod", "go.sum", "cmd", "internal", "configs", "scripts"})
+    if definition.category == "native":
+        required_entries.update({".mise.toml", "scripts"})
+    if definition.name == "apple":
+        required_entries.update({"Tuist.swift", "Workspace.swift"})
+    if definition.name == "android":
+        required_entries.update({"gradlew", "gradlew.bat", "scripts"})
+
+    missing_entries = sorted(entry for entry in required_entries if entry not in relative_entries)
+    if missing_entries:
+        errors.append(
+            f"{definition.name}: missing required starter entries: {', '.join(missing_entries)}"
+        )
 
     return errors
 
@@ -266,6 +345,7 @@ def validate_templates() -> list[str]:
     for definition in definitions:
         errors.extend(validate_template_definition(definition))
         errors.extend(validate_template_placeholders(definition))
+        errors.extend(validate_template_required_files(definition))
 
     for metadata_path in sorted(templates_root().glob("*/template.json")):
         folder_name = metadata_path.parent.name

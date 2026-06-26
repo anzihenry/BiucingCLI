@@ -423,11 +423,16 @@ def format_template_info(template_name: str) -> str:
         f"Category: {definition.category}",
         f"Platforms: {', '.join(definition.platforms)}",
         f"Tags: {', '.join(definition.tags)}",
+        f"Workflow labels: {', '.join(definition.workflow_labels)}",
         f"Maturity: {definition.maturity.level} - {definition.maturity.summary}",
         f"Validation: {definition.validation.status}",
+        f"Verification tier: {definition.validation.verification_tier}",
         f"Stack: {', '.join(definition.stack)}",
-        "Variables:",
+        "Operating assumptions:",
     ]
+    for assumption in definition.operating_assumptions:
+        lines.append(f"- {assumption}")
+    lines.append("Variables:")
     for variable in definition.variables:
         required = "required" if variable.required else "optional"
         details = [required]

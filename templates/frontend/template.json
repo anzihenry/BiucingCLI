@@ -11,12 +11,18 @@
   },
   "validation": {
     "status": "real-build-verified",
+    "verification_tier": "real-build",
     "evidence": [
       "python unittest template rendering coverage",
       "real docker runtime image builds",
       "real docker development image builds"
     ]
   },
+  "operating_assumptions": [
+    "Local development is expected to run through Docker-first workflows.",
+    "Browser smoke coverage and runtime packaging are part of the starter contract."
+  ],
+  "workflow_labels": ["bootstrap", "dev", "test", "build", "runtime"],
   "variables": [
     {
       "name": "project_name",
