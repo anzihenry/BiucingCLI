@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -76,11 +77,20 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("proto_package", output)
         self.assertIn("grpc_port", output)
 
+    def test_info_prints_worker_template_details(self):
+        output = self.run_cli(["info", "worker"])
+
+        self.assertIn("Template: worker", output)
+        self.assertIn("Go, Docker", output)
+        self.assertIn("worker_name", output)
+        self.assertIn("run_mode", output)
+        self.assertIn("tick_interval_seconds", output)
+
     def test_list_json_prints_machine_readable_templates(self):
         output = self.run_cli(["list", "--json"])
 
         payload = json.loads(output)
-        self.assertEqual(len(payload["templates"]), 5)
+        self.assertEqual(len(payload["templates"]), 6)
         web_service = next(
             template for template in payload["templates"] if template["name"] == "web-service"
         )
@@ -1169,6 +1179,99 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("type User struct", user_model)
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
+
+    def test_create_worker_renders_template_and_generated_tests_pass(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "worker",
+                    "email-worker",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/email-worker",
+                    "--worker-name",
+                    "mailer-worker",
+                    "--run-mode",
+                    "oneshot",
+                    "--tick-interval-seconds",
+                    "15",
+                    "--shutdown-timeout-seconds",
+                    "5",
+                ]
+            )
+            project_dir = Path(tmpdir) / "email-worker"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
+            dockerfile = (project_dir / "Dockerfile").read_text(encoding="utf-8")
+            dockerfile_dev = (project_dir / "Dockerfile.dev").read_text(encoding="utf-8")
+            compose_dev = (project_dir / "compose.dev.yaml").read_text(encoding="utf-8")
+            config_json = (project_dir / "configs" / "config.json").read_text(encoding="utf-8")
+            main_go = (project_dir / "cmd" / "worker" / "main.go").read_text(encoding="utf-8")
+            config_go = (project_dir / "internal" / "config" / "config.go").read_text(
+                encoding="utf-8"
+            )
+            runner_go = (project_dir / "internal" / "runtime" / "runner.go").read_text(
+                encoding="utf-8"
+            )
+            heartbeat_go = (project_dir / "internal" / "task" / "heartbeat.go").read_text(
+                encoding="utf-8"
+            )
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            worker_test = (project_dir / "tests" / "worker_test.go").read_text(encoding="utf-8")
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created worker project: email-worker", output)
+            self.assertIn("make bootstrap", output)
+            self.assertIn("make verify", output)
+            self.assertIn("make docker-run", output)
+            self.assertIn("background execution rather than a public HTTP API", readme)
+            self.assertIn("scheduled` and `oneshot` execution modes", readme)
+            self.assertIn("WORKER_RUN_MODE=oneshot make run", readme)
+            self.assertIn("go test ./...", readme)
+            self.assertIn("APP_NAME=mailer-worker", makefile)
+            self.assertIn("WORKER_RUN_MODE ?=oneshot", makefile)
+            self.assertIn("WORKER_TICK_INTERVAL_SECONDS ?=15", makefile)
+            self.assertIn("WORKER_SHUTDOWN_TIMEOUT_SECONDS ?=5", makefile)
+            self.assertIn("docker run --rm -e WORKER_RUN_MODE=$(WORKER_RUN_MODE)", makefile)
+            self.assertIn("ARG BUILDER_IMAGE=golang:1.26-alpine", dockerfile)
+            self.assertIn('CMD ["/usr/local/bin/worker"]', dockerfile)
+            self.assertIn('CMD ["sh", "-lc", "go run ./cmd/worker"]', dockerfile_dev)
+            self.assertIn('WORKER_RUN_MODE: ${WORKER_RUN_MODE:-oneshot}', compose_dev)
+            self.assertIn('"name": "mailer-worker"', config_json)
+            self.assertIn('"run_mode": "oneshot"', config_json)
+            self.assertIn('"tick_interval_seconds": 15', config_json)
+            self.assertIn('"shutdown_timeout_seconds": 5', config_json)
+            self.assertIn("signal.NotifyContext", main_go)
+            self.assertIn("task.NewHeartbeatTask", main_go)
+            self.assertIn('cfg.Worker.RunMode != "scheduled" && cfg.Worker.RunMode != "oneshot"', config_go)
+            self.assertIn("runScheduled", runner_go)
+            self.assertIn("heartbeat completed", heartbeat_go)
+            self.assertIn("Worker environment doctor", doctor)
+            self.assertIn("go mod tidy", bootstrap)
+            self.assertIn('cfg.Worker.Name != "mailer-worker"', worker_test)
+            self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
+
+            env = os.environ.copy()
+            env["GOCACHE"] = str(project_dir / ".cache" / "go-build")
+            env["GOTMPDIR"] = str(project_dir / ".cache" / "go-tmp")
+            os.makedirs(env["GOCACHE"], exist_ok=True)
+            os.makedirs(env["GOTMPDIR"], exist_ok=True)
+            result = subprocess.run(
+                ["go", "test", "./..."],
+                cwd=project_dir,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=f"go test failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}",
+            )
 
     def test_create_apple_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:

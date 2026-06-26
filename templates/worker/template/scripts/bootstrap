@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+
+mkdir -p .cache/go-build bin
+go mod tidy
+go test ./...

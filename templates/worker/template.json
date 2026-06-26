@@ -1,0 +1,63 @@
+{
+  "name": "worker",
+  "description": "Go background worker starter with scheduled and oneshot execution modes",
+  "category": "backend",
+  "stack": ["Go", "Docker"],
+  "tags": ["worker", "docker", "go", "async"],
+  "platforms": ["linux", "container"],
+  "maturity": {
+    "level": "validated",
+    "summary": "Dockerized worker starter with config loading, graceful shutdown, and generated-project test coverage."
+  },
+  "validation": {
+    "status": "generated-project-verified",
+    "verification_tier": "generated-project",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "real generated project go test validation"
+    ]
+  },
+  "operating_assumptions": [
+    "The starter is optimized for background execution rather than a public HTTP API surface.",
+    "Generated projects are expected to keep config, verification, and container packaging repo-local."
+  ],
+  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "module_name",
+      "required": true,
+      "prompt": "Go module name: "
+    },
+    {
+      "name": "worker_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "run_mode",
+      "required": false,
+      "default": "scheduled"
+    },
+    {
+      "name": "tick_interval_seconds",
+      "required": false,
+      "default": "30"
+    },
+    {
+      "name": "shutdown_timeout_seconds",
+      "required": false,
+      "default": "10"
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make dev",
+    "make verify",
+    "make docker-build",
+    "make docker-run"
+  ]
+}

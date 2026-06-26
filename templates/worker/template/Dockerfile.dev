@@ -1,0 +1,9 @@
+FROM golang:1.26-alpine
+ARG GOPROXY=https://proxy.golang.org,direct
+ARG GOSUMDB=sum.golang.org
+WORKDIR /app
+ENV GOPROXY=${GOPROXY}
+ENV GOSUMDB=${GOSUMDB}
+COPY go.mod go.sum ./
+RUN go mod download || true
+CMD ["sh", "-lc", "go run ./cmd/worker"]

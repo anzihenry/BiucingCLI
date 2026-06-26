@@ -4,3 +4,4 @@ Available templates:
 - frontend: React + TypeScript starter for independent projects
 - microservice: Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry
 - web-service: Go + Gin web service starter
+- worker: Go background worker starter with scheduled and oneshot execution modes

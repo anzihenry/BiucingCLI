@@ -1,0 +1,8 @@
+{
+  "worker": {
+    "name": "{{WORKER_NAME}}",
+    "run_mode": "{{RUN_MODE}}",
+    "tick_interval_seconds": {{TICK_INTERVAL_SECONDS}},
+    "shutdown_timeout_seconds": {{SHUTDOWN_TIMEOUT_SECONDS}}
+  }
+}

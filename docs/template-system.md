@@ -401,6 +401,44 @@ my-android-app/
     setup-android-sdk
 ```
 
+### `worker`
+
+Core variables:
+
+- `project_name`
+- `module_name`
+- `worker_name`
+- `run_mode`
+- `tick_interval_seconds`
+- `shutdown_timeout_seconds`
+
+Suggested output:
+
+```text
+email-worker/
+  .dockerignore
+  README.md
+  Dockerfile
+  Dockerfile.dev
+  Makefile
+  compose.dev.yaml
+  go.mod
+  go.sum
+  cmd/
+    worker/
+      main.go
+  internal/
+    config/
+    runtime/
+    task/
+  configs/
+    config.json
+  scripts/
+    bootstrap
+    doctor
+  tests/
+```
+
 ## CLI Behavior
 
 `biucing create <template> <project-name>` should:

@@ -1,0 +1,23 @@
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
+        GOSUMDB: ${GOSUMDB:-sum.golang.org}
+    image: {{WORKER_NAME}}-dev:latest
+    working_dir: /app
+    environment:
+      CONFIG_FILE: configs/config.json
+      WORKER_RUN_MODE: ${WORKER_RUN_MODE:-{{RUN_MODE}}}
+      WORKER_TICK_INTERVAL_SECONDS: ${WORKER_TICK_INTERVAL_SECONDS:-{{TICK_INTERVAL_SECONDS}}}
+      WORKER_SHUTDOWN_TIMEOUT_SECONDS: ${WORKER_SHUTDOWN_TIMEOUT_SECONDS:-{{SHUTDOWN_TIMEOUT_SECONDS}}}
+      GOCACHE: /cache/go-build
+    volumes:
+      - .:/app
+      - worker-go-build-cache:/cache/go-build
+    command: sh -lc "go run ./cmd/worker"
+
+volumes:
+  worker-go-build-cache:

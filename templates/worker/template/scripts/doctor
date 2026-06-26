@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+set -eu
+
+issues=0
+
+echo "Worker environment doctor"
+
+if command -v go >/dev/null 2>&1; then
+  echo "go is available"
+else
+  echo "go is not installed or not on PATH."
+  issues=$((issues + 1))
+fi
+
+if command -v docker >/dev/null 2>&1; then
+  echo "docker is available"
+else
+  echo "docker is not installed or not on PATH."
+  issues=$((issues + 1))
+fi
+
+if [ -f configs/config.json ]; then
+  echo "configs/config.json is present"
+else
+  echo "configs/config.json is missing"
+  issues=$((issues + 1))
+fi
+
+if [ -f go.mod ]; then
+  echo "go.mod is present"
+else
+  echo "go.mod is missing"
+  issues=$((issues + 1))
+fi
+
+if [ "$issues" -gt 0 ]; then
+  echo "Doctor found $issues issue(s)."
+  exit 1
+fi
+
+echo "Environment looks ready."

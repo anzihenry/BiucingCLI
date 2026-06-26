@@ -21,6 +21,7 @@ BiucingCLI focuses on a small set of templates that match the maintainer's real 
 - `frontend`: React + TypeScript starter with Docker-first local development, Vitest, and Playwright smoke checks
 - `web-service`: Go + Gin web service starter with Docker development/runtime workflows
 - `microservice`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
+- `worker`: Go background worker starter with scheduled and oneshot execution modes
 - `apple`: SwiftUI + Tuist + SwiftPM Apple app starter for `ios`, `macos`, `watchos`, and `tvos`
 - `android`: Kotlin + Gradle + Jetpack Compose Android app starter with fastlane and a committed Gradle wrapper
 
@@ -39,6 +40,7 @@ biucing list
 biucing info frontend
 biucing info web-service
 biucing info microservice
+biucing info worker
 biucing info apple
 biucing info android
 biucing create frontend my-app --dry-run
@@ -46,23 +48,26 @@ biucing create web-service user-service --plan --json
 biucing create frontend my-app
 biucing create web-service user-service
 biucing create microservice user-service
+biucing create worker email-worker
 biucing create apple my-apple-app
 biucing create android my-android-app
 ```
 
 ## Project Status
 
-This repository contains a small internal template system with practical starters for five flows:
+This repository contains a small internal template system with practical starters for six flows:
 
 - `frontend`
 - `web-service`
 - `microservice`
+- `worker`
 - `apple`
 - `android`
 
 The current maturity split is:
 
 - `frontend`, `web-service`, and `microservice` are fully Dockerized for development, verification, and runtime packaging.
+- `worker` is a backend-adjacent starter for scheduled and oneshot background execution, with generated-project `go test ./...` validation and Docker packaging.
 - `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
 
 Generator UX status:

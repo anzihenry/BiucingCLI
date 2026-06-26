@@ -367,6 +367,20 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--module-name", help="Go module name for web service projects.")
     create_parser.add_argument("--service-name", help="Service name for web service projects.")
     create_parser.add_argument("--http-port", help="HTTP port for web service projects.")
+    create_parser.add_argument("--worker-name", help="Worker process name for worker projects.")
+    create_parser.add_argument(
+        "--run-mode",
+        choices=["scheduled", "oneshot"],
+        help="Worker execution mode for worker projects.",
+    )
+    create_parser.add_argument(
+        "--tick-interval-seconds",
+        help="Tick interval in seconds for scheduled worker projects.",
+    )
+    create_parser.add_argument(
+        "--shutdown-timeout-seconds",
+        help="Shutdown timeout in seconds for worker projects.",
+    )
     create_parser.add_argument("--grpc-port", help="gRPC port for microservice projects.")
     create_parser.add_argument("--proto-package", help="Proto package for microservice projects.")
     create_parser.add_argument(
@@ -524,6 +538,10 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         "module_name": args.module_name,
         "service_name": args.service_name,
         "http_port": args.http_port,
+        "worker_name": args.worker_name,
+        "run_mode": args.run_mode,
+        "tick_interval_seconds": args.tick_interval_seconds,
+        "shutdown_timeout_seconds": args.shutdown_timeout_seconds,
         "grpc_port": args.grpc_port,
         "proto_package": args.proto_package,
         "dependency_store": args.dependency_store,
