@@ -5,7 +5,7 @@ This checklist is the repeatable release path for BiucingCLI `0.x`.
 It is intentionally split into:
 
 - repo product checks: does the CLI itself still behave correctly?
-- template proof: do the five shipped starters still meet their minimum release bar?
+- template proof: do the six shipped starters still meet their minimum release bar?
 - release surface checks: are version, changelog, tag, and publication aligned?
 
 Use this document together with [verification-matrix.md](verification-matrix.md).
@@ -23,9 +23,10 @@ Use this map before every version bump so the release does not update only part 
 | CLI version expectation | `tests/test_cli.py` | Expected `biucing --version` output |
 | Release operations docs | `docs/release-checklist.md`, `docs/verification-matrix.md` | Update if the verification bar or release flow changed |
 
-For `0.3.0`, also review:
+For `0.4.0`, also review:
 
-- `docs/0.3.0-plan.md`
+- `docs/0.4.0-plan.md`
+- `docs/0.4.0-release-prep.md`
 - `README.md` links under `Design Docs`
 
 ## 1. Scope The Release
@@ -66,6 +67,8 @@ PYTHONPATH=src python3 -m biucingcli.cli list
 PYTHONPATH=src python3 -m biucingcli.cli list --json
 PYTHONPATH=src python3 -m biucingcli.cli info web-service
 PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
+PYTHONPATH=src python3 -m biucingcli.cli info worker
+PYTHONPATH=src python3 -m biucingcli.cli info worker --json
 ```
 
 Release bar:
@@ -84,25 +87,31 @@ PYTHONPATH=src python3 -m biucingcli.cli list
 PYTHONPATH=src python3 -m biucingcli.cli list --json
 PYTHONPATH=src python3 -m biucingcli.cli info web-service
 PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
+PYTHONPATH=src python3 -m biucingcli.cli info worker
+PYTHONPATH=src python3 -m biucingcli.cli info worker --json
 biucing --version
 ```
 
 ## 4. Check Scriptability Paths
 
-The current `0.3.0` hardening work makes scripting part of the product surface, so release verification should cover it explicitly.
+The current `0.4.0` hardening work makes preview, scripting, and manifest output part of the product surface, so release verification should cover them explicitly.
 
 Minimum checks:
 
 ```bash
+PYTHONPATH=src python3 -m biucingcli.cli create frontend demo-app --output-dir /tmp/biucing-release-check --dry-run
+PYTHONPATH=src python3 -m biucingcli.cli create web-service demo-service --output-dir /tmp/biucing-release-check --module-name github.com/example/demo-service --plan --json
 PYTHONPATH=src python3 -m biucingcli.cli create frontend demo-app --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-app
 PYTHONPATH=src python3 -m biucingcli.cli create web-service demo-service --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service
 ```
 
 Release bar:
 
+- preview commands return the expected human-readable and JSON plan output;
 - `--non-interactive` fails fast when required values are missing;
 - `--set key=value` works for required values;
-- explicit template flags still override `--set` when both are supplied.
+- explicit template flags still override `--set` when both are supplied;
+- `create --json` remains stable enough for automation consumers.
 
 The automated Python tests are the main proof here; these commands are a quick maintainer smoke check before publication.
 
@@ -119,6 +128,7 @@ Rules:
 Practical expectation:
 
 - `frontend`, `web-service`, `microservice` should keep their Docker-based proof current;
+- `worker` should keep its generated-project `go test ./...` proof current;
 - `apple` and `android` should keep their generated-project proof current.
 
 ## 6. Review Docs And Messaging
@@ -127,7 +137,7 @@ Before tagging, confirm the human-facing story is clean:
 
 - `README.md` reflects the current template portfolio and maturity story;
 - `CHANGELOG.md` highlights user-visible changes rather than implementation trivia;
-- `docs/0.3.0-plan.md` or future version plans are not obviously behind shipped reality;
+- `docs/0.4.0-plan.md` or future version plans are not obviously behind shipped reality;
 - any new validation behavior is documented somewhere discoverable.
 
 ## 7. Stage The Release
@@ -186,6 +196,8 @@ Use this template in the PR body, release-prep note, or rollout summary:
   - `PYTHONPATH=src python3 -m biucingcli.cli list --json`
   - `PYTHONPATH=src python3 -m biucingcli.cli info web-service`
   - `PYTHONPATH=src python3 -m biucingcli.cli info web-service --json`
+  - `PYTHONPATH=src python3 -m biucingcli.cli info worker`
+  - `PYTHONPATH=src python3 -m biucingcli.cli info worker --json`
 - Fresh template proof:
   - `template-name`: `commands run and result`
 - Version surfaces updated:

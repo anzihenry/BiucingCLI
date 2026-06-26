@@ -48,7 +48,7 @@ Planned workstreams:
 - `biucing create` can preview what it will generate before files are written.
 - scripts can rely on a stable, machine-readable generation summary after create succeeds.
 - the current template family follows a clearer shared product contract.
-- the portfolio grows by one new surface without lowering validation quality.
+- the portfolio grows through a new `worker` starter without lowering validation quality.
 
 ## Deferred
 

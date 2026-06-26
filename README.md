@@ -100,6 +100,7 @@ Local Apple validation status:
 - Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
 - [0.3.0 Plan](docs/0.3.0-plan.md)
 - [0.4.0 Plan](docs/0.4.0-plan.md)
+- [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)
 - [Verification Matrix](docs/verification-matrix.md)

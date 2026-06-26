@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- added `create --dry-run`, `create --plan`, and JSON create manifests so generation can be previewed and audited more easily;
+- strengthened template metadata and `validate` rules with verification tiers, operating assumptions, workflow labels, and family-level required-file checks;
+- added a new `worker` starter for scheduled and oneshot background execution workloads;
+- refreshed release-prep and verification docs to match the expanded six-template product surface.
+
 ## 0.3.0 - 2026-06-19
 
 Product-hardening release for BiucingCLI itself.
