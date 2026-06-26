@@ -27,6 +27,19 @@ class TemplateVariable:
 
 
 @dataclass(frozen=True)
+class ResolvedVariable:
+    """A resolved template variable plus its source."""
+
+    name: str
+    value: str
+    source: str
+
+    def to_dict(self) -> dict[str, str]:
+        """Return a JSON-serializable representation."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class TemplateMaturity:
     """User-facing maturity metadata for a template."""
 
@@ -79,6 +92,23 @@ class TemplateDefinition:
             "validation": self.validation.to_dict(),
             "variables": [variable.to_dict() for variable in self.variables],
             "next_steps": self.next_steps,
+        }
+
+
+@dataclass(frozen=True)
+class VariableResolutionResult:
+    """Resolved template variables and missing required inputs."""
+
+    values: dict[str, str]
+    resolved_variables: list[ResolvedVariable]
+    missing_required: list[str]
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable representation."""
+        return {
+            "values": self.values,
+            "resolved_variables": [item.to_dict() for item in self.resolved_variables],
+            "missing_required": self.missing_required,
         }
 
 
@@ -257,34 +287,66 @@ def resolve_variables(
     interactive: bool = True,
 ) -> dict[str, str]:
     """Resolve final template variables from provided values and defaults."""
+    return resolve_variables_detailed(definition, provided, interactive=interactive).values
+
+
+def resolve_variables_detailed(
+    definition: TemplateDefinition,
+    provided: dict[str, str | None],
+    interactive: bool = True,
+) -> VariableResolutionResult:
+    """Resolve final template variables along with source metadata."""
     resolved: dict[str, str] = {}
+    resolution_sources: dict[str, str] = {}
+    missing_required: list[str] = []
     for variable in definition.variables:
         value = provided.get(variable.name)
         if value:
             resolved[variable.name] = value
+            resolution_sources[variable.name] = "provided"
             continue
 
         if variable.default is not None:
             resolved[variable.name] = variable.default
+            resolution_sources[variable.name] = "default"
             continue
 
         if variable.default_from is not None and variable.default_from in resolved:
             resolved[variable.name] = resolved[variable.default_from]
+            resolution_sources[variable.name] = f"default_from:{variable.default_from}"
             continue
 
         if variable.required:
             if not interactive:
-                raise ValueError(
-                    f"Missing required value for {variable.name} in non-interactive mode"
-                )
+                missing_required.append(variable.name)
+                continue
             prompt = variable.prompt or f"{variable.name}: "
             answer = input(prompt).strip()
             if not answer:
                 raise ValueError(f"Missing required value for {variable.name}")
             resolved[variable.name] = answer
-            continue
+            resolution_sources[variable.name] = "prompted"
 
-    return resolved
+    if missing_required:
+        missing_list = ", ".join(missing_required)
+        raise ValueError(
+            f"Missing required values in non-interactive mode: {missing_list}"
+        )
+
+    resolved_variables = [
+        ResolvedVariable(
+            name=variable.name,
+            value=resolved[variable.name],
+            source=resolution_sources[variable.name],
+        )
+        for variable in definition.variables
+        if variable.name in resolved and variable.name in resolution_sources
+    ]
+    return VariableResolutionResult(
+        values=resolved,
+        resolved_variables=resolved_variables,
+        missing_required=missing_required,
+    )
 
 
 def placeholder_map(values: dict[str, str]) -> dict[str, str]:

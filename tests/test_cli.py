@@ -800,9 +800,103 @@ class CLITestCase(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(stdout, "")
             self.assertIn(
-                "Missing required value for proto_package in non-interactive mode",
+                "Missing required values in non-interactive mode: proto_package",
                 stderr,
             )
+
+    def test_create_microservice_non_interactive_reports_all_missing_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            code, stdout, stderr = self.run_cli_failure(
+                [
+                    "create",
+                    "microservice",
+                    "needs-values",
+                    "--output-dir",
+                    tmpdir,
+                    "--non-interactive",
+                ]
+            )
+
+            self.assertEqual(code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn(
+                "Missing required values in non-interactive mode: module_name, proto_package",
+                stderr,
+            )
+
+    def test_create_frontend_dry_run_preview_does_not_write_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "frontend",
+                    "preview-app",
+                    "--output-dir",
+                    tmpdir,
+                    "--dry-run",
+                    "--set",
+                    "display_name=Preview App",
+                ]
+            )
+            project_dir = Path(tmpdir) / "preview-app"
+
+            self.assertFalse(project_dir.exists())
+            self.assertIn("Create preview (dry-run) for frontend: preview-app", output)
+            self.assertIn("Resolved variables:", output)
+            self.assertIn("display_name [provided]: Preview App", output)
+            self.assertIn("package_name [default_from:project_name]: preview-app", output)
+            self.assertIn("No files were written.", output)
+
+    def test_create_web_plan_json_returns_manifest(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "web-service",
+                    "plan-web-service",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/plan-web-service",
+                    "--plan",
+                    "--json",
+                ]
+            )
+            project_dir = Path(tmpdir) / "plan-web-service"
+            payload = json.loads(output)
+
+            self.assertFalse(project_dir.exists())
+            self.assertEqual(payload["operation"], "plan")
+            self.assertEqual(payload["template"]["name"], "web-service")
+            self.assertEqual(payload["project_name"], "plan-web-service")
+            self.assertEqual(payload["target_exists"], False)
+            self.assertEqual(payload["resolved_variables"][1]["name"], "module_name")
+            self.assertEqual(payload["resolved_variables"][1]["source"], "provided")
+            self.assertIn("make verify", payload["next_steps"])
+
+    def test_create_frontend_json_returns_manifest_after_generation(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "frontend",
+                    "json-app",
+                    "--output-dir",
+                    tmpdir,
+                    "--json",
+                ]
+            )
+            project_dir = Path(tmpdir) / "json-app"
+            payload = json.loads(output)
+
+            self.assertTrue(project_dir.exists())
+            self.assertEqual(payload["operation"], "create")
+            self.assertEqual(payload["template"]["name"], "frontend")
+            self.assertEqual(payload["project_name"], "json-app")
+            self.assertEqual(payload["target_exists"], True)
+            self.assertGreater(payload["template_file_count"], 0)
+            self.assertIn("README.md", payload["template_top_level_entries"])
+            self.assertIn("make docker-run", payload["next_steps"])
 
     def test_create_web_set_values_can_replace_prompt(self):
         with tempfile.TemporaryDirectory() as tmpdir:

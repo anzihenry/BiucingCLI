@@ -41,6 +41,8 @@ biucing info web-service
 biucing info microservice
 biucing info apple
 biucing info android
+biucing create frontend my-app --dry-run
+biucing create web-service user-service --plan --json
 biucing create frontend my-app
 biucing create web-service user-service
 biucing create microservice user-service
@@ -63,6 +65,13 @@ The current maturity split is:
 - `frontend`, `web-service`, and `microservice` are fully Dockerized for development, verification, and runtime packaging.
 - `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
 
+Generator UX status:
+
+- `biucing create ... --dry-run` previews resolved variables, target location, template file count, and next steps without writing files;
+- `biucing create ... --plan --json` returns a machine-readable preview payload for scripts and automation;
+- `biucing create ... --json` returns a machine-readable manifest after a real generation run;
+- non-interactive create failures now report all missing required values together.
+
 Local Android validation status:
 
 - the Android starter now includes a committed Gradle wrapper;
@@ -79,6 +88,7 @@ Local Apple validation status:
 
 - Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
 - [0.3.0 Plan](docs/0.3.0-plan.md)
+- [0.4.0 Plan](docs/0.4.0-plan.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)
 - [Verification Matrix](docs/verification-matrix.md)

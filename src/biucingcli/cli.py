@@ -11,7 +11,7 @@ from biucingcli.templates import load_template
 from biucingcli.templates import load_templates
 from biucingcli.templates import render_template
 from biucingcli.templates import render_text
-from biucingcli.templates import resolve_variables
+from biucingcli.templates import resolve_variables_detailed
 from biucingcli.templates import validate_templates
 
 
@@ -347,6 +347,21 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Fail instead of prompting for missing required values.",
     )
+    create_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print the create plan or result as JSON.",
+    )
+    create_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Resolve values and preview the generation result without writing files.",
+    )
+    create_parser.add_argument(
+        "--plan",
+        action="store_true",
+        help="Print a human-readable generation plan without writing files.",
+    )
     create_parser.add_argument("--display-name", help="Display name for frontend projects.")
     create_parser.add_argument("--package-name", help="Package name for frontend projects.")
     create_parser.add_argument("--module-name", help="Go module name for web service projects.")
@@ -453,8 +468,18 @@ def format_validation_report_json(errors: list[str]) -> str:
     return json.dumps(payload, indent=2)
 
 
-def create_project(args: argparse.Namespace) -> str:
-    """Generate a project and return the output message."""
+def count_template_files(template_dir: Path) -> int:
+    """Return the number of files in a template directory."""
+    return sum(1 for path in template_dir.rglob("*") if path.is_file())
+
+
+def top_level_template_entries(template_dir: Path) -> list[str]:
+    """Return top-level template entries for preview and manifest output."""
+    return sorted(path.name for path in template_dir.iterdir())
+
+
+def build_create_context(args: argparse.Namespace) -> dict[str, object]:
+    """Resolve a create request into a reusable context."""
     definition = load_template(args.template)
     set_values = parse_set_values(args.set_values)
     allowed_keys = {variable.name for variable in definition.variables}
@@ -489,8 +514,6 @@ def create_project(args: argparse.Namespace) -> str:
 
     if args.package_name is not None:
         provided_values["package_name"] = args.package_name
-    elif args.template == "frontend" and "package_name" not in provided_values:
-        provided_values["package_name"] = args.project_name
 
     explicit_values = {
         "module_name": args.module_name,
@@ -521,19 +544,25 @@ def create_project(args: argparse.Namespace) -> str:
         if value is not None:
             provided_values[key] = value
 
-    values = resolve_variables(
+    resolution_result = resolve_variables_detailed(
         definition,
         provided_values,
         interactive=not args.non_interactive,
     )
+    values = dict(resolution_result.values)
+    derived_values: dict[str, str] = {}
+    if args.template == "microservice":
+        derived_values["service_type_name"] = default_swift_module_name(args.project_name)
+    if args.template == "apple":
+        derived_values["swift_module_name"] = values.get("swift_module_name") or default_swift_module_name(
+            args.project_name
+        )
+    if args.template == "android":
+        derived_values["kotlin_module_name"] = values.get("kotlin_module_name") or default_kotlin_module_name(
+            args.project_name
+        )
     values.update(
-        {
-            "service_type_name": default_swift_module_name(args.project_name),
-            "swift_module_name": values.get("swift_module_name")
-            or default_swift_module_name(args.project_name),
-            "kotlin_module_name": values.get("kotlin_module_name")
-            or default_kotlin_module_name(args.project_name),
-        }
+        derived_values
     )
     if args.template == "apple":
         values.update(apple_platform_snippets(values))
@@ -541,17 +570,132 @@ def create_project(args: argparse.Namespace) -> str:
     values.update({key: value for key, value in microservice_values.items() if value is not None})
 
     target_dir = Path(args.output_dir).resolve() / args.project_name
-    render_template(definition, values, target_dir)
+    rendered_next_steps = [render_text(step, values) for step in definition.next_steps]
+    system_derived_values = {
+        key: values[key]
+        for key in sorted(
+            {
+                *derived_values.keys(),
+                *apple_values.keys(),
+                *microservice_values.keys(),
+            }
+        )
+        if key in values
+    }
+    return {
+        "definition": definition,
+        "project_name": args.project_name,
+        "target_dir": target_dir,
+        "values": values,
+        "resolved_variables": [item.to_dict() for item in resolution_result.resolved_variables],
+        "derived_values": system_derived_values,
+        "rendered_next_steps": rendered_next_steps,
+        "template_file_count": count_template_files(definition.template_dir),
+        "template_top_level_entries": top_level_template_entries(definition.template_dir),
+    }
 
+
+def create_manifest(context: dict[str, object], mode: str) -> dict[str, object]:
+    """Build a machine-readable preview or generation result."""
+    definition = context["definition"]
+    assert hasattr(definition, "name")
+    return {
+        "operation": mode,
+        "template": {
+            "name": definition.name,
+            "description": definition.description,
+            "category": definition.category,
+            "stack": definition.stack,
+            "platforms": definition.platforms,
+        },
+        "project_name": context["project_name"],
+        "output_path": str(context["target_dir"]),
+        "target_exists": Path(context["target_dir"]).exists(),
+        "resolved_variables": context["resolved_variables"],
+        "derived_values": context["derived_values"],
+        "next_steps": context["rendered_next_steps"],
+        "template_file_count": context["template_file_count"],
+        "template_top_level_entries": context["template_top_level_entries"],
+    }
+
+
+def format_create_preview(context: dict[str, object], preview_mode: str) -> str:
+    """Return a human-readable create preview."""
+    definition = context["definition"]
+    target_dir = Path(context["target_dir"])
     lines = [
-        f"Created {definition.name} project: {args.project_name}",
+        f"Create preview ({preview_mode}) for {definition.name}: {context['project_name']}",
+        f"Location: {target_dir}",
+        f"Target exists: {'yes' if target_dir.exists() else 'no'}",
+        f"Stack: {', '.join(definition.stack)}",
+        "Resolved variables:",
+    ]
+    for item in context["resolved_variables"]:
+        lines.append(f"  - {item['name']} [{item['source']}]: {item['value']}")
+    if context["derived_values"]:
+        lines.append("Derived values:")
+        for key, value in context["derived_values"].items():
+            lines.append(f"  - {key}: {value}")
+    lines.extend(
+        [
+            f"Template file count: {context['template_file_count']}",
+            "Top-level template entries:",
+        ]
+    )
+    lines.extend(f"  - {entry}" for entry in context["template_top_level_entries"])
+    lines.extend(
+        [
+            "Next steps:",
+            f"  cd {context['project_name']}",
+        ]
+    )
+    lines.extend(f"  {step}" for step in context["rendered_next_steps"])
+    lines.append("No files were written.")
+    return "\n".join(lines)
+
+
+def format_create_success(context: dict[str, object]) -> str:
+    """Return a human-readable create success summary."""
+    definition = context["definition"]
+    target_dir = Path(context["target_dir"])
+    lines = [
+        f"Created {definition.name} project: {context['project_name']}",
         f"Location: {target_dir}",
         f"Stack: {', '.join(definition.stack)}",
-        "Next steps:",
-        f"  cd {args.project_name}",
+        "Resolved variables:",
     ]
-    lines.extend(f"  {render_text(step, values)}" for step in definition.next_steps)
+    for item in context["resolved_variables"]:
+        lines.append(f"  - {item['name']} [{item['source']}]: {item['value']}")
+    lines.extend(
+        [
+            f"Template file count: {context['template_file_count']}",
+            "Next steps:",
+            f"  cd {context['project_name']}",
+        ]
+    )
+    lines.extend(f"  {step}" for step in context["rendered_next_steps"])
     return "\n".join(lines)
+
+
+def preview_project(args: argparse.Namespace, preview_mode: str) -> str:
+    """Preview a project generation request."""
+    context = build_create_context(args)
+    if args.json:
+        return json.dumps(create_manifest(context, mode=preview_mode), indent=2)
+    return format_create_preview(context, preview_mode)
+
+
+def create_project_output(args: argparse.Namespace) -> str:
+    """Create a project and return either text or JSON output."""
+    context = build_create_context(args)
+    render_template(
+        context["definition"],
+        context["values"],
+        context["target_dir"],
+    )
+    if args.json:
+        return json.dumps(create_manifest(context, mode="create"), indent=2)
+    return format_create_success(context)
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -583,7 +727,11 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "create":
         try:
-            print(create_project(args))
+            if args.dry_run or args.plan:
+                preview_mode = "dry-run" if args.dry_run else "plan"
+                print(preview_project(args, preview_mode))
+            else:
+                print(create_project_output(args))
         except ValueError as exc:
             parser.exit(2, f"error: {exc}\n")
         return
