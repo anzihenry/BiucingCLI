@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- added an experimental `harmonyos` template for ArkTS + ArkUI DevEco Studio projects with CLI flags, doctor/bootstrap scripts, metadata validation, and render tests.
+
 ## 0.4.0 - 2026-06-26
 
 - added `create --dry-run`, `create --plan`, and JSON create manifests so generation can be previewed and audited more easily;

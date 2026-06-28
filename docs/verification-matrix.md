@@ -1,6 +1,6 @@
 # BiucingCLI Verification Matrix
 
-This matrix defines the minimum release bar for the current six templates and the CLI surface around them.
+This matrix defines the minimum release bar for the current seven templates and the CLI surface around them.
 
 The goal is not to re-run every heavy workflow on every commit.
 The goal is to make release proof explicit and reusable.
@@ -18,6 +18,7 @@ These checks apply to every release regardless of which template changed.
 | Human-readable info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service` | Must pass |
 | JSON info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service --json` | Must pass |
 | Worker info output | Python test coverage for `biucing info worker` and `biucing info worker --json` | Must pass |
+| HarmonyOS info output | Python test coverage for `biucing info harmonyos` | Must pass |
 | Scriptable create flow | Python test coverage for `--set` and `--non-interactive` | Must pass |
 | Preview and manifest flow | Python test coverage for `--dry-run`, `--plan --json`, and `create --json` | Must pass |
 | Version surface | `biucing --version` test expectation and version files aligned | Must pass |
@@ -32,6 +33,7 @@ These checks apply to every release regardless of which template changed.
 | `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
 | `apple` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `make generate`, plus at least one platform `make build` or `make test` path | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
 | `android` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `./gradlew assembleDebug` and, when release/setup changes, `./gradlew assembleRelease` | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
+| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor` and `make build` on a workstation with DevEco Studio, ohpm, hvigor, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
 
 ## Recommended Command Catalog
 
@@ -45,6 +47,7 @@ These are the default commands to reach for when fresh proof is needed.
 | `worker` | `PYTHONPATH=src python3 -m biucingcli.cli create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
 | `apple` | `PYTHONPATH=src python3 -m biucingcli.cli create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
 | `android` | `PYTHONPATH=src python3 -m biucingcli.cli create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
+| `harmonyos` | `PYTHONPATH=src python3 -m biucingcli.cli create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
 
 When using these commands for release evidence, prefer a fresh empty output directory per template so the proof is easy to explain and reproduce.
 
@@ -58,6 +61,7 @@ When using these commands for release evidence, prefer a fresh empty output dire
 | Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `microservice` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
 | Background-worker template change in `worker` | Release-wide checks plus fresh generated-project `go test ./...` proof and, when Docker paths changed, Docker packaging verification |
 | Native project structure change in `apple` or `android` | Release-wide checks plus fresh generated-project verification for the touched native template |
+| Native project structure change in `harmonyos` | Release-wide checks plus generated-project static checks; run `make build` when DevEco Studio and HarmonyOS SDK are available |
 | Version bump and release-doc only | Release-wide checks, changelog/readme/version alignment review |
 
 ## Current Evidence Baseline
@@ -65,7 +69,7 @@ When using these commands for release evidence, prefer a fresh empty output dire
 The current repository metadata declares:
 
 - `frontend`, `web-service`, and `microservice` as `real-build-verified`;
-- `worker`, `apple`, and `android` as `generated-project-verified`.
+- `worker`, `apple`, `android`, and `harmonyos` as `generated-project-verified`.
 
 The current repo-level automated baseline includes:
 

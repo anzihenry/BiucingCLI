@@ -1,0 +1,10 @@
+{
+  "app": {
+    "bundleName": "{{BUNDLE_NAME}}",
+    "vendor": "{{ORGANIZATION_NAME}}",
+    "versionCode": {{HARMONY_VERSION_CODE}},
+    "versionName": "{{HARMONY_VERSION_NAME}}",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name"
+  }
+}

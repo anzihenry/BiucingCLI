@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Installing HarmonyOS project dependencies with ohpm..."
+
+if ! command -v ohpm >/dev/null 2>&1; then
+  echo "ohpm is not available. Install DevEco Studio or add the HarmonyOS SDK tools to PATH."
+  exit 1
+fi
+
+ohpm install
+./scripts/doctor

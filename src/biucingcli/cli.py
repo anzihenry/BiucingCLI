@@ -411,6 +411,14 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.add_argument("--java-version", help="Java version for Android builds.")
     create_parser.add_argument("--android-namespace", help="Android namespace.")
     create_parser.add_argument("--kotlin-module-name", help="Kotlin module name for Android code.")
+    create_parser.add_argument("--bundle-name", help="HarmonyOS bundle name.")
+    create_parser.add_argument("--harmony-module-name", help="HarmonyOS module name.")
+    create_parser.add_argument("--ability-name", help="HarmonyOS entry ability name.")
+    create_parser.add_argument("--compatible-sdk-version", help="HarmonyOS compatible SDK version.")
+    create_parser.add_argument("--target-sdk-version", help="HarmonyOS target SDK version.")
+    create_parser.add_argument("--min-api-version", help="HarmonyOS minimum API version.")
+    create_parser.add_argument("--harmony-version-code", help="HarmonyOS version code.")
+    create_parser.add_argument("--harmony-version-name", help="HarmonyOS version name.")
     return parser
 
 
@@ -561,6 +569,14 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         "java_version": args.java_version,
         "android_namespace": args.android_namespace,
         "kotlin_module_name": args.kotlin_module_name,
+        "bundle_name": args.bundle_name,
+        "harmony_module_name": args.harmony_module_name,
+        "ability_name": args.ability_name,
+        "compatible_sdk_version": args.compatible_sdk_version,
+        "target_sdk_version": args.target_sdk_version,
+        "min_api_version": args.min_api_version,
+        "harmony_version_code": args.harmony_version_code,
+        "harmony_version_name": args.harmony_version_name,
         "swift_module_name": args.swift_module_name,
     }
     for key, value in explicit_values.items():

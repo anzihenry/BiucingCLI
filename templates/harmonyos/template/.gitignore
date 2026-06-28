@@ -1,0 +1,10 @@
+.hvigor/
+.ohpm/
+build/
+entry/build/
+node_modules/
+oh_modules/
+local.properties
+*.hap
+*.app
+*.log

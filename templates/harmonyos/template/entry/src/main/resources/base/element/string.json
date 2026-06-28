@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "{{DISPLAY_NAME}}"
+    },
+    {
+      "name": "module_desc",
+      "value": "{{DISPLAY_NAME}} entry module"
+    },
+    {
+      "name": "ability_desc",
+      "value": "{{DISPLAY_NAME}} main ability"
+    }
+  ]
+}

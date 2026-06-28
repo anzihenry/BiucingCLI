@@ -26,11 +26,25 @@
       },
       "validation": {
         "status": "generated-project-verified",
+        "verification_tier": "generated-project",
         "evidence": [
           "python unittest template rendering coverage",
           "real generated project gradle build validation"
         ]
       },
+      "operating_assumptions": [
+        "The starter assumes a native Android workstation flow with Gradle, emulator, and release-signing guidance.",
+        "Generated projects should expose bootstrap, doctor, format, build, test, and UI smoke workflows."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "doctor",
+        "format",
+        "build",
+        "test",
+        "ui-test",
+        "open"
+      ],
       "variables": [
         {
           "name": "project_name",
@@ -162,11 +176,24 @@
       },
       "validation": {
         "status": "generated-project-verified",
+        "verification_tier": "generated-project",
         "evidence": [
           "python unittest template rendering coverage",
           "real generated project make generate/build/test validation"
         ]
       },
+      "operating_assumptions": [
+        "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
+        "Generated projects should keep bootstrap, doctor, generate, lint, and test workflows explicit."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "doctor",
+        "generate",
+        "lint",
+        "test",
+        "open"
+      ],
       "variables": [
         {
           "name": "project_name",
@@ -264,12 +291,24 @@
       },
       "validation": {
         "status": "real-build-verified",
+        "verification_tier": "real-build",
         "evidence": [
           "python unittest template rendering coverage",
           "real docker runtime image builds",
           "real docker development image builds"
         ]
       },
+      "operating_assumptions": [
+        "Local development is expected to run through Docker-first workflows.",
+        "Browser smoke coverage and runtime packaging are part of the starter contract."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "dev",
+        "test",
+        "build",
+        "runtime"
+      ],
       "variables": [
         {
           "name": "project_name",
@@ -302,6 +341,138 @@
       ]
     },
     {
+      "name": "harmonyos",
+      "description": "ArkTS HarmonyOS app starter for DevEco Studio projects",
+      "stack": [
+        "ArkTS",
+        "ArkUI",
+        "HarmonyOS",
+        "DevEco Studio",
+        "hvigor",
+        "ohpm"
+      ],
+      "category": "native",
+      "tags": [
+        "harmonyos",
+        "arkts",
+        "arkui",
+        "deveco",
+        "native"
+      ],
+      "platforms": [
+        "harmonyos"
+      ],
+      "maturity": {
+        "level": "experimental",
+        "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, and generated-project render coverage."
+      },
+      "validation": {
+        "status": "generated-project-verified",
+        "verification_tier": "generated-project",
+        "evidence": [
+          "python unittest template rendering coverage",
+          "repo-level template metadata and placeholder validation"
+        ]
+      },
+      "operating_assumptions": [
+        "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
+        "Generated projects are structured for an ArkTS Stage model app with one entry module."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "doctor",
+        "build",
+        "test",
+        "open"
+      ],
+      "variables": [
+        {
+          "name": "project_name",
+          "required": true,
+          "default": null,
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "display_name",
+          "required": false,
+          "default": null,
+          "default_from": "project_name",
+          "prompt": null
+        },
+        {
+          "name": "bundle_name",
+          "required": true,
+          "default": null,
+          "default_from": null,
+          "prompt": "HarmonyOS bundle name: "
+        },
+        {
+          "name": "harmony_module_name",
+          "required": false,
+          "default": "entry",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "ability_name",
+          "required": false,
+          "default": "EntryAbility",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "compatible_sdk_version",
+          "required": false,
+          "default": "5.0.0(12)",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "target_sdk_version",
+          "required": false,
+          "default": "5.0.0(12)",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "min_api_version",
+          "required": false,
+          "default": "12",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "harmony_version_code",
+          "required": false,
+          "default": "1",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "harmony_version_name",
+          "required": false,
+          "default": "1.0.0",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "organization_name",
+          "required": false,
+          "default": "Example Team",
+          "default_from": null,
+          "prompt": null
+        }
+      ],
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make build",
+        "make test",
+        "open -a \"DevEco Studio\" ."
+      ]
+    },
+    {
       "name": "microservice",
       "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
       "stack": [
@@ -330,12 +501,24 @@
       },
       "validation": {
         "status": "real-build-verified",
+        "verification_tier": "real-build",
         "evidence": [
           "python unittest template rendering coverage",
           "real docker runtime image builds",
           "real docker development image builds"
         ]
       },
+      "operating_assumptions": [
+        "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
+        "Generated projects are expected to validate protobuf, service runtime, and container packaging together."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "dev",
+        "verify",
+        "build",
+        "runtime"
+      ],
       "variables": [
         {
           "name": "project_name",
@@ -426,12 +609,24 @@
       },
       "validation": {
         "status": "real-build-verified",
+        "verification_tier": "real-build",
         "evidence": [
           "python unittest template rendering coverage",
           "real docker runtime image builds",
           "real docker development image builds"
         ]
       },
+      "operating_assumptions": [
+        "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
+        "Generated projects are expected to keep config, build, and verification workflows repo-local."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "dev",
+        "verify",
+        "build",
+        "runtime"
+      ],
       "variables": [
         {
           "name": "project_name",
@@ -458,6 +653,99 @@
           "name": "http_port",
           "required": false,
           "default": "8080",
+          "default_from": null,
+          "prompt": null
+        }
+      ],
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make docker-build",
+        "make docker-run"
+      ]
+    },
+    {
+      "name": "worker",
+      "description": "Go background worker starter with scheduled and oneshot execution modes",
+      "stack": [
+        "Go",
+        "Docker"
+      ],
+      "category": "backend",
+      "tags": [
+        "worker",
+        "docker",
+        "go",
+        "async"
+      ],
+      "platforms": [
+        "linux",
+        "container"
+      ],
+      "maturity": {
+        "level": "validated",
+        "summary": "Dockerized worker starter with config loading, graceful shutdown, and generated-project test coverage."
+      },
+      "validation": {
+        "status": "generated-project-verified",
+        "verification_tier": "generated-project",
+        "evidence": [
+          "python unittest template rendering coverage",
+          "real generated project go test validation"
+        ]
+      },
+      "operating_assumptions": [
+        "The starter is optimized for background execution rather than a public HTTP API surface.",
+        "Generated projects are expected to keep config, verification, and container packaging repo-local."
+      ],
+      "workflow_labels": [
+        "bootstrap",
+        "dev",
+        "verify",
+        "build",
+        "runtime"
+      ],
+      "variables": [
+        {
+          "name": "project_name",
+          "required": true,
+          "default": null,
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "module_name",
+          "required": true,
+          "default": null,
+          "default_from": null,
+          "prompt": "Go module name: "
+        },
+        {
+          "name": "worker_name",
+          "required": false,
+          "default": null,
+          "default_from": "project_name",
+          "prompt": null
+        },
+        {
+          "name": "run_mode",
+          "required": false,
+          "default": "scheduled",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "tick_interval_seconds",
+          "required": false,
+          "default": "30",
+          "default_from": null,
+          "prompt": null
+        },
+        {
+          "name": "shutdown_timeout_seconds",
+          "required": false,
+          "default": "10",
           "default_from": null,
           "prompt": null
         }

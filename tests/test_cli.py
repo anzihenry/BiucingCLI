@@ -69,6 +69,14 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("package_name", output)
         self.assertIn("compile_sdk", output)
 
+    def test_info_prints_harmonyos_template_details(self):
+        output = self.run_cli(["info", "harmonyos"])
+
+        self.assertIn("Template: harmonyos", output)
+        self.assertIn("ArkTS, ArkUI, HarmonyOS, DevEco Studio, hvigor, ohpm", output)
+        self.assertIn("bundle_name", output)
+        self.assertIn("compatible_sdk_version", output)
+
     def test_info_prints_microservice_template_details(self):
         output = self.run_cli(["info", "microservice"])
 
@@ -90,7 +98,7 @@ class CLITestCase(unittest.TestCase):
         output = self.run_cli(["list", "--json"])
 
         payload = json.loads(output)
-        self.assertEqual(len(payload["templates"]), 6)
+        self.assertEqual(len(payload["templates"]), 7)
         web_service = next(
             template for template in payload["templates"] if template["name"] == "web-service"
         )
@@ -472,6 +480,124 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Created android project: prompt-android", output)
             self.assertIn('namespace = "com.example.promptandroid"', app_build)
 
+    def test_create_harmonyos_renders_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "harmonyos",
+                    "demo-harmony",
+                    "--output-dir",
+                    tmpdir,
+                    "--bundle-name",
+                    "com.example.demoharmony",
+                    "--harmony-module-name",
+                    "entry",
+                    "--ability-name",
+                    "EntryAbility",
+                    "--compatible-sdk-version",
+                    "5.0.0(12)",
+                    "--target-sdk-version",
+                    "5.0.0(12)",
+                    "--min-api-version",
+                    "12",
+                    "--harmony-version-code",
+                    "7",
+                    "--harmony-version-name",
+                    "1.2.3",
+                    "--organization-name",
+                    "Example Labs",
+                ]
+            )
+            project_dir = Path(tmpdir) / "demo-harmony"
+            readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            app_json = (project_dir / "AppScope" / "app.json5").read_text(encoding="utf-8")
+            build_profile = (project_dir / "build-profile.json5").read_text(encoding="utf-8")
+            module_json = (
+                project_dir / "entry" / "src" / "main" / "module.json5"
+            ).read_text(encoding="utf-8")
+            ability = (
+                project_dir
+                / "entry"
+                / "src"
+                / "main"
+                / "ets"
+                / "entryability"
+                / "EntryAbility.ets"
+            ).read_text(encoding="utf-8")
+            page = (
+                project_dir / "entry" / "src" / "main" / "ets" / "pages" / "Index.ets"
+            ).read_text(encoding="utf-8")
+            strings = (
+                project_dir
+                / "entry"
+                / "src"
+                / "main"
+                / "resources"
+                / "base"
+                / "element"
+                / "string.json"
+            ).read_text(encoding="utf-8")
+            main_pages = (
+                project_dir
+                / "entry"
+                / "src"
+                / "main"
+                / "resources"
+                / "base"
+                / "profile"
+                / "main_pages.json"
+            ).read_text(encoding="utf-8")
+            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
+            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
+            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
+
+            self.assertTrue(project_dir.exists())
+            self.assertIn("Created harmonyos project: demo-harmony", output)
+            self.assertIn("make bootstrap", output)
+            self.assertIn("make doctor", output)
+            self.assertIn("make build", output)
+            self.assertIn('open -a "DevEco Studio" .', output)
+            self.assertIn("Bundle name: `com.example.demoharmony`", readme)
+            self.assertIn("Compatible SDK: `5.0.0(12)`", readme)
+            self.assertIn("Version: `1.2.3` (`7`)", readme)
+            self.assertIn('"bundleName": "com.example.demoharmony"', app_json)
+            self.assertIn('"vendor": "Example Labs"', app_json)
+            self.assertIn('"versionCode": 7', app_json)
+            self.assertIn('"versionName": "1.2.3"', app_json)
+            self.assertIn('"compatibleSdkVersion": "5.0.0(12)"', build_profile)
+            self.assertIn('"srcPath": "./entry"', build_profile)
+            self.assertIn('"name": "entry"', module_json)
+            self.assertIn('"mainElement": "EntryAbility"', module_json)
+            self.assertIn('"srcEntry": "./ets/entryability/EntryAbility.ets"', module_json)
+            self.assertIn('"metadata"', module_json)
+            self.assertIn("export default class EntryAbility extends UIAbility", ability)
+            self.assertIn("windowStage.loadContent('pages/Index'", ability)
+            self.assertIn("Text('Demo Harmony')", page)
+            self.assertIn("Bundle: com.example.demoharmony", page)
+            self.assertIn('"value": "Demo Harmony"', strings)
+            self.assertIn('"pages/Index"', main_pages)
+            self.assertIn("hvigor assembleHap --mode module -p module=entry", makefile)
+            self.assertIn("ohpm install", bootstrap)
+            self.assertIn("HarmonyOS environment doctor", doctor)
+            self.assertIn("ohpm is available", doctor)
+            self.assertIn("hvigor is available", doctor)
+            self.assertIn("entry/src/main/module.json5 is missing", doctor)
+            self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
+
+    def test_create_harmonyos_prompts_for_bundle_name(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                ["create", "harmonyos", "prompt-harmony", "--output-dir", tmpdir],
+                stdin_values=["com.example.promptharmony"],
+            )
+            project_dir = Path(tmpdir) / "prompt-harmony"
+            app_json = (project_dir / "AppScope" / "app.json5").read_text(encoding="utf-8")
+
+            self.assertIn("Created harmonyos project: prompt-harmony", output)
+            self.assertIn('"bundleName": "com.example.promptharmony"', app_json)
+
     def test_create_frontend_supports_set_values(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = self.run_cli(
@@ -536,6 +662,41 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("versionName = 1.0.0", rendered)
         self.assertIn("javaVersion = 17", rendered)
         self.assertIn("moduleName = DemoAndroid", rendered)
+
+    def test_render_text_replaces_harmonyos_placeholders(self):
+        rendered = render_text(
+            "\n".join(
+                [
+                    "bundleName = {{BUNDLE_NAME}}",
+                    "module = {{HARMONY_MODULE_NAME}}",
+                    "ability = {{ABILITY_NAME}}",
+                    "compatible = {{COMPATIBLE_SDK_VERSION}}",
+                    "target = {{TARGET_SDK_VERSION}}",
+                    "minApi = {{MIN_API_VERSION}}",
+                    "versionCode = {{HARMONY_VERSION_CODE}}",
+                    "versionName = {{HARMONY_VERSION_NAME}}",
+                ]
+            ),
+            {
+                "bundle_name": "com.example.demo",
+                "harmony_module_name": "entry",
+                "ability_name": "EntryAbility",
+                "compatible_sdk_version": "5.0.0(12)",
+                "target_sdk_version": "5.0.0(12)",
+                "min_api_version": "12",
+                "harmony_version_code": "1",
+                "harmony_version_name": "1.0.0",
+            },
+        )
+
+        self.assertIn("bundleName = com.example.demo", rendered)
+        self.assertIn("module = entry", rendered)
+        self.assertIn("ability = EntryAbility", rendered)
+        self.assertIn("compatible = 5.0.0(12)", rendered)
+        self.assertIn("target = 5.0.0(12)", rendered)
+        self.assertIn("minApi = 12", rendered)
+        self.assertIn("versionCode = 1", rendered)
+        self.assertIn("versionName = 1.0.0", rendered)
 
     def test_render_text_replaces_microservice_placeholders(self):
         rendered = render_text(

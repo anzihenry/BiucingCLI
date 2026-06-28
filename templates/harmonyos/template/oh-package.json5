@@ -1,0 +1,10 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "{{HARMONY_VERSION_NAME}}",
+  "description": "{{DISPLAY_NAME}} HarmonyOS application",
+  "main": "",
+  "author": "{{ORGANIZATION_NAME}}",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

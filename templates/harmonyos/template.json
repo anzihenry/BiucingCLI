@@ -1,0 +1,88 @@
+{
+  "name": "harmonyos",
+  "description": "ArkTS HarmonyOS app starter for DevEco Studio projects",
+  "category": "native",
+  "stack": ["ArkTS", "ArkUI", "HarmonyOS", "DevEco Studio", "hvigor", "ohpm"],
+  "tags": ["harmonyos", "arkts", "arkui", "deveco", "native"],
+  "platforms": ["harmonyos"],
+  "maturity": {
+    "level": "experimental",
+    "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, and generated-project render coverage."
+  },
+  "validation": {
+    "status": "generated-project-verified",
+    "verification_tier": "generated-project",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "repo-level template metadata and placeholder validation"
+    ]
+  },
+  "operating_assumptions": [
+    "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
+    "Generated projects are structured for an ArkTS Stage model app with one entry module."
+  ],
+  "workflow_labels": ["bootstrap", "doctor", "build", "test", "open"],
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true
+    },
+    {
+      "name": "display_name",
+      "required": false,
+      "default_from": "project_name"
+    },
+    {
+      "name": "bundle_name",
+      "required": true,
+      "prompt": "HarmonyOS bundle name: "
+    },
+    {
+      "name": "harmony_module_name",
+      "required": false,
+      "default": "entry"
+    },
+    {
+      "name": "ability_name",
+      "required": false,
+      "default": "EntryAbility"
+    },
+    {
+      "name": "compatible_sdk_version",
+      "required": false,
+      "default": "5.0.0(12)"
+    },
+    {
+      "name": "target_sdk_version",
+      "required": false,
+      "default": "5.0.0(12)"
+    },
+    {
+      "name": "min_api_version",
+      "required": false,
+      "default": "12"
+    },
+    {
+      "name": "harmony_version_code",
+      "required": false,
+      "default": "1"
+    },
+    {
+      "name": "harmony_version_name",
+      "required": false,
+      "default": "1.0.0"
+    },
+    {
+      "name": "organization_name",
+      "required": false,
+      "default": "Example Team"
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make doctor",
+    "make build",
+    "make test",
+    "open -a \"DevEco Studio\" ."
+  ]
+}

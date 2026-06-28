@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+failures=0
+warnings=0
+
+pass() {
+  echo "[pass] $1"
+}
+
+warn() {
+  echo "[warn] $1"
+  warnings=$((warnings + 1))
+}
+
+fail() {
+  echo "[fail] $1"
+  failures=$((failures + 1))
+}
+
+echo "HarmonyOS environment doctor"
+
+if command -v node >/dev/null 2>&1; then
+  pass "node is available at $(command -v node)"
+  node --version
+else
+  fail "node is not available. Install Node.js before running hvigor or ohpm."
+fi
+
+if command -v ohpm >/dev/null 2>&1; then
+  pass "ohpm is available at $(command -v ohpm)"
+else
+  fail "ohpm is not available. Install DevEco Studio or add the HarmonyOS SDK tools to PATH."
+fi
+
+if command -v hvigor >/dev/null 2>&1; then
+  pass "hvigor is available at $(command -v hvigor)"
+else
+  fail "hvigor is not available. Open the project in DevEco Studio or add hvigor to PATH."
+fi
+
+if [[ -n "${HOS_SDK_HOME:-}" ]]; then
+  if [[ -d "${HOS_SDK_HOME}" ]]; then
+    pass "HOS_SDK_HOME points to ${HOS_SDK_HOME}"
+  else
+    fail "HOS_SDK_HOME is set to ${HOS_SDK_HOME}, but that directory does not exist."
+  fi
+elif [[ -n "${OHOS_SDK_HOME:-}" ]]; then
+  if [[ -d "${OHOS_SDK_HOME}" ]]; then
+    pass "OHOS_SDK_HOME points to ${OHOS_SDK_HOME}"
+  else
+    fail "OHOS_SDK_HOME is set to ${OHOS_SDK_HOME}, but that directory does not exist."
+  fi
+else
+  warn "HOS_SDK_HOME or OHOS_SDK_HOME is not set. DevEco Studio may still configure SDK paths internally."
+fi
+
+if [[ ! -f "AppScope/app.json5" ]]; then
+  fail "AppScope/app.json5 is missing."
+fi
+
+if [[ ! -f "entry/src/main/module.json5" ]]; then
+  fail "entry/src/main/module.json5 is missing."
+fi
+
+if (( failures > 0 )); then
+  echo "Doctor found ${failures} issue(s) and ${warnings} warning(s)."
+  exit 1
+fi
+
+if (( warnings > 0 )); then
+  echo "Doctor completed with ${warnings} warning(s)."
+else
+  echo "Environment looks ready."
+fi

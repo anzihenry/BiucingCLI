@@ -1,0 +1,13 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "arkOptions": {
+      "apPath": "./src/main/resources"
+    }
+  },
+  "targets": [
+    {
+      "name": "default"
+    }
+  ]
+}
