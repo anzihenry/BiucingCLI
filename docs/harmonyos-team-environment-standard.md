@@ -104,6 +104,11 @@ Responsible for:
 │   └── src/
 │       └── main/
 │           ├── ets/
+│           │   ├── core/
+│           │   │   ├── config/
+│           │   │   └── designsystem/
+│           │   ├── entryability/
+│           │   └── pages/
 │           ├── module.json5
 │           └── resources/
 ├── docs/
@@ -113,7 +118,8 @@ Responsible for:
 ├── scripts/
 │   ├── bootstrap
 │   ├── doctor
-│   └── lint
+│   ├── lint
+│   └── release-build
 ├── .mise.toml
 ├── Makefile
 ├── build-profile.json5
@@ -129,6 +135,9 @@ Responsible for:
 - `build-profile.json5`: product, module, SDK, build mode, and signing shape.
 - `AppScope/app.json5`: application identity, bundle name, label, icon, and version.
 - `entry/src/main/module.json5`: entry module, ability, device types, and routes.
+- `entry/src/main/ets/core/config/AppConfig.ets`: generated bundle, module, ability, version, and channel constants.
+- `entry/src/main/ets/core/designsystem/Tokens.ets`: shared ArkUI tokens for starter pages.
+- `entry/src/main/ets/pages/`: routeable ArkUI pages, including settings/config surfaces.
 - `oh-package.json5` and `oh-package-lock.json5`: HarmonyOS package metadata and lock state.
 - `hvigor/hvigor-config.json5`: hvigor execution settings.
 - `code-linter.json5`: DevEco Studio lint configuration source.
@@ -143,11 +152,12 @@ make doctor
 make lint
 make build
 make package
+make release
 make signing-info
 make open
 ```
 
-`make build` must produce an unsigned HAP on a configured workstation. Release signing is intentionally a separate setup step.
+`make build` must produce an unsigned HAP on a configured workstation. `make release` may be used only when local signing material has been supplied through git-ignored `local.properties`.
 
 ## Lint Policy
 
@@ -157,13 +167,15 @@ Current CLI lint scope:
 
 - verify lint config is valid JSON;
 - verify source/config files contain no unrendered template placeholders;
-- verify required HarmonyOS config files exist.
+- verify required HarmonyOS config, page, design system, and release script files exist.
 
-DevEco Studio remains the primary full ArkTS lint surface until a stable command-line linter entrypoint is verified.
+DevEco Studio remains the primary full ArkTS lint surface until a stable command-line linter entrypoint is verified. In the current DevEco Studio CLI install, `hvigorw tasks` does not expose lint, `hvigorw lint` is not a working public HAP task, and `hvigorw arkLinter` reports that the task is not present for the generated entry module.
 
 ## Testing Policy
 
 Do not expose `make test` until a generated project can run ArkTS/Hypium tests reliably through the CLI on a clean workstation.
+
+Current verification found that `hvigorw test --mode module -p module=entry` enters the UnitTest pipeline, but fails unless `entry/src/test/List.test.ets` exists and then still fails because `@ohos/hypium` cannot be resolved. Declaring `@ohos/hypium@1.0.0` in `oh-package.json5` follows DevEco template shape, but the configured OpenHarmony ohpm registry did not provide that package during verification. Keep this blocked until dependency resolution is repeatable.
 
 The current release bar is:
 
@@ -184,4 +196,4 @@ Local signing setup may use:
 - local-only `local.properties`;
 - CI-specific secret injection.
 
-Release packaging should be added only after the signing material format and CI handoff are verified against a real generated app.
+`make release` reads local-only signing keys from `local.properties`, checks that certificate, profile, and store files exist, temporarily injects a `HarmonyOS` release signing config into `build-profile.json5`, runs hvigor with `buildMode=release`, and restores the original build profile afterward.

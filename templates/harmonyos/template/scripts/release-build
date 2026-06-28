@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HVIGOR_BIN="${HVIGOR:-hvigorw}"
+MODULE_NAME="{{HARMONY_MODULE_NAME}}"
+BUILD_PROFILE="build-profile.json5"
+BACKUP_PROFILE=".biucing/release/build-profile.json5.backup"
+
+if [[ ! -f "local.properties" ]]; then
+  cat >&2 <<'EOF'
+local.properties is missing.
+
+Copy docs/release-signing.local.properties.example to local.properties and fill in
+your HarmonyOS signing material before running make release.
+EOF
+  exit 1
+fi
+
+mkdir -p "$(dirname "$BACKUP_PROFILE")"
+cp "$BUILD_PROFILE" "$BACKUP_PROFILE"
+
+restore_build_profile() {
+  if [[ -f "$BACKUP_PROFILE" ]]; then
+    cp "$BACKUP_PROFILE" "$BUILD_PROFILE"
+  fi
+}
+trap restore_build_profile EXIT
+
+node <<'NODE'
+const fs = require('fs');
+const path = require('path');
+
+const localPropertiesPath = 'local.properties';
+const buildProfilePath = 'build-profile.json5';
+const requiredKeys = [
+  'biucing.harmony.signing.certpath',
+  'biucing.harmony.signing.profile',
+  'biucing.harmony.signing.storeFile',
+  'biucing.harmony.signing.storePassword',
+  'biucing.harmony.signing.keyAlias',
+  'biucing.harmony.signing.keyPassword'
+];
+
+function parseProperties(raw) {
+  const values = {};
+  for (const line of raw.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+    const separator = trimmed.indexOf('=');
+    if (separator < 0) {
+      continue;
+    }
+    const key = trimmed.slice(0, separator).trim();
+    const value = trimmed.slice(separator + 1).trim();
+    values[key] = value;
+  }
+  return values;
+}
+
+const properties = parseProperties(fs.readFileSync(localPropertiesPath, 'utf8'));
+const missing = requiredKeys.filter((key) => !properties[key]);
+if (missing.length > 0) {
+  console.error(`Missing signing key(s) in ${localPropertiesPath}:`);
+  for (const key of missing) {
+    console.error(`  - ${key}`);
+  }
+  process.exit(1);
+}
+
+for (const key of [
+  'biucing.harmony.signing.certpath',
+  'biucing.harmony.signing.profile',
+  'biucing.harmony.signing.storeFile'
+]) {
+  const value = properties[key];
+  const resolved = path.isAbsolute(value) ? value : path.resolve(value);
+  if (!fs.existsSync(resolved)) {
+    console.error(`Signing file for ${key} does not exist: ${value}`);
+    process.exit(1);
+  }
+}
+
+const buildProfile = JSON.parse(fs.readFileSync(buildProfilePath, 'utf8'));
+const material = {
+  certpath: properties['biucing.harmony.signing.certpath'],
+  profile: properties['biucing.harmony.signing.profile'],
+  storeFile: properties['biucing.harmony.signing.storeFile'],
+  storePassword: properties['biucing.harmony.signing.storePassword'],
+  keyAlias: properties['biucing.harmony.signing.keyAlias'],
+  keyPassword: properties['biucing.harmony.signing.keyPassword'],
+  signAlg: properties['biucing.harmony.signing.signAlg'] || 'SHA256withECDSA'
+};
+
+buildProfile.app.signingConfigs = [
+  {
+    name: 'release',
+    type: 'HarmonyOS',
+    material
+  }
+];
+for (const product of buildProfile.app.products || []) {
+  product.signingConfig = 'release';
+}
+
+fs.writeFileSync(buildProfilePath, `${JSON.stringify(buildProfile, null, 2)}\n`);
+console.log('Injected release signing config from local.properties.');
+NODE
+
+"$HVIGOR_BIN" assembleHap --mode module -p "module=${MODULE_NAME}" -p buildMode=release
+
+echo "Release build finished. build-profile.json5 has been restored."

@@ -1,7 +1,7 @@
 SHELL := /bin/zsh
 HVIGOR ?= hvigorw
 
-.PHONY: bootstrap doctor lint build package signing-info clean open
+.PHONY: bootstrap doctor lint build package release signing-info clean open
 
 bootstrap:
 	./scripts/bootstrap
@@ -17,8 +17,11 @@ build:
 
 package: build
 
+release:
+	./scripts/release-build
+
 signing-info:
-	@printf '%s\n' "Configure signing in DevEco Studio or copy docs/release-signing.local.properties.example to local.properties."
+	@printf '%s\n' "Configure signing in DevEco Studio or copy docs/release-signing.local.properties.example to local.properties, then run make release."
 
 clean:
 	$(HVIGOR) clean

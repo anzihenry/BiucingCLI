@@ -553,6 +553,29 @@ class CLITestCase(unittest.TestCase):
             page = (
                 project_dir / "entry" / "src" / "main" / "ets" / "pages" / "Index.ets"
             ).read_text(encoding="utf-8")
+            app_config = (
+                project_dir
+                / "entry"
+                / "src"
+                / "main"
+                / "ets"
+                / "core"
+                / "config"
+                / "AppConfig.ets"
+            ).read_text(encoding="utf-8")
+            design_tokens = (
+                project_dir
+                / "entry"
+                / "src"
+                / "main"
+                / "ets"
+                / "core"
+                / "designsystem"
+                / "Tokens.ets"
+            ).read_text(encoding="utf-8")
+            settings_page = (
+                project_dir / "entry" / "src" / "main" / "ets" / "pages" / "Settings.ets"
+            ).read_text(encoding="utf-8")
             strings = (
                 project_dir
                 / "entry"
@@ -577,6 +600,9 @@ class CLITestCase(unittest.TestCase):
             bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
             doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
             lint = (project_dir / "scripts" / "lint").read_text(encoding="utf-8")
+            release_build = (project_dir / "scripts" / "release-build").read_text(
+                encoding="utf-8"
+            )
             signing_example = (
                 project_dir / "docs" / "release-signing.local.properties.example"
             ).read_text(encoding="utf-8")
@@ -614,16 +640,31 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('"metadata"', module_json)
             self.assertIn("export default class EntryAbility extends UIAbility", ability)
             self.assertIn("windowStage.loadContent('pages/Index'", ability)
-            self.assertIn("Text('Demo Harmony')", page)
-            self.assertIn("Bundle: com.example.demoharmony", page)
+            self.assertIn("Text(AppConfig.displayName)", page)
+            self.assertIn("router.pushUrl({ url: 'pages/Settings' })", page)
+            self.assertIn("BiucingSpacing.large", page)
+            self.assertIn("static readonly displayName: string = 'Demo Harmony';", app_config)
+            self.assertIn("static readonly bundleName: string = 'com.example.demoharmony';", app_config)
+            self.assertIn("static readonly versionName: string = '1.2.3';", app_config)
+            self.assertIn("class BiucingSpacing", design_tokens)
+            self.assertIn("class BiucingTypography", design_tokens)
+            self.assertIn("struct Settings", settings_page)
+            self.assertIn("Text(`Bundle: ${AppConfig.bundleName}`)", settings_page)
+            self.assertIn("Text(`Version ${AppConfig.versionName}`)", settings_page)
             self.assertIn('"value": "Demo Harmony"', strings)
             self.assertIn('"pages/Index"', main_pages)
+            self.assertIn('"pages/Settings"', main_pages)
             self.assertIn("HVIGOR ?= hvigorw", makefile)
             self.assertIn("./scripts/lint", makefile)
+            self.assertIn("./scripts/release-build", makefile)
             self.assertIn("$(HVIGOR) assembleHap --mode module -p module=entry", makefile)
             self.assertIn("make signing-info", readme)
+            self.assertIn("make release", readme)
             self.assertIn("does not expose `make test` yet", readme)
             self.assertIn("release-signing.local.properties.example", readme)
+            self.assertIn("local.properties` for local-only signing values", readme)
+            self.assertIn("entry/src/main/ets/core/config/", readme)
+            self.assertIn("entry/src/main/ets/core/designsystem/", readme)
             self.assertIn("ohpm install", bootstrap)
             self.assertIn("HarmonyOS environment doctor", doctor)
             self.assertIn("DevEco Studio is installed", doctor)
@@ -633,15 +674,27 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("SDK entry ${sdk_entry} exists", doctor)
             self.assertIn("code-linter.json5 is parseable", doctor)
             self.assertIn("Local builds can produce unsigned HAPs", doctor)
+            self.assertIn("make release requires local signing material", doctor)
             self.assertIn("entry/src/main/module.json5 is missing", doctor)
+            self.assertIn("entry/src/main/ets/core/config/AppConfig.ets", doctor)
+            self.assertIn("entry/src/main/ets/pages/Settings.ets", doctor)
             self.assertIn("HarmonyOS lint configuration guard", lint)
             self.assertIn("code-linter.json5 is valid JSON", lint)
+            self.assertIn("entry/src/main/ets/core/designsystem/Tokens.ets", lint)
+            self.assertIn("entry/src/main/ets/pages/Settings.ets", lint)
+            self.assertIn("scripts/release-build", lint)
             self.assertIn("no unrendered template placeholders found", lint)
+            self.assertIn("local.properties is missing", release_build)
+            self.assertIn("biucing.harmony.signing.certpath", release_build)
+            self.assertIn("type: 'HarmonyOS'", release_build)
+            self.assertIn("buildMode=release", release_build)
             self.assertIn("biucing.harmony.signing.certpath", signing_example)
             self.assertIn("change-me-32-characters-minimum", signing_example)
+            self.assertIn("biucing.harmony.signing.signAlg=SHA256withECDSA", signing_example)
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "lint", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "release-build", os.X_OK))
 
     def test_create_harmonyos_prompts_for_bundle_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:

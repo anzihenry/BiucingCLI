@@ -28,11 +28,16 @@ required_files=(
   "AppScope/app.json5"
   "build-profile.json5"
   "entry/build-profile.json5"
+  "entry/src/main/ets/core/config/AppConfig.ets"
+  "entry/src/main/ets/core/designsystem/Tokens.ets"
   "entry/src/main/module.json5"
+  "entry/src/main/ets/pages/Index.ets"
+  "entry/src/main/ets/pages/Settings.ets"
   "entry/src/main/resources/base/profile/main_pages.json"
   "hvigor/hvigor-config.json5"
   "oh-package.json5"
   "oh-package-lock.json5"
+  "scripts/release-build"
 )
 
 for path in "${required_files[@]}"; do
@@ -42,6 +47,25 @@ for path in "${required_files[@]}"; do
     fail "$path is missing."
   fi
 done
+
+if [[ -x "scripts/release-build" ]]; then
+  pass "scripts/release-build is executable"
+else
+  fail "scripts/release-build must be executable."
+fi
+
+if grep -q '"pages/Settings"' entry/src/main/resources/base/profile/main_pages.json; then
+  pass "Settings page is registered in main_pages.json"
+else
+  fail "pages/Settings is not registered in main_pages.json."
+fi
+
+if grep -q "class AppConfig" entry/src/main/ets/core/config/AppConfig.ets &&
+   grep -q "class BiucingSpacing" entry/src/main/ets/core/designsystem/Tokens.ets; then
+  pass "config and design system sources expose expected starter symbols"
+else
+  fail "config or design system starter symbols are missing."
+fi
 
 placeholder_hits="$(
   find AppScope entry hvigor -type f \

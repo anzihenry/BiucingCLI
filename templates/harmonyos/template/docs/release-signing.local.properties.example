@@ -10,3 +10,4 @@ biucing.harmony.signing.storeFile=signing/release.p12
 biucing.harmony.signing.storePassword=change-me-32-characters-minimum
 biucing.harmony.signing.keyAlias=release
 biucing.harmony.signing.keyPassword=change-me-32-characters-minimum
+biucing.harmony.signing.signAlg=SHA256withECDSA

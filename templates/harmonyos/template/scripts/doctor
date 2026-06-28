@@ -108,6 +108,9 @@ fi
 for app_resource in \
   "AppScope/resources/base/element/string.json" \
   "AppScope/resources/base/media/layered_image.json" \
+  "entry/src/main/ets/core/config/AppConfig.ets" \
+  "entry/src/main/ets/core/designsystem/Tokens.ets" \
+  "entry/src/main/ets/pages/Settings.ets" \
   "entry/src/main/resources/base/profile/main_pages.json"; do
   if [[ -f "$app_resource" ]]; then
     pass "$app_resource exists"
@@ -118,6 +121,12 @@ done
 
 if grep -Eq '"signingConfigs"[[:space:]]*:[[:space:]]*\[\]' build-profile.json5; then
   warn "build-profile.json5 has no signingConfigs. Local builds can produce unsigned HAPs; configure signing before release."
+fi
+
+if [[ -f "local.properties" ]]; then
+  pass "local.properties exists for local signing material"
+else
+  warn "local.properties is missing. make release requires local signing material."
 fi
 
 if (( failures > 0 )); then
