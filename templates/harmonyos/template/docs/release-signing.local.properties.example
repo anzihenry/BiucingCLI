@@ -1,0 +1,12 @@
+# Copy these keys into local.properties for local-only HarmonyOS signing setup.
+# Do not commit real signing material.
+#
+# DevEco Studio can manage signing interactively. Use this file only when the
+# team has agreed on CLI/CI signing property names.
+
+biucing.harmony.signing.certpath=signing/release.cer
+biucing.harmony.signing.profile=signing/release.p7b
+biucing.harmony.signing.storeFile=signing/release.p12
+biucing.harmony.signing.storePassword=change-me-32-characters-minimum
+biucing.harmony.signing.keyAlias=release
+biucing.harmony.signing.keyPassword=change-me-32-characters-minimum

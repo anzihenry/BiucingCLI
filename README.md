@@ -73,7 +73,7 @@ The current maturity split is:
 - `frontend`, `web-service`, and `microservice` are fully Dockerized for development, verification, and runtime packaging.
 - `worker` is a backend-adjacent starter for scheduled and oneshot background execution, with generated-project `go test ./...` validation and Docker packaging.
 - `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
-- `harmonyos` is an experimental native starter for ArkTS/ArkUI projects that open in DevEco Studio and expose bootstrap, doctor, build, and test workflows.
+- `harmonyos` is an experimental native starter for ArkTS/ArkUI projects that open in DevEco Studio and expose bootstrap, doctor, lint, build, and signing guidance workflows.
 
 Generator UX status:
 
@@ -116,5 +116,6 @@ Local Apple validation status:
 - [Microservice Team Environment Standard](docs/microservice-team-environment-standard.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
 - [Android Team Environment Standard](docs/android-team-environment-standard.md)
+- [HarmonyOS Team Environment Standard](docs/harmonyos-team-environment-standard.md)
 - [Android Template Design](docs/android-template-design.md)
 - [Microservice Template Design](docs/microservice-template-design.md)

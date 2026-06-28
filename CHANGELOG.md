@@ -3,6 +3,7 @@
 ## Unreleased
 
 - added an experimental `harmonyos` template for ArkTS + ArkUI DevEco Studio projects with CLI flags, doctor/bootstrap scripts, metadata validation, and render tests.
+- strengthened the `harmonyos` template with real `hvigorw` build alignment, a team environment standard, lint configuration guards, deeper doctor checks, and release-signing guidance.
 
 ## 0.4.0 - 2026-06-26
 

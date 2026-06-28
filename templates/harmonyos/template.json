@@ -21,7 +21,7 @@
     "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
     "Generated projects are structured for an ArkTS Stage model app with one entry module."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "build", "open"],
+  "workflow_labels": ["bootstrap", "doctor", "lint", "build", "release", "open"],
   "variables": [
     {
       "name": "project_name",
@@ -81,6 +81,7 @@
   "next_steps": [
     "make bootstrap",
     "make doctor",
+    "make lint",
     "make build",
     "open -a \"DevEco Studio\" ."
   ]

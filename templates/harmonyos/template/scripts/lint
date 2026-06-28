@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+failures=0
+
+pass() {
+  echo "[pass] $1"
+}
+
+fail() {
+  echo "[fail] $1"
+  failures=$((failures + 1))
+}
+
+echo "HarmonyOS lint configuration guard"
+
+if [[ -f "code-linter.json5" ]]; then
+  if node -e "JSON.parse(require('fs').readFileSync('code-linter.json5', 'utf8'))" >/dev/null 2>&1; then
+    pass "code-linter.json5 is valid JSON"
+  else
+    fail "code-linter.json5 is not valid JSON. Keep it parseable until a JSON5-aware CLI linter is wired."
+  fi
+else
+  fail "code-linter.json5 is missing."
+fi
+
+required_files=(
+  "AppScope/app.json5"
+  "build-profile.json5"
+  "entry/build-profile.json5"
+  "entry/src/main/module.json5"
+  "entry/src/main/resources/base/profile/main_pages.json"
+  "hvigor/hvigor-config.json5"
+  "oh-package.json5"
+  "oh-package-lock.json5"
+)
+
+for path in "${required_files[@]}"; do
+  if [[ -f "$path" ]]; then
+    pass "$path exists"
+  else
+    fail "$path is missing."
+  fi
+done
+
+placeholder_hits="$(
+  find AppScope entry hvigor -type f \
+    ! -path '*/build/*' \
+    ! -path '*/.hvigor/*' \
+    -print0 \
+    | xargs -0 grep -n '{{' 2>/dev/null || true
+)"
+if [[ -n "$placeholder_hits" ]]; then
+  printf '%s\n' "$placeholder_hits"
+  fail "unrendered template placeholders remain in generated project files."
+else
+  pass "no unrendered template placeholders found"
+fi
+
+if (( failures > 0 )); then
+  echo "Lint guard found ${failures} issue(s)."
+  exit 1
+fi
+
+echo "Lint guard passed."

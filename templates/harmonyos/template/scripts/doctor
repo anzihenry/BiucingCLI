@@ -20,6 +20,12 @@ fail() {
 
 echo "HarmonyOS environment doctor"
 
+if [[ -d "/Applications/DevEco-Studio.app" ]]; then
+  pass "DevEco Studio is installed at /Applications/DevEco-Studio.app"
+else
+  warn "DevEco Studio was not found at /Applications/DevEco-Studio.app. If it is installed elsewhere, make sure PATH and DEVECO_SDK_HOME point to that installation."
+fi
+
 if command -v node >/dev/null 2>&1; then
   pass "node is available at $(command -v node)"
   node --version
@@ -29,14 +35,17 @@ fi
 
 if command -v ohpm >/dev/null 2>&1; then
   pass "ohpm is available at $(command -v ohpm)"
+  ohpm --version 2>/dev/null || true
 else
   fail "ohpm is not available. Install DevEco Studio or add the HarmonyOS SDK tools to PATH."
 fi
 
 if command -v hvigor >/dev/null 2>&1; then
   pass "hvigor is available at $(command -v hvigor)"
+  hvigor --version 2>/dev/null || true
 elif command -v hvigorw >/dev/null 2>&1; then
   pass "hvigorw is available at $(command -v hvigorw)"
+  hvigorw --version 2>/dev/null || true
 else
   fail "hvigor or hvigorw is not available. Open the project in DevEco Studio or add DevEco Studio tools/hvigor/bin to PATH."
 fi
@@ -44,6 +53,13 @@ fi
 if [[ -n "${DEVECO_SDK_HOME:-}" ]]; then
   if [[ -d "${DEVECO_SDK_HOME}" ]]; then
     pass "DEVECO_SDK_HOME points to ${DEVECO_SDK_HOME}"
+    for sdk_entry in default/openharmony default/openharmony/ets default/openharmony/toolchains; do
+      if [[ -d "${DEVECO_SDK_HOME}/${sdk_entry}" ]]; then
+        pass "SDK entry ${sdk_entry} exists"
+      else
+        fail "SDK entry ${DEVECO_SDK_HOME}/${sdk_entry} is missing."
+      fi
+    done
   else
     fail "DEVECO_SDK_HOME is set to ${DEVECO_SDK_HOME}, but that directory does not exist."
   fi
@@ -73,6 +89,35 @@ fi
 
 if [[ ! -f "entry/src/main/module.json5" ]]; then
   fail "entry/src/main/module.json5 is missing."
+fi
+
+if [[ ! -f "hvigor/hvigor-config.json5" ]]; then
+  fail "hvigor/hvigor-config.json5 is missing."
+fi
+
+if [[ ! -f "code-linter.json5" ]]; then
+  fail "code-linter.json5 is missing."
+elif command -v node >/dev/null 2>&1; then
+  if node -e "JSON.parse(require('fs').readFileSync('code-linter.json5', 'utf8'))" >/dev/null 2>&1; then
+    pass "code-linter.json5 is parseable"
+  else
+    fail "code-linter.json5 is not parseable JSON."
+  fi
+fi
+
+for app_resource in \
+  "AppScope/resources/base/element/string.json" \
+  "AppScope/resources/base/media/layered_image.json" \
+  "entry/src/main/resources/base/profile/main_pages.json"; do
+  if [[ -f "$app_resource" ]]; then
+    pass "$app_resource exists"
+  else
+    fail "$app_resource is missing."
+  fi
+done
+
+if grep -Eq '"signingConfigs"[[:space:]]*:[[:space:]]*\[\]' build-profile.json5; then
+  warn "build-profile.json5 has no signingConfigs. Local builds can produce unsigned HAPs; configure signing before release."
 fi
 
 if (( failures > 0 )); then

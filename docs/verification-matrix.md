@@ -33,7 +33,7 @@ These checks apply to every release regardless of which template changed.
 | `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
 | `apple` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `make generate`, plus at least one platform `make build` or `make test` path | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
 | `android` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `./gradlew assembleDebug` and, when release/setup changes, `./gradlew assembleRelease` | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
-| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor` and `make build` on a workstation with DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
+| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor`, `make lint`, and `make build` on a workstation with DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
 
 ## Recommended Command Catalog
 
@@ -47,7 +47,7 @@ These are the default commands to reach for when fresh proof is needed.
 | `worker` | `PYTHONPATH=src python3 -m biucingcli.cli create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
 | `apple` | `PYTHONPATH=src python3 -m biucingcli.cli create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
 | `android` | `PYTHONPATH=src python3 -m biucingcli.cli create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
-| `harmonyos` | `PYTHONPATH=src python3 -m biucingcli.cli create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
+| `harmonyos` | `PYTHONPATH=src python3 -m biucingcli.cli create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, `make lint`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
 
 When using these commands for release evidence, prefer a fresh empty output directory per template so the proof is easy to explain and reproduce.
 
