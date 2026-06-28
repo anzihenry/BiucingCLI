@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.4.0`.
+The current repository release target is `0.5.0`.
 
 ```bash
 biucing --version
@@ -99,6 +99,12 @@ Local Apple validation status:
 - the generated Apple starter has passed real `make generate` verification for both `iOS` and `macOS`;
 - `iOS` output now renders a mobile-specific starter structure and has passed real `make build`;
 - `macOS` output now renders a desktop-specific starter structure and has passed real `make test`.
+
+Local HarmonyOS validation status:
+
+- the generated HarmonyOS starter has passed real `make bootstrap`, `make lint`, and `make build` verification with a local DevEco Studio/HarmonyOS SDK install;
+- `make release` is wired to local-only signing material and fails fast when `local.properties` is missing or incomplete;
+- `make test` remains intentionally absent until the ArkTS/Hypium CLI dependency path is repeatably resolvable.
 
 ## Design Docs
 
