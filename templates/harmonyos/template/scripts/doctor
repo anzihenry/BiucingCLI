@@ -35,8 +35,20 @@ fi
 
 if command -v hvigor >/dev/null 2>&1; then
   pass "hvigor is available at $(command -v hvigor)"
+elif command -v hvigorw >/dev/null 2>&1; then
+  pass "hvigorw is available at $(command -v hvigorw)"
 else
-  fail "hvigor is not available. Open the project in DevEco Studio or add hvigor to PATH."
+  fail "hvigor or hvigorw is not available. Open the project in DevEco Studio or add DevEco Studio tools/hvigor/bin to PATH."
+fi
+
+if [[ -n "${DEVECO_SDK_HOME:-}" ]]; then
+  if [[ -d "${DEVECO_SDK_HOME}" ]]; then
+    pass "DEVECO_SDK_HOME points to ${DEVECO_SDK_HOME}"
+  else
+    fail "DEVECO_SDK_HOME is set to ${DEVECO_SDK_HOME}, but that directory does not exist."
+  fi
+else
+  fail "DEVECO_SDK_HOME must be set for hvigorw builds. Example: export DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk"
 fi
 
 if [[ -n "${HOS_SDK_HOME:-}" ]]; then
@@ -52,7 +64,7 @@ elif [[ -n "${OHOS_SDK_HOME:-}" ]]; then
     fail "OHOS_SDK_HOME is set to ${OHOS_SDK_HOME}, but that directory does not exist."
   fi
 else
-  warn "HOS_SDK_HOME or OHOS_SDK_HOME is not set. DevEco Studio may still configure SDK paths internally."
+  warn "HOS_SDK_HOME or OHOS_SDK_HOME is not set. DevEco Studio may still configure SDK paths internally, but CLI builds also need DEVECO_SDK_HOME."
 fi
 
 if [[ ! -f "AppScope/app.json5" ]]; then

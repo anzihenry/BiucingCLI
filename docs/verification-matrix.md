@@ -33,7 +33,7 @@ These checks apply to every release regardless of which template changed.
 | `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
 | `apple` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `make generate`, plus at least one platform `make build` or `make test` path | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
 | `android` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `./gradlew assembleDebug` and, when release/setup changes, `./gradlew assembleRelease` | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
-| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor` and `make build` on a workstation with DevEco Studio, ohpm, hvigor, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
+| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor` and `make build` on a workstation with DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
 
 ## Recommended Command Catalog
 

@@ -511,8 +511,33 @@ class CLITestCase(unittest.TestCase):
             )
             project_dir = Path(tmpdir) / "demo-harmony"
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
+            root_package = (project_dir / "oh-package.json5").read_text(encoding="utf-8")
+            root_lock = (project_dir / "oh-package-lock.json5").read_text(encoding="utf-8")
             app_json = (project_dir / "AppScope" / "app.json5").read_text(encoding="utf-8")
+            app_scope_strings = (
+                project_dir
+                / "AppScope"
+                / "resources"
+                / "base"
+                / "element"
+                / "string.json"
+            ).read_text(encoding="utf-8")
+            layered_image = (
+                project_dir
+                / "AppScope"
+                / "resources"
+                / "base"
+                / "media"
+                / "layered_image.json"
+            ).read_text(encoding="utf-8")
             build_profile = (project_dir / "build-profile.json5").read_text(encoding="utf-8")
+            root_hvigorfile = (project_dir / "hvigorfile.ts").read_text(encoding="utf-8")
+            hvigor_config = (
+                project_dir / "hvigor" / "hvigor-config.json5"
+            ).read_text(encoding="utf-8")
+            entry_hvigorfile = (project_dir / "entry" / "hvigorfile.ts").read_text(
+                encoding="utf-8"
+            )
             module_json = (
                 project_dir / "entry" / "src" / "main" / "module.json5"
             ).read_text(encoding="utf-8")
@@ -557,16 +582,27 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make bootstrap", output)
             self.assertIn("make doctor", output)
             self.assertIn("make build", output)
+            self.assertNotIn("make test", output)
             self.assertIn('open -a "DevEco Studio" .', output)
             self.assertIn("Bundle name: `com.example.demoharmony`", readme)
             self.assertIn("Compatible SDK: `5.0.0(12)`", readme)
             self.assertIn("Version: `1.2.3` (`7`)", readme)
+            self.assertIn('"modelVersion": "5.0.0"', root_package)
+            self.assertIn('"lockfileVersion": 3', root_lock)
             self.assertIn('"bundleName": "com.example.demoharmony"', app_json)
             self.assertIn('"vendor": "Example Labs"', app_json)
             self.assertIn('"versionCode": 7', app_json)
             self.assertIn('"versionName": "1.2.3"', app_json)
+            self.assertIn('"icon": "$media:layered_image"', app_json)
+            self.assertIn('"value": "Demo Harmony"', app_scope_strings)
+            self.assertIn('"background": "$media:background"', layered_image)
             self.assertIn('"compatibleSdkVersion": "5.0.0(12)"', build_profile)
+            self.assertIn('"targetSdkVersion": "5.0.0(12)"', build_profile)
+            self.assertIn('"signingConfigs": []', build_profile)
             self.assertIn('"srcPath": "./entry"', build_profile)
+            self.assertIn("import { appTasks } from '@ohos/hvigor-ohos-plugin';", root_hvigorfile)
+            self.assertIn('"modelVersion": "5.0.0"', hvigor_config)
+            self.assertIn("import { hapTasks } from '@ohos/hvigor-ohos-plugin';", entry_hvigorfile)
             self.assertIn('"name": "entry"', module_json)
             self.assertIn('"mainElement": "EntryAbility"', module_json)
             self.assertIn('"srcEntry": "./ets/entryability/EntryAbility.ets"', module_json)
@@ -577,11 +613,13 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Bundle: com.example.demoharmony", page)
             self.assertIn('"value": "Demo Harmony"', strings)
             self.assertIn('"pages/Index"', main_pages)
-            self.assertIn("hvigor assembleHap --mode module -p module=entry", makefile)
+            self.assertIn("HVIGOR ?= hvigorw", makefile)
+            self.assertIn("$(HVIGOR) assembleHap --mode module -p module=entry", makefile)
             self.assertIn("ohpm install", bootstrap)
             self.assertIn("HarmonyOS environment doctor", doctor)
             self.assertIn("ohpm is available", doctor)
-            self.assertIn("hvigor is available", doctor)
+            self.assertIn("hvigorw is available", doctor)
+            self.assertIn("DEVECO_SDK_HOME must be set for hvigorw builds", doctor)
             self.assertIn("entry/src/main/module.json5 is missing", doctor)
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))

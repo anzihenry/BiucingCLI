@@ -1,6 +1,7 @@
 SHELL := /bin/zsh
+HVIGOR ?= hvigorw
 
-.PHONY: bootstrap doctor build test clean open
+.PHONY: bootstrap doctor build clean open
 
 bootstrap:
 	./scripts/bootstrap
@@ -9,13 +10,10 @@ doctor:
 	./scripts/doctor
 
 build:
-	hvigor assembleHap --mode module -p module={{HARMONY_MODULE_NAME}}
-
-test:
-	hvigor test
+	$(HVIGOR) assembleHap --mode module -p module={{HARMONY_MODULE_NAME}}
 
 clean:
-	hvigor clean
+	$(HVIGOR) clean
 
 open:
 	open -a "DevEco Studio" .
