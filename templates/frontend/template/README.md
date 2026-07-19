@@ -73,6 +73,7 @@ make clean-worktree
 - `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
 - `COMPOSE_PROJECT_NAME` defaults to `{{PACKAGE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 ## Direct pnpm Scripts

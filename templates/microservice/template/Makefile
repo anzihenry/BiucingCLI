@@ -69,6 +69,13 @@ worktree-doctor:
 	@if [ "$(HOST_DEPENDENCY_STORE_PORT)" = "{{DEPENDENCY_STORE_PORT}}" ]; then printf '%s\n' "Warning: HOST_DEPENDENCY_STORE_PORT uses {{DEPENDENCY_STORE_PORT}}; override it when another dependency store is running."; fi
 	@if [ "$(HOST_OTEL_GRPC_PORT)" = "4317" ]; then printf '%s\n' "Warning: HOST_OTEL_GRPC_PORT uses 4317; override it when another collector is running."; fi
 	@if [ "$(HOST_OTEL_HTTP_PORT)" = "4318" ]; then printf '%s\n' "Warning: HOST_OTEL_HTTP_PORT uses 4318; override it when another collector is running."; fi
+	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
+		if lsof -nP -iTCP:$(HOST_HTTP_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_HTTP_PORT $(HOST_HTTP_PORT) is already in use." "Suggested override: HOST_HTTP_PORT=$$(( $(HOST_HTTP_PORT) + 10000 )) make dev"; fi; \
+		if lsof -nP -iTCP:$(HOST_GRPC_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_GRPC_PORT $(HOST_GRPC_PORT) is already in use." "Suggested override: HOST_GRPC_PORT=$$(( $(HOST_GRPC_PORT) + 10000 )) make dev"; fi; \
+		if lsof -nP -iTCP:$(HOST_DEPENDENCY_STORE_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_DEPENDENCY_STORE_PORT $(HOST_DEPENDENCY_STORE_PORT) is already in use." "Suggested override: HOST_DEPENDENCY_STORE_PORT=$$(( $(HOST_DEPENDENCY_STORE_PORT) + 10000 )) make dev"; fi; \
+		if lsof -nP -iTCP:$(HOST_OTEL_GRPC_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_OTEL_GRPC_PORT $(HOST_OTEL_GRPC_PORT) is already in use." "Suggested override: HOST_OTEL_GRPC_PORT=$$(( $(HOST_OTEL_GRPC_PORT) + 10000 )) make dev"; fi; \
+		if lsof -nP -iTCP:$(HOST_OTEL_HTTP_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_OTEL_HTTP_PORT $(HOST_OTEL_HTTP_PORT) is already in use." "Suggested override: HOST_OTEL_HTTP_PORT=$$(( $(HOST_OTEL_HTTP_PORT) + 10000 )) make dev"; fi; \
+	fi
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes

@@ -50,6 +50,9 @@ worktree-info:
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
 	@if [ "$(HOST_PORT)" = "{{HTTP_PORT}}" ]; then printf '%s\n' "Warning: HOST_PORT uses the generated default {{HTTP_PORT}}; override it when another worktree is running."; fi
+	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
+		if lsof -nP -iTCP:$(HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_PORT $(HOST_PORT) is already in use." "Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make dev"; fi; \
+	fi
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes

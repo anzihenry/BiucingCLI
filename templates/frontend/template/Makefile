@@ -38,6 +38,10 @@ worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
 	@if [ "$(DEV_HOST_PORT)" = "5173" ]; then printf '%s\n' "Warning: DEV_HOST_PORT uses the default 5173; override it when another worktree is running."; fi
 	@if [ "$(HOST_PORT)" = "8080" ]; then printf '%s\n' "Warning: HOST_PORT uses the default 8080; override it when another runtime container is running."; fi
+	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
+		if lsof -nP -iTCP:$(DEV_HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: DEV_HOST_PORT $(DEV_HOST_PORT) is already in use." "Suggested override: DEV_HOST_PORT=$$(( $(DEV_HOST_PORT) + 10000 )) make dev"; fi; \
+		if lsof -nP -iTCP:$(HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_PORT $(HOST_PORT) is already in use." "Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make docker-run"; fi; \
+	fi
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes

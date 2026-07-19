@@ -124,6 +124,7 @@ make clean-worktree
 - `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
 - `GOCACHE` and `GOLANGCI_LINT_CACHE` stay under the current worktree's `.cache/` directory.
+- `make worktree-doctor` checks whether `HOST_PORT` is already in use and prints a suggested override.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 Push a tagged image:

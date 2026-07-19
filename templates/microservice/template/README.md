@@ -130,6 +130,7 @@ make clean-worktree
 - `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, dependency stores, and cache volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
 - `HOST_HTTP_PORT`, `HOST_GRPC_PORT`, `HOST_DEPENDENCY_STORE_PORT`, `HOST_OTEL_GRPC_PORT`, and `HOST_OTEL_HTTP_PORT` can be overridden when several worktrees run at once.
+- `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 ## Contracts
