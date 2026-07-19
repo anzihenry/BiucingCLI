@@ -111,6 +111,10 @@ Local HarmonyOS validation status:
 - Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
 - [0.3.0 Plan](docs/0.3.0-plan.md)
 - [0.4.0 Plan](docs/0.4.0-plan.md)
+- [0.6.0 Plan](docs/0.6.0-plan.md)
+- [0.6.0 Worktree Task Breakdown](docs/0.6.0-worktree-tasks.md)
+- [Worktree Isolation Contract](docs/worktree-isolation-contract.md)
+- [0.6.0 Worktree Collision Audit](docs/0.6.0-worktree-collision-audit.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

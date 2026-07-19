@@ -35,8 +35,22 @@
 
 ## Next
 
-The next release scope is not locked yet.
-Use [docs/roadmap.md](roadmap.md) together with a future version plan once `0.5.0` priorities are chosen.
+### 0.6.0 - Worktree-First Starters
+
+`0.6.0` should make BiucingCLI's generated starters safe for parallel Git worktree development.
+
+The release direction is now locked around:
+
+- a shared worktree isolation contract across all seven templates;
+- Docker-first isolation for Compose project names, volumes, ports, runtime image tags, dependency stores, and caches;
+- native-template isolation for build caches, local signing files, IDE output, and debug app identities;
+- generated `make worktree-info`, `make worktree-doctor`, and `make clean-worktree` workflows where appropriate;
+- validation, docs, and release evidence that prove parallel-worktree behavior instead of only claiming it.
+
+Planning anchors:
+
+- [0.6.0 Plan](0.6.0-plan.md)
+- [0.6.0 Worktree Task Breakdown](0.6.0-worktree-tasks.md)
 
 ## Deferred
 
@@ -46,3 +60,4 @@ These remain intentionally out of scope unless the roadmap changes:
 - a heavy external templating engine;
 - remote registries, plugin systems, or online template marketplaces;
 - turning BiucingCLI into a generalized platform or workflow orchestrator.
+- automatically managing Git worktrees inside BiucingCLI.
