@@ -19,7 +19,7 @@ export HVIGOR_HOME
 export OHPM_HOME
 export BIUCING_HARMONY_DEBUG_BUNDLE_SUFFIX := $(DEBUG_BUNDLE_SUFFIX)
 
-.PHONY: bootstrap doctor lint build package release signing-info clean open worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor lint build package release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
@@ -59,8 +59,8 @@ worktree-info:
 	@printf '%s\n' "Module build dir: $(MODULE_BUILD_DIR)"
 	@printf '%s\n' "local.properties: $(LOCAL_PROPERTIES)"
 	@printf '%s\n' "Debug bundle suffix: $(DEBUG_BUNDLE_SUFFIX)"
-	@printf '%s\n' "Requested debug bundle name: $(EFFECTIVE_DEBUG_BUNDLE_NAME)"
-	@printf '%s\n' "Bundle-name suffix is passed as a build property; keep AppScope/app.json5 stable unless your DevEco setup explicitly supports per-worktree bundle rewriting."
+	@printf '%s\n' "Diagnostic debug bundle name: $(EFFECTIVE_DEBUG_BUNDLE_NAME)"
+	@printf '%s\n' "Debug bundle rewriting: deferred; AppScope/app.json5 stays stable by default."
 
 worktree-doctor:
 	@printf '%s\n' "Checking HarmonyOS worktree isolation..."
@@ -68,7 +68,17 @@ worktree-doctor:
 	@case "$(HVIGOR_HOME)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "HVIGOR_HOME should stay inside this worktree: $(HVIGOR_HOME)"; exit 1;; esac
 	@case "$(OHPM_HOME)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "OHPM_HOME should stay inside this worktree: $(OHPM_HOME)"; exit 1;; esac
 	@if [ -f "$(LOCAL_PROPERTIES)" ]; then printf '%s\n' "local.properties is local to this worktree and must remain untracked."; else printf '%s\n' "local.properties is absent; make release requires local signing material."; fi
+	@printf '%s\n' "Debug identity check: make worktree-debug-identity"
 	@printf '%s\n' "HarmonyOS worktree isolation looks ready."
+
+worktree-debug-identity:
+	@printf '%s\n' "HarmonyOS debug identity status"
+	@printf '%s\n' "Base bundle name: {{BUNDLE_NAME}}"
+	@printf '%s\n' "Debug bundle suffix: $(DEBUG_BUNDLE_SUFFIX)"
+	@printf '%s\n' "Diagnostic debug bundle name: $(EFFECTIVE_DEBUG_BUNDLE_NAME)"
+	@printf '%s\n' "Hvigor properties: biucing.worktree.id=$(WORKTREE_ID), biucing.worktree.bundleSuffix=$(DEBUG_BUNDLE_SUFFIX)"
+	@printf '%s\n' "Status: bundle rewriting is deferred until the DevEco/hvigor app metadata hook is verified."
+	@printf '%s\n' "AppScope/app.json5 remains the source of truth for bundleName."
 
 clean-worktree:
 	rm -rf "$(HVIGOR_HOME)" "$(OHPM_HOME)" "$(MODULE_BUILD_DIR)" build .biucing/release

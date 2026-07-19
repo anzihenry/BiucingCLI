@@ -154,6 +154,7 @@ make -n build test test-ui lint install-debug WORKTREE_ID=beta
 
 # HarmonyOS static plus doctor proof
 make worktree-info WORKTREE_ID=alpha
+make worktree-debug-identity WORKTREE_ID=alpha
 make worktree-doctor WORKTREE_ID=alpha
 make -n build clean-worktree WORKTREE_ID=beta
 ```
@@ -178,6 +179,7 @@ Release bar:
 - generated native projects print worktree-local cache paths and local config/signing paths;
 - `make clean-worktree` only targets state owned by the current worktree.
 - native worktree evidence is labeled as `static`, `doctor`, or `real-build` using [verification-matrix.md](verification-matrix.md).
+- HarmonyOS evidence includes `make worktree-debug-identity` and treats per-worktree bundle rewriting as deferred unless a configured DevEco/hvigor workstation has verified the metadata hook.
 
 Use [0.6.0-release-prep.md](0.6.0-release-prep.md) for a concrete evidence run.
 

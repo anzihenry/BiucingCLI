@@ -62,6 +62,7 @@ and a hash-based `WORKTREE_ID` from the worktree root path. Override
 
 ```bash
 WORKTREE_ID=feature-a make worktree-info
+WORKTREE_ID=feature-a make worktree-debug-identity
 WORKTREE_ID=feature-a make build
 WORKTREE_ID=feature-a make clean-worktree
 ```
@@ -69,9 +70,14 @@ WORKTREE_ID=feature-a make clean-worktree
 `make worktree-info` prints the isolated hvigor, ohpm, `oh_modules`, module
 build, and signing-file paths. `make worktree-doctor` checks that tool caches
 stay inside this worktree and reminds you that `local.properties` is local-only
-signing material. `DEBUG_BUNDLE_SUFFIX` is passed to hvigor as a build property;
-keep `AppScope/app.json5` stable unless your DevEco Studio setup explicitly
-supports per-worktree bundle rewriting.
+signing material.
+
+`make worktree-debug-identity` prints the base bundle name, requested
+`DEBUG_BUNDLE_SUFFIX`, diagnostic debug bundle name, and hvigor properties. It
+is intentionally read-only: `AppScope/app.json5` remains the source of truth for
+`bundleName`. Automatic per-worktree bundle rewriting is deferred until the
+DevEco/hvigor app metadata hook is verified on a configured HarmonyOS
+workstation.
 
 ## Standard Commands
 

@@ -69,7 +69,7 @@ Use a fresh output directory for these examples so the output is easy to reprodu
 | --- | --- | --- | --- |
 | `apple` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when Xcode and Tuist are installed | `make generate`, then `make build` or `make test` for each claimed platform variant |
 | `android` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when JDK and Android SDK are installed | `./gradlew assembleDebug`; add `./gradlew test` or `./gradlew connectedDebugAndroidTest` when claiming test or device/emulator coverage |
-| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK are configured | `make build` on a configured DevEco/HarmonyOS SDK workstation; add signing/package commands only when those flows changed |
+| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-debug-identity WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK are configured | `make build` on a configured DevEco/HarmonyOS SDK workstation; add signing/package commands only when those flows changed |
 
 Real-build proof is required when the release changes native project structure, generated manifests, package identity, signing inputs, build settings, generated platform dependency files, or native build/test targets.
 It is optional, but valuable, for docs-only, CLI metadata-only, or worktree diagnostic wording changes that do not alter generated native build behavior.
@@ -84,7 +84,7 @@ Suggested fresh worktree proof for `0.6.0`:
 | `worker` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-worker-alpha DEV_IMAGE=demo-worker-alpha-dev DEV_TAG=dev docker compose -f compose.dev.yaml config` |
 | `apple` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
 | `android` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
-| `harmonyos` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
+| `harmonyos` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-debug-identity WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
 
 ## Recommended Command Catalog
 
