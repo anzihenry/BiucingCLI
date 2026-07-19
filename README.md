@@ -123,6 +123,8 @@ Local HarmonyOS validation status:
 - [Worktree Isolation Contract](docs/worktree-isolation-contract.md)
 - [0.6.0 Worktree Collision Audit](docs/0.6.0-worktree-collision-audit.md)
 - [0.6.0 Release Prep](docs/0.6.0-release-prep.md)
+- [0.6.1 Plan](docs/0.6.1-plan.md)
+- [0.6.1 Worktree Hardening Task Breakdown](docs/0.6.1-worktree-hardening-tasks.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

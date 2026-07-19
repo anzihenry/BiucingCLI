@@ -40,8 +40,6 @@
 - expanded the template portfolio to seven shipped starters;
 - kept HarmonyOS generated-project validation separate from workstation-specific SDK availability.
 
-## Current
-
 ### 0.6.0 - Worktree-First Starters
 
 `0.6.0` makes BiucingCLI's generated starters safe for parallel Git worktree development.
@@ -65,6 +63,25 @@ Planning anchors:
 - [0.6.0 Plan](0.6.0-plan.md)
 - [0.6.0 Worktree Task Breakdown](0.6.0-worktree-tasks.md)
 - [0.6.0 Release Prep](0.6.0-release-prep.md)
+
+## Current
+
+### 0.6.1 - Worktree Isolation Hardening
+
+`0.6.1` should harden the worktree-first behavior shipped in `0.6.0`.
+
+The release is focused on:
+
+- unifying the worktree identity model across Docker-first and native templates;
+- adding actionable port-conflict advice for Docker-first templates;
+- exposing non-invasive Compose config diagnostics as generated-project commands;
+- making native worktree evidence more precise;
+- deciding the safe boundary for HarmonyOS debug identity behavior.
+
+Planning anchors:
+
+- [0.6.1 Plan](0.6.1-plan.md)
+- [0.6.1 Worktree Hardening Task Breakdown](0.6.1-worktree-hardening-tasks.md)
 
 ## Deferred
 
