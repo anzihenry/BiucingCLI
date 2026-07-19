@@ -64,6 +64,7 @@ This starter is safe to run from parallel Git worktrees when each worktree keeps
 ```bash
 make worktree-info
 make worktree-doctor
+make worktree-compose-config
 DEV_HOST_PORT=5174 make dev
 HOST_PORT=8081 make docker-run
 make clean-worktree
@@ -74,6 +75,7 @@ make clean-worktree
 - `COMPOSE_PROJECT_NAME` defaults to `{{PACKAGE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
 - `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
+- `make worktree-compose-config` renders the current worktree's Compose config without starting containers.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 ## Direct pnpm Scripts

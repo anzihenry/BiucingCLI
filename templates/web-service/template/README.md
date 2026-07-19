@@ -114,6 +114,7 @@ This starter is safe to run from parallel Git worktrees when each worktree keeps
 ```bash
 make worktree-info
 make worktree-doctor
+make worktree-compose-config
 HOST_PORT=8081 make dev
 HOST_PORT=8081 make docker-run
 make clean-worktree
@@ -125,6 +126,7 @@ make clean-worktree
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
 - `GOCACHE` and `GOLANGCI_LINT_CACHE` stay under the current worktree's `.cache/` directory.
 - `make worktree-doctor` checks whether `HOST_PORT` is already in use and prints a suggested override.
+- `make worktree-compose-config` renders the current worktree's Compose config without starting containers.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 Push a tagged image:

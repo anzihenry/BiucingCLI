@@ -121,6 +121,7 @@ This starter is safe to run from parallel Git worktrees without publishing host 
 ```bash
 make worktree-info
 make worktree-doctor
+make worktree-compose-config
 make dev
 make clean-worktree
 ```
@@ -129,6 +130,7 @@ make clean-worktree
 - `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
 - `COMPOSE_PROJECT_NAME` defaults to `{{WORKER_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and cache volumes stay scoped to the worktree.
 - `DEV_IMAGE` and `IMAGE` default to worktree-specific names so dev/runtime image tags do not overwrite another worktree by default.
+- `make worktree-compose-config` renders the current worktree's Compose config without starting containers.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 ## Validation

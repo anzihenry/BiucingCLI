@@ -121,6 +121,7 @@ This starter is safe to run from parallel Git worktrees when each worktree keeps
 ```bash
 make worktree-info
 make worktree-doctor
+make worktree-compose-config
 HOST_HTTP_PORT=8081 HOST_GRPC_PORT=9091 HOST_DEPENDENCY_STORE_PORT=5433 make up
 make clean-worktree
 ```
@@ -131,6 +132,7 @@ make clean-worktree
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
 - `HOST_HTTP_PORT`, `HOST_GRPC_PORT`, `HOST_DEPENDENCY_STORE_PORT`, `HOST_OTEL_GRPC_PORT`, and `HOST_OTEL_HTTP_PORT` can be overridden when several worktrees run at once.
 - `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
+- `make worktree-compose-config` renders the current worktree's Compose config without starting containers.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
 
 ## Contracts

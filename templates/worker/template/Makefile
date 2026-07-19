@@ -29,7 +29,7 @@ export WORKER_TICK_INTERVAL_SECONDS
 export WORKER_SHUTDOWN_TIMEOUT_SECONDS
 export GOCACHE
 
-.PHONY: worktree-info worktree-doctor clean-worktree bootstrap doctor dev dev-shell test verify run build docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell test verify run build docker-build docker-run
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -45,6 +45,11 @@ worktree-info:
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
 	@printf '%s\n' "Worker has no published host ports by default."
+	@printf '%s\n' "Compose config check: make worktree-compose-config"
+
+worktree-compose-config:
+	@if ! command -v docker >/dev/null 2>&1; then printf '%s\n' "Docker is not available; cannot render Compose config."; exit 1; fi
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) config
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes

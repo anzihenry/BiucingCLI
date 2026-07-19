@@ -34,7 +34,7 @@ BUILDER_IMAGE ?= golang:1.26-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 
-.PHONY: worktree-info worktree-doctor clean-worktree bootstrap doctor dev dev-shell tidy lint test verify run build docker-build docker-run docker-push
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell tidy lint test verify run build docker-build docker-run docker-push
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -53,6 +53,11 @@ worktree-doctor:
 	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
 		if lsof -nP -iTCP:$(HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_PORT $(HOST_PORT) is already in use." "Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make dev"; fi; \
 	fi
+	@printf '%s\n' "Compose config check: make worktree-compose-config"
+
+worktree-compose-config:
+	@if ! command -v docker >/dev/null 2>&1; then printf '%s\n' "Docker is not available; cannot render Compose config."; exit 1; fi
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) config
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes

@@ -21,7 +21,7 @@ export DEV_PORT
 export HOST_PORT
 export CONTAINER_PORT
 
-.PHONY: worktree-info worktree-doctor clean-worktree bootstrap bootstrap-full install dev dev-shell lint typecheck test build preview browser-install browser-smoke format format-check docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install dev dev-shell lint typecheck test build preview browser-install browser-smoke format format-check docker-build docker-run
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -42,6 +42,11 @@ worktree-doctor:
 		if lsof -nP -iTCP:$(DEV_HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: DEV_HOST_PORT $(DEV_HOST_PORT) is already in use." "Suggested override: DEV_HOST_PORT=$$(( $(DEV_HOST_PORT) + 10000 )) make dev"; fi; \
 		if lsof -nP -iTCP:$(HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_PORT $(HOST_PORT) is already in use." "Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make docker-run"; fi; \
 	fi
+	@printf '%s\n' "Compose config check: make worktree-compose-config"
+
+worktree-compose-config:
+	@if ! command -v docker >/dev/null 2>&1; then printf '%s\n' "Docker is not available; cannot render Compose config."; exit 1; fi
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) config
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes
