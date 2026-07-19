@@ -19,6 +19,7 @@ These checks apply to every release regardless of which template changed.
 | JSON info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service --json` | Must pass |
 | Worker info output | Python test coverage for `biucing info worker` and `biucing info worker --json` | Must pass |
 | HarmonyOS info output | Python test coverage for `biucing info harmonyos` | Must pass |
+| Worktree metadata | `PYTHONPATH=src python3 -m biucingcli.cli list --json` plus golden coverage | Every shipped template declares `worktree-ready` |
 | Scriptable create flow | Python test coverage for `--set` and `--non-interactive` | Must pass |
 | Preview and manifest flow | Python test coverage for `--dry-run`, `--plan --json`, and `create --json` | Must pass |
 | Version surface | `biucing --version` test expectation and version files aligned | Must pass |
@@ -34,6 +35,29 @@ These checks apply to every release regardless of which template changed.
 | `apple` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `make generate`, plus at least one platform `make build` or `make test` path | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
 | `android` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `./gradlew assembleDebug` and, when release/setup changes, `./gradlew assembleRelease` | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
 | `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor`, `make lint`, and `make build` on a workstation with DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
+
+## Worktree Isolation Matrix
+
+These checks are the release bar for the `0.6.0` worktree-first claim.
+
+| Template family | Required proof | Release bar |
+| --- | --- | --- |
+| All templates | Generate a fresh project, then run `make worktree-info WORKTREE_ID=alpha` and `make worktree-doctor WORKTREE_ID=alpha` | Commands complete and print the resolved worktree identity, cache/output paths, and cleanup surface |
+| Docker-first templates | Run `docker compose -f compose.dev.yaml config` with explicit `COMPOSE_PROJECT_NAME` and non-default host ports where published ports exist | Config shows worktree-scoped Compose project names, Docker volume names, image refs, and host port mappings |
+| Native templates | Run `make -n build WORKTREE_ID=beta` or the nearest supported dry-run command | Command expansion shows worktree-local cache paths and debug identity suffixes without invoking heavyweight platform builds |
+| Cleanup commands | Inspect or dry-run `make clean-worktree WORKTREE_ID=beta` where safe | Cleanup targets current-worktree state only and avoids global SDKs, shared Docker images, unrelated containers, and unrelated worktrees |
+
+Suggested fresh worktree proof for `0.6.0`:
+
+| Template | Worktree proof |
+| --- | --- |
+| `frontend` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-frontend-alpha DEV_HOST_PORT=5174 docker compose -f compose.dev.yaml config` |
+| `web-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-service-alpha HOST_PORT=18081 docker compose -f compose.dev.yaml config` |
+| `microservice` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-micro-alpha HOST_HTTP_PORT=18080 HOST_GRPC_PORT=19090 HOST_DEPENDENCY_STORE_PORT=15432 HOST_OTEL_GRPC_PORT=14317 HOST_OTEL_HTTP_PORT=14318 docker compose -f compose.dev.yaml config` |
+| `worker` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-worker-alpha DEV_IMAGE=demo-worker-alpha-dev DEV_TAG=dev docker compose -f compose.dev.yaml config` |
+| `apple` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
+| `android` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
+| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
 
 ## Recommended Command Catalog
 
@@ -58,6 +82,7 @@ When using these commands for release evidence, prefer a fresh empty output dire
 | CLI-only change | Release-wide checks |
 | Metadata-only change in one template | Release-wide checks plus `biucing info <template>` sanity check and, when semantics changed, fresh proof for that template |
 | Shared renderer or placeholder change | Release-wide checks plus fresh proof for at least one Dockerized template and one native template |
+| Worktree metadata or command-surface change | Release-wide checks plus fresh worktree proof for every touched template |
 | Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `microservice` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
 | Background-worker template change in `worker` | Release-wide checks plus fresh generated-project `go test ./...` proof and, when Docker paths changed, Docker packaging verification |
 | Native project structure change in `apple` or `android` | Release-wide checks plus fresh generated-project verification for the touched native template |
@@ -79,10 +104,11 @@ The current repo-level automated baseline includes:
 - scripted create-flow coverage for `--set` and `--non-interactive`;
 - preview and manifest coverage for `--dry-run`, `--plan --json`, and `create --json`;
 - generated-project `go test ./...` proof for the new `worker` starter.
+- worktree metadata and Makefile command-surface coverage for every shipped starter.
 
 ## Maintainer Notes
 
 - Prefer evidence that can be rerun with a small number of explicit commands.
 - If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
-- For a concrete version-prep walkthrough, use [0.4.0-release-prep.md](0.4.0-release-prep.md).
+- For a concrete version-prep walkthrough, use [0.6.0-release-prep.md](0.6.0-release-prep.md).

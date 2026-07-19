@@ -5,7 +5,7 @@ This checklist is the repeatable release path for BiucingCLI `0.x`.
 It is intentionally split into:
 
 - repo product checks: does the CLI itself still behave correctly?
-- template proof: do the six shipped starters still meet their minimum release bar?
+- template proof: do the seven shipped starters still meet their minimum release bar?
 - release surface checks: are version, changelog, tag, and publication aligned?
 
 Use this document together with [verification-matrix.md](verification-matrix.md).
@@ -23,10 +23,12 @@ Use this map before every version bump so the release does not update only part 
 | CLI version expectation | `tests/test_cli.py` | Expected `biucing --version` output |
 | Release operations docs | `docs/release-checklist.md`, `docs/verification-matrix.md` | Update if the verification bar or release flow changed |
 
-For `0.4.0`, also review:
+For `0.6.0`, also review:
 
-- `docs/0.4.0-plan.md`
-- `docs/0.4.0-release-prep.md`
+- `docs/0.6.0-plan.md`
+- `docs/0.6.0-worktree-tasks.md`
+- `docs/worktree-isolation-contract.md`
+- `docs/0.6.0-release-prep.md`
 - `README.md` links under `Design Docs`
 
 ## 1. Scope The Release
@@ -69,6 +71,7 @@ PYTHONPATH=src python3 -m biucingcli.cli info web-service
 PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
 PYTHONPATH=src python3 -m biucingcli.cli info worker
 PYTHONPATH=src python3 -m biucingcli.cli info worker --json
+PYTHONPATH=src python3 -m biucingcli.cli info harmonyos
 ```
 
 Release bar:
@@ -89,12 +92,13 @@ PYTHONPATH=src python3 -m biucingcli.cli info web-service
 PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
 PYTHONPATH=src python3 -m biucingcli.cli info worker
 PYTHONPATH=src python3 -m biucingcli.cli info worker --json
+PYTHONPATH=src python3 -m biucingcli.cli info harmonyos
 biucing --version
 ```
 
 ## 4. Check Scriptability Paths
 
-The current `0.4.0` hardening work makes preview, scripting, and manifest output part of the product surface, so release verification should cover them explicitly.
+The current scriptability surface makes preview, scripting, and manifest output part of the product surface, so release verification should cover them explicitly.
 
 Minimum checks:
 
@@ -129,18 +133,38 @@ Practical expectation:
 
 - `frontend`, `web-service`, `microservice` should keep their Docker-based proof current;
 - `worker` should keep its generated-project `go test ./...` proof current;
-- `apple` and `android` should keep their generated-project proof current.
+- `apple` and `android` should keep their generated-project proof current;
+- `harmonyos` should keep generated-project static checks current, with real DevEco/HarmonyOS SDK builds recorded when the workstation is configured.
 
-## 6. Review Docs And Messaging
+## 6. Check Worktree Isolation
+
+For `0.6.0` and later, every shipped template should expose the shared worktree command surface:
+
+```bash
+make worktree-info WORKTREE_ID=alpha
+make worktree-doctor WORKTREE_ID=alpha
+make clean-worktree WORKTREE_ID=alpha
+```
+
+Release bar:
+
+- `biucing list --json` shows every shipped template as `worktree-ready`;
+- generated Docker-first projects render distinct Compose project names and volume names for different `WORKTREE_ID` values;
+- generated native projects print worktree-local cache paths and local config/signing paths;
+- `make clean-worktree` only targets state owned by the current worktree.
+
+Use [0.6.0-release-prep.md](0.6.0-release-prep.md) for a concrete evidence run.
+
+## 7. Review Docs And Messaging
 
 Before tagging, confirm the human-facing story is clean:
 
 - `README.md` reflects the current template portfolio and maturity story;
 - `CHANGELOG.md` highlights user-visible changes rather than implementation trivia;
-- `docs/0.4.0-plan.md` or future version plans are not obviously behind shipped reality;
+- `docs/0.6.0-plan.md`, `docs/0.6.0-worktree-tasks.md`, and future version plans are not obviously behind shipped reality;
 - any new validation behavior is documented somewhere discoverable.
 
-## 7. Stage The Release
+## 8. Stage The Release
 
 Recommended sequence:
 
@@ -158,7 +182,7 @@ Before pushing, double-check:
 - the working tree is clean except for intentionally excluded files;
 - the annotated tag points at the intended release commit.
 
-## 8. Publish
+## 9. Publish
 
 Proven publication sequence for this repo:
 
@@ -169,7 +193,7 @@ gh release create vX.Y.Z --title "BiucingCLI X.Y.Z" --notes-file CHANGELOG.md
 
 If you need to review the generated release notes manually, create the GitHub release after a final changelog inspection instead of rushing the one-liner.
 
-## 9. Record Release Evidence
+## 10. Record Release Evidence
 
 After publication, record the proof in the release notes, PR description, or rollout summary:
 
@@ -198,8 +222,11 @@ Use this template in the PR body, release-prep note, or rollout summary:
   - `PYTHONPATH=src python3 -m biucingcli.cli info web-service --json`
   - `PYTHONPATH=src python3 -m biucingcli.cli info worker`
   - `PYTHONPATH=src python3 -m biucingcli.cli info worker --json`
+  - `PYTHONPATH=src python3 -m biucingcli.cli info harmonyos`
 - Fresh template proof:
   - `template-name`: `commands run and result`
+- Worktree proof:
+  - `template-name`: `worktree-info/doctor/config/build-command proof`
 - Version surfaces updated:
   - `README.md`
   - `CHANGELOG.md`

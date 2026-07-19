@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.5.0`.
+The current repository release target is `0.6.0`.
 
 ```bash
 biucing --version
@@ -88,6 +88,13 @@ Template consistency status:
 - `biucing validate` now checks the stronger metadata contract plus family-level required starter entries;
 - `biucing info <template>` now surfaces those consistency fields directly.
 
+Worktree-first status:
+
+- all seven templates now declare `worktree-ready` support metadata;
+- generated projects expose `make worktree-info`, `make worktree-doctor`, and `make clean-worktree`;
+- Docker-first starters isolate Compose project names, volumes, image tags, published host ports, dependency stores, and caches;
+- native starters isolate build caches, local signing/config files, generated output, and debug install identity hooks where the platform supports them.
+
 Local Android validation status:
 
 - the Android starter now includes a committed Gradle wrapper;
@@ -115,6 +122,7 @@ Local HarmonyOS validation status:
 - [0.6.0 Worktree Task Breakdown](docs/0.6.0-worktree-tasks.md)
 - [Worktree Isolation Contract](docs/worktree-isolation-contract.md)
 - [0.6.0 Worktree Collision Audit](docs/0.6.0-worktree-collision-audit.md)
+- [0.6.0 Release Prep](docs/0.6.0-release-prep.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

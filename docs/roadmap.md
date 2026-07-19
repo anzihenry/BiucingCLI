@@ -33,13 +33,20 @@
 - the current template family follows a clearer shared product contract.
 - the portfolio grows through a new `worker` starter without lowering validation quality.
 
-## Next
+### 0.5.0 - HarmonyOS Starter
+
+- added an experimental `harmonyos` template for ArkTS + ArkUI DevEco Studio projects;
+- wired HarmonyOS bootstrap, doctor, lint, build, and release-signing guidance;
+- expanded the template portfolio to seven shipped starters;
+- kept HarmonyOS generated-project validation separate from workstation-specific SDK availability.
+
+## Current
 
 ### 0.6.0 - Worktree-First Starters
 
-`0.6.0` should make BiucingCLI's generated starters safe for parallel Git worktree development.
+`0.6.0` makes BiucingCLI's generated starters safe for parallel Git worktree development.
 
-The release direction is now locked around:
+The release is centered on:
 
 - a shared worktree isolation contract across all seven templates;
 - Docker-first isolation for Compose project names, volumes, ports, runtime image tags, dependency stores, and caches;
@@ -47,10 +54,17 @@ The release direction is now locked around:
 - generated `make worktree-info`, `make worktree-doctor`, and `make clean-worktree` workflows where appropriate;
 - validation, docs, and release evidence that prove parallel-worktree behavior instead of only claiming it.
 
+Implementation status:
+
+- Phase A through Phase D are complete;
+- all seven templates declare `worktree-ready` metadata;
+- Phase E release-hardening docs and verification evidence are complete.
+
 Planning anchors:
 
 - [0.6.0 Plan](0.6.0-plan.md)
 - [0.6.0 Worktree Task Breakdown](0.6.0-worktree-tasks.md)
+- [0.6.0 Release Prep](0.6.0-release-prep.md)
 
 ## Deferred
 

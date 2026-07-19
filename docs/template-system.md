@@ -61,7 +61,7 @@ Suggested shape:
     ]
   },
   "worktree": {
-    "support_level": "planned",
+    "support_level": "worktree-ready",
     "isolation_dimensions": [
       "runtime-names",
       "ports",
@@ -150,6 +150,9 @@ The default `0.6.0` command vocabulary is:
 - `make clean-worktree`
 
 See [worktree-isolation-contract.md](worktree-isolation-contract.md) for the full contract.
+
+For `0.6.0`, every shipped template should declare `worktree-ready`.
+`planned` and `partial` remain valid so future templates can enter the portfolio before their full isolation implementation lands.
 
 ### Workflow Labels
 

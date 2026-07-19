@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+- added a shared worktree isolation contract and release evidence path across all seven starters.
+- exposed template worktree support through `biucing list`, `biucing info`, JSON output, and `biucing validate`.
+- made Docker-first starters worktree-ready with isolated Compose project names, Docker volumes, image tags, host ports, dependency stores, caches, diagnostics, and cleanup.
+- made native starters worktree-ready with isolated build/tool caches, local signing/config visibility, generated-output cleanup, and debug identity suffix hooks.
+
 ## 0.5.0 - 2026-06-28
 
 - added an experimental `harmonyos` template for ArkTS + ArkUI DevEco Studio projects with CLI flags, doctor/bootstrap scripts, metadata validation, and render tests.
