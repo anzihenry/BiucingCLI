@@ -1,8 +1,10 @@
 SHELL := /bin/zsh
 
-WORKTREE_ROOT := $(shell pwd)
-WORKTREE_ID ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
-WORKTREE_SLUG ?= {{PROJECT_NAME}}-$(WORKTREE_ID)
+APP_NAME={{PROJECT_NAME}}
+WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+WORKTREE_LABEL ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
+WORKTREE_ID ?= $(shell printf '%s' "$(WORKTREE_ROOT)" | shasum | cut -c1-8)
+WORKTREE_SLUG ?= $(APP_NAME)-$(WORKTREE_ID)
 DERIVED_DATA_PATH ?= $(WORKTREE_ROOT)/DerivedData/$(WORKTREE_ID)
 SWIFTPM_BUILD_PATH ?= $(WORKTREE_ROOT)/.build/$(WORKTREE_ID)
 TUIST_HOME ?= $(WORKTREE_ROOT)/.cache/tuist/$(WORKTREE_ID)/home
@@ -69,6 +71,7 @@ release:
 worktree-info:
 	@printf '%s\n' "Project: {{PROJECT_NAME}}"
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
+	@printf '%s\n' "WORKTREE_LABEL: $(WORKTREE_LABEL)"
 	@printf '%s\n' "WORKTREE_ID: $(WORKTREE_ID)"
 	@printf '%s\n' "WORKTREE_SLUG: $(WORKTREE_SLUG)"
 	@printf '%s\n' "DerivedData: $(DERIVED_DATA_PATH)"

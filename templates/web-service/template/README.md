@@ -119,6 +119,7 @@ HOST_PORT=8081 make docker-run
 make clean-worktree
 ```
 
+- `WORKTREE_LABEL` is derived from the worktree directory name for display.
 - `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
 - `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.

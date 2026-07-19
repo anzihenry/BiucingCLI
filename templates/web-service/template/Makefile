@@ -1,5 +1,6 @@
 APP_NAME={{SERVICE_NAME}}
 WORKTREE_ROOT ?=$(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+WORKTREE_LABEL ?=$(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
 WORKTREE_ID ?=$(shell printf '%s' "$(WORKTREE_ROOT)" | shasum | cut -c1-8)
 WORKTREE_SLUG ?=$(APP_NAME)-$(WORKTREE_ID)
 COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)
@@ -37,6 +38,7 @@ endif
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
+	@printf '%s\n' "Worktree label: $(WORKTREE_LABEL)"
 	@printf '%s\n' "Worktree ID: $(WORKTREE_ID)"
 	@printf '%s\n' "Worktree slug: $(WORKTREE_SLUG)"
 	@printf '%s\n' "Compose project: $(COMPOSE_PROJECT_NAME)"

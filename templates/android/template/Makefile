@@ -1,8 +1,10 @@
 SHELL := /bin/zsh
 
-WORKTREE_ROOT := $(shell pwd)
-WORKTREE_ID ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
-WORKTREE_SLUG ?= {{PROJECT_NAME}}-$(WORKTREE_ID)
+APP_NAME={{PROJECT_NAME}}
+WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+WORKTREE_LABEL ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
+WORKTREE_ID ?= $(shell printf '%s' "$(WORKTREE_ROOT)" | shasum | cut -c1-8)
+WORKTREE_SLUG ?= $(APP_NAME)-$(WORKTREE_ID)
 GRADLE_USER_HOME ?= $(WORKTREE_ROOT)/.gradle/worktree/$(WORKTREE_ID)
 GRADLE_PROJECT_CACHE ?= $(WORKTREE_ROOT)/.gradle
 ANDROID_LOCAL_PROPERTIES ?= $(WORKTREE_ROOT)/local.properties
@@ -53,6 +55,7 @@ release:
 worktree-info:
 	@printf '%s\n' "Project: {{PROJECT_NAME}}"
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
+	@printf '%s\n' "WORKTREE_LABEL: $(WORKTREE_LABEL)"
 	@printf '%s\n' "WORKTREE_ID: $(WORKTREE_ID)"
 	@printf '%s\n' "WORKTREE_SLUG: $(WORKTREE_SLUG)"
 	@printf '%s\n' "Gradle user home: $(GRADLE_USER_HOME)"

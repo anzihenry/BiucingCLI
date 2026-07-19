@@ -1,9 +1,11 @@
 SHELL := /bin/zsh
 HVIGOR ?= hvigorw
 
-WORKTREE_ROOT := $(shell pwd)
-WORKTREE_ID ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
-WORKTREE_SLUG ?= {{PROJECT_NAME}}-$(WORKTREE_ID)
+APP_NAME={{PROJECT_NAME}}
+WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+WORKTREE_LABEL ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
+WORKTREE_ID ?= $(shell printf '%s' "$(WORKTREE_ROOT)" | shasum | cut -c1-8)
+WORKTREE_SLUG ?= $(APP_NAME)-$(WORKTREE_ID)
 HVIGOR_HOME ?= $(WORKTREE_ROOT)/.hvigor/worktree/$(WORKTREE_ID)
 OHPM_HOME ?= $(WORKTREE_ROOT)/.ohpm/worktree/$(WORKTREE_ID)
 OH_MODULES_DIR ?= $(WORKTREE_ROOT)/oh_modules
@@ -48,6 +50,7 @@ open:
 worktree-info:
 	@printf '%s\n' "Project: {{PROJECT_NAME}}"
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
+	@printf '%s\n' "WORKTREE_LABEL: $(WORKTREE_LABEL)"
 	@printf '%s\n' "WORKTREE_ID: $(WORKTREE_ID)"
 	@printf '%s\n' "WORKTREE_SLUG: $(WORKTREE_SLUG)"
 	@printf '%s\n' "HVIGOR_HOME: $(HVIGOR_HOME)"

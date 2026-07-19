@@ -41,8 +41,9 @@ make test
 
 ## Worktree Workflow
 
-Each worktree derives a local identity from its directory name. Override `WORKTREE_ID`
-when you want a shorter or stable value across renamed folders:
+Each worktree derives a human-readable `WORKTREE_LABEL` from its directory name
+and a hash-based `WORKTREE_ID` from the worktree root path. Override
+`WORKTREE_ID` when you want a shorter or stable value across renamed folders:
 
 ```bash
 WORKTREE_ID=feature-a make worktree-info
