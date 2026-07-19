@@ -6,8 +6,8 @@ services:
       args:
         BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}
         RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
-    image: {{SERVICE_NAME}}:latest
+    image: ${IMAGE:-{{SERVICE_NAME}}}:${TAG:-latest}
     ports:
-      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+      - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
     environment:
       CONFIG_FILE: /app/configs/config.yaml

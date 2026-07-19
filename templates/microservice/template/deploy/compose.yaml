@@ -6,10 +6,10 @@ services:
       args:
         BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}
         RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
-    image: {{SERVICE_NAME}}:latest
+    image: ${IMAGE:-{{SERVICE_NAME}}}:${TAG:-latest}
     ports:
-      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
-      - "{{GRPC_PORT}}:{{GRPC_PORT}}"
+      - "${HOST_HTTP_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
+      - "${HOST_GRPC_PORT:-{{GRPC_PORT}}}:{{GRPC_PORT}}"
     environment:
       CONFIG_FILE: /app/configs/config.yaml
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
@@ -22,7 +22,7 @@ services:
     image: {{DEPENDENCY_STORE_IMAGE}}
 {{DEPENDENCY_STORE_ENV_BLOCK}}
     ports:
-      - "{{DEPENDENCY_STORE_PORT}}:{{DEPENDENCY_STORE_PORT}}"
+      - "${HOST_DEPENDENCY_STORE_PORT:-{{DEPENDENCY_STORE_PORT}}}:{{DEPENDENCY_STORE_PORT}}"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -30,5 +30,5 @@ services:
     volumes:
       - ./otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
     ports:
-      - "4317:4317"
-      - "4318:4318"
+      - "${HOST_OTEL_GRPC_PORT:-4317}:4317"
+      - "${HOST_OTEL_HTTP_PORT:-4318}:4318"

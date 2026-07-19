@@ -7,7 +7,7 @@ Workflow labels: bootstrap, dev, verify, build, runtime
 Maturity: validated - Dockerized web service starter with live-reload, lint, test, and runtime image workflows.
 Validation: real-build-verified
 Verification tier: real-build
-Worktree support: planned
+Worktree support: worktree-ready
 Worktree isolation: runtime-names, ports, caches, generated-output, cleanup, diagnostics
 Stack: Go, Gin
 Operating assumptions:

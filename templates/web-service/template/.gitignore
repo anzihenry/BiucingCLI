@@ -1,4 +1,5 @@
 bin/
 dist/
+.cache/
 .DS_Store
 coverage.out

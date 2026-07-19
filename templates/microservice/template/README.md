@@ -114,6 +114,23 @@ Run the runtime image directly:
 make docker-run
 ```
 
+## Worktree Workflow
+
+This starter is safe to run from parallel Git worktrees when each worktree keeps its own identity and host ports.
+
+```bash
+make worktree-info
+make worktree-doctor
+HOST_HTTP_PORT=8081 HOST_GRPC_PORT=9091 HOST_DEPENDENCY_STORE_PORT=5433 make up
+make clean-worktree
+```
+
+- `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
+- `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, dependency stores, and cache volumes stay scoped to the worktree.
+- `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `HOST_HTTP_PORT`, `HOST_GRPC_PORT`, `HOST_DEPENDENCY_STORE_PORT`, `HOST_OTEL_GRPC_PORT`, and `HOST_OTEL_HTTP_PORT` can be overridden when several worktrees run at once.
+- `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
+
 ## Contracts
 
 The canonical service contract lives under `api/proto/service/v1/service.proto`.

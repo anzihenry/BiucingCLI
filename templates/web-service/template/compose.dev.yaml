@@ -13,7 +13,7 @@ services:
       GOCACHE: /workspace/.cache/go-build
       GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
     ports:
-      - "{{HTTP_PORT}}:{{HTTP_PORT}}"
+      - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
     volumes:
       - .:/workspace
       - web-service-go-build:/workspace/.cache/go-build

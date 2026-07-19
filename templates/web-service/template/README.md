@@ -107,6 +107,24 @@ make docker-run
 
 `make docker-run` starts whatever image tag you last built or specify explicitly through `IMAGE` and `TAG`.
 
+## Worktree Workflow
+
+This starter is safe to run from parallel Git worktrees when each worktree keeps its own identity and host port.
+
+```bash
+make worktree-info
+make worktree-doctor
+HOST_PORT=8081 make dev
+HOST_PORT=8081 make docker-run
+make clean-worktree
+```
+
+- `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
+- `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
+- `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `GOCACHE` and `GOLANGCI_LINT_CACHE` stay under the current worktree's `.cache/` directory.
+- `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
+
 Push a tagged image:
 
 ```bash

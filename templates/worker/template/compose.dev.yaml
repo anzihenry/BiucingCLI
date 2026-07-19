@@ -6,7 +6,7 @@ services:
       args:
         GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
         GOSUMDB: ${GOSUMDB:-sum.golang.org}
-    image: {{WORKER_NAME}}-dev:latest
+    image: ${DEV_IMAGE:-{{WORKER_NAME}}-dev}:${DEV_TAG:-latest}
     working_dir: /app
     environment:
       CONFIG_FILE: configs/config.json

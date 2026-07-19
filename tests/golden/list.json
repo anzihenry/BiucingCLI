@@ -335,7 +335,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "runtime-names",
           "ports",
@@ -582,7 +582,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "runtime-names",
           "ports",
@@ -709,7 +709,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "runtime-names",
           "ports",
@@ -806,7 +806,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "runtime-names",
           "caches",

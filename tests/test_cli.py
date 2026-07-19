@@ -55,7 +55,7 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Template: web-service", output)
         self.assertIn("Workflow labels: bootstrap, dev, verify, build, runtime", output)
         self.assertIn("Verification tier: real-build", output)
-        self.assertIn("Worktree support: planned", output)
+        self.assertIn("Worktree support: worktree-ready", output)
         self.assertIn(
             "Worktree isolation: runtime-names, ports, caches, "
             "generated-output, cleanup, diagnostics",
@@ -117,7 +117,7 @@ class CLITestCase(unittest.TestCase):
             web_service["workflow_labels"],
             ["bootstrap", "dev", "verify", "build", "runtime"],
         )
-        self.assertEqual(web_service["worktree"]["support_level"], "planned")
+        self.assertEqual(web_service["worktree"]["support_level"], "worktree-ready")
         self.assertIn("runtime-names", web_service["worktree"]["isolation_dimensions"])
         self.assertIn("make worktree-info", web_service["worktree"]["diagnostics"])
         self.assertIn("make clean-worktree", web_service["worktree"]["cleanup"])
@@ -133,7 +133,7 @@ class CLITestCase(unittest.TestCase):
             payload["workflow_labels"],
             ["bootstrap", "dev", "verify", "build", "runtime"],
         )
-        self.assertEqual(payload["worktree"]["support_level"], "planned")
+        self.assertEqual(payload["worktree"]["support_level"], "worktree-ready")
         self.assertIn("ports", payload["worktree"]["isolation_dimensions"])
         self.assertEqual(
             payload["worktree"]["diagnostics"],
@@ -955,25 +955,33 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make bootstrap-full", readme)
             self.assertIn("DEV_DOCKERFILE=Dockerfile.dev.full make dev", readme)
             self.assertIn("<title>Demo App</title>", index_html)
+            self.assertIn("WORKTREE_ID ?=$(shell printf", makefile)
+            self.assertIn("COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)", makefile)
+            self.assertIn("IMAGE ?=$(WORKTREE_SLUG)", makefile)
+            self.assertIn("TAG ?=dev", makefile)
+            self.assertIn("DEV_HOST_PORT ?=$(DEV_PORT)", makefile)
+            self.assertIn("worktree-info:", makefile)
+            self.assertIn("worktree-doctor:", makefile)
+            self.assertIn("clean-worktree:", makefile)
             self.assertIn("DEV_DOCKERFILE ?=Dockerfile.dev", makefile)
             self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
                 makefile,
             )
             self.assertIn(
-                "DEV_DOCKERFILE=Dockerfile.dev.full docker compose -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
+                "DEV_DOCKERFILE=Dockerfile.dev.full $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
                 makefile,
             )
             self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)",
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)",
                 makefile,
             )
             self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:install",
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:install",
                 makefile,
             )
             self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke",
+                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke",
                 makefile,
             )
             self.assertIn("docker build -t $(IMAGE_REF) .", makefile)
@@ -994,9 +1002,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("frontend-dev", compose_dev)
             self.assertIn("dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}", compose_dev)
             self.assertIn(
-                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173 --strictPort"',
+                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port ${DEV_PORT:-5173} --strictPort"',
                 compose_dev,
             )
+            self.assertIn('"${DEV_HOST_PORT:-5173}:${DEV_PORT:-5173}"', compose_dev)
             self.assertIn("frontend-node-modules", compose_dev)
             self.assertIn("frontend-pnpm-store", compose_dev)
             self.assertIn("frontend-playwright-cache", compose_dev)
@@ -1101,8 +1110,14 @@ class CLITestCase(unittest.TestCase):
             )
             self.assertIn("GOPROXY", readme)
             self.assertIn("GOSUMDB", readme)
-            self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) redis otel-collector", makefile)
-            self.assertIn("docker compose -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) buf generate ./api", makefile)
+            self.assertIn("COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)", makefile)
+            self.assertIn("HOST_DEPENDENCY_STORE_PORT ?=6379", makefile)
+            self.assertIn("HOST_OTEL_GRPC_PORT ?=4317", makefile)
+            self.assertIn("HOST_OTEL_HTTP_PORT ?=4318", makefile)
+            self.assertIn("worktree-info:", makefile)
+            self.assertIn("clean-worktree:", makefile)
+            self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) redis otel-collector", makefile)
+            self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) buf generate ./api", makefile)
             self.assertIn('bash -lc "buf lint ./api && golangci-lint run', makefile)
             self.assertIn("HOST_GRPC_PORT ?=9191", makefile)
             self.assertIn("BUILDER_IMAGE ?= golang:1.26-alpine", makefile)
@@ -1125,8 +1140,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('cmd = "go build -o ./tmp/server ./cmd/server"', air_toml)
             self.assertIn("include_ext = [\"go\", \"yaml\", \"proto\"]", air_toml)
             self.assertIn(".cache/", dockerignore)
-            self.assertIn('image: user-service:latest', compose_yaml)
-            self.assertIn('- "9191:9191"', compose_yaml)
+            self.assertIn('image: ${IMAGE:-user-service}:${TAG:-latest}', compose_yaml)
+            self.assertIn('- "${HOST_GRPC_PORT:-9191}:9191"', compose_yaml)
             self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}", compose_yaml)
             self.assertIn("STORE_DSN: redis://redis:6379/0", compose_yaml)
             self.assertIn("image: redis:7-alpine", compose_yaml)
@@ -1410,17 +1425,20 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("EXPOSE 8080", dockerfile)
             self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}", compose_yaml)
             self.assertIn("RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}", compose_yaml)
-            self.assertIn("image: user-service:latest", compose_yaml)
-            self.assertIn('- "8080:8080"', compose_yaml)
+            self.assertIn("image: ${IMAGE:-user-service}:${TAG:-latest}", compose_yaml)
+            self.assertIn('- "${HOST_PORT:-8080}:8080"', compose_yaml)
             self.assertIn("DOCKER_VARIANT ?=alpine", makefile)
             self.assertIn("DOCKER_PLATFORM ?=linux/arm64", makefile)
             self.assertIn("GOPROXY ?=https://proxy.golang.org,direct", makefile)
             self.assertIn("GOSUMDB ?=sum.golang.org", makefile)
             self.assertIn("DEV_COMPOSE_FILE ?=compose.dev.yaml", makefile)
-            self.assertIn("GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) docker compose -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)", makefile)
+            self.assertIn("COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)", makefile)
+            self.assertIn("worktree-info:", makefile)
+            self.assertIn("clean-worktree:", makefile)
+            self.assertIn("GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)", makefile)
             self.assertIn("public.ecr.aws/docker/library/golang:1.26", makefile)
             self.assertIn("public.ecr.aws/docker/library/ubuntu:26.04", makefile)
-            self.assertIn("IMAGE ?=$(APP_NAME)", makefile)
+            self.assertIn("IMAGE ?=$(WORKTREE_SLUG)", makefile)
             self.assertIn("--build-arg BUILDER_IMAGE=$(BUILDER_IMAGE)", makefile)
             self.assertIn("--build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE)", makefile)
             self.assertIn("--build-arg GOPROXY=$(GOPROXY)", makefile)

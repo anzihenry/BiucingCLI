@@ -57,6 +57,23 @@ make docker-run
 - Development server: `http://127.0.0.1:5173`
 - Runtime image: `http://127.0.0.1:8080`
 
+## Worktree Workflow
+
+This starter is safe to run from parallel Git worktrees when each worktree keeps its own identity and host ports.
+
+```bash
+make worktree-info
+make worktree-doctor
+DEV_HOST_PORT=5174 make dev
+HOST_PORT=8081 make docker-run
+make clean-worktree
+```
+
+- `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
+- `COMPOSE_PROJECT_NAME` defaults to `{{PACKAGE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
+- `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
+
 ## Direct pnpm Scripts
 
 ```bash
@@ -98,7 +115,7 @@ pnpm format:check
 - This starter standardizes on `pnpm` via Corepack.
 - The generated `package.json` declares the expected `pnpm` and Node.js versions.
 - `make install` is still available when you intentionally refresh dependencies after editing `package.json`.
-- `frontend-pnpm-store` and `frontend-playwright-cache` persist the pnpm store and browser downloads across container runs.
+- Compose-scoped pnpm and Playwright cache volumes persist downloads across container runs without sharing state across worktrees.
 
 ## Browser Smoke Check
 
