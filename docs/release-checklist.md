@@ -133,8 +133,33 @@ Practical expectation:
 
 - `frontend`, `web-service`, `microservice` should keep their Docker-based proof current;
 - `worker` should keep its generated-project `go test ./...` proof current;
-- `apple` and `android` should keep their generated-project proof current;
-- `harmonyos` should keep generated-project static checks current, with real DevEco/HarmonyOS SDK builds recorded when the workstation is configured.
+- `apple`, `android`, and `harmonyos` should label native proof as `static`, `doctor`, or `real-build`;
+- `make -n` proof for native templates is useful static evidence, but it is never a real build;
+- native real-build proof is required when generated platform structure, manifests, package identity, signing inputs, build settings, dependency files, or native build/test targets change;
+- native real-build proof is optional, but valuable, for docs-only, CLI metadata-only, or diagnostic wording changes that do not alter generated native build behavior;
+- `harmonyos` should keep generated-project static and doctor checks current, with real DevEco/HarmonyOS SDK builds recorded when the workstation is configured.
+
+Suggested native worktree evidence block:
+
+```bash
+# Apple static plus doctor proof
+make worktree-info WORKTREE_ID=alpha
+make worktree-doctor WORKTREE_ID=alpha
+make -n build test lint format WORKTREE_ID=beta
+
+# Android static plus doctor proof
+make worktree-info WORKTREE_ID=alpha
+make worktree-doctor WORKTREE_ID=alpha
+make -n build test test-ui lint install-debug WORKTREE_ID=beta
+
+# HarmonyOS static plus doctor proof
+make worktree-info WORKTREE_ID=alpha
+make worktree-doctor WORKTREE_ID=alpha
+make -n build clean-worktree WORKTREE_ID=beta
+```
+
+When a native real-build is required, record the exact configured workstation commands that ran, for example `make generate && make build`, `./gradlew assembleDebug`, or `make build` for HarmonyOS.
+If the workstation does not have the required SDKs, record that as an environment limitation instead of implying fresh real-build coverage.
 
 ## 6. Check Worktree Isolation
 
@@ -152,6 +177,7 @@ Release bar:
 - generated Docker-first projects render distinct Compose project names and volume names for different `WORKTREE_ID` values;
 - generated native projects print worktree-local cache paths and local config/signing paths;
 - `make clean-worktree` only targets state owned by the current worktree.
+- native worktree evidence is labeled as `static`, `doctor`, or `real-build` using [verification-matrix.md](verification-matrix.md).
 
 Use [0.6.0-release-prep.md](0.6.0-release-prep.md) for a concrete evidence run.
 
@@ -227,6 +253,7 @@ Use this template in the PR body, release-prep note, or rollout summary:
   - `template-name`: `commands run and result`
 - Worktree proof:
   - `template-name`: `worktree-info/doctor/config/build-command proof`
+  - `native-template-name`: `static/doctor/real-build: commands run and result`
 - Version surfaces updated:
   - `README.md`
   - `CHANGELOG.md`

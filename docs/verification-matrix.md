@@ -32,9 +32,9 @@ These checks apply to every release regardless of which template changed.
 | `web-service` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify` and `make docker-build` in the generated project | Prefer both dev-image and runtime-image proof when Dockerfiles or Makefile flows change |
 | `microservice` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify`, `make up`, and `make docker-build` in the generated project | Re-check dependency-store variants when compose wiring or protobuf flow changes |
 | `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
-| `apple` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `make generate`, plus at least one platform `make build` or `make test` path | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
-| `android` | `generated-project-verified` | Python render tests plus metadata validation | Real generated-project proof such as `./gradlew assembleDebug` and, when release/setup changes, `./gradlew assembleRelease` | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
-| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `make doctor`, `make lint`, and `make build` on a workstation with DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK configured | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
+| `apple` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Apple project structure, Tuist wiring, or build settings change | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
+| `android` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Gradle, Android manifest, signing, packaging, or build settings change | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
+| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when HarmonyOS metadata, hvigor, signing, packaging, or build settings change | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
 
 ## Worktree Isolation Matrix
 
@@ -47,6 +47,33 @@ These checks are the release bar for the `0.6.0` worktree-first claim.
 | Native templates | Run `make -n build WORKTREE_ID=beta` or the nearest supported dry-run command | Command expansion shows worktree-local cache paths and debug identity suffixes without invoking heavyweight platform builds |
 | Cleanup commands | Inspect or dry-run `make clean-worktree WORKTREE_ID=beta` where safe | Cleanup targets current-worktree state only and avoids global SDKs, shared Docker images, unrelated containers, and unrelated worktrees |
 
+## Native Evidence Tiers
+
+Native templates need evidence that is precise about what ran on the current workstation.
+Use these labels in release notes and release-prep docs instead of flattening every proof into "generated-project verified."
+
+| Tier | What it proves | What it does not prove |
+| --- | --- | --- |
+| `static` | Template rendering, metadata validation, generated command wiring, and dry-run expansion such as `make -n ...` | Platform SDK availability, compiler success, simulator/device execution, signing validity |
+| `doctor` | The generated project's diagnostic surface can report local toolchain and worktree paths without mutating global state | A full native build, packaged artifact, installed app, or runtime behavior |
+| `real-build` | The platform toolchain can compile or test the generated project on a configured workstation | Cross-workstation SDK parity, store submission readiness, or every platform variant unless each variant was run |
+
+`make -n` evidence is always `static` evidence.
+Do not describe it as a real build success, even when the expanded command looks correct.
+
+### Native Evidence Commands
+
+Use a fresh output directory for these examples so the output is easy to reproduce.
+
+| Template | `static` evidence | `doctor` evidence | `real-build` evidence |
+| --- | --- | --- | --- |
+| `apple` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when Xcode and Tuist are installed | `make generate`, then `make build` or `make test` for each claimed platform variant |
+| `android` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when JDK and Android SDK are installed | `./gradlew assembleDebug`; add `./gradlew test` or `./gradlew connectedDebugAndroidTest` when claiming test or device/emulator coverage |
+| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK are configured | `make build` on a configured DevEco/HarmonyOS SDK workstation; add signing/package commands only when those flows changed |
+
+Real-build proof is required when the release changes native project structure, generated manifests, package identity, signing inputs, build settings, generated platform dependency files, or native build/test targets.
+It is optional, but valuable, for docs-only, CLI metadata-only, or worktree diagnostic wording changes that do not alter generated native build behavior.
+
 Suggested fresh worktree proof for `0.6.0`:
 
 | Template | Worktree proof |
@@ -55,9 +82,9 @@ Suggested fresh worktree proof for `0.6.0`:
 | `web-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-service-alpha HOST_PORT=18081 docker compose -f compose.dev.yaml config` |
 | `microservice` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-micro-alpha HOST_HTTP_PORT=18080 HOST_GRPC_PORT=19090 HOST_DEPENDENCY_STORE_PORT=15432 HOST_OTEL_GRPC_PORT=14317 HOST_OTEL_HTTP_PORT=14318 docker compose -f compose.dev.yaml config` |
 | `worker` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-worker-alpha DEV_IMAGE=demo-worker-alpha-dev DEV_TAG=dev docker compose -f compose.dev.yaml config` |
-| `apple` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
-| `android` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
-| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
+| `apple` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
+| `android` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
+| `harmonyos` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
 
 ## Recommended Command Catalog
 
@@ -85,8 +112,8 @@ When using these commands for release evidence, prefer a fresh empty output dire
 | Worktree metadata or command-surface change | Release-wide checks plus fresh worktree proof for every touched template |
 | Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `microservice` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
 | Background-worker template change in `worker` | Release-wide checks plus fresh generated-project `go test ./...` proof and, when Docker paths changed, Docker packaging verification |
-| Native project structure change in `apple` or `android` | Release-wide checks plus fresh generated-project verification for the touched native template |
-| Native project structure change in `harmonyos` | Release-wide checks plus generated-project static checks; run `make build` when DevEco Studio and HarmonyOS SDK are available |
+| Native project structure change in `apple` or `android` | Release-wide checks plus fresh native `static`, `doctor`, and `real-build` evidence for the touched native template |
+| Native project structure change in `harmonyos` | Release-wide checks plus fresh native `static` and `doctor` evidence; run and record `real-build` evidence when DevEco Studio and HarmonyOS SDK are available |
 | Version bump and release-doc only | Release-wide checks, changelog/readme/version alignment review |
 
 ## Current Evidence Baseline
@@ -111,4 +138,5 @@ The current repo-level automated baseline includes:
 - Prefer evidence that can be rerun with a small number of explicit commands.
 - If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
+- For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
 - For a concrete version-prep walkthrough, use [0.6.0-release-prep.md](0.6.0-release-prep.md).
