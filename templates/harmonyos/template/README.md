@@ -54,6 +54,24 @@ export HOS_SDK_HOME="/Applications/DevEco-Studio.app/Contents/sdk/default/openha
 Open the project with DevEco Studio when you need signing, device management, previewer, or emulator workflows.
 `make build` creates an unsigned HAP by default. `make release` reads local-only signing material from `local.properties`, temporarily injects a release signing config into `build-profile.json5`, runs hvigor with `buildMode=release`, and restores the original profile after the build.
 
+## Worktree Workflow
+
+Each worktree derives a local identity from its directory name. Override `WORKTREE_ID`
+when you want a shorter or stable value across renamed folders:
+
+```bash
+WORKTREE_ID=feature-a make worktree-info
+WORKTREE_ID=feature-a make build
+WORKTREE_ID=feature-a make clean-worktree
+```
+
+`make worktree-info` prints the isolated hvigor, ohpm, `oh_modules`, module
+build, and signing-file paths. `make worktree-doctor` checks that tool caches
+stay inside this worktree and reminds you that `local.properties` is local-only
+signing material. `DEBUG_BUNDLE_SUFFIX` is passed to hvigor as a build property;
+keep `AppScope/app.json5` stable unless your DevEco Studio setup explicitly
+supports per-worktree bundle rewriting.
+
 ## Standard Commands
 
 ```bash

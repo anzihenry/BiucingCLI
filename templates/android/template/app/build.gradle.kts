@@ -55,6 +55,11 @@ val hasCompleteReleaseSigning =
         releaseKeyAlias,
         releaseKeyPassword,
     ).all { !it.isNullOrBlank() }
+val debugApplicationIdSuffix =
+    providers.gradleProperty("biucing.worktree.applicationIdSuffix")
+        .orElse(providers.environmentVariable("BIUCING_ANDROID_APPLICATION_ID_SUFFIX"))
+        .orElse(".debug")
+        .get()
 
 android {
     namespace = "{{ANDROID_NAMESPACE}}"
@@ -75,7 +80,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
+            applicationIdSuffix = debugApplicationIdSuffix
             versionNameSuffix = "-debug"
         }
 

@@ -6,11 +6,12 @@ warnings=0
 platform="{{APPLE_PLATFORM}}"
 platform_name="{{APPLE_PLATFORM_NAME}}"
 repo_root="$(pwd)"
-tuist_home="${repo_root}/.cache/tuist/home"
-tuist_xdg_cache="${repo_root}/.cache/tuist/xdg-cache"
-tuist_xdg_state="${repo_root}/.cache/tuist/xdg-state"
-tuist_xdg_config="${repo_root}/.cache/tuist/xdg-config"
-tuist_tmp="${repo_root}/.cache/tuist/tmp"
+worktree_id="${WORKTREE_ID:-$(basename "$repo_root" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$//')}"
+tuist_home="${TUIST_HOME:-${repo_root}/.cache/tuist/${worktree_id}/home}"
+tuist_xdg_cache="${TUIST_XDG_CACHE_HOME:-${repo_root}/.cache/tuist/${worktree_id}/xdg-cache}"
+tuist_xdg_state="${TUIST_XDG_STATE_HOME:-${repo_root}/.cache/tuist/${worktree_id}/xdg-state}"
+tuist_xdg_config="${TUIST_XDG_CONFIG_HOME:-${repo_root}/.cache/tuist/${worktree_id}/xdg-config}"
+tuist_tmp="${TUIST_TMPDIR:-${repo_root}/.cache/tuist/${worktree_id}/tmp}"
 
 pass() {
   echo "[pass] $1"

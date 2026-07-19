@@ -1,6 +1,18 @@
 SHELL := /bin/zsh
 
-.PHONY: bootstrap doctor wrapper clean build test test-ui lint format install-debug beta release
+WORKTREE_ROOT := $(shell pwd)
+WORKTREE_ID ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
+WORKTREE_SLUG ?= {{PROJECT_NAME}}-$(WORKTREE_ID)
+GRADLE_USER_HOME ?= $(WORKTREE_ROOT)/.gradle/worktree/$(WORKTREE_ID)
+GRADLE_PROJECT_CACHE ?= $(WORKTREE_ROOT)/.gradle
+ANDROID_LOCAL_PROPERTIES ?= $(WORKTREE_ROOT)/local.properties
+DEBUG_APPLICATION_ID_SUFFIX ?= .debug.$(WORKTREE_ID)
+EFFECTIVE_DEBUG_APPLICATION_ID ?= {{APPLICATION_ID}}$(DEBUG_APPLICATION_ID_SUFFIX)
+GRADLE := GRADLE_USER_HOME=$(GRADLE_USER_HOME) ./gradlew -Dorg.gradle.project.biucing.worktree.applicationIdSuffix=$(DEBUG_APPLICATION_ID_SUFFIX)
+
+export GRADLE_USER_HOME
+
+.PHONY: bootstrap doctor wrapper clean build test test-ui lint format install-debug beta release worktree-info worktree-doctor clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
@@ -12,28 +24,49 @@ wrapper:
 	./scripts/sync-gradle-wrapper
 
 clean:
-	./gradlew clean
+	$(GRADLE) clean
 
 build:
-	./gradlew assembleDebug
+	$(GRADLE) assembleDebug
 
 test:
-	./gradlew test
+	$(GRADLE) test
 
 test-ui:
-	./gradlew connectedDebugAndroidTest
+	$(GRADLE) connectedDebugAndroidTest
 
 lint:
-	./gradlew lint
+	$(GRADLE) lint
 
 format:
-	./gradlew spotlessApply
+	$(GRADLE) spotlessApply
 
 install-debug:
-	./gradlew installDebug
+	$(GRADLE) installDebug
 
 beta:
 	fastlane beta
 
 release:
 	fastlane release
+
+worktree-info:
+	@printf '%s\n' "Project: {{PROJECT_NAME}}"
+	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
+	@printf '%s\n' "WORKTREE_ID: $(WORKTREE_ID)"
+	@printf '%s\n' "WORKTREE_SLUG: $(WORKTREE_SLUG)"
+	@printf '%s\n' "Gradle user home: $(GRADLE_USER_HOME)"
+	@printf '%s\n' "Gradle project cache: $(GRADLE_PROJECT_CACHE)"
+	@printf '%s\n' "local.properties: $(ANDROID_LOCAL_PROPERTIES)"
+	@printf '%s\n' "Debug application ID suffix: $(DEBUG_APPLICATION_ID_SUFFIX)"
+	@printf '%s\n' "Debug application ID: $(EFFECTIVE_DEBUG_APPLICATION_ID)"
+
+worktree-doctor:
+	@printf '%s\n' "Checking Android worktree isolation..."
+	@test -n "$(WORKTREE_ID)" || (printf '%s\n' "WORKTREE_ID is empty" && exit 1)
+	@case "$(GRADLE_USER_HOME)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "Gradle user home should stay inside this worktree: $(GRADLE_USER_HOME)"; exit 1;; esac
+	@if [ -f "$(ANDROID_LOCAL_PROPERTIES)" ]; then printf '%s\n' "local.properties is local to this worktree and must remain untracked."; else printf '%s\n' "local.properties is absent; run make bootstrap or configure Android SDK paths if needed."; fi
+	@printf '%s\n' "Android worktree isolation looks ready."
+
+clean-worktree:
+	rm -rf "$(GRADLE_USER_HOME)" app/build core/*/build feature/*/build build

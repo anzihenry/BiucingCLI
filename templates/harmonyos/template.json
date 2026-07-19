@@ -23,7 +23,7 @@
   ],
   "workflow_labels": ["bootstrap", "doctor", "lint", "build", "release", "open"],
   "worktree": {
-    "support_level": "planned",
+    "support_level": "worktree-ready",
     "isolation_dimensions": [
       "caches",
       "generated-output",

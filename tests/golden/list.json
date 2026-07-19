@@ -33,7 +33,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "caches",
           "generated-output",
@@ -201,7 +201,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "caches",
           "generated-output",
@@ -429,7 +429,7 @@
         ]
       },
       "worktree": {
-        "support_level": "planned",
+        "support_level": "worktree-ready",
         "isolation_dimensions": [
           "caches",
           "generated-output",

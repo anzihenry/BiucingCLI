@@ -36,6 +36,24 @@ make lint
 make test
 ```
 
+## Worktree Workflow
+
+Each worktree derives a local identity from its directory name. Override `WORKTREE_ID`
+when you want a shorter or stable value across renamed folders:
+
+```bash
+WORKTREE_ID=feature-a make worktree-info
+WORKTREE_ID=feature-a make generate
+WORKTREE_ID=feature-a make test
+WORKTREE_ID=feature-a make clean-worktree
+```
+
+`make worktree-info` prints the isolated DerivedData, SwiftPM, Tuist, SwiftLint,
+SwiftFormat, and debug bundle identifier values. `make worktree-doctor` checks
+that cache paths stay under this worktree. Debug builds use
+`DEBUG_BUNDLE_SUFFIX` by default so two worktrees can install side by side in
+Simulator; set `DEBUG_BUNDLE_SUFFIX=` to keep the generated bundle identifier.
+
 ## Standard Commands
 
 ```bash

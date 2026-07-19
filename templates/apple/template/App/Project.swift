@@ -1,6 +1,8 @@
+import Foundation
 import ProjectDescription
 
 let appName = "{{SWIFT_MODULE_NAME}}"
+let debugBundleSuffix = ProcessInfo.processInfo.environment["DEBUG_BUNDLE_SUFFIX"] ?? ""
 
 let project = Project(
     name: appName,
@@ -20,7 +22,7 @@ let project = Project(
             name: appName,
             destinations: {{TUIST_DESTINATIONS}},
             product: .app,
-            bundleId: "{{BUNDLE_IDENTIFIER}}",
+            bundleId: "{{BUNDLE_IDENTIFIER}}\(debugBundleSuffix)",
             deploymentTargets: {{TUIST_DEPLOYMENT_TARGETS}},
             infoPlist: .extendingDefault(
                 with: [
@@ -39,7 +41,7 @@ let project = Project(
             name: "\(appName)Tests",
             destinations: {{TUIST_DESTINATIONS}},
             product: .unitTests,
-            bundleId: "{{BUNDLE_IDENTIFIER}}.tests",
+            bundleId: "{{BUNDLE_IDENTIFIER}}\(debugBundleSuffix).tests",
             infoPlist: .default,
             sources: ["Targets/AppTests/Sources/**"],
             dependencies: [

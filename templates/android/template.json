@@ -23,7 +23,7 @@
   ],
   "workflow_labels": ["bootstrap", "doctor", "format", "build", "test", "ui-test", "open"],
   "worktree": {
-    "support_level": "planned",
+    "support_level": "worktree-ready",
     "isolation_dimensions": [
       "caches",
       "generated-output",

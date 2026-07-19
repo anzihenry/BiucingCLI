@@ -39,6 +39,24 @@ make build
 make test
 ```
 
+## Worktree Workflow
+
+Each worktree derives a local identity from its directory name. Override `WORKTREE_ID`
+when you want a shorter or stable value across renamed folders:
+
+```bash
+WORKTREE_ID=feature-a make worktree-info
+WORKTREE_ID=feature-a make build
+WORKTREE_ID=feature-a make install-debug
+WORKTREE_ID=feature-a make clean-worktree
+```
+
+`make worktree-info` prints the isolated Gradle user home, project cache,
+`local.properties`, and debug application ID. Debug builds receive
+`DEBUG_APPLICATION_ID_SUFFIX` through Gradle, so parallel worktrees can install
+side by side on the same emulator or device. Set `DEBUG_APPLICATION_ID_SUFFIX=.debug`
+to keep the classic single debug package name.
+
 If the team later upgrades Gradle and needs to refresh the wrapper files, run:
 
 ```bash
