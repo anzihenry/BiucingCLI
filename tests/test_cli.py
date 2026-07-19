@@ -55,6 +55,16 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Template: web-service", output)
         self.assertIn("Workflow labels: bootstrap, dev, verify, build, runtime", output)
         self.assertIn("Verification tier: real-build", output)
+        self.assertIn("Worktree support: planned", output)
+        self.assertIn(
+            "Worktree isolation: runtime-names, ports, caches, "
+            "generated-output, cleanup, diagnostics",
+            output,
+        )
+        self.assertIn("Worktree diagnostics:", output)
+        self.assertIn("- make worktree-info", output)
+        self.assertIn("Worktree cleanup:", output)
+        self.assertIn("- make clean-worktree", output)
         self.assertIn("Operating assumptions:", output)
         self.assertIn(
             "- The starter is optimized for Go service development with Docker-based dev and runtime flows.",
@@ -107,6 +117,10 @@ class CLITestCase(unittest.TestCase):
             web_service["workflow_labels"],
             ["bootstrap", "dev", "verify", "build", "runtime"],
         )
+        self.assertEqual(web_service["worktree"]["support_level"], "planned")
+        self.assertIn("runtime-names", web_service["worktree"]["isolation_dimensions"])
+        self.assertIn("make worktree-info", web_service["worktree"]["diagnostics"])
+        self.assertIn("make clean-worktree", web_service["worktree"]["cleanup"])
         self.assertTrue(web_service["operating_assumptions"])
 
     def test_info_json_prints_machine_readable_template_detail(self):
@@ -119,6 +133,13 @@ class CLITestCase(unittest.TestCase):
             payload["workflow_labels"],
             ["bootstrap", "dev", "verify", "build", "runtime"],
         )
+        self.assertEqual(payload["worktree"]["support_level"], "planned")
+        self.assertIn("ports", payload["worktree"]["isolation_dimensions"])
+        self.assertEqual(
+            payload["worktree"]["diagnostics"],
+            ["make worktree-info", "make worktree-doctor"],
+        )
+        self.assertEqual(payload["worktree"]["cleanup"], ["make clean-worktree"])
         self.assertIn("Go service development", payload["operating_assumptions"][0])
 
     def test_validate_passes_for_repo_templates(self):
@@ -160,6 +181,12 @@ class CLITestCase(unittest.TestCase):
                         },
                         "operating_assumptions": ["Synthetic test assumption."],
                         "workflow_labels": ["bootstrap", "wrong-label"],
+                        "worktree": {
+                            "support_level": "wrong-level",
+                            "isolation_dimensions": ["wrong-dimension"],
+                            "diagnostics": ["make worktree-info"],
+                            "cleanup": ["make clean-worktree"],
+                        },
                         "variables": [
                             {"name": "project_name", "required": True},
                         ],
@@ -189,6 +216,14 @@ class CLITestCase(unittest.TestCase):
             )
             self.assertIn(
                 "broken-service: workflow_labels contain unsupported values: wrong-label",
+                joined,
+            )
+            self.assertIn(
+                "broken-service: worktree.support_level must be one of: partial, planned, worktree-ready",
+                joined,
+            )
+            self.assertIn(
+                "broken-service: worktree.isolation_dimensions contain unsupported values: wrong-dimension",
                 joined,
             )
             self.assertIn(

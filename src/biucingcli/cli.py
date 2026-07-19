@@ -449,11 +449,19 @@ def format_template_info(template_name: str) -> str:
         f"Maturity: {definition.maturity.level} - {definition.maturity.summary}",
         f"Validation: {definition.validation.status}",
         f"Verification tier: {definition.validation.verification_tier}",
+        f"Worktree support: {definition.worktree.support_level}",
+        f"Worktree isolation: {', '.join(definition.worktree.isolation_dimensions)}",
         f"Stack: {', '.join(definition.stack)}",
         "Operating assumptions:",
     ]
     for assumption in definition.operating_assumptions:
         lines.append(f"- {assumption}")
+    lines.append("Worktree diagnostics:")
+    for diagnostic in definition.worktree.diagnostics:
+        lines.append(f"- {diagnostic}")
+    lines.append("Worktree cleanup:")
+    for cleanup in definition.worktree.cleanup:
+        lines.append(f"- {cleanup}")
     lines.append("Variables:")
     for variable in definition.variables:
         required = "required" if variable.required else "optional"

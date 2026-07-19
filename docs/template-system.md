@@ -32,6 +32,7 @@ Each template should contain a `template.json` file with:
 - platforms;
 - maturity;
 - validation;
+- worktree support;
 - operating assumptions;
 - workflow labels;
 - variable definitions;
@@ -57,6 +58,24 @@ Suggested shape:
     "evidence": [
       "python unittest template rendering coverage",
       "real docker runtime image builds"
+    ]
+  },
+  "worktree": {
+    "support_level": "planned",
+    "isolation_dimensions": [
+      "runtime-names",
+      "ports",
+      "caches",
+      "generated-output",
+      "cleanup",
+      "diagnostics"
+    ],
+    "diagnostics": [
+      "make worktree-info",
+      "make worktree-doctor"
+    ],
+    "cleanup": [
+      "make clean-worktree"
     ]
   },
   "operating_assumptions": [
@@ -86,6 +105,7 @@ At minimum, every template should define:
 - `stack`, `tags`, `platforms`
 - `maturity`
 - `validation.status`, `validation.verification_tier`, `validation.evidence`
+- `worktree.support_level`, `worktree.isolation_dimensions`, `worktree.diagnostics`, `worktree.cleanup`
 - `operating_assumptions`
 - `workflow_labels`
 - `variables`
@@ -99,6 +119,37 @@ Current supported values:
 
 - `generated-project`
 - `real-build`
+
+### Worktree Support
+
+`worktree` metadata describes whether a generated starter participates in the `0.6.0` worktree-first contract.
+
+Current supported `support_level` values:
+
+- `planned`: the starter has declared worktree support as part of the `0.6.0` rollout, but implementation has not landed yet
+- `partial`: some isolation behavior is implemented, but known gaps remain
+- `worktree-ready`: the starter meets the worktree isolation contract
+
+Current supported `isolation_dimensions` values:
+
+- `runtime-names`
+- `ports`
+- `dependency-stores`
+- `caches`
+- `generated-output`
+- `local-config`
+- `installed-app-identity`
+- `cleanup`
+- `diagnostics`
+
+`diagnostics` and `cleanup` should list generated-project commands rather than prose.
+The default `0.6.0` command vocabulary is:
+
+- `make worktree-info`
+- `make worktree-doctor`
+- `make clean-worktree`
+
+See [worktree-isolation-contract.md](worktree-isolation-contract.md) for the full contract.
 
 ### Workflow Labels
 
@@ -169,6 +220,7 @@ Repo-level validation should keep using the same source of truth as rendering.
 It currently checks:
 
 - metadata completeness;
+- worktree metadata shape and supported values;
 - variable-to-placeholder mapping support;
 - placeholder legality inside template files and `next_steps`;
 - template folder naming consistency;

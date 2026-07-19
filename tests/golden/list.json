@@ -32,6 +32,24 @@
           "real generated project gradle build validation"
         ]
       },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "caches",
+          "generated-output",
+          "local-config",
+          "installed-app-identity",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
+        ]
+      },
       "operating_assumptions": [
         "The starter assumes a native Android workstation flow with Gradle, emulator, and release-signing guidance.",
         "Generated projects should expose bootstrap, doctor, format, build, test, and UI smoke workflows."
@@ -182,6 +200,24 @@
           "real generated project make generate/build/test validation"
         ]
       },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "caches",
+          "generated-output",
+          "local-config",
+          "installed-app-identity",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
+        ]
+      },
       "operating_assumptions": [
         "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
         "Generated projects should keep bootstrap, doctor, generate, lint, and test workflows explicit."
@@ -298,6 +334,24 @@
           "real docker development image builds"
         ]
       },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "runtime-names",
+          "ports",
+          "caches",
+          "generated-output",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
+        ]
+      },
       "operating_assumptions": [
         "Local development is expected to run through Docker-first workflows.",
         "Browser smoke coverage and runtime packaging are part of the starter contract."
@@ -374,6 +428,24 @@
           "repo-level template metadata and placeholder validation"
         ]
       },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "caches",
+          "generated-output",
+          "local-config",
+          "installed-app-identity",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
+        ]
+      },
       "operating_assumptions": [
         "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
         "Generated projects are structured for an ArkTS Stage model app with one entry module."
@@ -381,8 +453,9 @@
       "workflow_labels": [
         "bootstrap",
         "doctor",
+        "lint",
         "build",
-        "test",
+        "release",
         "open"
       ],
       "variables": [
@@ -467,8 +540,8 @@
       "next_steps": [
         "make bootstrap",
         "make doctor",
+        "make lint",
         "make build",
-        "make test",
         "open -a \"DevEco Studio\" ."
       ]
     },
@@ -506,6 +579,25 @@
           "python unittest template rendering coverage",
           "real docker runtime image builds",
           "real docker development image builds"
+        ]
+      },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "runtime-names",
+          "ports",
+          "dependency-stores",
+          "caches",
+          "generated-output",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
         ]
       },
       "operating_assumptions": [
@@ -616,6 +708,24 @@
           "real docker development image builds"
         ]
       },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "runtime-names",
+          "ports",
+          "caches",
+          "generated-output",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
+        ]
+      },
       "operating_assumptions": [
         "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
         "Generated projects are expected to keep config, build, and verification workflows repo-local."
@@ -693,6 +803,23 @@
         "evidence": [
           "python unittest template rendering coverage",
           "real generated project go test validation"
+        ]
+      },
+      "worktree": {
+        "support_level": "planned",
+        "isolation_dimensions": [
+          "runtime-names",
+          "caches",
+          "generated-output",
+          "cleanup",
+          "diagnostics"
+        ],
+        "diagnostics": [
+          "make worktree-info",
+          "make worktree-doctor"
+        ],
+        "cleanup": [
+          "make clean-worktree"
         ]
       },
       "operating_assumptions": [

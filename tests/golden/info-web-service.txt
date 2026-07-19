@@ -3,9 +3,21 @@ Description: Go + Gin web service starter
 Category: backend
 Platforms: linux, container
 Tags: api, docker, go, service
+Workflow labels: bootstrap, dev, verify, build, runtime
 Maturity: validated - Dockerized web service starter with live-reload, lint, test, and runtime image workflows.
 Validation: real-build-verified
+Verification tier: real-build
+Worktree support: planned
+Worktree isolation: runtime-names, ports, caches, generated-output, cleanup, diagnostics
 Stack: Go, Gin
+Operating assumptions:
+- The starter is optimized for Go service development with Docker-based dev and runtime flows.
+- Generated projects are expected to keep config, build, and verification workflows repo-local.
+Worktree diagnostics:
+- make worktree-info
+- make worktree-doctor
+Worktree cleanup:
+- make clean-worktree
 Variables:
 - project_name (required)
 - module_name (required)

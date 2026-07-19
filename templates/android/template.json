@@ -22,6 +22,24 @@
     "Generated projects should expose bootstrap, doctor, format, build, test, and UI smoke workflows."
   ],
   "workflow_labels": ["bootstrap", "doctor", "format", "build", "test", "ui-test", "open"],
+  "worktree": {
+    "support_level": "planned",
+    "isolation_dimensions": [
+      "caches",
+      "generated-output",
+      "local-config",
+      "installed-app-identity",
+      "cleanup",
+      "diagnostics"
+    ],
+    "diagnostics": [
+      "make worktree-info",
+      "make worktree-doctor"
+    ],
+    "cleanup": [
+      "make clean-worktree"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",

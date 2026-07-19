@@ -8,6 +8,7 @@ import stat
 import shutil
 from dataclasses import asdict
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 
 
@@ -65,6 +66,20 @@ class TemplateValidation:
 
 
 @dataclass(frozen=True)
+class TemplateWorktree:
+    """Worktree isolation metadata for a template."""
+
+    support_level: str = ""
+    isolation_dimensions: list[str] = field(default_factory=list)
+    diagnostics: list[str] = field(default_factory=list)
+    cleanup: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-serializable representation."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class TemplateDefinition:
     """Template metadata and file locations."""
 
@@ -76,6 +91,7 @@ class TemplateDefinition:
     platforms: list[str]
     maturity: TemplateMaturity
     validation: TemplateValidation
+    worktree: TemplateWorktree
     operating_assumptions: list[str]
     workflow_labels: list[str]
     variables: list[TemplateVariable]
@@ -93,6 +109,7 @@ class TemplateDefinition:
             "platforms": self.platforms,
             "maturity": self.maturity.to_dict(),
             "validation": self.validation.to_dict(),
+            "worktree": self.worktree.to_dict(),
             "operating_assumptions": self.operating_assumptions,
             "workflow_labels": self.workflow_labels,
             "variables": [variable.to_dict() for variable in self.variables],
@@ -137,6 +154,22 @@ ALLOWED_WORKFLOW_LABELS = {
     "open",
     "lint",
 }
+ALLOWED_WORKTREE_SUPPORT_LEVELS = {
+    "planned",
+    "partial",
+    "worktree-ready",
+}
+ALLOWED_WORKTREE_ISOLATION_DIMENSIONS = {
+    "runtime-names",
+    "ports",
+    "dependency-stores",
+    "caches",
+    "generated-output",
+    "local-config",
+    "installed-app-identity",
+    "cleanup",
+    "diagnostics",
+}
 
 
 def project_root() -> Path:
@@ -161,6 +194,7 @@ def load_template(name: str) -> TemplateDefinition:
     variables = [TemplateVariable(**variable) for variable in data["variables"]]
     maturity = TemplateMaturity(**data["maturity"])
     validation = TemplateValidation(**data["validation"])
+    worktree = TemplateWorktree(**data.get("worktree", {}))
     return TemplateDefinition(
         name=data["name"],
         description=data["description"],
@@ -170,6 +204,7 @@ def load_template(name: str) -> TemplateDefinition:
         platforms=data["platforms"],
         maturity=maturity,
         validation=validation,
+        worktree=worktree,
         operating_assumptions=data["operating_assumptions"],
         workflow_labels=data["workflow_labels"],
         variables=variables,
@@ -233,6 +268,45 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
 
     if not definition.validation.evidence:
         errors.append(f"{definition.name}: validation.evidence must contain at least one entry")
+
+    if definition.worktree.support_level not in ALLOWED_WORKTREE_SUPPORT_LEVELS:
+        allowed_levels = ", ".join(sorted(ALLOWED_WORKTREE_SUPPORT_LEVELS))
+        errors.append(
+            f"{definition.name}: worktree.support_level must be one of: {allowed_levels}"
+        )
+
+    if not definition.worktree.isolation_dimensions:
+        errors.append(
+            f"{definition.name}: worktree.isolation_dimensions must contain at least one entry"
+        )
+    if not definition.worktree.diagnostics:
+        errors.append(f"{definition.name}: worktree.diagnostics must contain at least one entry")
+    if not definition.worktree.cleanup:
+        errors.append(f"{definition.name}: worktree.cleanup must contain at least one entry")
+
+    invalid_worktree_dimensions = sorted(
+        dimension
+        for dimension in definition.worktree.isolation_dimensions
+        if dimension not in ALLOWED_WORKTREE_ISOLATION_DIMENSIONS
+    )
+    if invalid_worktree_dimensions:
+        allowed_dimensions = ", ".join(sorted(ALLOWED_WORKTREE_ISOLATION_DIMENSIONS))
+        invalid_dimensions = ", ".join(invalid_worktree_dimensions)
+        errors.append(
+            f"{definition.name}: worktree.isolation_dimensions contain unsupported values: "
+            f"{invalid_dimensions}; expected one of: {allowed_dimensions}"
+        )
+
+    if len(definition.worktree.isolation_dimensions) != len(
+        set(definition.worktree.isolation_dimensions)
+    ):
+        errors.append(
+            f"{definition.name}: worktree.isolation_dimensions must not contain duplicates"
+        )
+    if len(definition.worktree.diagnostics) != len(set(definition.worktree.diagnostics)):
+        errors.append(f"{definition.name}: worktree.diagnostics must not contain duplicates")
+    if len(definition.worktree.cleanup) != len(set(definition.worktree.cleanup)):
+        errors.append(f"{definition.name}: worktree.cleanup must not contain duplicates")
 
     invalid_workflow_labels = sorted(
         label for label in definition.workflow_labels if label not in ALLOWED_WORKFLOW_LABELS

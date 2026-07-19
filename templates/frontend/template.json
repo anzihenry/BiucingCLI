@@ -23,6 +23,24 @@
     "Browser smoke coverage and runtime packaging are part of the starter contract."
   ],
   "workflow_labels": ["bootstrap", "dev", "test", "build", "runtime"],
+  "worktree": {
+    "support_level": "planned",
+    "isolation_dimensions": [
+      "runtime-names",
+      "ports",
+      "caches",
+      "generated-output",
+      "cleanup",
+      "diagnostics"
+    ],
+    "diagnostics": [
+      "make worktree-info",
+      "make worktree-doctor"
+    ],
+    "cleanup": [
+      "make clean-worktree"
+    ]
+  },
   "variables": [
     {
       "name": "project_name",
