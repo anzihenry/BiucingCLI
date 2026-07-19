@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 - Unreleased
+## 0.6.0 - 2026-07-19
 
 - added a shared worktree isolation contract and release evidence path across all seven starters.
 - exposed template worktree support through `biucing list`, `biucing info`, JSON output, and `biucing validate`.
