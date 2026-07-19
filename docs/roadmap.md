@@ -82,6 +82,15 @@ Planning anchors:
 
 - [0.6.1 Plan](0.6.1-plan.md)
 - [0.6.1 Worktree Hardening Task Breakdown](0.6.1-worktree-hardening-tasks.md)
+- [0.6.1 Release Prep](0.6.1-release-prep.md)
+
+Implementation status:
+
+- Phase A through Phase G are complete;
+- all seven templates use one worktree identity model;
+- Docker-first templates expose port conflict advice and Compose config diagnostics;
+- native evidence is split into `static`, `doctor`, and `real-build` tiers;
+- HarmonyOS debug bundle rewriting is explicitly deferred behind a read-only diagnostic boundary.
 
 ## Deferred
 

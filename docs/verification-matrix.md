@@ -38,7 +38,7 @@ These checks apply to every release regardless of which template changed.
 
 ## Worktree Isolation Matrix
 
-These checks are the release bar for the `0.6.0` worktree-first claim.
+These checks are the release bar for the `0.6.0` worktree-first claim and the `0.6.1` worktree hardening follow-up.
 
 | Template family | Required proof | Release bar |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ Use a fresh output directory for these examples so the output is easy to reprodu
 Real-build proof is required when the release changes native project structure, generated manifests, package identity, signing inputs, build settings, generated platform dependency files, or native build/test targets.
 It is optional, but valuable, for docs-only, CLI metadata-only, or worktree diagnostic wording changes that do not alter generated native build behavior.
 
-Suggested fresh worktree proof for `0.6.0`:
+Suggested fresh worktree proof for `0.6.1`:
 
 | Template | Worktree proof |
 | --- | --- |
@@ -139,4 +139,4 @@ The current repo-level automated baseline includes:
 - If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
 - For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
-- For a concrete version-prep walkthrough, use [0.6.0-release-prep.md](0.6.0-release-prep.md).
+- For the latest concrete version-prep walkthrough, use [0.6.1-release-prep.md](0.6.1-release-prep.md).

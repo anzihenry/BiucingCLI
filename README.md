@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.6.0`.
+The current repository release target is `0.6.1`.
 
 ```bash
 biucing --version
@@ -93,7 +93,9 @@ Worktree-first status:
 - all seven templates now declare `worktree-ready` support metadata;
 - generated projects expose `make worktree-info`, `make worktree-doctor`, and `make clean-worktree`;
 - Docker-first starters isolate Compose project names, volumes, image tags, published host ports, dependency stores, and caches;
-- native starters isolate build caches, local signing/config files, generated output, and debug install identity hooks where the platform supports them.
+- Docker-first starters now expose port conflict advice and `make worktree-compose-config` for non-invasive Compose diagnostics;
+- native starters isolate build caches, local signing/config files, generated output, and debug install identity hooks where the platform supports them;
+- native release evidence is now labeled as `static`, `doctor`, or `real-build` so worktree claims do not overstate SDK-backed coverage.
 
 Local Android validation status:
 
@@ -125,6 +127,7 @@ Local HarmonyOS validation status:
 - [0.6.0 Release Prep](docs/0.6.0-release-prep.md)
 - [0.6.1 Plan](docs/0.6.1-plan.md)
 - [0.6.1 Worktree Hardening Task Breakdown](docs/0.6.1-worktree-hardening-tasks.md)
+- [0.6.1 Release Prep](docs/0.6.1-release-prep.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

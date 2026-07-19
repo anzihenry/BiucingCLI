@@ -23,12 +23,15 @@ Use this map before every version bump so the release does not update only part 
 | CLI version expectation | `tests/test_cli.py` | Expected `biucing --version` output |
 | Release operations docs | `docs/release-checklist.md`, `docs/verification-matrix.md` | Update if the verification bar or release flow changed |
 
-For `0.6.0`, also review:
+For `0.6.1`, also review:
 
 - `docs/0.6.0-plan.md`
 - `docs/0.6.0-worktree-tasks.md`
 - `docs/worktree-isolation-contract.md`
 - `docs/0.6.0-release-prep.md`
+- `docs/0.6.1-plan.md`
+- `docs/0.6.1-worktree-hardening-tasks.md`
+- `docs/0.6.1-release-prep.md`
 - `README.md` links under `Design Docs`
 
 ## 1. Scope The Release
@@ -181,7 +184,7 @@ Release bar:
 - native worktree evidence is labeled as `static`, `doctor`, or `real-build` using [verification-matrix.md](verification-matrix.md).
 - HarmonyOS evidence includes `make worktree-debug-identity` and treats per-worktree bundle rewriting as deferred unless a configured DevEco/hvigor workstation has verified the metadata hook.
 
-Use [0.6.0-release-prep.md](0.6.0-release-prep.md) for a concrete evidence run.
+Use [0.6.1-release-prep.md](0.6.1-release-prep.md) for the latest concrete evidence run.
 
 ## 7. Review Docs And Messaging
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1 - 2026-07-20
+
+- unified worktree identity across all seven starters with `WORKTREE_LABEL`, hash-based `WORKTREE_ID`, and `WORKTREE_SLUG`.
+- added Docker-first port conflict advice and generated `make worktree-compose-config` diagnostics.
+- strengthened native worktree verification docs with explicit `static`, `doctor`, and `real-build` evidence tiers.
+- clarified HarmonyOS debug identity behavior with a read-only diagnostic target and deferred bundle rewriting boundary.
+- added 0.6.1 release-prep evidence covering all seven generated templates.
+
 ## 0.6.0 - 2026-07-19
 
 - added a shared worktree isolation contract and release evidence path across all seven starters.
