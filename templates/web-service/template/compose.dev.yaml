@@ -11,14 +11,17 @@ services:
     environment:
       CONFIG_FILE: /workspace/configs/config.yaml
       GOCACHE: /workspace/.cache/go-build
+      GOMODCACHE: /workspace/.cache/go-mod
       GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
     ports:
       - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
     volumes:
       - .:/workspace
       - web-service-go-build:/workspace/.cache/go-build
+      - web-service-go-mod:/workspace/.cache/go-mod
       - web-service-golangci-lint:/workspace/.cache/golangci-lint
 
 volumes:
   web-service-go-build:
+  web-service-go-mod:
   web-service-golangci-lint:

@@ -23,6 +23,7 @@ COMPOSE_FILE ?=deploy/compose.yaml
 GOPROXY ?=https://proxy.golang.org,direct
 GOSUMDB ?=sum.golang.org
 GOCACHE ?= $(CURDIR)/.cache/go-build
+GOMODCACHE ?= $(CURDIR)/.cache/go-mod
 GOLANGCI_LINT_CACHE ?= $(CURDIR)/.cache/golangci-lint
 export COMPOSE_PROJECT_NAME
 export IMAGE
@@ -35,6 +36,7 @@ export HOST_DEPENDENCY_STORE_PORT
 export HOST_OTEL_GRPC_PORT
 export HOST_OTEL_HTTP_PORT
 export GOCACHE
+export GOMODCACHE
 export GOLANGCI_LINT_CACHE
 
 ifeq ($(DOCKER_VARIANT),ubuntu)
@@ -60,10 +62,14 @@ worktree-info:
 	@printf '%s\n' "OTel HTTP host port: $(HOST_OTEL_HTTP_PORT)"
 	@printf '%s\n' "Image ref: $(IMAGE_REF)"
 	@printf '%s\n' "Go cache: $(GOCACHE)"
+	@printf '%s\n' "Go module cache: $(GOMODCACHE)"
 	@printf '%s\n' "golangci-lint cache: $(GOLANGCI_LINT_CACHE)"
 
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
+	@case "$(GOCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOCACHE should stay inside this worktree: $(GOCACHE)"; exit 1;; esac
+	@case "$(GOMODCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOMODCACHE should stay inside this worktree: $(GOMODCACHE)"; exit 1;; esac
+	@case "$(GOLANGCI_LINT_CACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOLANGCI_LINT_CACHE should stay inside this worktree: $(GOLANGCI_LINT_CACHE)"; exit 1;; esac
 	@if [ "$(HOST_HTTP_PORT)" = "{{HTTP_PORT}}" ]; then printf '%s\n' "Warning: HOST_HTTP_PORT uses the generated default {{HTTP_PORT}}; override it when another worktree is running."; fi
 	@if [ "$(HOST_GRPC_PORT)" = "{{GRPC_PORT}}" ]; then printf '%s\n' "Warning: HOST_GRPC_PORT uses the generated default {{GRPC_PORT}}; override it when another worktree is running."; fi
 	@if [ "$(HOST_DEPENDENCY_STORE_PORT)" = "{{DEPENDENCY_STORE_PORT}}" ]; then printf '%s\n' "Warning: HOST_DEPENDENCY_STORE_PORT uses {{DEPENDENCY_STORE_PORT}}; override it when another dependency store is running."; fi

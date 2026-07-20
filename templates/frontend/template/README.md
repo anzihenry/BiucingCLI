@@ -74,6 +74,7 @@ make clean-worktree
 - `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
 - `COMPOSE_PROJECT_NAME` defaults to `{{PACKAGE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, and volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `.npmrc` keeps direct `pnpm install` package-store state under `.pnpm-store` inside this worktree.
 - `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
 - `make worktree-compose-config` renders the current worktree's Compose config without starting containers.
 - `make clean-worktree` removes only the current worktree's Compose containers, networks, and volumes.
@@ -119,7 +120,8 @@ pnpm format:check
 - This starter standardizes on `pnpm` via Corepack.
 - The generated `package.json` declares the expected `pnpm` and Node.js versions.
 - `make install` is still available when you intentionally refresh dependencies after editing `package.json`.
-- Compose-scoped pnpm and Playwright cache volumes persist downloads across container runs without sharing state across worktrees.
+- Compose-scoped `node_modules`, pnpm, and Playwright cache volumes persist downloads across container runs without sharing state across worktrees.
+- Direct pnpm usage reads `.npmrc`, so package-store state stays in `.pnpm-store` under the current worktree.
 
 ## Browser Smoke Check
 

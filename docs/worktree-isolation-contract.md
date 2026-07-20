@@ -14,6 +14,7 @@ At minimum, a developer should be able to:
 - run one worktree in dev mode;
 - run tests in another worktree;
 - build or package from a third worktree;
+- resolve and install dependencies in one worktree without changing another worktree's dependency cache or install state;
 - use local-only signing or environment files without sharing them through Git;
 - clean runtime state for one worktree without damaging another.
 
@@ -68,6 +69,7 @@ The output should include relevant values from this list:
 - image tag;
 - host ports;
 - cache paths;
+- dependency install and module cache paths;
 - build output paths;
 - native app identifier or identifier suffix;
 - local-only config files.
@@ -117,7 +119,7 @@ Every template should declare and implement the dimensions that apply to it.
 | runtime names | Docker and native templates | containers, Compose projects, images, and installed app identities should not collide by default |
 | ports | long-running services | host ports must be overridable and visible through diagnostics |
 | dependency stores | service templates | local databases, Redis, OTel, and similar services should be isolated by Compose project, network, and volume |
-| caches | all templates | caches should be project-local or worktree-local when shared state can corrupt, slow, or confuse workflows |
+| caches | all templates | caches and dependency install state should be project-local or worktree-local when shared state can corrupt, slow, or confuse workflows |
 | generated outputs | all templates | build artifacts and generated files should stay under the worktree root unless the platform requires otherwise |
 | local config | all templates | `.env.local`, `local.properties`, signing material, and other machine-local files must stay git-ignored |
 | installed app identity | native templates | debug builds should support a worktree-specific identity when parallel install matters |
@@ -141,6 +143,7 @@ Required behavior:
 - expose every published host port as a Make variable;
 - document how to override ports for parallel worktrees;
 - keep dependency stores inside the worktree-specific Compose project;
+- keep language package caches and installed dependency directories scoped to the current Compose project or worktree;
 - make `clean-worktree` run `docker compose down --remove-orphans --volumes` for the current project only.
 
 Recommended naming:
@@ -178,8 +181,8 @@ Platform-specific focus:
 | Template | Required Focus |
 | --- | --- |
 | `apple` | Xcode DerivedData, SwiftPM build output, Tuist cache/output, bundle identifier suffix for debug installs |
-| `android` | Gradle user home/build cache, debug `applicationIdSuffix`, `local.properties`, emulator install behavior |
-| `harmonyos` | `.hvigor`, `oh_modules`, build output, local signing properties, bundle-name suffix only if DevEco/hvigor supports it cleanly |
+| `android` | Gradle user home/build cache and dependency metadata, debug `applicationIdSuffix`, `local.properties`, emulator install behavior |
+| `harmonyos` | `.hvigor`, ohpm home, `oh_modules`, build output, local signing properties, bundle-name suffix only if DevEco/hvigor supports it cleanly |
 
 ## Metadata Contract
 

@@ -21,6 +21,7 @@ WORKER_RUN_MODE ?={{RUN_MODE}}
 WORKER_TICK_INTERVAL_SECONDS ?={{TICK_INTERVAL_SECONDS}}
 WORKER_SHUTDOWN_TIMEOUT_SECONDS ?={{SHUTDOWN_TIMEOUT_SECONDS}}
 GOCACHE ?= $(CURDIR)/.cache/go-build
+GOMODCACHE ?= $(CURDIR)/.cache/go-mod
 export COMPOSE_PROJECT_NAME
 export DEV_IMAGE
 export DEV_TAG
@@ -28,6 +29,7 @@ export WORKER_RUN_MODE
 export WORKER_TICK_INTERVAL_SECONDS
 export WORKER_SHUTDOWN_TIMEOUT_SECONDS
 export GOCACHE
+export GOMODCACHE
 
 .PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell test verify run build docker-build docker-run
 
@@ -40,10 +42,13 @@ worktree-info:
 	@printf '%s\n' "Dev image ref: $(DEV_IMAGE_REF)"
 	@printf '%s\n' "Runtime image ref: $(IMAGE_REF)"
 	@printf '%s\n' "Go cache: $(GOCACHE)"
+	@printf '%s\n' "Go module cache: $(GOMODCACHE)"
 	@printf '%s\n' "Worker run mode: $(WORKER_RUN_MODE)"
 
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
+	@case "$(GOCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOCACHE should stay inside this worktree: $(GOCACHE)"; exit 1;; esac
+	@case "$(GOMODCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOMODCACHE should stay inside this worktree: $(GOMODCACHE)"; exit 1;; esac
 	@printf '%s\n' "Worker has no published host ports by default."
 	@printf '%s\n' "Compose config check: make worktree-compose-config"
 

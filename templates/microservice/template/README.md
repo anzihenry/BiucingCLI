@@ -130,6 +130,8 @@ make clean-worktree
 - `WORKTREE_ID` is derived from the current worktree path by default and can be overridden.
 - `COMPOSE_PROJECT_NAME` defaults to `{{SERVICE_NAME}}-$(WORKTREE_ID)`, so Compose containers, networks, dependency stores, and cache volumes stay scoped to the worktree.
 - `IMAGE` defaults to the worktree slug and `TAG` defaults to `dev`, so runtime image tags do not overwrite another worktree by default.
+- `GOCACHE`, `GOMODCACHE`, and `GOLANGCI_LINT_CACHE` stay under the current worktree's `.cache/` directory.
+- The Docker dev workflow mounts Go build, module, and lint caches as Compose-scoped volumes, so dependency versions and downloads do not bleed across worktrees.
 - `HOST_HTTP_PORT`, `HOST_GRPC_PORT`, `HOST_DEPENDENCY_STORE_PORT`, `HOST_OTEL_GRPC_PORT`, and `HOST_OTEL_HTTP_PORT` can be overridden when several worktrees run at once.
 - `make worktree-doctor` checks whether published host ports are already in use and prints suggested overrides.
 - `make worktree-compose-config` renders the current worktree's Compose config without starting containers.

@@ -17,6 +17,7 @@ DOCKER_PLATFORM ?=linux/arm64
 GOPROXY ?=https://proxy.golang.org,direct
 GOSUMDB ?=sum.golang.org
 GOCACHE ?= $(CURDIR)/.cache/go-build
+GOMODCACHE ?= $(CURDIR)/.cache/go-mod
 GOLANGCI_LINT_CACHE ?= $(CURDIR)/.cache/golangci-lint
 export COMPOSE_PROJECT_NAME
 export IMAGE
@@ -24,6 +25,7 @@ export TAG
 export HOST_PORT
 export CONTAINER_PORT
 export GOCACHE
+export GOMODCACHE
 export GOLANGCI_LINT_CACHE
 
 ifeq ($(DOCKER_VARIANT),ubuntu)
@@ -45,10 +47,14 @@ worktree-info:
 	@printf '%s\n' "HTTP URL: http://127.0.0.1:$(HOST_PORT)"
 	@printf '%s\n' "Image ref: $(IMAGE_REF)"
 	@printf '%s\n' "Go cache: $(GOCACHE)"
+	@printf '%s\n' "Go module cache: $(GOMODCACHE)"
 	@printf '%s\n' "golangci-lint cache: $(GOLANGCI_LINT_CACHE)"
 
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
+	@case "$(GOCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOCACHE should stay inside this worktree: $(GOCACHE)"; exit 1;; esac
+	@case "$(GOMODCACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOMODCACHE should stay inside this worktree: $(GOMODCACHE)"; exit 1;; esac
+	@case "$(GOLANGCI_LINT_CACHE)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "GOLANGCI_LINT_CACHE should stay inside this worktree: $(GOLANGCI_LINT_CACHE)"; exit 1;; esac
 	@if [ "$(HOST_PORT)" = "{{HTTP_PORT}}" ]; then printf '%s\n' "Warning: HOST_PORT uses the generated default {{HTTP_PORT}}; override it when another worktree is running."; fi
 	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
 		if lsof -nP -iTCP:$(HOST_PORT) -sTCP:LISTEN >/dev/null 2>&1; then printf '%s\n%s\n' "Warning: HOST_PORT $(HOST_PORT) is already in use." "Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make dev"; fi; \

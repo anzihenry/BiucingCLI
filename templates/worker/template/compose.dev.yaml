@@ -14,10 +14,13 @@ services:
       WORKER_TICK_INTERVAL_SECONDS: ${WORKER_TICK_INTERVAL_SECONDS:-{{TICK_INTERVAL_SECONDS}}}
       WORKER_SHUTDOWN_TIMEOUT_SECONDS: ${WORKER_SHUTDOWN_TIMEOUT_SECONDS:-{{SHUTDOWN_TIMEOUT_SECONDS}}}
       GOCACHE: /cache/go-build
+      GOMODCACHE: /cache/go-mod
     volumes:
       - .:/app
       - worker-go-build-cache:/cache/go-build
+      - worker-go-mod-cache:/cache/go-mod
     command: sh -lc "go run ./cmd/worker"
 
 volumes:
   worker-go-build-cache:
+  worker-go-mod-cache:

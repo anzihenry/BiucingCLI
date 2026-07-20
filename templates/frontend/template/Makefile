@@ -15,11 +15,15 @@ DEV_PORT ?=5173
 DEV_HOST_PORT ?=$(DEV_PORT)
 HOST_PORT ?=8080
 CONTAINER_PORT ?=80
+PNPM_HOME ?=$(WORKTREE_ROOT)/.pnpm-home/$(WORKTREE_ID)
+PNPM_STORE_DIR ?=$(WORKTREE_ROOT)/.pnpm-store
 export COMPOSE_PROJECT_NAME
 export DEV_HOST_PORT
 export DEV_PORT
 export HOST_PORT
 export CONTAINER_PORT
+export PNPM_HOME
+export PNPM_STORE_DIR
 
 .PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install dev dev-shell lint typecheck test build preview browser-install browser-smoke format format-check docker-build docker-run
 
@@ -33,9 +37,13 @@ worktree-info:
 	@printf '%s\n' "Runtime URL: http://127.0.0.1:$(HOST_PORT)"
 	@printf '%s\n' "Image ref: $(IMAGE_REF)"
 	@printf '%s\n' "Compose file: $(DEV_COMPOSE_FILE)"
+	@printf '%s\n' "pnpm home: $(PNPM_HOME)"
+	@printf '%s\n' "pnpm store: $(PNPM_STORE_DIR)"
 
 worktree-doctor:
 	@$(MAKE) --no-print-directory worktree-info
+	@case "$(PNPM_HOME)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "PNPM_HOME should stay inside this worktree: $(PNPM_HOME)"; exit 1;; esac
+	@case "$(PNPM_STORE_DIR)" in "$(WORKTREE_ROOT)"/*) ;; *) printf '%s\n' "PNPM_STORE_DIR should stay inside this worktree: $(PNPM_STORE_DIR)"; exit 1;; esac
 	@if [ "$(DEV_HOST_PORT)" = "5173" ]; then printf '%s\n' "Warning: DEV_HOST_PORT uses the default 5173; override it when another worktree is running."; fi
 	@if [ "$(HOST_PORT)" = "8080" ]; then printf '%s\n' "Warning: HOST_PORT uses the default 8080; override it when another runtime container is running."; fi
 	@if ! command -v lsof >/dev/null 2>&1; then printf '%s\n' "Port occupancy checks skipped: lsof is not available."; else \
