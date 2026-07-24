@@ -3,8 +3,15 @@
 .cache
 .mise
 DerivedData
+build
 Tuist/.cache
 Tuist/Dependencies
 *.xcodeproj
 *.xcworkspace
+*.xcarchive
+*.ipa
+*.pkg
+fastlane/.env
+fastlane/*.json
+fastlane/*.p8
 xcuserdata

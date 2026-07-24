@@ -43,6 +43,8 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
         "ios": {
             "apple_platform": "ios",
             "apple_platform_name": "iOS",
+            "fastlane_platform": "ios",
+            "app_store_platform": "ios",
             "minimum_os_version": "26.0",
             "tuist_destinations": ".iOS",
             "tuist_deployment_targets": '.iOS("{{MINIMUM_OS_VERSION}}")',
@@ -52,6 +54,8 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
         "macos": {
             "apple_platform": "macos",
             "apple_platform_name": "macOS",
+            "fastlane_platform": "mac",
+            "app_store_platform": "osx",
             "minimum_os_version": "26.0",
             "tuist_destinations": ".macOS",
             "tuist_deployment_targets": '.macOS("{{MINIMUM_OS_VERSION}}")',
@@ -61,6 +65,8 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
         "watchos": {
             "apple_platform": "watchos",
             "apple_platform_name": "watchOS",
+            "fastlane_platform": "ios",
+            "app_store_platform": "ios",
             "minimum_os_version": "26.0",
             "tuist_destinations": ".watchOS",
             "tuist_deployment_targets": '.watchOS("{{MINIMUM_OS_VERSION}}")',
@@ -70,6 +76,8 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
         "tvos": {
             "apple_platform": "tvos",
             "apple_platform_name": "tvOS",
+            "fastlane_platform": "ios",
+            "app_store_platform": "ios",
             "minimum_os_version": "26.0",
             "tuist_destinations": ".tvOS",
             "tuist_deployment_targets": '.tvOS("{{MINIMUM_OS_VERSION}}")',

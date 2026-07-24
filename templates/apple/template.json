@@ -7,7 +7,7 @@
   "platforms": ["ios", "macos", "watchos", "tvos"],
   "maturity": {
     "level": "validated",
-    "summary": "Multi-platform Apple starter with doctor, generate, lint, and test workflows."
+    "summary": "Multi-platform Apple starter with doctor, generate, lint, test, beta, and release workflows."
   },
   "validation": {
     "status": "generated-project-verified",
@@ -19,9 +19,9 @@
   },
   "operating_assumptions": [
     "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
-    "Generated projects should keep bootstrap, doctor, generate, lint, and test workflows explicit."
+    "Generated projects should keep bootstrap, doctor, generate, lint, test, beta, and release workflows explicit."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "generate", "lint", "test", "open"],
+  "workflow_labels": ["bootstrap", "doctor", "generate", "lint", "test", "build", "release", "open"],
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [

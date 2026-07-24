@@ -1,5 +1,3 @@
 app_identifier("{{BUNDLE_IDENTIFIER}}")
-# Replace this placeholder with the Apple ID or fastlane auth strategy
-# your team uses for TestFlight and App Store Connect operations.
-apple_id("developer@example.com")
-team_id("{{DEVELOPMENT_TEAM}}")
+apple_id(ENV.fetch("FASTLANE_USER", "developer@example.com"))
+team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "{{DEVELOPMENT_TEAM}}"))

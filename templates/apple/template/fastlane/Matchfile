@@ -1,0 +1,7 @@
+git_url(ENV.fetch("MATCH_GIT_URL", "git@github.com:your-org/apple-certificates.git"))
+git_branch(ENV.fetch("MATCH_GIT_BRANCH", "main"))
+storage_mode("git")
+type(ENV.fetch("MATCH_TYPE", "appstore"))
+app_identifier(["{{BUNDLE_IDENTIFIER}}"])
+team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "{{DEVELOPMENT_TEAM}}"))
+readonly(ENV.fetch("MATCH_ALLOW_WRITE", "false") != "true")

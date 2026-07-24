@@ -26,7 +26,7 @@ export TUIST_XDG_CONFIG_HOME
 export TUIST_TMPDIR
 export DEBUG_BUNDLE_SUFFIX
 
-.PHONY: bootstrap doctor generate clean build test lint format beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor generate clean build test lint format release-doctor archive beta release worktree-info worktree-doctor clean-worktree
 
 bootstrap:
 	$(TUIST_ENV) WORKTREE_ID=$(WORKTREE_ID) ./scripts/bootstrap
@@ -61,6 +61,12 @@ lint:
 
 format:
 	swiftformat . --cache $(SWIFTFORMAT_CACHE)
+
+release-doctor:
+	fastlane release_doctor
+
+archive:
+	fastlane archive
 
 beta:
 	fastlane beta

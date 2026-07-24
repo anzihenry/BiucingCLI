@@ -1,19 +1,122 @@
-default_platform(:ios)
+default_platform(:{{FASTLANE_PLATFORM}})
 
-platform :ios do
-  desc "Run a beta pipeline"
-  lane :beta do
-    UI.message("Beta lane assumes the generated project already builds locally and that signing decisions stay outside the starter template until your team wires them in.")
-    sh("make generate")
-    sh("make test")
+APP_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}"
+APP_STORE_PLATFORM = "{{APP_STORE_PLATFORM}}"
+TEAM_ID = ENV.fetch("DEVELOPMENT_TEAM_ID", "{{DEVELOPMENT_TEAM}}")
+WORKSPACE = "{{PROJECT_NAME}}.xcworkspace"
+SCHEME = "{{SWIFT_MODULE_NAME}}"
+ARCHIVE_PATH = "build/release/{{SWIFT_MODULE_NAME}}.xcarchive"
+OUTPUT_DIRECTORY = "build/release"
+
+def env_true?(name, default: false)
+  value = ENV[name]
+  return default if value.nil? || value.empty?
+
+  %w[1 true yes y].include?(value.downcase)
+end
+
+def require_env_file(name)
+  value = ENV[name]
+  UI.user_error!("Set #{name}. See fastlane/.env.example.") if value.to_s.empty?
+  UI.user_error!("#{name} does not exist: #{value}") unless File.exist?(File.expand_path(value))
+  value
+end
+
+def require_env_value(name)
+  value = ENV[name]
+  UI.user_error!("Set #{name}. See fastlane/.env.example.") if value.to_s.empty?
+  value
+end
+
+def app_store_api_key_path
+  require_env_file("APP_STORE_CONNECT_API_KEY_PATH")
+end
+
+def signing_git_url
+  require_env_value("MATCH_GIT_URL")
+end
+
+def built_artifact_options
+  ipa_path = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+  pkg_path = Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+
+  return { ipa: ipa_path } if ipa_path && File.exist?(ipa_path)
+  return { pkg: pkg_path } if pkg_path && File.exist?(pkg_path)
+
+  UI.user_error!("No signed ipa/pkg was produced by build_app.")
+end
+
+def sync_app_store_signing
+  match(
+    type: ENV.fetch("MATCH_TYPE", "appstore"),
+    app_identifier: APP_IDENTIFIER,
+    team_id: TEAM_ID,
+    git_url: signing_git_url,
+    git_branch: ENV.fetch("MATCH_GIT_BRANCH", "main"),
+    readonly: !env_true?("MATCH_ALLOW_WRITE", default: false),
+    api_key_path: app_store_api_key_path
+  )
+end
+
+def build_signed_app
+  build_app(
+    workspace: WORKSPACE,
+    scheme: SCHEME,
+    clean: true,
+    configuration: "Release",
+    export_method: "app-store",
+    export_team_id: TEAM_ID,
+    derived_data_path: ENV.fetch("DERIVED_DATA_PATH", "DerivedData/release"),
+    archive_path: ARCHIVE_PATH,
+    output_directory: OUTPUT_DIRECTORY,
+    xcodebuild_formatter: ENV.fetch("XCODEBUILD_FORMATTER", "xcbeautify")
+  )
+end
+
+platform :{{FASTLANE_PLATFORM}} do
+  desc "Validate release credentials and signing configuration"
+  lane :release_doctor do
+    app_store_api_key_path
+    signing_git_url
+    UI.user_error!("Set DEVELOPMENT_TEAM_ID or replace the template development_team value.") if TEAM_ID == "DEVELOPMENT_TEAM_ID"
+    UI.success("Release credentials and signing configuration are present.")
   end
 
-  desc "Run a release pipeline"
-  lane :release do
-    UI.message("Release lane is a starter entrypoint. Add match, provisioning, and TestFlight/App Store delivery after you replace the Apple ID placeholder and confirm signing for {{DEVELOPMENT_TEAM}} / {{BUNDLE_IDENTIFIER}}.")
+  desc "Build a signed App Store archive without uploading"
+  lane :archive do
+    release_doctor
     sh("make generate")
     sh("make lint")
     sh("make test")
-    sh("make build")
+    sync_app_store_signing
+    build_signed_app
+  end
+
+  desc "Build, sign, and upload a beta build to TestFlight"
+  lane :beta do
+    archive
+    upload_to_testflight(
+      api_key_path: app_store_api_key_path,
+      app_identifier: APP_IDENTIFIER,
+      app_platform: APP_STORE_PLATFORM,
+      skip_waiting_for_build_processing: env_true?("TESTFLIGHT_SKIP_WAITING", default: true),
+      changelog: ENV["TESTFLIGHT_CHANGELOG"],
+      **built_artifact_options
+    )
+  end
+
+  desc "Build, sign, and upload an App Store Connect release build"
+  lane :release do
+    archive
+    upload_to_app_store(
+      api_key_path: app_store_api_key_path,
+      app_identifier: APP_IDENTIFIER,
+      platform: APP_STORE_PLATFORM,
+      force: true,
+      skip_metadata: env_true?("APP_STORE_SKIP_METADATA", default: true),
+      skip_screenshots: env_true?("APP_STORE_SKIP_SCREENSHOTS", default: true),
+      submit_for_review: env_true?("APP_STORE_SUBMIT_FOR_REVIEW", default: false),
+      **built_artifact_options
+    )
   end
 end

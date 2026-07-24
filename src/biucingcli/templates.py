@@ -545,6 +545,8 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{HARMONY_VERSION_NAME}}": values.get("harmony_version_name", ""),
         "{{APPLE_PLATFORM}}": values.get("apple_platform", ""),
         "{{APPLE_PLATFORM_NAME}}": values.get("apple_platform_name", ""),
+        "{{FASTLANE_PLATFORM}}": values.get("fastlane_platform", ""),
+        "{{APP_STORE_PLATFORM}}": values.get("app_store_platform", ""),
         "{{BUNDLE_IDENTIFIER}}": values.get("bundle_identifier", ""),
         "{{MINIMUM_OS_VERSION}}": values.get("minimum_os_version", ""),
         "{{DEVELOPMENT_TEAM}}": values.get("development_team", ""),

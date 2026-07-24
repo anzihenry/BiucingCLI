@@ -29,7 +29,8 @@ public struct DefaultReleaseChecklistProvider: ReleaseChecklistProviding {
         [
             "Confirm signing for \(developmentTeam).",
             "Verify bundle identifier \(bundleIdentifier).",
-            "Run make test before the next beta build.",
+            "Run make release-doctor before archiving.",
+            "Upload beta builds through make beta.",
         ]
     }
 }
