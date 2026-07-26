@@ -42,7 +42,8 @@ make test
 ## Worktree Workflow
 
 Each worktree derives a human-readable `WORKTREE_LABEL` from its directory name
-and a hash-based `WORKTREE_ID` from the worktree root path. Override
+and a hash-based `WORKTREE_ID` from the worktree root path, prefixed with `w`
+so generated Android application ID suffixes remain valid. Override
 `WORKTREE_ID` when you want a shorter or stable value across renamed folders:
 
 ```bash

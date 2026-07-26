@@ -1,5 +1,5 @@
 brew "mise"
-brew "android-platform-tools"
+cask "android-platform-tools"
 brew "openjdk@{{JAVA_VERSION}}"
 brew "fastlane"
 brew "gh"

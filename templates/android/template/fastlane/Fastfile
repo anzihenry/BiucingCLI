@@ -3,13 +3,13 @@ default_platform(:android)
 platform :android do
   desc "Run a beta pipeline"
   lane :beta do
-    sh("make build")
-    sh("make test")
+    sh("cd .. && make build")
+    sh("cd .. && make test")
   end
 
   desc "Run a release pipeline"
   lane :release do
     UI.message("Release lane expects signing via local.properties or BIUCING_RELEASE_* environment variables before distribution.")
-    sh("./gradlew lint test assembleRelease")
+    sh("cd .. && ./gradlew lint test assembleRelease")
   end
 end
