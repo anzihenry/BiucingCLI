@@ -18,6 +18,7 @@ DEBUG_BUNDLE_SUFFIX ?= .$(WORKTREE_ID)
 EFFECTIVE_BUNDLE_IDENTIFIER ?= {{BUNDLE_IDENTIFIER}}$(DEBUG_BUNDLE_SUFFIX)
 XCODEBUILD := xcodebuild -derivedDataPath $(DERIVED_DATA_PATH)
 TUIST_ENV := HOME=$(TUIST_HOME) XDG_CACHE_HOME=$(TUIST_XDG_CACHE_HOME) XDG_STATE_HOME=$(TUIST_XDG_STATE_HOME) XDG_CONFIG_HOME=$(TUIST_XDG_CONFIG_HOME) TMPDIR=$(TUIST_TMPDIR)
+TEST_DESTINATION ?= $(shell ./scripts/test-destination {{APPLE_PLATFORM}} 2>/dev/null || printf '%s' '{{XCODEBUILD_DESTINATION}}')
 
 export TUIST_HOME
 export TUIST_XDG_CACHE_HOME
@@ -53,13 +54,15 @@ test:
 	$(XCODEBUILD) \
 		-workspace {{PROJECT_NAME}}.xcworkspace \
 		-scheme {{SWIFT_MODULE_NAME}} \
-		-destination '{{XCODEBUILD_DESTINATION}}' \
+		-destination '$(TEST_DESTINATION)' \
 		test
 
 lint:
+	mkdir -p "$(SWIFTLINT_CACHE)"
 	swiftlint lint --cache-path $(SWIFTLINT_CACHE)
 
 format:
+	mkdir -p "$(SWIFTFORMAT_CACHE)"
 	swiftformat . --cache $(SWIFTFORMAT_CACHE)
 
 release-doctor:
@@ -91,6 +94,7 @@ worktree-info:
 	@printf '%s\n' "SwiftFormat cache: $(SWIFTFORMAT_CACHE)"
 	@printf '%s\n' "Debug bundle suffix: $(DEBUG_BUNDLE_SUFFIX)"
 	@printf '%s\n' "Debug bundle identifier: $(EFFECTIVE_BUNDLE_IDENTIFIER)"
+	@printf '%s\n' "Test destination: $(TEST_DESTINATION)"
 
 worktree-doctor:
 	@printf '%s\n' "Checking Apple worktree isolation..."

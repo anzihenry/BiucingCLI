@@ -77,7 +77,7 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
             "apple_platform": "tvos",
             "apple_platform_name": "tvOS",
             "fastlane_platform": "ios",
-            "app_store_platform": "ios",
+            "app_store_platform": "appletvos",
             "minimum_os_version": "26.0",
             "tuist_destinations": ".tvOS",
             "tuist_deployment_targets": '.tvOS("{{MINIMUM_OS_VERSION}}")',

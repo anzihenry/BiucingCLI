@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from biucingcli.cli import apple_platform_config
 from biucingcli.cli import default_kotlin_module_name
 from biucingcli.cli import main
 from biucingcli.templates import render_text
@@ -78,6 +79,20 @@ class CLITestCase(unittest.TestCase):
         self.assertIn("Kotlin, Android, Gradle, Jetpack Compose, fastlane", output)
         self.assertIn("package_name", output)
         self.assertIn("compile_sdk", output)
+
+    def test_apple_platform_config_sets_release_platforms(self):
+        expected = {
+            "ios": ("ios", "ios"),
+            "macos": ("mac", "osx"),
+            "watchos": ("ios", "ios"),
+            "tvos": ("ios", "appletvos"),
+        }
+
+        for platform, (fastlane_platform, app_store_platform) in expected.items():
+            with self.subTest(platform=platform):
+                config = apple_platform_config(platform, None)
+                self.assertEqual(config["fastlane_platform"], fastlane_platform)
+                self.assertEqual(config["app_store_platform"], app_store_platform)
 
     def test_info_prints_harmonyos_template_details(self):
         output = self.run_cli(["info", "harmonyos"])
@@ -1757,6 +1772,9 @@ class CLITestCase(unittest.TestCase):
             app_tests = (
                 project_dir / "App" / "Targets" / "AppTests" / "Sources" / "AppTests.swift"
             ).read_text(encoding="utf-8")
+            test_destination = (
+                project_dir / "scripts" / "test-destination"
+            ).read_text(encoding="utf-8")
 
             self.assertTrue(project_dir.exists())
             self.assertIn("Created apple project: pulse-mac", output)
@@ -1797,6 +1815,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("WORKTREE_ID ?= $(shell printf '%s' \"$(WORKTREE_ROOT)\" | shasum | cut -c1-8)", makefile)
             self.assertIn("WORKTREE_ID", makefile)
             self.assertIn("DERIVED_DATA_PATH", makefile)
+            self.assertIn("TEST_DESTINATION ?= $(shell ./scripts/test-destination macos", makefile)
+            self.assertIn("-destination '$(TEST_DESTINATION)'", makefile)
             self.assertIn("TUIST_HOME", makefile)
             self.assertIn("XDG_CACHE_HOME=$(TUIST_XDG_CACHE_HOME)", makefile)
             self.assertIn("DEBUG_BUNDLE_SUFFIX", makefile)
@@ -1845,6 +1865,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("fastlane is not available", doctor)
             self.assertIn("simulator services are not ready", doctor)
             self.assertIn("Doctor completed with", doctor)
+            self.assertIn('printf \'%s\\n\' "platform=macOS"', test_destination)
+            self.assertIn("No available", test_destination)
+            self.assertTrue(os.access(project_dir / "scripts" / "test-destination", os.X_OK))
             self.assertIn('.macOS("26.0")', design_system)
             self.assertIn('name: "AppServices"', app_services_package)
             self.assertIn("public struct StarterFact: Equatable", app_services_source)
@@ -1874,7 +1897,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('git_url(ENV.fetch("MATCH_GIT_URL"', matchfile)
             self.assertIn('app_identifier(["com.example.pulsemac"])', matchfile)
             self.assertIn('team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "ABCDE12345"))', matchfile)
-            self.assertIn("APP_STORE_CONNECT_API_KEY_PATH=fastlane/app-store-connect-api-key.json", fastlane_env_example)
+            self.assertIn("APP_STORE_CONNECT_API_KEY_PATH=app-store-connect-api-key.json", fastlane_env_example)
             self.assertIn("MATCH_ALLOW_WRITE=false", fastlane_env_example)
             self.assertIn("make release-doctor", release_delivery)
             self.assertIn("MATCH_ALLOW_WRITE=true fastlane match appstore", release_delivery)

@@ -30,7 +30,7 @@ public struct DefaultReleaseChecklistProvider: ReleaseChecklistProviding {
             "Confirm signing for \(developmentTeam).",
             "Verify bundle identifier \(bundleIdentifier).",
             "Run make release-doctor before archiving.",
-            "Upload beta builds through make beta.",
+            "Upload beta builds through make beta."
         ]
     }
 }
@@ -46,7 +46,7 @@ public enum StarterFactBuilder {
             StarterFact(label: "Bundle ID", systemImage: "shippingbox", value: bundleIdentifier),
             StarterFact(label: "Platform", systemImage: "app", value: platformName),
             StarterFact(label: "Minimum OS", systemImage: "gear", value: minimumOSVersion),
-            StarterFact(label: "Team", systemImage: "person.3", value: developmentTeam),
+            StarterFact(label: "Team", systemImage: "person.3", value: developmentTeam)
         ]
     }
 }

@@ -20,7 +20,7 @@ final class AppTests: XCTestCase {
                 StarterFact(label: "Bundle ID", systemImage: "shippingbox", value: "com.example.pulsemac"),
                 StarterFact(label: "Platform", systemImage: "app", value: "macOS"),
                 StarterFact(label: "Minimum OS", systemImage: "gear", value: "26.0"),
-                StarterFact(label: "Team", systemImage: "person.3", value: "ABCDE12345"),
+                StarterFact(label: "Team", systemImage: "person.3", value: "ABCDE12345")
             ]
         )
     }
@@ -35,7 +35,7 @@ final class AppTests: XCTestCase {
             checklistProvider: MockReleaseChecklistProvider(
                 items: [
                     "Check beta notes.",
-                    "Share build with QA.",
+                    "Share build with QA."
                 ]
             )
         )
@@ -44,7 +44,7 @@ final class AppTests: XCTestCase {
             viewModel.releaseChecklist(),
             [
                 "Check beta notes.",
-                "Share build with QA.",
+                "Share build with QA."
             ]
         )
     }

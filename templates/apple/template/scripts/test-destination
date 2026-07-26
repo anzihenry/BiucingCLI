@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+platform="${1:-ios}"
+
+case "$platform" in
+  ios)
+    runtime_label="iOS"
+    ;;
+  watchos)
+    runtime_label="watchOS"
+    ;;
+  tvos)
+    runtime_label="tvOS"
+    ;;
+  macos)
+    printf '%s\n' "platform=macOS"
+    exit 0
+    ;;
+  *)
+    printf 'Unsupported Apple platform for tests: %s\n' "$platform" >&2
+    exit 1
+    ;;
+esac
+
+device_line="$(
+  xcrun simctl list devices available 2>/dev/null \
+    | awk -v label="$runtime_label" '
+        $0 ~ "^-- " label " " { active = 1; next }
+        $0 ~ "^-- " { active = 0 }
+        active && /^    / { print; exit }
+      '
+)"
+
+udid="$(printf '%s\n' "$device_line" | sed -E 's/.*\(([0-9A-Fa-f-]{36})\).*/\1/')"
+
+if [[ -z "$udid" || "$udid" == "$device_line" ]]; then
+  printf 'No available %s simulator was found. Install a runtime and create a simulator, then rerun make test.\n' "$runtime_label" >&2
+  exit 1
+fi
+
+printf 'id=%s\n' "$udid"

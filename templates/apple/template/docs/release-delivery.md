@@ -38,7 +38,7 @@ By default, `make release` uploads the binary but does not submit it for review.
 Keep these files local or in your CI secret store:
 
 - `fastlane/.env`
-- `fastlane/app-store-connect-api-key.json`
+- `fastlane/app-store-connect-api-key.json` when viewed from the project root, or `app-store-connect-api-key.json` in `fastlane/.env`
 - `fastlane/*.p8`
 
 Do not commit API keys, certificate repository credentials, provisioning profiles, or Apple ID sessions.
