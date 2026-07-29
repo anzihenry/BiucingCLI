@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODULE_NAME="{{HARMONY_MODULE_NAME}}"
+OUTPUT_ROOT="${MODULE_NAME}/build"
+
+echo "HarmonyOS package artifact check"
+
+if [[ ! -d "$OUTPUT_ROOT" ]]; then
+  echo "${OUTPUT_ROOT} does not exist. Run make build first." >&2
+  exit 1
+fi
+
+hap_path="$(find "$OUTPUT_ROOT" -type f -name '*.hap' | sort | tail -n 1)"
+if [[ -z "$hap_path" ]]; then
+  echo "No HAP artifact found under ${OUTPUT_ROOT}. Run make build first." >&2
+  exit 1
+fi
+
+if [[ ! -s "$hap_path" ]]; then
+  echo "HAP artifact is empty: ${hap_path}" >&2
+  exit 1
+fi
+
+printf '%s\n' "HAP: ${hap_path}"
+if command -v shasum >/dev/null 2>&1; then
+  shasum -a 256 "$hap_path"
+fi
+if command -v du >/dev/null 2>&1; then
+  du -h "$hap_path"
+fi

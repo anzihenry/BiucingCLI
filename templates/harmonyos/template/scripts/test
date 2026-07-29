@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HVIGOR_BIN="${HVIGOR:-hvigorw}"
+MODULE_NAME="{{HARMONY_MODULE_NAME}}"
+
+echo "Running HarmonyOS ArkTS unit tests with hvigor..."
+
+if [[ ! -f "entry/src/test/List.test.ets" ]]; then
+  cat >&2 <<'EOF'
+entry/src/test/List.test.ets is missing.
+
+Keep at least one Hypium test suite in the generated project before treating
+the project as release-ready.
+EOF
+  exit 1
+fi
+
+if [[ ! -d "oh_modules/@ohos/hypium" && ! -d "entry/oh_modules/@ohos/hypium" ]]; then
+  cat >&2 <<'EOF'
+@ohos/hypium is not installed.
+
+Run make bootstrap before make test so ohpm can install test dependencies.
+EOF
+  exit 1
+fi
+
+"$HVIGOR_BIN" test --mode module -p "module=${MODULE_NAME}"

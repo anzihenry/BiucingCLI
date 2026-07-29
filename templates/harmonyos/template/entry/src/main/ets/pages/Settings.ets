@@ -1,4 +1,3 @@
-import router from '@ohos.router';
 import { AppConfig } from '../core/config/AppConfig';
 import { BiucingColors, BiucingRadius, BiucingSpacing, BiucingTypography } from '../core/designsystem/Tokens';
 
@@ -18,7 +17,7 @@ struct Settings {
           .fontSize(BiucingTypography.caption)
           .backgroundColor(BiucingColors.accent)
           .onClick(() => {
-            router.back();
+            this.getUIContext().getRouter().back();
           })
       }
       .width('100%')

@@ -118,8 +118,11 @@ Responsible for:
 ├── scripts/
 │   ├── bootstrap
 │   ├── doctor
+│   ├── artifact-info
 │   ├── lint
-│   └── release-build
+│   ├── release-build
+│   ├── release-preflight
+│   └── test
 ├── .mise.toml
 ├── Makefile
 ├── build-profile.json5
@@ -150,14 +153,18 @@ Responsible for:
 make bootstrap
 make doctor
 make lint
+make test
 make build
 make package
+make artifact-info
+make verify
+make release-preflight
 make release
 make signing-info
 make open
 ```
 
-`make build` must produce an unsigned HAP on a configured workstation. `make release` may be used only when local signing material has been supplied through git-ignored `local.properties`.
+`make verify` is the default local gate before signing or distribution handoff. It must run `doctor`, `lint`, `test`, `build`, and `artifact-info`. `make build` must produce an unsigned HAP on a configured workstation. `make release-preflight` validates local signing material without mutating project files. `make release` may be used only when local signing material has been supplied through git-ignored `local.properties`.
 
 ## Lint Policy
 
@@ -173,9 +180,13 @@ DevEco Studio remains the primary full ArkTS lint surface until a stable command
 
 ## Testing Policy
 
-Do not expose `make test` until a generated project can run ArkTS/Hypium tests reliably through the CLI on a clean workstation.
+Expose `make test` for generated projects and run ArkTS/Hypium tests through `hvigorw test --mode module -p module=entry`.
 
-Current verification found that `hvigorw test --mode module -p module=entry` enters the UnitTest pipeline, but fails unless `entry/src/test/List.test.ets` exists and then still fails because `@ohos/hypium` cannot be resolved. Declaring `@ohos/hypium@1.0.0` in `oh-package.json5` follows DevEco template shape, but the configured OpenHarmony ohpm registry did not provide that package during verification. Keep this blocked until dependency resolution is repeatable.
+Generated projects must include:
+
+- `@ohos/hypium` in `oh-package.json5` dev dependencies;
+- `entry/src/test/List.test.ets` with at least one starter smoke test;
+- a test script that fails clearly when `make bootstrap` has not installed Hypium.
 
 The current release bar is:
 
@@ -183,8 +194,11 @@ The current release bar is:
 - run `make bootstrap`;
 - run `make doctor`;
 - run `make lint`;
+- run `make test`;
 - run `make build`;
 - verify an unsigned HAP is produced.
+- run `make artifact-info`;
+- run `make release-preflight` when signing material is present.
 
 ## Signing And Release Policy
 

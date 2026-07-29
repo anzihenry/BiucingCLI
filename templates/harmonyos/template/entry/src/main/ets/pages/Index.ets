@@ -1,4 +1,3 @@
-import router from '@ohos.router';
 import { AppConfig } from '../core/config/AppConfig';
 import { BiucingColors, BiucingRadius, BiucingSpacing, BiucingTypography } from '../core/designsystem/Tokens';
 
@@ -35,7 +34,7 @@ struct Index {
         .fontSize(BiucingTypography.body)
         .backgroundColor(BiucingColors.accent)
         .onClick(() => {
-          router.pushUrl({ url: 'pages/Settings' });
+          this.getUIContext().getRouter().pushUrl({ url: 'pages/Settings' });
         })
     }
     .justifyContent(FlexAlign.Center)

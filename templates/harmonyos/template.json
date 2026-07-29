@@ -7,21 +7,22 @@
   "platforms": ["harmonyos"],
   "maturity": {
     "level": "experimental",
-    "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, and generated-project render coverage."
+    "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, Hypium test wiring, build verification, artifact checks, and local release-signing preflight."
   },
   "validation": {
     "status": "generated-project-verified",
     "verification_tier": "generated-project",
     "evidence": [
       "python unittest template rendering coverage",
-      "repo-level template metadata and placeholder validation"
+      "repo-level template metadata and placeholder validation",
+      "generated-project bootstrap, lint, test, build, artifact, and release-preflight commands"
     ]
   },
   "operating_assumptions": [
     "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
     "Generated projects are structured for an ArkTS Stage model app with one entry module."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "lint", "build", "release", "open"],
+  "workflow_labels": ["bootstrap", "doctor", "lint", "test", "build", "verify", "release", "open"],
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -100,7 +101,11 @@
     "make bootstrap",
     "make doctor",
     "make lint",
+    "make test",
     "make build",
+    "make artifact-info",
+    "make verify",
+    "make release-preflight",
     "open -a \"DevEco Studio\" ."
   ]
 }

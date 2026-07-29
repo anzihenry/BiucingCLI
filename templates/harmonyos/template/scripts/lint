@@ -33,11 +33,15 @@ required_files=(
   "entry/src/main/module.json5"
   "entry/src/main/ets/pages/Index.ets"
   "entry/src/main/ets/pages/Settings.ets"
+  "entry/src/test/List.test.ets"
   "entry/src/main/resources/base/profile/main_pages.json"
   "hvigor/hvigor-config.json5"
   "oh-package.json5"
   "oh-package-lock.json5"
+  "scripts/artifact-info"
   "scripts/release-build"
+  "scripts/release-preflight"
+  "scripts/test"
 )
 
 for path in "${required_files[@]}"; do
@@ -48,11 +52,13 @@ for path in "${required_files[@]}"; do
   fi
 done
 
-if [[ -x "scripts/release-build" ]]; then
-  pass "scripts/release-build is executable"
-else
-  fail "scripts/release-build must be executable."
-fi
+for executable_script in scripts/artifact-info scripts/release-build scripts/release-preflight scripts/test; do
+  if [[ -x "$executable_script" ]]; then
+    pass "$executable_script is executable"
+  else
+    fail "$executable_script must be executable."
+  fi
+done
 
 if grep -q '"pages/Settings"' entry/src/main/resources/base/profile/main_pages.json; then
   pass "Settings page is registered in main_pages.json"
@@ -67,10 +73,18 @@ else
   fail "config or design system starter symbols are missing."
 fi
 
+if grep -q "@ohos/hypium" oh-package.json5 &&
+   grep -q "export default function testsuite" entry/src/test/List.test.ets; then
+  pass "Hypium test dependency and starter test suite are present"
+else
+  fail "Hypium dependency or starter test suite is missing."
+fi
+
 placeholder_hits="$(
   find AppScope entry hvigor -type f \
     ! -path '*/build/*' \
     ! -path '*/.hvigor/*' \
+    ! -path '*/.test/*' \
     -print0 \
     | xargs -0 grep -n '{{' 2>/dev/null || true
 )"

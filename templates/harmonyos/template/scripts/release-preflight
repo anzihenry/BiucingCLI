@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HVIGOR_BIN="${HVIGOR:-hvigorw}"
-MODULE_NAME="{{HARMONY_MODULE_NAME}}"
-BUILD_PROFILE="build-profile.json5"
-BACKUP_PROFILE=".biucing/release/build-profile.json5.backup"
+echo "HarmonyOS release signing preflight"
 
 if [[ ! -f "local.properties" ]]; then
   cat >&2 <<'EOF'
@@ -16,24 +13,11 @@ EOF
   exit 1
 fi
 
-./scripts/release-preflight
-
-mkdir -p "$(dirname "$BACKUP_PROFILE")"
-cp "$BUILD_PROFILE" "$BACKUP_PROFILE"
-
-restore_build_profile() {
-  if [[ -f "$BACKUP_PROFILE" ]]; then
-    cp "$BACKUP_PROFILE" "$BUILD_PROFILE"
-  fi
-}
-trap restore_build_profile EXIT
-
 node <<'NODE'
 const fs = require('fs');
 const path = require('path');
 
 const localPropertiesPath = 'local.properties';
-const buildProfilePath = 'build-profile.json5';
 const requiredKeys = [
   'biucing.harmony.signing.certpath',
   'biucing.harmony.signing.profile',
@@ -41,6 +25,11 @@ const requiredKeys = [
   'biucing.harmony.signing.storePassword',
   'biucing.harmony.signing.keyAlias',
   'biucing.harmony.signing.keyPassword'
+];
+const fileKeys = [
+  'biucing.harmony.signing.certpath',
+  'biucing.harmony.signing.profile',
+  'biucing.harmony.signing.storeFile'
 ];
 
 function parseProperties(raw) {
@@ -71,11 +60,7 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-for (const key of [
-  'biucing.harmony.signing.certpath',
-  'biucing.harmony.signing.profile',
-  'biucing.harmony.signing.storeFile'
-]) {
+for (const key of fileKeys) {
   const value = properties[key];
   const resolved = path.isAbsolute(value) ? value : path.resolve(value);
   if (!fs.existsSync(resolved)) {
@@ -84,32 +69,5 @@ for (const key of [
   }
 }
 
-const buildProfile = JSON.parse(fs.readFileSync(buildProfilePath, 'utf8'));
-const material = {
-  certpath: properties['biucing.harmony.signing.certpath'],
-  profile: properties['biucing.harmony.signing.profile'],
-  storeFile: properties['biucing.harmony.signing.storeFile'],
-  storePassword: properties['biucing.harmony.signing.storePassword'],
-  keyAlias: properties['biucing.harmony.signing.keyAlias'],
-  keyPassword: properties['biucing.harmony.signing.keyPassword'],
-  signAlg: properties['biucing.harmony.signing.signAlg'] || 'SHA256withECDSA'
-};
-
-buildProfile.app.signingConfigs = [
-  {
-    name: 'release',
-    type: 'HarmonyOS',
-    material
-  }
-];
-for (const product of buildProfile.app.products || []) {
-  product.signingConfig = 'release';
-}
-
-fs.writeFileSync(buildProfilePath, `${JSON.stringify(buildProfile, null, 2)}\n`);
-console.log('Injected release signing config from local.properties.');
+console.log('Release signing material is present and file paths resolve.');
 NODE
-
-"$HVIGOR_BIN" assembleHap --mode module -p "module=${MODULE_NAME}" -p buildMode=release
-
-echo "Release build finished. build-profile.json5 has been restored."

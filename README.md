@@ -111,9 +111,9 @@ Local Apple validation status:
 
 Local HarmonyOS validation status:
 
-- the generated HarmonyOS starter has passed real `make bootstrap`, `make lint`, and `make build` verification with a local DevEco Studio/HarmonyOS SDK install;
-- `make release` is wired to local-only signing material and fails fast when `local.properties` is missing or incomplete;
-- `make test` remains intentionally absent until the ArkTS/Hypium CLI dependency path is repeatably resolvable.
+- the generated HarmonyOS starter has passed real `make bootstrap` and `make verify` verification with a local DevEco Studio/HarmonyOS SDK install;
+- `make verify` now covers `doctor`, `lint`, ArkTS/Hypium `test`, unsigned HAP `build`, and package artifact fingerprinting;
+- `make release-preflight` and `make release` are wired to local-only signing material and fail fast when `local.properties` is missing or incomplete.
 
 ## Design Docs
 

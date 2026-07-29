@@ -1,10 +1,6 @@
 {
   "string": [
     {
-      "name": "app_name",
-      "value": "{{DISPLAY_NAME}}"
-    },
-    {
       "name": "module_desc",
       "value": "{{DISPLAY_NAME}} entry module"
     },

@@ -19,7 +19,7 @@ export HVIGOR_HOME
 export OHPM_HOME
 export BIUCING_HARMONY_DEBUG_BUNDLE_SUFFIX := $(DEBUG_BUNDLE_SUFFIX)
 
-.PHONY: bootstrap doctor lint build package release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
+.PHONY: bootstrap doctor lint test build package artifact-info verify release-preflight release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
@@ -30,16 +30,27 @@ doctor:
 lint:
 	./scripts/lint
 
+test:
+	./scripts/test
+
 build:
 	$(HVIGOR) assembleHap --mode module $(HVIGOR_PROPS)
 
 package: build
 
+artifact-info:
+	./scripts/artifact-info
+
+verify: doctor lint test build artifact-info
+
+release-preflight:
+	./scripts/release-preflight
+
 release:
 	./scripts/release-build
 
 signing-info:
-	@printf '%s\n' "Configure signing in DevEco Studio or copy docs/release-signing.local.properties.example to local.properties, then run make release."
+	@printf '%s\n' "Configure signing in DevEco Studio or copy docs/release-signing.local.properties.example to local.properties, then run make release-preflight and make release."
 
 clean:
 	$(HVIGOR) clean
