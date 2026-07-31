@@ -569,6 +569,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("debugImplementation(libs.androidx.compose.ui.test.manifest)", app_build)
             self.assertIn("Android App Bundle artifact check", artifact_info)
             self.assertIn("BundleConfig.pb", artifact_info)
+            self.assertIn('unzip -p "$artifact_path" "BundleConfig.pb"', artifact_info)
             self.assertIn("gradle wrapper --gradle-version 8.10.2", sync_wrapper)
             self.assertIn('-jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"', gradlew)
             self.assertTrue(expected_files.issubset(generated_files))
