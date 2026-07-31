@@ -78,6 +78,8 @@ make test
 make test-ui
 make lint
 make install-debug
+make release-doctor
+make archive
 make beta
 make release
 ```
@@ -93,7 +95,7 @@ The generated starter treats build types like this:
 - `debug`: default local development build, with a `.debug` application ID suffix and `-debug` version suffix
 - `release`: production-shaped build intended for CI, beta handoff, or store preparation
 
-Release signing is optional for local generation and verification. If signing inputs are missing, `assembleRelease` still gives you an unsigned release artifact that is useful for smoke validation.
+Release signing is optional for local generation and verification. If signing inputs are missing, `assembleRelease` still gives you an unsigned release artifact that is useful for smoke validation. Store delivery uses a signed Android App Bundle (AAB) built by `bundleRelease`.
 
 To wire real signing, choose one of these paths:
 
@@ -107,8 +109,23 @@ The Gradle template also accepts the same values as Gradle properties:
 - `biucing.release.keyAlias`
 - `biucing.release.keyPassword`
 
-`make beta` is the lightweight developer lane: it runs the debug build plus tests.
-`make release` is the release-oriented lane: it runs lint, tests, and `assembleRelease`, and it is the lane that should be connected to signed distribution later.
+Gradle properties are useful for direct Gradle invocations. The fastlane delivery lanes use `local.properties` or `BIUCING_RELEASE_*` so `make release-doctor`, `make archive`, `make beta`, and `make release` can verify the signing material before building.
+
+Before a real Google Play handoff, the team also needs to supply:
+
+- a Google Play Console app record for `{{APPLICATION_ID}}`
+- a Google Cloud service-account JSON key that is invited to the Play Console app
+- an upload keystore and all four signing values above
+
+Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and keep the real `.env`, service-account JSON, and keystore untracked. See `docs/release-delivery.md` for the complete setup path.
+
+`make release-doctor` checks the service-account JSON path, release-signing inputs, upload keystore, and enabled metadata configuration before a native bundle spends time building.
+
+`make archive` runs lint, unit tests, and `bundleRelease`, then verifies that a signed `app-release.aab` was created without uploading it.
+
+`make beta` runs the archive lane and uploads the AAB to the Google Play `internal` track by default.
+
+`make release` runs the archive lane and uploads the AAB to the Google Play `production` track as a `draft` by default. It does not make the release public; complete the Play Console review and required compliance information before promoting the draft.
 
 ## Notes
 
@@ -126,4 +143,5 @@ The Gradle template also accepts the same values as Gradle properties:
 - Dark mode is part of the starter theme contract, so new components should prefer `MaterialTheme.colorScheme` and shared tokens over hard-coded colors.
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.
 - `docs/release-signing.properties.example` documents the expected signing keys without committing secrets.
-- `fastlane release` expects a signed release path eventually, but the generated template stays safe for unsigned local verification first.
+- `fastlane/Fastfile` owns Google Play credential checks, signed AAB creation, internal-track delivery, and draft production delivery.
+- Google Play store listings can be managed from `fastlane/metadata/android` after `fastlane supply init`; Data safety, content ratings, policy declarations, and review answers remain Play Console responsibilities.

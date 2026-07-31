@@ -1,15 +1,118 @@
 default_platform(:android)
 
+APP_IDENTIFIER = "{{APPLICATION_ID}}"
+PROJECT_ROOT = File.expand_path("..", __dir__)
+RELEASE_AAB_PATH = File.join(PROJECT_ROOT, "app/build/outputs/bundle/release/app-release.aab")
+METADATA_PATH = File.join(PROJECT_ROOT, "fastlane/metadata/android")
+
+def env_true?(name, default: false)
+  value = ENV[name]
+  return default if value.nil? || value.empty?
+
+  %w[1 true yes y].include?(value.downcase)
+end
+
+def require_env_file(name)
+  value = ENV[name]
+  UI.user_error!("Set #{name}. See fastlane/.env.example.") if value.to_s.empty?
+  path = File.expand_path(value, PROJECT_ROOT)
+  UI.user_error!("#{name} does not exist: #{path}") unless File.file?(path)
+  path
+end
+
+def signing_value(property_name, environment_name)
+  ENV[environment_name] || local_properties[property_name]
+end
+
+def local_properties
+  return @local_properties if defined?(@local_properties)
+
+  path = File.join(PROJECT_ROOT, "local.properties")
+  @local_properties = {}
+  return @local_properties unless File.file?(path)
+
+  File.foreach(path) do |line|
+    next if line.start_with?("#") || !line.include?("=")
+
+    key, value = line.split("=", 2)
+    @local_properties[key.strip] = value.strip
+  end
+  @local_properties
+end
+
+def release_signing_ready?
+  store_file = signing_value("biucing.release.storeFile", "BIUCING_RELEASE_STORE_FILE")
+  values = [
+    store_file,
+    signing_value("biucing.release.storePassword", "BIUCING_RELEASE_STORE_PASSWORD"),
+    signing_value("biucing.release.keyAlias", "BIUCING_RELEASE_KEY_ALIAS"),
+    signing_value("biucing.release.keyPassword", "BIUCING_RELEASE_KEY_PASSWORD")
+  ]
+  return false unless values.all? { |value| !value.to_s.empty? }
+
+  File.file?(File.expand_path(store_file, PROJECT_ROOT))
+end
+
+def play_service_account_json_path
+  require_env_file("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON")
+end
+
+def metadata_upload_requested?
+  !env_true?("PLAY_STORE_SKIP_METADATA", default: true) ||
+    !env_true?("PLAY_STORE_SKIP_CHANGELOGS", default: true) ||
+    !env_true?("PLAY_STORE_SKIP_IMAGES", default: true) ||
+    !env_true?("PLAY_STORE_SKIP_SCREENSHOTS", default: true)
+end
+
+def upload_to_google_play(track:, release_status:)
+  options = {
+    package_name: APP_IDENTIFIER,
+    aab: RELEASE_AAB_PATH,
+    json_key: play_service_account_json_path,
+    track: track,
+    release_status: release_status,
+    skip_upload_metadata: env_true?("PLAY_STORE_SKIP_METADATA", default: true),
+    skip_upload_changelogs: env_true?("PLAY_STORE_SKIP_CHANGELOGS", default: true),
+    skip_upload_images: env_true?("PLAY_STORE_SKIP_IMAGES", default: true),
+    skip_upload_screenshots: env_true?("PLAY_STORE_SKIP_SCREENSHOTS", default: true)
+  }
+  options[:metadata_path] = METADATA_PATH if Dir.exist?(METADATA_PATH)
+  upload_to_play_store(**options)
+end
+
 platform :android do
-  desc "Run a beta pipeline"
-  lane :beta do
-    sh("cd .. && make build")
-    sh("cd .. && make test")
+  desc "Validate Google Play credentials, signing inputs, and metadata configuration"
+  lane :release_doctor do
+    play_service_account_json_path
+    UI.user_error!("Configure all BIUCING_RELEASE_* values or local.properties signing values.") unless release_signing_ready?
+    UI.user_error!("Create #{METADATA_PATH} before enabling Play Store metadata uploads.") if metadata_upload_requested? && !Dir.exist?(METADATA_PATH)
+    UI.success("Google Play credentials, release signing, and metadata configuration are present.")
   end
 
-  desc "Run a release pipeline"
+  desc "Build a signed Android App Bundle without uploading"
+  lane :archive do
+    release_doctor
+    sh("make lint")
+    sh("make test")
+    sh("make bundle-release")
+    UI.user_error!("No signed Android App Bundle was produced at #{RELEASE_AAB_PATH}.") unless File.file?(RELEASE_AAB_PATH)
+  end
+
+  desc "Build, sign, and upload an internal Google Play test build"
+  lane :beta do
+    archive
+    upload_to_google_play(
+      track: ENV.fetch("PLAY_STORE_BETA_TRACK", "internal"),
+      release_status: ENV.fetch("PLAY_STORE_BETA_RELEASE_STATUS", "completed")
+    )
+  end
+
+  desc "Build, sign, and upload a draft Google Play production release"
   lane :release do
-    UI.message("Release lane expects signing via local.properties or BIUCING_RELEASE_* environment variables before distribution.")
-    sh("cd .. && ./gradlew lint test assembleRelease")
+    archive
+    upload_to_google_play(
+      track: ENV.fetch("PLAY_STORE_RELEASE_TRACK", "production"),
+      release_status: ENV.fetch("PLAY_STORE_RELEASE_STATUS", "draft")
+    )
   end
 end

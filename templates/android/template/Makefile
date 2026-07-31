@@ -14,7 +14,7 @@ GRADLE := GRADLE_USER_HOME=$(GRADLE_USER_HOME) ./gradlew -Dorg.gradle.project.bi
 
 export GRADLE_USER_HOME
 
-.PHONY: bootstrap doctor wrapper clean build test test-ui lint format install-debug beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor wrapper clean build bundle-release test test-ui lint format install-debug release-doctor archive beta release worktree-info worktree-doctor clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
@@ -31,6 +31,9 @@ clean:
 build:
 	$(GRADLE) assembleDebug
 
+bundle-release:
+	$(GRADLE) bundleRelease
+
 test:
 	$(GRADLE) test
 
@@ -45,6 +48,12 @@ format:
 
 install-debug:
 	$(GRADLE) installDebug
+
+release-doctor:
+	fastlane release_doctor
+
+archive:
+	fastlane archive
 
 beta:
 	fastlane beta

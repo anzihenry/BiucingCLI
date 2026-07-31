@@ -23,8 +23,8 @@ fun Project.releaseProperty(
     envKey: String,
 ): String? {
     return providers.gradleProperty(gradleKey).orNull
-        ?: localProperties.getProperty(gradleKey)
         ?: System.getenv(envKey)
+        ?: localProperties.getProperty(gradleKey)
 }
 
 val localProperties = loadLocalProperties(rootDir)
@@ -99,7 +99,7 @@ android {
     signingConfigs {
         create("release") {
             if (hasCompleteReleaseSigning) {
-                storeFile = file(releaseStoreFile!!)
+                storeFile = rootProject.file(releaseStoreFile!!)
                 storePassword = releaseStorePassword
                 keyAlias = releaseKeyAlias
                 keyPassword = releaseKeyPassword

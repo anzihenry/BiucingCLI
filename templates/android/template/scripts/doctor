@@ -113,6 +113,12 @@ else
   pass "Gradle wrapper files are present"
 fi
 
+if command -v fastlane >/dev/null 2>&1; then
+  pass "fastlane is available"
+else
+  warn "fastlane is not available. Run 'brew bundle' before using make release-doctor, make archive, make beta, or make release."
+fi
+
 if (( failures > 0 )); then
   echo "Doctor found ${failures} issue(s) and ${warnings} warning(s)."
   exit 1

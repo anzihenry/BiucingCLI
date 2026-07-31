@@ -357,6 +357,12 @@ class CLITestCase(unittest.TestCase):
             release_signing_example = (
                 project_dir / "docs" / "release-signing.properties.example"
             ).read_text(encoding="utf-8")
+            release_delivery = (
+                project_dir / "docs" / "release-delivery.md"
+            ).read_text(encoding="utf-8")
+            fastlane_env_example = (
+                project_dir / "fastlane" / ".env.example"
+            ).read_text(encoding="utf-8")
             gradlew = (project_dir / "gradlew").read_text(encoding="utf-8")
             generated_files = {
                 path.relative_to(project_dir).as_posix()
@@ -390,7 +396,9 @@ class CLITestCase(unittest.TestCase):
                 "core/network/src/main/java/network/AppEnvironment.kt",
                 "core/testing/build.gradle.kts",
                 "core/testing/src/main/java/testing/FakeAppEnvironmentProvider.kt",
+                "docs/release-delivery.md",
                 "docs/release-signing.properties.example",
+                "fastlane/.env.example",
                 "fastlane/Appfile",
                 "fastlane/Fastfile",
                 "feature/home/build.gradle.kts",
@@ -425,6 +433,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Release signing is optional", readme)
             self.assertIn("BIUCING_RELEASE_STORE_FILE", readme)
             self.assertIn("make release", readme)
+            self.assertIn("make release-doctor", readme)
+            self.assertIn("make archive", readme)
+            self.assertIn("Google Play `internal` track", readme)
+            self.assertIn("production` track as a `draft`", readme)
             self.assertIn("cmdline-tools/latest", readme)
             self.assertIn("emulator/AVD visibility", readme)
             self.assertIn("connectedDebugAndroidTest", readme)
@@ -457,6 +469,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('versionNameSuffix = "-debug"', app_build)
             self.assertIn('create("release")', app_build)
             self.assertIn('signingConfig = signingConfigs.getByName("release")', app_build)
+            self.assertIn('storeFile = rootProject.file(releaseStoreFile!!)', app_build)
             self.assertIn('biucing.release.storeFile', app_build)
             self.assertIn('BIUCING_RELEASE_STORE_FILE', app_build)
             self.assertIn('hasCompleteReleaseSigning', app_build)
@@ -494,9 +507,20 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("fun AppSectionCard(", components)
             self.assertIn("fun StatusBadge(", components)
             self.assertIn('package_name("com.example.demoandroid.app")', appfile)
-            self.assertIn("cd .. && ./gradlew lint test assembleRelease", fastfile)
-            self.assertIn("assembleRelease", fastfile)
-            self.assertIn("BIUCING_RELEASE_*", fastfile)
+            self.assertIn('APP_IDENTIFIER = "com.example.demoandroid.app"', fastfile)
+            self.assertIn("lane :release_doctor", fastfile)
+            self.assertIn("lane :archive", fastfile)
+            self.assertIn("make bundle-release", fastfile)
+            self.assertIn("upload_to_play_store", fastfile)
+            self.assertIn('PLAY_STORE_BETA_TRACK", "internal"', fastfile)
+            self.assertIn('PLAY_STORE_RELEASE_TRACK", "production"', fastfile)
+            self.assertIn('PLAY_STORE_RELEASE_STATUS", "draft"', fastfile)
+            self.assertIn("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON", fastfile)
+            self.assertIn("BIUCING_RELEASE_STORE_FILE", fastlane_env_example)
+            self.assertIn("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON=play-store-service-account.json", fastlane_env_example)
+            self.assertIn("make release-doctor", release_delivery)
+            self.assertIn("uploads the AAB to the `internal` track", release_delivery)
+            self.assertIn("production` track as a `draft`", release_delivery)
             self.assertIn("./scripts/setup-android-sdk", bootstrap)
             self.assertNotIn("./scripts/sync-gradle-wrapper", bootstrap)
             self.assertIn("Android environment doctor", doctor)
@@ -505,6 +529,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("adb is available", doctor)
             self.assertIn("Emulator command is available", doctor)
             self.assertIn("gradle-wrapper.jar is missing", doctor)
+            self.assertIn("fastlane is not available", doctor)
             self.assertIn("Doctor found", doctor)
             self.assertIn("biucing.release.storeFile=signing/release.keystore", release_signing_example)
             self.assertIn("BIUCING_RELEASE_KEY_ALIAS", release_signing_example)
@@ -519,6 +544,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("worktree-doctor:", android_makefile)
             self.assertIn("clean-worktree:", android_makefile)
             self.assertIn("$(GRADLE) spotlessApply", android_makefile)
+            self.assertIn("$(GRADLE) bundleRelease", android_makefile)
+            self.assertIn("release-doctor:", android_makefile)
+            self.assertIn("archive:", android_makefile)
             self.assertIn("$(GRADLE) connectedDebugAndroidTest", android_makefile)
             self.assertIn("Worktree Workflow", readme)
             self.assertIn("debug application ID", readme)

@@ -317,6 +317,8 @@ Should define the standard developer surface:
 - `lint`
 - `format`
 - `install-debug`
+- `release-doctor`
+- `archive`
 - `beta`
 - `release`
 
