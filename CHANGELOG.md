@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 - 2026-08-01
+
+- completed release-delivery workflows for the Apple and Android starters, including signed archive/upload lanes for App Store Connect and Google Play tracks when local credentials are configured;
+- added Android release-signing verification and App Bundle artifact checks, including a reliable `BundleConfig.pb` integrity check;
+- completed HarmonyOS local pre-distribution automation with signing preflight and signed HAP build support;
+- recorded fresh native real-build evidence: Apple iOS/macOS generation, build, test, and simulator verification; Android lint, unit, APK, AAB, and emulator UI verification; HarmonyOS verify, test, and HAP verification;
+- clarified the remaining external boundary: no real store upload is claimed without the respective Apple, Google Play, or AppGallery credentials and application records.
+
 ## 0.6.1 - 2026-07-20
 
 - unified worktree identity across all seven starters with `WORKTREE_LABEL`, hash-based `WORKTREE_ID`, and `WORKTREE_SLUG`.

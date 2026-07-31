@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.6.1`.
+The current repository release target is `0.7.0`.
 
 ```bash
 biucing --version
@@ -100,8 +100,8 @@ Worktree-first status:
 Local Android validation status:
 
 - the Android starter now includes a committed Gradle wrapper;
-- the generated Android project has passed real `./gradlew assembleDebug` and `./gradlew assembleRelease` verification;
-- the maintainer workstation has one validated emulator target retained as `Biucing_API_35`.
+- the generated Android project has passed real lint, JVM unit tests, debug APK and release AAB builds, plus AAB integrity checks;
+- the maintainer workstation has validated the Compose UI smoke test on `Biucing_API_35`.
 
 Local Apple validation status:
 
@@ -128,6 +128,8 @@ Local HarmonyOS validation status:
 - [0.6.1 Plan](docs/0.6.1-plan.md)
 - [0.6.1 Worktree Hardening Task Breakdown](docs/0.6.1-worktree-hardening-tasks.md)
 - [0.6.1 Release Prep](docs/0.6.1-release-prep.md)
+- [0.7.0 Release Notes](docs/0.7.0-release-notes.md)
+- [0.7.0 Release Prep](docs/0.7.0-release-prep.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

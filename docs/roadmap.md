@@ -64,11 +64,9 @@ Planning anchors:
 - [0.6.0 Worktree Task Breakdown](0.6.0-worktree-tasks.md)
 - [0.6.0 Release Prep](0.6.0-release-prep.md)
 
-## Current
-
 ### 0.6.1 - Worktree Isolation Hardening
 
-`0.6.1` should harden the worktree-first behavior shipped in `0.6.0`.
+`0.6.1` hardened the worktree-first behavior shipped in `0.6.0`.
 
 The release is focused on:
 
@@ -86,11 +84,30 @@ Planning anchors:
 
 Implementation status:
 
-- Phase A through Phase G are complete;
 - all seven templates use one worktree identity model;
 - Docker-first templates expose port conflict advice and Compose config diagnostics;
 - native evidence is split into `static`, `doctor`, and `real-build` tiers;
 - HarmonyOS debug bundle rewriting is explicitly deferred behind a read-only diagnostic boundary.
+
+## Current
+
+### 0.7.0 - Native Release Readiness
+
+`0.7.0` completes the native templates' local verification and pre-distribution workflows.
+
+The release is focused on:
+
+- Apple Fastlane archive, TestFlight, and App Store Connect delivery lanes;
+- Android signing validation, release AAB validation, and Google Play internal/production delivery lanes;
+- HarmonyOS signing preflight and local release HAP generation;
+- fresh real-build evidence across Apple, Android, and HarmonyOS.
+
+Release anchors:
+
+- [0.7.0 Release Notes](0.7.0-release-notes.md)
+- [0.7.0 Release Prep](0.7.0-release-prep.md)
+
+External account credentials and actual store submissions remain intentionally outside the committed template configuration.
 
 ## Deferred
 

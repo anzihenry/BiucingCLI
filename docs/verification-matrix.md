@@ -38,7 +38,7 @@ These checks apply to every release regardless of which template changed.
 
 ## Worktree Isolation Matrix
 
-These checks are the release bar for the `0.6.0` worktree-first claim and the `0.6.1` worktree hardening follow-up.
+These checks are the release bar for the `0.6.0` worktree-first claim, the `0.6.1` worktree hardening follow-up, and later template releases.
 
 | Template family | Required proof | Release bar |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ Use a fresh output directory for these examples so the output is easy to reprodu
 Real-build proof is required when the release changes native project structure, generated manifests, package identity, signing inputs, build settings, generated platform dependency files, or native build/test targets.
 It is optional, but valuable, for docs-only, CLI metadata-only, or worktree diagnostic wording changes that do not alter generated native build behavior.
 
-Suggested fresh worktree proof for `0.6.1`:
+Suggested fresh worktree proof:
 
 | Template | Worktree proof |
 | --- | --- |
@@ -133,10 +133,12 @@ The current repo-level automated baseline includes:
 - generated-project `go test ./...` proof for the new `worker` starter.
 - worktree metadata and Makefile command-surface coverage for every shipped starter.
 
+The `0.7.0` release additionally records fresh `real-build` evidence for all three native templates in [0.7.0-release-prep.md](0.7.0-release-prep.md). This is workstation-specific proof and does not claim that store credentials or external distribution accounts were exercised.
+
 ## Maintainer Notes
 
 - Prefer evidence that can be rerun with a small number of explicit commands.
 - If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
 - For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
-- For the latest concrete version-prep walkthrough, use [0.6.1-release-prep.md](0.6.1-release-prep.md).
+- For the latest concrete version-prep walkthrough, use [0.7.0-release-prep.md](0.7.0-release-prep.md).
