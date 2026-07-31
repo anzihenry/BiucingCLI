@@ -351,6 +351,9 @@ class CLITestCase(unittest.TestCase):
             fastfile = (project_dir / "fastlane" / "Fastfile").read_text(encoding="utf-8")
             bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
             doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
+            artifact_info = (project_dir / "scripts" / "artifact-info").read_text(
+                encoding="utf-8"
+            )
             sync_wrapper = (
                 project_dir / "scripts" / "sync-gradle-wrapper"
             ).read_text(encoding="utf-8")
@@ -411,6 +414,7 @@ class CLITestCase(unittest.TestCase):
                 "gradlew",
                 "gradlew.bat",
                 "scripts/bootstrap",
+                "scripts/artifact-info",
                 "scripts/doctor",
                 "scripts/setup-android-sdk",
                 "scripts/sync-gradle-wrapper",
@@ -435,6 +439,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make release", readme)
             self.assertIn("make release-doctor", readme)
             self.assertIn("make archive", readme)
+            self.assertIn("make verify", readme)
+            self.assertIn("make verify-release-signing", readme)
+            self.assertIn("make artifact-info", readme)
             self.assertIn("Google Play `internal` track", readme)
             self.assertIn("production` track as a `draft`", readme)
             self.assertIn("cmdline-tools/latest", readme)
@@ -470,6 +477,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('create("release")', app_build)
             self.assertIn('signingConfig = signingConfigs.getByName("release")', app_build)
             self.assertIn('storeFile = rootProject.file(releaseStoreFile!!)', app_build)
+            self.assertIn('tasks.register("verifyReleaseSigning")', app_build)
+            self.assertIn("KeyStore.getInstance", app_build)
             self.assertIn('biucing.release.storeFile', app_build)
             self.assertIn('BIUCING_RELEASE_STORE_FILE', app_build)
             self.assertIn('hasCompleteReleaseSigning', app_build)
@@ -511,6 +520,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("lane :release_doctor", fastfile)
             self.assertIn("lane :archive", fastfile)
             self.assertIn("make bundle-release", fastfile)
+            self.assertIn("make verify-release-signing", fastfile)
+            self.assertIn("make artifact-info", fastfile)
             self.assertIn("upload_to_play_store", fastfile)
             self.assertIn('PLAY_STORE_BETA_TRACK", "internal"', fastfile)
             self.assertIn('PLAY_STORE_RELEASE_TRACK", "production"', fastfile)
@@ -519,6 +530,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("BIUCING_RELEASE_STORE_FILE", fastlane_env_example)
             self.assertIn("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON=play-store-service-account.json", fastlane_env_example)
             self.assertIn("make release-doctor", release_delivery)
+            self.assertIn("make artifact-info", release_delivery)
             self.assertIn("uploads the AAB to the `internal` track", release_delivery)
             self.assertIn("production` track as a `draft`", release_delivery)
             self.assertIn("./scripts/setup-android-sdk", bootstrap)
@@ -545,6 +557,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("clean-worktree:", android_makefile)
             self.assertIn("$(GRADLE) spotlessApply", android_makefile)
             self.assertIn("$(GRADLE) bundleRelease", android_makefile)
+            self.assertIn("verify-release-signing:", android_makefile)
+            self.assertIn("artifact-info:", android_makefile)
+            self.assertIn("verify: doctor lint test build", android_makefile)
             self.assertIn("release-doctor:", android_makefile)
             self.assertIn("archive:", android_makefile)
             self.assertIn("$(GRADLE) connectedDebugAndroidTest", android_makefile)
@@ -552,12 +567,15 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("debug application ID", readme)
             self.assertIn("androidTestImplementation(libs.androidx.compose.ui.test.junit4)", app_build)
             self.assertIn("debugImplementation(libs.androidx.compose.ui.test.manifest)", app_build)
+            self.assertIn("Android App Bundle artifact check", artifact_info)
+            self.assertIn("BundleConfig.pb", artifact_info)
             self.assertIn("gradle wrapper --gradle-version 8.10.2", sync_wrapper)
             self.assertIn('-jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"', gradlew)
             self.assertTrue(expected_files.issubset(generated_files))
             self.assertIn("gradle/wrapper/gradle-wrapper.jar", generated_files)
             self.assertTrue(os.access(project_dir / "gradlew", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "artifact-info", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "sync-gradle-wrapper", os.X_OK))
 

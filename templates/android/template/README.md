@@ -37,6 +37,7 @@ make doctor
 make format
 make build
 make test
+make verify
 ```
 
 ## Worktree Workflow
@@ -78,8 +79,10 @@ make test
 make test-ui
 make lint
 make install-debug
+make verify-release-signing
 make release-doctor
 make archive
+make artifact-info
 make beta
 make release
 ```
@@ -119,9 +122,13 @@ Before a real Google Play handoff, the team also needs to supply:
 
 Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and keep the real `.env`, service-account JSON, and keystore untracked. See `docs/release-delivery.md` for the complete setup path.
 
-`make release-doctor` checks the service-account JSON path, release-signing inputs, upload keystore, and enabled metadata configuration before a native bundle spends time building.
+`make verify` is the default local quality gate: it runs doctor, lint, unit tests, and a debug build.
 
-`make archive` runs lint, unit tests, and `bundleRelease`, then verifies that a signed `app-release.aab` was created without uploading it.
+`make verify-release-signing` opens the configured keystore and verifies that the configured alias is a usable private-key entry without printing any signing secret.
+
+`make release-doctor` checks the service-account JSON path, release-signing inputs, upload keystore, private key, and enabled metadata configuration before a native bundle spends time building.
+
+`make archive` runs lint, unit tests, signing verification, and `bundleRelease`, then verifies that a signed `app-release.aab` is a readable Android App Bundle and prints its checksum without uploading it.
 
 `make beta` runs the archive lane and uploads the AAB to the Google Play `internal` track by default.
 
@@ -144,4 +151,5 @@ Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and k
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.
 - `docs/release-signing.properties.example` documents the expected signing keys without committing secrets.
 - `fastlane/Fastfile` owns Google Play credential checks, signed AAB creation, internal-track delivery, and draft production delivery.
+- `scripts/artifact-info` verifies a release AAB is readable, contains `BundleConfig.pb`, and prints a checksum for handoff records.
 - Google Play store listings can be managed from `fastlane/metadata/android` after `fastlane supply init`; Data safety, content ratings, policy declarations, and review answers remain Play Console responsibilities.

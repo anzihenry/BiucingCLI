@@ -5,6 +5,7 @@ plugins {
 }
 
 import java.util.Properties
+import java.security.KeyStore
 
 fun loadLocalProperties(rootDir: java.io.File): Properties {
     val properties = Properties()
@@ -118,6 +119,36 @@ android {
 
     buildFeatures {
         compose = true
+    }
+}
+
+tasks.register("verifyReleaseSigning") {
+    group = "verification"
+    description = "Verifies that the configured release keystore contains the configured private key."
+
+    doLast {
+        require(hasCompleteReleaseSigning) {
+            "Configure all biucing.release.* values or BIUCING_RELEASE_* environment variables."
+        }
+
+        val storeFile = rootProject.file(requireNotNull(releaseStoreFile))
+        require(storeFile.isFile) { "Release keystore does not exist: ${storeFile.path}" }
+
+        val storePassword = requireNotNull(releaseStorePassword)
+        val keyAlias = requireNotNull(releaseKeyAlias)
+        val keyPassword = requireNotNull(releaseKeyPassword)
+        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+
+        storeFile.inputStream().use { keyStore.load(it, storePassword.toCharArray()) }
+        require(keyStore.containsAlias(keyAlias)) {
+            "Release keystore does not contain alias: $keyAlias"
+        }
+        require(keyStore.isKeyEntry(keyAlias)) {
+            "Release signing alias is not a private-key entry: $keyAlias"
+        }
+        requireNotNull(keyStore.getKey(keyAlias, keyPassword.toCharArray())) {
+            "Release signing key could not be opened for alias: $keyAlias"
+        }
     }
 }
 

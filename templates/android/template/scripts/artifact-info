@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+artifact_path="app/build/outputs/bundle/release/app-release.aab"
+
+echo "Android App Bundle artifact check"
+
+if [[ ! -s "$artifact_path" ]]; then
+  echo "AAB is missing or empty: $artifact_path"
+  echo "Run make bundle-release or make archive first."
+  exit 1
+fi
+
+if ! unzip -tqq "$artifact_path"; then
+  echo "AAB archive validation failed: $artifact_path"
+  exit 1
+fi
+
+if ! unzip -Z1 "$artifact_path" | grep -qx "BundleConfig.pb"; then
+  echo "AAB does not contain BundleConfig.pb: $artifact_path"
+  exit 1
+fi
+
+echo "AAB: $artifact_path"
+shasum -a 256 "$artifact_path"
+du -h "$artifact_path"

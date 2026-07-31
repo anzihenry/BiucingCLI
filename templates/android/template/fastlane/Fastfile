@@ -86,6 +86,7 @@ platform :android do
     play_service_account_json_path
     UI.user_error!("Configure all BIUCING_RELEASE_* values or local.properties signing values.") unless release_signing_ready?
     UI.user_error!("Create #{METADATA_PATH} before enabling Play Store metadata uploads.") if metadata_upload_requested? && !Dir.exist?(METADATA_PATH)
+    sh("make verify-release-signing")
     UI.success("Google Play credentials, release signing, and metadata configuration are present.")
   end
 
@@ -96,6 +97,7 @@ platform :android do
     sh("make test")
     sh("make bundle-release")
     UI.user_error!("No signed Android App Bundle was produced at #{RELEASE_AAB_PATH}.") unless File.file?(RELEASE_AAB_PATH)
+    sh("make artifact-info")
   end
 
   desc "Build, sign, and upload an internal Google Play test build"

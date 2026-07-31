@@ -22,12 +22,14 @@ Google Play requires an app record to exist before API-driven delivery. Complete
 ```bash
 make release-doctor
 make archive
+make artifact-info
 make beta
 make release
 ```
 
-- `make release-doctor` verifies the service-account JSON, the four release-signing inputs, the upload keystore, and any enabled metadata directory.
-- `make archive` runs lint and unit tests, then builds a signed `app-release.aab` without uploading it.
+- `make release-doctor` verifies the service-account JSON, the four release-signing inputs, upload keystore, private key alias, and any enabled metadata directory.
+- `make archive` runs lint and unit tests, validates the signing key, then builds a signed `app-release.aab` without uploading it.
+- `make artifact-info` verifies the AAB is readable, confirms its `BundleConfig.pb` entry, and prints a SHA-256 checksum.
 - `make beta` runs the archive lane and uploads the AAB to the `internal` track by default.
 - `make release` runs the archive lane and uploads the AAB to the `production` track as a `draft` by default.
 
