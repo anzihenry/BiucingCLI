@@ -2,10 +2,25 @@
 .idea/
 build/
 local.properties
-fastlane/.env
-fastlane/*.json
 captures/
 *.iml
 app/build/
 core/**/build/
 feature/**/build/
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+/credentials/
+/signing/
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+/key.properties
+/keystore.properties
+/signing.properties
+/fastlane/*.json
+/play-store-service-account.json

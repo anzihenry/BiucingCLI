@@ -6,7 +6,7 @@ The generated starter includes fastlane lanes for release credential checks, sig
 
 1. Register `{{BUNDLE_IDENTIFIER}}` in Apple Developer and App Store Connect.
 2. Create an App Store Connect API key with access to manage builds for the app.
-3. Save the fastlane API key JSON locally and keep it untracked.
+3. Save the fastlane API key JSON as `credentials/app-store-connect-api-key.json` locally and keep it untracked.
 4. Create a private certificate repository for `fastlane match`.
 5. Copy `fastlane/.env.example` to `fastlane/.env` and replace the placeholders.
 6. Run the first certificate/profile sync from a trusted machine:
@@ -46,7 +46,10 @@ By default, `make release` uploads the binary but does not submit it for review.
 Keep these files local or in your CI secret store:
 
 - `fastlane/.env`
-- `fastlane/app-store-connect-api-key.json` when viewed from the project root, or `app-store-connect-api-key.json` in `fastlane/.env`
-- `fastlane/*.p8`
+- `credentials/app-store-connect-api-key.json`
+- `.p8`, `.p12`, and `.pfx` private-key containers
+- `.mobileprovision` and `.provisionprofile` files
 
-Do not commit API keys, certificate repository credentials, provisioning profiles, or Apple ID sessions.
+The template also ignores the legacy root name `app-store-connect-api-key.json` and credential JSON files directly under `fastlane/`. Keep `.env.example` as placeholders only. Do not commit API keys, certificate repository credentials, provisioning profiles, or Apple ID sessions.
+
+Ignore rules only protect untracked files and do not override `git add -f`. If real credentials have already been committed, revoke or rotate them first, remove them from the index, and assess whether repository history must be rewritten.

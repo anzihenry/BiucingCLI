@@ -6,13 +6,13 @@ The generated starter uses fastlane `supply` to validate release inputs, build a
 
 1. Create `{{APPLICATION_ID}}` in Google Play Console and finish the required app-registration steps.
 2. Enable the Google Play Developer API for the Google Cloud project that owns the service account.
-3. Create a service-account JSON key, invite that account in Play Console with the least privileges needed for the intended tracks, and keep the JSON file untracked.
+3. Create a service-account JSON key, invite that account in Play Console with the least privileges needed for the intended tracks, and save it locally as `credentials/play-store-service-account.json`.
 4. Configure an upload keystore through `local.properties` or the `BIUCING_RELEASE_*` CI variables. For Play App Signing, this is the upload key, not the app-signing key managed by Google.
 5. Copy `fastlane/.env.example` to `fastlane/.env` and replace its placeholder values.
 6. Verify the credential independently before the first delivery:
 
 ```bash
-fastlane run validate_play_store_json_key json_key:play-store-service-account.json
+fastlane run validate_play_store_json_key json_key:credentials/play-store-service-account.json
 ```
 
 Google Play requires an app record to exist before API-driven delivery. Complete the first app-registration flow in Play Console before relying on a CI upload.
@@ -52,6 +52,10 @@ Data safety declarations, content rating, target audience, app access instructio
 Keep these out of version control and store them in the CI secret manager:
 
 - `fastlane/.env`
-- the Google Play service-account JSON file
-- the upload keystore and its passwords
+- `credentials/play-store-service-account.json`
+- the upload keystore under `signing/` and its passwords
 - `local.properties` when it contains signing values
+
+For direct Gradle use, keep signing values in `~/.gradle/gradle.properties`; never add them to the tracked project-level `gradle.properties`. Keep `.env.example` and signing-property examples as placeholders only.
+
+Ignore rules only protect untracked files and do not override `git add -f`. If real credentials have already been committed, revoke or rotate them first, remove them from the index, and assess whether repository history must be rewritten.

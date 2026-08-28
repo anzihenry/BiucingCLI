@@ -112,7 +112,7 @@ The Gradle template also accepts the same values as Gradle properties:
 - `biucing.release.keyAlias`
 - `biucing.release.keyPassword`
 
-Gradle properties are useful for direct Gradle invocations. The fastlane delivery lanes use `local.properties` or `BIUCING_RELEASE_*` so `make release-doctor`, `make archive`, `make beta`, and `make release` can verify the signing material before building.
+For direct Gradle invocations, put these values in the user-level `~/.gradle/gradle.properties`, not the tracked project-level `gradle.properties`. The fastlane delivery lanes use `local.properties` or `BIUCING_RELEASE_*` so `make release-doctor`, `make archive`, `make beta`, and `make release` can verify the signing material before building.
 
 Before a real Google Play handoff, the team also needs to supply:
 
@@ -120,7 +120,7 @@ Before a real Google Play handoff, the team also needs to supply:
 - a Google Cloud service-account JSON key that is invited to the Play Console app
 - an upload keystore and all four signing values above
 
-Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and keep the real `.env`, service-account JSON, and keystore untracked. See `docs/release-delivery.md` for the complete setup path.
+Copy `fastlane/.env.example` to `fastlane/.env`, place the service-account JSON under the ignored `credentials/` directory and the upload keystore under the ignored `signing/` directory, then replace the placeholders. See `docs/release-delivery.md` for the complete setup path.
 
 `make verify` is the default local quality gate: it runs doctor, lint, unit tests, and a debug build.
 
@@ -150,6 +150,7 @@ Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and k
 - Dark mode is part of the starter theme contract, so new components should prefer `MaterialTheme.colorScheme` and shared tokens over hard-coded colors.
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.
 - `docs/release-signing.properties.example` documents the expected signing keys without committing secrets.
+- `.gitignore` protects the recommended `credentials/` and `signing/` directories, keystores, local signing property files, and Fastlane credential JSON. It cannot protect files already tracked or force-added.
 - `fastlane/Fastfile` owns Google Play credential checks, signed AAB creation, internal-track delivery, and draft production delivery.
 - `scripts/artifact-info` verifies a release AAB is readable, contains `BundleConfig.pb`, and prints a checksum for handoff records.
 - Google Play store listings can be managed from `fastlane/metadata/android` after `fastlane supply init`; Data safety, content ratings, policy declarations, and review answers remain Play Console responsibilities.

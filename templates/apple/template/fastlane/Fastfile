@@ -3,6 +3,7 @@ default_platform(:{{FASTLANE_PLATFORM}})
 APP_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}"
 APP_STORE_PLATFORM = "{{APP_STORE_PLATFORM}}"
 TEAM_ID = ENV.fetch("DEVELOPMENT_TEAM_ID", "{{DEVELOPMENT_TEAM}}")
+PROJECT_ROOT = File.expand_path("..", __dir__)
 WORKSPACE = "{{PROJECT_NAME}}.xcworkspace"
 SCHEME = "{{SWIFT_MODULE_NAME}}"
 ARCHIVE_PATH = "build/release/{{SWIFT_MODULE_NAME}}.xcarchive"
@@ -18,8 +19,9 @@ end
 def require_env_file(name)
   value = ENV[name]
   UI.user_error!("Set #{name}. See fastlane/.env.example.") if value.to_s.empty?
-  UI.user_error!("#{name} does not exist: #{value}") unless File.exist?(File.expand_path(value))
-  value
+  path = File.expand_path(value, PROJECT_ROOT)
+  UI.user_error!("#{name} does not exist: #{path}") unless File.file?(path)
+  path
 end
 
 def require_env_value(name)

@@ -46,6 +46,62 @@ class CLITestCase(unittest.TestCase):
                 main(argv)
         return excinfo.exception.code, stdout.getvalue(), stderr.getvalue()
 
+    def init_git_repository(self, project_dir, *, commit=False):
+        subprocess.run(["git", "init", "-q"], cwd=project_dir, check=True)
+        if commit:
+            subprocess.run(
+                ["git", "config", "user.email", "tests@example.com"],
+                cwd=project_dir,
+                check=True,
+            )
+            subprocess.run(
+                ["git", "config", "user.name", "BiucingCLI Tests"],
+                cwd=project_dir,
+                check=True,
+            )
+            subprocess.run(["git", "add", "."], cwd=project_dir, check=True)
+            subprocess.run(
+                ["git", "commit", "-q", "-m", "test fixture"],
+                cwd=project_dir,
+                check=True,
+            )
+
+    def create_harmony_release_fixture(self, tmpdir, name):
+        self.run_cli(
+            [
+                "create",
+                "harmonyos",
+                name,
+                "--output-dir",
+                tmpdir,
+                "--bundle-name",
+                f"com.example.{name.replace('-', '')}",
+            ]
+        )
+        project_dir = Path(tmpdir) / name
+        self.init_git_repository(project_dir, commit=True)
+
+        signing_dir = project_dir / "signing"
+        signing_dir.mkdir()
+        for filename in ("release.cer", "release.p7b", "release.p12"):
+            (signing_dir / filename).write_text("test signing material", encoding="utf-8")
+        (project_dir / "local.properties").write_text(
+            "\n".join(
+                [
+                    "biucing.harmony.signing.certpath=signing/release.cer",
+                    "biucing.harmony.signing.profile=signing/release.p7b",
+                    "biucing.harmony.signing.storeFile=signing/release.p12",
+                    "biucing.harmony.signing.storePassword=store-secret-value",
+                    "biucing.harmony.signing.keyAlias=release",
+                    "biucing.harmony.signing.keyPassword=key-secret-value",
+                    "biucing.harmony.signing.signAlg=SHA256withECDSA",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        return project_dir
+
     def test_main_defaults_to_template_summary(self):
         output = self.run_cli([])
 
@@ -529,7 +585,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('PLAY_STORE_RELEASE_STATUS", "draft"', fastfile)
             self.assertIn("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON", fastfile)
             self.assertIn("BIUCING_RELEASE_STORE_FILE", fastlane_env_example)
-            self.assertIn("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON=play-store-service-account.json", fastlane_env_example)
+            self.assertIn(
+                "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON=credentials/play-store-service-account.json",
+                fastlane_env_example,
+            )
             self.assertIn("make release-doctor", release_delivery)
             self.assertIn("make artifact-info", release_delivery)
             self.assertIn("uploads the AAB to the `internal` track", release_delivery)
@@ -849,12 +908,16 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("HarmonyOS package artifact check", artifact_info)
             self.assertIn("No HAP artifact found", artifact_info)
             self.assertIn("HarmonyOS release signing preflight", release_preflight)
+            self.assertIn("contains signing material", release_preflight)
             self.assertIn("Release signing material is present", release_preflight)
             self.assertIn("import { describe, expect, it } from '@ohos/hypium';", starter_test)
             self.assertIn("export default function testsuite", starter_test)
             self.assertIn("com.example.demoharmony", starter_test)
             self.assertIn("local.properties is missing", release_build)
             self.assertIn("./scripts/release-preflight", release_build)
+            self.assertIn("git diff --quiet", release_build)
+            self.assertIn("cmp -s", release_build)
+            self.assertIn("trap 'exit 143' TERM", release_build)
             self.assertIn("biucing.harmony.signing.certpath", release_build)
             self.assertIn("type: 'HarmonyOS'", release_build)
             self.assertIn("buildMode=release", release_build)
@@ -1984,9 +2047,11 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("enum BiucingTheme", design_system_theme)
             self.assertIn("sectionTitleFont", design_system_theme)
             self.assertIn("import AppServices", app_tests)
-            self.assertIn("fastlane/.env", gitignore)
-            self.assertIn("fastlane/*.json", gitignore)
-            self.assertIn("fastlane/*.p8", gitignore)
+            self.assertIn("!.env.example", gitignore)
+            self.assertIn("/credentials/", gitignore)
+            self.assertIn("/signing/", gitignore)
+            self.assertIn("*.mobileprovision", gitignore)
+            self.assertIn("/fastlane/*.json", gitignore)
             self.assertIn('app_identifier("com.example.pulsemac")', appfile)
             self.assertIn('apple_id(ENV.fetch("FASTLANE_USER", "developer@example.com"))', appfile)
             self.assertIn('team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "ABCDE12345"))', appfile)
@@ -2011,7 +2076,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('git_url(ENV.fetch("MATCH_GIT_URL"', matchfile)
             self.assertIn('app_identifier(["com.example.pulsemac"])', matchfile)
             self.assertIn('team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "ABCDE12345"))', matchfile)
-            self.assertIn("APP_STORE_CONNECT_API_KEY_PATH=app-store-connect-api-key.json", fastlane_env_example)
+            self.assertIn(
+                "APP_STORE_CONNECT_API_KEY_PATH=credentials/app-store-connect-api-key.json",
+                fastlane_env_example,
+            )
             self.assertIn("MATCH_ALLOW_WRITE=false", fastlane_env_example)
             self.assertIn("make release-doctor", release_delivery)
             self.assertIn("MATCH_ALLOW_WRITE=true fastlane match appstore", release_delivery)
@@ -2292,6 +2360,260 @@ class CLITestCase(unittest.TestCase):
             self.assertIn(".listStyle(.insetGrouped)", home_view)
             self.assertIn('navigationTitle("Starter Overview")', home_view)
             self.assertNotIn("NavigationSplitView", home_view)
+
+    def test_native_templates_ignore_credentials_without_hiding_public_fixtures(self):
+        cases = {
+            "apple": {
+                "args": [
+                    "create",
+                    "apple",
+                    "ignore-apple",
+                    "--bundle-identifier",
+                    "com.example.ignoreapple",
+                ],
+                "project": "ignore-apple",
+                "ignored": [
+                    "credentials/api-key.json",
+                    "signing/distribution.cer",
+                    "private-key.p8",
+                    "distribution.p12",
+                    "distribution.pfx",
+                    "profile.mobileprovision",
+                    "profile.provisionprofile",
+                    "fastlane/private.json",
+                    "fastlane/.env.production",
+                    "app-store-connect-api-key.json",
+                ],
+                "trackable": [
+                    "fastlane/.env.example",
+                    "fixtures/public.cer",
+                    "fixtures/public.pem",
+                    "fixtures/config.json",
+                    "fixtures/profile.p7b",
+                ],
+            },
+            "android": {
+                "args": [
+                    "create",
+                    "android",
+                    "ignore-android",
+                    "--package-name",
+                    "com.example.ignoreandroid",
+                ],
+                "project": "ignore-android",
+                "ignored": [
+                    "credentials/play.json",
+                    "signing/release.keystore",
+                    "release.jks",
+                    "release.keystore",
+                    "release.p12",
+                    "release.pfx",
+                    "key.properties",
+                    "keystore.properties",
+                    "signing.properties",
+                    "fastlane/private.json",
+                    "fastlane/.env.local",
+                    "play-store-service-account.json",
+                    "local.properties",
+                ],
+                "trackable": [
+                    "fastlane/.env.example",
+                    "docs/release-signing.properties.example",
+                    "gradle.properties",
+                    "fixtures/public.cer",
+                    "fixtures/public.pem",
+                    "fixtures/config.json",
+                    "fixtures/profile.p7b",
+                ],
+            },
+            "harmonyos": {
+                "args": [
+                    "create",
+                    "harmonyos",
+                    "ignore-harmony",
+                    "--bundle-name",
+                    "com.example.ignoreharmony",
+                ],
+                "project": "ignore-harmony",
+                "ignored": [
+                    "credentials/account.json",
+                    "signing/release.cer",
+                    "signing/release.p7b",
+                    "signing/release.p12",
+                    "release.p8",
+                    "release.pfx",
+                    ".biucing/release/build-profile.json5.backup",
+                    ".env.release",
+                    "local.properties",
+                ],
+                "trackable": [
+                    "docs/release-signing.local.properties.example",
+                    "build-profile.json5",
+                    "fixtures/public.cer",
+                    "fixtures/public.pem",
+                    "fixtures/config.json",
+                    "fixtures/profile.p7b",
+                ],
+            },
+        }
+
+        for platform, case in cases.items():
+            with self.subTest(platform=platform), tempfile.TemporaryDirectory() as tmpdir:
+                self.run_cli([*case["args"], "--output-dir", tmpdir])
+                project_dir = Path(tmpdir) / case["project"]
+                self.init_git_repository(project_dir)
+
+                for relative_path in [*case["ignored"], *case["trackable"]]:
+                    path = project_dir / relative_path
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    if not path.exists():
+                        path.write_text("fixture", encoding="utf-8")
+
+                for relative_path in case["ignored"]:
+                    result = subprocess.run(
+                        ["git", "check-ignore", "-q", "--", relative_path],
+                        cwd=project_dir,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 0, relative_path)
+
+                for relative_path in case["trackable"]:
+                    result = subprocess.run(
+                        ["git", "check-ignore", "-q", "--", relative_path],
+                        cwd=project_dir,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 1, relative_path)
+
+    def test_harmonyos_release_restores_profile_after_success_and_failure(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_dir = self.create_harmony_release_fixture(
+                tmpdir, "release-restore-harmony"
+            )
+            build_profile_path = project_dir / "build-profile.json5"
+            original_profile = build_profile_path.read_bytes()
+            fake_hvigor = Path(tmpdir) / "fake-hvigor"
+            fake_hvigor.write_text(
+                """#!/usr/bin/env bash
+set -euo pipefail
+node - <<'NODE'
+const fs = require('fs');
+const profile = JSON.parse(fs.readFileSync('build-profile.json5', 'utf8'));
+const configs = profile.app.signingConfigs || [];
+if (configs.length !== 1 || configs[0].name !== 'release') {
+  console.error('release signing config was not injected');
+  process.exit(20);
+}
+NODE
+if [[ "${FAKE_HVIGOR_FAIL:-0}" == "1" ]]; then
+  exit 42
+fi
+if [[ -n "${FAKE_HVIGOR_SIGNAL:-}" ]]; then
+  kill -s "$FAKE_HVIGOR_SIGNAL" "$PPID"
+  sleep 0.2
+fi
+""",
+                encoding="utf-8",
+            )
+            fake_hvigor.chmod(0o755)
+            release_script = project_dir / "scripts" / "release-build"
+
+            for should_fail in (False, True):
+                with self.subTest(should_fail=should_fail):
+                    env = os.environ.copy()
+                    env["HVIGOR"] = str(fake_hvigor)
+                    if should_fail:
+                        env["FAKE_HVIGOR_FAIL"] = "1"
+                    result = subprocess.run(
+                        [str(release_script)],
+                        cwd=project_dir,
+                        env=env,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, 42 if should_fail else 0)
+                    self.assertEqual(build_profile_path.read_bytes(), original_profile)
+                    self.assertFalse((project_dir / ".biucing" / "release").exists())
+                    self.assertNotIn("store-secret-value", result.stdout + result.stderr)
+                    self.assertNotIn("key-secret-value", result.stdout + result.stderr)
+
+            for signal_name, expected_status in (("HUP", 129), ("INT", 130), ("TERM", 143)):
+                with self.subTest(signal=signal_name):
+                    env = os.environ.copy()
+                    env["HVIGOR"] = str(fake_hvigor)
+                    env["FAKE_HVIGOR_SIGNAL"] = signal_name
+                    result = subprocess.run(
+                        [str(release_script)],
+                        cwd=project_dir,
+                        env=env,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, expected_status)
+                    self.assertEqual(build_profile_path.read_bytes(), original_profile)
+                    self.assertFalse((project_dir / ".biucing" / "release").exists())
+
+    def test_harmonyos_release_rejects_residue_and_dirty_build_profile(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_dir = self.create_harmony_release_fixture(
+                tmpdir, "release-guard-harmony"
+            )
+            build_profile_path = project_dir / "build-profile.json5"
+            original_profile = build_profile_path.read_text(encoding="utf-8")
+            release_script = project_dir / "scripts" / "release-build"
+            preflight_script = project_dir / "scripts" / "release-preflight"
+
+            dirty_profile = f"{original_profile}\n"
+            build_profile_path.write_text(dirty_profile, encoding="utf-8")
+            result = subprocess.run(
+                [str(release_script)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("has staged or unstaged changes", result.stderr)
+
+            build_profile_path.write_text(original_profile, encoding="utf-8")
+            build_profile_path.write_text(dirty_profile, encoding="utf-8")
+            subprocess.run(
+                ["git", "add", "build-profile.json5"], cwd=project_dir, check=True
+            )
+            result = subprocess.run(
+                [str(release_script)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("has staged or unstaged changes", result.stderr)
+
+            residue = json.loads(original_profile)
+            residue["app"]["signingConfigs"] = [
+                {
+                    "name": "release",
+                    "material": {
+                        "storePassword": "residual-store-secret",
+                        "keyPassword": "residual-key-secret",
+                    },
+                }
+            ]
+            build_profile_path.write_text(json.dumps(residue), encoding="utf-8")
+            result = subprocess.run(
+                [str(preflight_script)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("contains signing material", result.stderr)
+            self.assertNotIn("residual-store-secret", result.stdout + result.stderr)
+            self.assertNotIn("residual-key-secret", result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,18 @@ Tuist/Dependencies
 *.xcarchive
 *.ipa
 *.pkg
-fastlane/.env
-fastlane/*.json
-fastlane/*.p8
 xcuserdata
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+/credentials/
+/signing/
+*.p8
+*.p12
+*.pfx
+*.mobileprovision
+*.provisionprofile
+/fastlane/*.json
+/app-store-connect-api-key.json

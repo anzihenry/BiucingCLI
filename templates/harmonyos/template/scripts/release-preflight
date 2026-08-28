@@ -3,6 +3,42 @@ set -euo pipefail
 
 echo "HarmonyOS release signing preflight"
 
+node <<'NODE'
+const fs = require('fs');
+
+const buildProfilePath = 'build-profile.json5';
+let buildProfile;
+try {
+  buildProfile = JSON.parse(fs.readFileSync(buildProfilePath, 'utf8'));
+} catch (_error) {
+  console.error(`${buildProfilePath} is missing or is not valid JSON.`);
+  process.exit(1);
+}
+
+const signingConfigs = buildProfile?.app?.signingConfigs;
+const containsPasswordField = (value) => {
+  if (Array.isArray(value)) {
+    return value.some(containsPasswordField);
+  }
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  return Object.entries(value).some(([key, child]) => {
+    if ((key === 'storePassword' || key === 'keyPassword') && String(child || '').length > 0) {
+      return true;
+    }
+    return containsPasswordField(child);
+  });
+};
+
+if (!Array.isArray(signingConfigs) || signingConfigs.length > 0 || containsPasswordField(buildProfile)) {
+  console.error(`${buildProfilePath} contains signing material.`);
+  console.error('Restore the committed unsigned build profile before running a release.');
+  process.exit(1);
+}
+NODE
+
 if [[ ! -f "local.properties" ]]; then
   cat >&2 <<'EOF'
 local.properties is missing.

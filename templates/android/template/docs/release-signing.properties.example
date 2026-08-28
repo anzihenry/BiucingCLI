@@ -1,3 +1,4 @@
+# This example must contain placeholders only. Never put real credentials here.
 # Copy these keys into local.properties for local-only signing setup,
 # or export the matching BIUCING_RELEASE_* environment variables in CI.
 #

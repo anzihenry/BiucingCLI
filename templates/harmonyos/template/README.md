@@ -56,7 +56,7 @@ export DEVECO_SDK_HOME="/Applications/DevEco-Studio.app/Contents/sdk"
 export HOS_SDK_HOME="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony"
 ```
 Open the project with DevEco Studio when you need signing, device management, previewer, or emulator workflows.
-`make test` runs the starter Hypium suite through `hvigorw test`. `make build` creates an unsigned HAP by default. `make artifact-info` verifies the latest HAP exists, is non-empty, and prints its checksum. `make verify` runs the local pre-distribution gate: `doctor`, `lint`, `test`, `build`, and `artifact-info`. `make release-preflight` checks local signing material without mutating the build profile. `make release` reads local-only signing material from `local.properties`, temporarily injects a release signing config into `build-profile.json5`, runs hvigor with `buildMode=release`, and restores the original profile after the build.
+`make test` runs the starter Hypium suite through `hvigorw test`. `make build` creates an unsigned HAP by default. `make artifact-info` verifies the latest HAP exists, is non-empty, and prints its checksum. `make verify` runs the local pre-distribution gate: `doctor`, `lint`, `test`, `build`, and `artifact-info`. `make release-preflight` checks local signing material and rejects signing values left in the tracked build profile. `make release` requires a clean tracked `build-profile.json5`, temporarily injects release signing config, runs hvigor with `buildMode=release`, and verifies exact restoration on exit.
 
 ## Worktree Workflow
 
@@ -113,7 +113,11 @@ The generated starter exposes `make test` through `hvigorw test --mode module -p
 
 ## Release Signing
 
-Local builds produce an unsigned HAP unless signing is configured. Use DevEco Studio for interactive signing setup, or copy `docs/release-signing.local.properties.example` to `local.properties` for local-only signing values. `make release-preflight` fails fast when any required signing key is missing or any signing file path does not exist. `make release` runs that same preflight before it injects signing config and starts the release build.
+Local builds produce an unsigned HAP unless signing is configured. Use DevEco Studio for interactive signing setup, or copy `docs/release-signing.local.properties.example` to `local.properties` for local-only signing values. Put `.cer`, `.p7b`, and `.p12` signing material under the ignored `signing/` directory. `make release-preflight` fails fast when required values are missing, paths do not resolve, or signing material remains in tracked `build-profile.json5`.
+
+`make release` stores a mode-restricted backup under the ignored `.biucing/release/` directory, writes the injected profile atomically, and restores the original bytes after success, build failure, `HUP`, `INT`, or `TERM`. `SIGKILL` cannot run cleanup handlers; the next preflight detects a non-empty signing configuration. Do not stage Git changes concurrently with a signed release build.
+
+The ignore rules also protect `credentials/`, private-key containers, and local environment files. They only apply to untracked files and do not override `git add -f`. If a real credential has already been committed, revoke or rotate it first, remove it from the index, and assess whether repository history must be rewritten.
 
 ## Pre-Distribution Coverage
 
@@ -133,7 +137,7 @@ The template intentionally stops before app-market upload or enterprise distribu
 - `oh-package.json5` is the project dependency manifest.
 - `build-profile.json5` declares the app signing placeholder and entry module.
 - `code-linter.json5` is committed so DevEco Studio and later CLI lint wiring share one rule source.
-- `docs/release-signing.local.properties.example` documents the local-only signing keys without committing secrets; `local.properties` is git-ignored.
+- `docs/release-signing.local.properties.example` documents placeholder-only local signing keys; `local.properties`, `signing/`, `credentials/`, and `.biucing/` are git-ignored.
 - The generated starter keeps app metadata in `AppConfig` and visual constants in `core/designsystem` so feature pages do not duplicate bundle, version, spacing, or color values.
 - Signing is left to DevEco Studio or CI-specific `local.properties` configuration.
 - Keep `bundleName`, module name, and SDK versions aligned with your target HarmonyOS release channel before store packaging.

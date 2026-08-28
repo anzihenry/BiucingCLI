@@ -4,7 +4,10 @@ set -euo pipefail
 HVIGOR_BIN="${HVIGOR:-hvigorw}"
 MODULE_NAME="{{HARMONY_MODULE_NAME}}"
 BUILD_PROFILE="build-profile.json5"
-BACKUP_PROFILE=".biucing/release/build-profile.json5.backup"
+BACKUP_DIR=".biucing/release"
+BACKUP_PROFILE="${BACKUP_DIR}/build-profile.json5.backup"
+GENERATED_PROFILE="${BACKUP_DIR}/build-profile.json5.generated"
+RESTORE_PROFILE="${BACKUP_DIR}/build-profile.json5.restore"
 
 if [[ ! -f "local.properties" ]]; then
   cat >&2 <<'EOF'
@@ -18,22 +21,69 @@ fi
 
 ./scripts/release-preflight
 
-mkdir -p "$(dirname "$BACKUP_PROFILE")"
-cp "$BUILD_PROFILE" "$BACKUP_PROFILE"
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1 || \
+  ! git ls-files --error-unmatch "$BUILD_PROFILE" >/dev/null 2>&1; then
+  echo "$BUILD_PROFILE must be tracked in a Git repository before a signed release." >&2
+  exit 1
+fi
+
+if ! git diff --quiet -- "$BUILD_PROFILE" || ! git diff --cached --quiet -- "$BUILD_PROFILE"; then
+  echo "$BUILD_PROFILE has staged or unstaged changes." >&2
+  echo "Commit or stash those changes before running a signed release." >&2
+  exit 1
+fi
+
+if ORIGINAL_MODE="$(stat -f '%Lp' "$BUILD_PROFILE" 2>/dev/null)"; then
+  :
+else
+  ORIGINAL_MODE="$(stat -c '%a' "$BUILD_PROFILE")"
+fi
+
+umask 077
+mkdir -p "$BACKUP_DIR"
+cp -p "$BUILD_PROFILE" "$BACKUP_PROFILE"
+chmod 600 "$BACKUP_PROFILE"
 
 restore_build_profile() {
+  local original_status=$?
+  local restore_status=0
+
+  trap - EXIT HUP INT TERM
+  rm -f "$GENERATED_PROFILE" "$RESTORE_PROFILE"
+
   if [[ -f "$BACKUP_PROFILE" ]]; then
-    cp "$BACKUP_PROFILE" "$BUILD_PROFILE"
+    if cp -p "$BACKUP_PROFILE" "$RESTORE_PROFILE" && \
+      mv -f "$RESTORE_PROFILE" "$BUILD_PROFILE" && chmod "$ORIGINAL_MODE" "$BUILD_PROFILE"; then
+      if cmp -s "$BACKUP_PROFILE" "$BUILD_PROFILE"; then
+        rm -f "$BACKUP_PROFILE"
+        rmdir "$BACKUP_DIR" 2>/dev/null || true
+      else
+        echo "Failed to verify restoration of $BUILD_PROFILE; backup retained at $BACKUP_PROFILE." >&2
+        restore_status=1
+      fi
+    else
+      echo "Failed to restore $BUILD_PROFILE; backup retained at $BACKUP_PROFILE." >&2
+      restore_status=1
+    fi
   fi
+
+  if [[ "$restore_status" -ne 0 ]]; then
+    exit "$restore_status"
+  fi
+  exit "$original_status"
 }
 trap restore_build_profile EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
-node <<'NODE'
+BUILD_PROFILE_PATH="$BUILD_PROFILE" GENERATED_PROFILE_PATH="$GENERATED_PROFILE" node <<'NODE'
 const fs = require('fs');
 const path = require('path');
 
 const localPropertiesPath = 'local.properties';
-const buildProfilePath = 'build-profile.json5';
+const buildProfilePath = process.env.BUILD_PROFILE_PATH;
+const generatedProfilePath = process.env.GENERATED_PROFILE_PATH;
 const requiredKeys = [
   'biucing.harmony.signing.certpath',
   'biucing.harmony.signing.profile',
@@ -106,10 +156,12 @@ for (const product of buildProfile.app.products || []) {
   product.signingConfig = 'release';
 }
 
-fs.writeFileSync(buildProfilePath, `${JSON.stringify(buildProfile, null, 2)}\n`);
+fs.writeFileSync(generatedProfilePath, `${JSON.stringify(buildProfile, null, 2)}\n`, { mode: 0o600 });
 console.log('Injected release signing config from local.properties.');
 NODE
 
+mv -f "$GENERATED_PROFILE" "$BUILD_PROFILE"
+
 "$HVIGOR_BIN" assembleHap --mode module -p "module=${MODULE_NAME}" -p buildMode=release
 
-echo "Release build finished. build-profile.json5 has been restored."
+echo "Release build finished. Restoring build-profile.json5."

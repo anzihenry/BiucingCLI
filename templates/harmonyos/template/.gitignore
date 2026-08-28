@@ -8,3 +8,14 @@ local.properties
 *.hap
 *.app
 *.log
+
+# Local credentials, signing material, and release backups
+.env
+.env.*
+!.env.example
+/credentials/
+/signing/
+/.biucing/
+*.p8
+*.p12
+*.pfx

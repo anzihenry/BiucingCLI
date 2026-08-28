@@ -101,7 +101,7 @@ Before a real beta or release handoff, the team needs to supply:
 - an App Store Connect API key JSON file referenced by `APP_STORE_CONNECT_API_KEY_PATH`
 - a private signing repository referenced by `MATCH_GIT_URL`
 
-Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and keep the real `.env`, API key JSON, and `.p8` files untracked. See `docs/release-delivery.md` for the full setup path.
+Copy `fastlane/.env.example` to `fastlane/.env`, place the API key JSON under the ignored `credentials/` directory, and replace the placeholders. Keep real `.env`, API key, private-key, certificate-container, and provisioning-profile files in your CI secret manager or an ignored local directory. See `docs/release-delivery.md` for the full setup path.
 
 `make release-doctor` validates the local release environment before a native archive spends time building. `make release-identity-check` separately verifies that the generated Release workspace resolves the exact configured bundle identifier.
 
@@ -124,5 +124,6 @@ Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and k
 - `fastlane/Appfile` reads `FASTLANE_USER` and `DEVELOPMENT_TEAM_ID` while keeping the generated bundle identifier as the stable app identity.
 - `fastlane/Fastfile` owns release credential checks, `match` signing sync, signed archive creation, TestFlight upload, and App Store Connect upload.
 - `scripts/verify-release-identity` prevents a worktree debug suffix from reaching signing or an uploaded archive by checking both Release build settings and the final xcarchive.
+- `.gitignore` protects the recommended `credentials/` and `signing/` directories plus common Apple private-key and provisioning-profile formats. It does not protect files already tracked or force-added with `git add -f`.
 - `{{APPLE_PLATFORM_OUTPUT_NOTE}}`
 - Generated `.xcodeproj` and `.xcworkspace` files should not be edited manually.
