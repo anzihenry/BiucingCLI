@@ -382,6 +382,15 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
                 "tests/server_test.go",
             }
         )
+    if definition.name == "frontend":
+        required_entries.update(
+            {
+                "pnpm-lock.yaml",
+                "playwright.production.config.ts",
+                "scripts/browser-smoke-production",
+                "tests/production-browser-smoke.spec.ts",
+            }
+        )
 
     missing_entries = sorted(entry for entry in required_entries if entry not in relative_entries)
     if missing_entries:

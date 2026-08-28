@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOCKER_BIN="${DOCKER:-docker}"
+IMAGE_REF="${IMAGE_REF:?IMAGE_REF is required}"
+HOST_PORT="${HOST_PORT:-8080}"
+CONTAINER_PORT="${CONTAINER_PORT:-80}"
+RUNTIME_CONTAINER="${RUNTIME_CONTAINER:?RUNTIME_CONTAINER is required}"
+DEV_COMPOSE_FILE="${DEV_COMPOSE_FILE:-compose.dev.yaml}"
+DEV_SERVICE="${DEV_SERVICE:-frontend-dev}"
+DEV_DOCKERFILE="${DEV_DOCKERFILE:-Dockerfile.dev}"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:?COMPOSE_PROJECT_NAME is required}"
+container_started=false
+
+cleanup() {
+  if [[ "$container_started" == "true" ]]; then
+    "$DOCKER_BIN" rm -f "$RUNTIME_CONTAINER" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+"$DOCKER_BIN" run --detach \
+  --name "$RUNTIME_CONTAINER" \
+  --publish "127.0.0.1:${HOST_PORT}:${CONTAINER_PORT}" \
+  "$IMAGE_REF" >/dev/null
+container_started=true
+
+runtime_status=""
+for _ in $(seq 1 30); do
+  runtime_status="$("$DOCKER_BIN" inspect --format '{{.State.Health.Status}}' "$RUNTIME_CONTAINER")"
+  if [[ "$runtime_status" == "healthy" ]]; then
+    break
+  fi
+  if [[ "$runtime_status" == "unhealthy" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ "$runtime_status" != "healthy" ]]; then
+  echo "Production container did not become healthy (status: ${runtime_status:-unknown})." >&2
+  "$DOCKER_BIN" logs "$RUNTIME_CONTAINER" >&2 || true
+  exit 1
+fi
+
+PLAYWRIGHT_BASE_URL="http://host.docker.internal:${HOST_PORT}" \
+DEV_DOCKERFILE="$DEV_DOCKERFILE" \
+COMPOSE_PROJECT_NAME="$COMPOSE_PROJECT_NAME" \
+  "$DOCKER_BIN" compose -f "$DEV_COMPOSE_FILE" run --rm \
+    --env PLAYWRIGHT_BASE_URL \
+    "$DEV_SERVICE" \
+    pnpm browser:smoke:production

@@ -1083,6 +1083,7 @@ class CLITestCase(unittest.TestCase):
             )
             project_dir = Path(tmpdir) / "demo-app"
             package_json = (project_dir / "package.json").read_text(encoding="utf-8")
+            pnpm_lock = (project_dir / "pnpm-lock.yaml").read_text(encoding="utf-8")
             readme = (project_dir / "README.md").read_text(encoding="utf-8")
             index_html = (project_dir / "index.html").read_text(encoding="utf-8")
             eslint_config = (project_dir / "eslint.config.js").read_text(encoding="utf-8")
@@ -1105,8 +1106,17 @@ class CLITestCase(unittest.TestCase):
             playwright_config = (
                 project_dir / "playwright.smoke.config.ts"
             ).read_text(encoding="utf-8")
+            playwright_production_config = (
+                project_dir / "playwright.production.config.ts"
+            ).read_text(encoding="utf-8")
             browser_smoke_test = (
                 project_dir / "tests" / "browser-smoke.spec.ts"
+            ).read_text(encoding="utf-8")
+            production_browser_smoke_test = (
+                project_dir / "tests" / "production-browser-smoke.spec.ts"
+            ).read_text(encoding="utf-8")
+            production_browser_smoke_script = (
+                project_dir / "scripts" / "browser-smoke-production"
             ).read_text(encoding="utf-8")
             app_router = (
                 project_dir / "src" / "router" / "AppRouter.tsx"
@@ -1144,6 +1154,13 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('"test:watch": "vitest"', package_json)
             self.assertIn('"browser:install": "playwright install chromium"', package_json)
             self.assertIn('"browser:smoke": "playwright test -c playwright.smoke.config.ts"', package_json)
+            self.assertIn(
+                '"browser:smoke:production": "playwright test -c playwright.production.config.ts"',
+                package_json,
+            )
+            self.assertIn('lockfileVersion: "9.0"', pnpm_lock)
+            self.assertIn("playwright@1.55.0", pnpm_lock)
+            self.assertIn("@testing-library/jest-dom@6.9.1", pnpm_lock)
             self.assertIn('"format": "prettier --write ."', package_json)
             self.assertIn("Docker Workflow", readme)
             self.assertIn("Available Commands", readme)
@@ -1153,6 +1170,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("Package Manager", readme)
             self.assertIn("make dev", readme)
             self.assertIn("make browser-smoke", readme)
+            self.assertIn("make browser-smoke-production", readme)
+            self.assertIn("make lockfile-update", readme)
+            self.assertIn("committed `pnpm-lock.yaml`", readme)
             self.assertIn("The default development image stays relatively light", readme)
             self.assertIn("make bootstrap-full", readme)
             self.assertIn("DEV_DOCKERFILE=Dockerfile.dev.full make dev", readme)
@@ -1165,6 +1185,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("DEV_HOST_PORT ?=$(DEV_PORT)", makefile)
             self.assertIn("PNPM_HOME ?=$(WORKTREE_ROOT)/.pnpm-home/$(WORKTREE_ID)", makefile)
             self.assertIn("PNPM_STORE_DIR ?=$(WORKTREE_ROOT)/.pnpm-store", makefile)
+            self.assertIn("RUNTIME_CONTAINER ?=$(WORKTREE_SLUG)-production-smoke", makefile)
             self.assertIn("worktree-info:", makefile)
             self.assertIn("worktree-doctor:", makefile)
             self.assertIn("PNPM_STORE_DIR should stay inside this worktree", makefile)
@@ -1191,34 +1212,49 @@ class CLITestCase(unittest.TestCase):
                 makefile,
             )
             self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:install",
+                'DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "pnpm install --frozen-lockfile && pnpm browser:install"',
                 makefile,
             )
             self.assertIn(
                 "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke",
                 makefile,
             )
-            self.assertIn("docker build -t $(IMAGE_REF) .", makefile)
-            self.assertIn("FROM node:20-alpine AS builder", dockerfile)
-            self.assertIn("FROM nginx:1.27-alpine", dockerfile)
+            self.assertIn("BUILDER_IMAGE ?=node:20-alpine", makefile)
+            self.assertIn("RUNTIME_IMAGE ?=nginx:1.27-alpine", makefile)
+            self.assertIn("DEV_BASE_IMAGE ?=node:20-bookworm", makefile)
+            self.assertIn("--build-arg BUILDER_IMAGE=$(BUILDER_IMAGE)", makefile)
+            self.assertIn("browser-smoke-production: docker-build browser-install", makefile)
+            self.assertIn("./scripts/browser-smoke-production", makefile)
+            self.assertIn("lockfile-update:", makefile)
+            self.assertIn("pnpm install --no-frozen-lockfile", makefile)
+            self.assertIn("ARG BUILDER_IMAGE=node:20-alpine", dockerfile)
+            self.assertIn("FROM ${BUILDER_IMAGE} AS builder", dockerfile)
+            self.assertIn("ARG RUNTIME_IMAGE=nginx:1.27-alpine", dockerfile)
+            self.assertIn("FROM ${RUNTIME_IMAGE}", dockerfile)
+            self.assertIn("COPY package.json pnpm-lock.yaml ./", dockerfile)
+            self.assertIn("pnpm install --frozen-lockfile", dockerfile)
+            self.assertIn("HEALTHCHECK", dockerfile)
             self.assertIn("COPY --from=builder /app/dist /usr/share/nginx/html", dockerfile)
-            self.assertIn("FROM node:20-bookworm", dockerfile_dev)
+            self.assertIn("ARG DEV_BASE_IMAGE=node:20-bookworm", dockerfile_dev)
+            self.assertIn("FROM ${DEV_BASE_IMAGE}", dockerfile_dev)
             self.assertIn("PNPM_STORE_DIR=/pnpm-store", dockerfile_dev)
             self.assertIn("PLAYWRIGHT_BROWSERS_PATH=/ms-playwright", dockerfile_dev)
             self.assertIn(
-                'CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173"]',
+                'CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install --frozen-lockfile; fi; pnpm dev --host 0.0.0.0 --port 5173"]',
                 dockerfile_dev,
             )
-            self.assertIn("FROM node:20-bookworm", dockerfile_dev_full)
-            self.assertIn("COPY package.json ./", dockerfile_dev_full)
-            self.assertIn("pnpm install --no-frozen-lockfile", dockerfile_dev_full)
+            self.assertIn("ARG DEV_BASE_IMAGE=node:20-bookworm", dockerfile_dev_full)
+            self.assertIn("COPY package.json pnpm-lock.yaml ./", dockerfile_dev_full)
+            self.assertIn("pnpm install --frozen-lockfile", dockerfile_dev_full)
             self.assertIn("pnpm exec playwright install chromium", dockerfile_dev_full)
             self.assertIn("frontend-dev", compose_dev)
             self.assertIn("dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}", compose_dev)
+            self.assertIn("DEV_BASE_IMAGE: ${DEV_BASE_IMAGE:-node:20-bookworm}", compose_dev)
             self.assertIn(
-                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port ${DEV_PORT:-5173} --strictPort"',
+                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install --frozen-lockfile; fi; pnpm dev --host 0.0.0.0 --port ${DEV_PORT:-5173} --strictPort"',
                 compose_dev,
             )
+            self.assertIn('"host.docker.internal:host-gateway"', compose_dev)
             self.assertIn('"${DEV_HOST_PORT:-5173}:${DEV_PORT:-5173}"', compose_dev)
             self.assertIn("frontend-node-modules", compose_dev)
             self.assertIn("frontend-pnpm-store", compose_dev)
@@ -1239,9 +1275,22 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("AppRouter", app_file)
             self.assertIn("apiBaseUrl", env_config)
             self.assertIn("pnpm exec vite", playwright_config)
+            self.assertIn('testMatch: "browser-smoke.spec.ts"', playwright_config)
             self.assertIn('baseURL: "http://127.0.0.1:4173"', playwright_config)
+            self.assertIn("PLAYWRIGHT_BASE_URL is required", playwright_production_config)
+            self.assertNotIn("webServer", playwright_production_config)
             self.assertIn('name: "Demo App"', browser_smoke_test)
             self.assertIn("browser-smoke-homepage.png", browser_smoke_test)
+            self.assertIn('toContain("nginx")', production_browser_smoke_test)
+            self.assertIn("production-image-homepage.png", production_browser_smoke_test)
+            self.assertIn("State.Health.Status", production_browser_smoke_script)
+            self.assertIn("pnpm browser:smoke:production", production_browser_smoke_script)
+            self.assertIn("docker.internal", production_browser_smoke_script)
+            self.assertTrue(
+                os.access(
+                    project_dir / "scripts" / "browser-smoke-production", os.X_OK
+                )
+            )
             self.assertIn("createBrowserRouter", app_router)
             self.assertIn("v7_startTransition", app_router)
             self.assertIn("VITE_API_BASE_URL is not configured", api_client)

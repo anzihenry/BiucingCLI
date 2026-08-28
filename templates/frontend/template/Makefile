@@ -8,6 +8,10 @@ IMAGE ?=$(WORKTREE_SLUG)
 TAG ?=dev
 IMAGE_REF := $(IMAGE):$(TAG)
 COMPOSE ?=COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) docker compose
+DOCKER ?=docker
+BUILDER_IMAGE ?=node:20-alpine
+RUNTIME_IMAGE ?=nginx:1.27-alpine
+DEV_BASE_IMAGE ?=node:20-bookworm
 DEV_COMPOSE_FILE ?=compose.dev.yaml
 DEV_SERVICE ?=frontend-dev
 DEV_DOCKERFILE ?=Dockerfile.dev
@@ -15,6 +19,7 @@ DEV_PORT ?=5173
 DEV_HOST_PORT ?=$(DEV_PORT)
 HOST_PORT ?=8080
 CONTAINER_PORT ?=80
+RUNTIME_CONTAINER ?=$(WORKTREE_SLUG)-production-smoke
 PNPM_HOME ?=$(WORKTREE_ROOT)/.pnpm-home/$(WORKTREE_ID)
 PNPM_STORE_DIR ?=$(WORKTREE_ROOT)/.pnpm-store
 export COMPOSE_PROJECT_NAME
@@ -24,8 +29,9 @@ export HOST_PORT
 export CONTAINER_PORT
 export PNPM_HOME
 export PNPM_STORE_DIR
+export DEV_BASE_IMAGE
 
-.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install dev dev-shell lint typecheck test build preview browser-install browser-smoke format format-check docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install lockfile-update dev dev-shell lint typecheck test build preview browser-install browser-smoke browser-smoke-production format format-check docker-build docker-run
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -35,7 +41,11 @@ worktree-info:
 	@printf '%s\n' "Compose project: $(COMPOSE_PROJECT_NAME)"
 	@printf '%s\n' "Dev URL: http://127.0.0.1:$(DEV_HOST_PORT)"
 	@printf '%s\n' "Runtime URL: http://127.0.0.1:$(HOST_PORT)"
+	@printf '%s\n' "Production smoke container: $(RUNTIME_CONTAINER)"
 	@printf '%s\n' "Image ref: $(IMAGE_REF)"
+	@printf '%s\n' "Builder image: $(BUILDER_IMAGE)"
+	@printf '%s\n' "Runtime base image: $(RUNTIME_IMAGE)"
+	@printf '%s\n' "Development base image: $(DEV_BASE_IMAGE)"
 	@printf '%s\n' "Compose file: $(DEV_COMPOSE_FILE)"
 	@printf '%s\n' "pnpm home: $(PNPM_HOME)"
 	@printf '%s\n' "pnpm store: $(PNPM_STORE_DIR)"
@@ -58,6 +68,7 @@ worktree-compose-config:
 
 clean-worktree:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans --volumes
+	@$(DOCKER) rm -f "$(RUNTIME_CONTAINER)" >/dev/null 2>&1 || true
 
 bootstrap:
 	DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
@@ -66,7 +77,10 @@ bootstrap-full:
 	DEV_DOCKERFILE=Dockerfile.dev.full $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
 install:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm install
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm install --frozen-lockfile
+
+lockfile-update:
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm install --no-frozen-lockfile
 
 dev:
 	DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
@@ -90,10 +104,13 @@ preview:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE) pnpm preview --host 0.0.0.0 --port $(DEV_PORT)
 
 browser-install:
-	DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:install
+	DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "pnpm install --frozen-lockfile && pnpm browser:install"
 
 browser-smoke:
 	DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke
+
+browser-smoke-production: docker-build browser-install
+	DOCKER="$(DOCKER)" IMAGE_REF="$(IMAGE_REF)" HOST_PORT="$(HOST_PORT)" CONTAINER_PORT="$(CONTAINER_PORT)" RUNTIME_CONTAINER="$(RUNTIME_CONTAINER)" DEV_COMPOSE_FILE="$(DEV_COMPOSE_FILE)" DEV_SERVICE="$(DEV_SERVICE)" DEV_DOCKERFILE="$(DEV_DOCKERFILE)" COMPOSE_PROJECT_NAME="$(COMPOSE_PROJECT_NAME)" ./scripts/browser-smoke-production
 
 format:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm format
@@ -102,7 +119,7 @@ format-check:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm format:check
 
 docker-build:
-	docker build -t $(IMAGE_REF) .
+	$(DOCKER) build --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) -t $(IMAGE_REF) .
 
 docker-run:
-	docker run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)
+	$(DOCKER) run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)

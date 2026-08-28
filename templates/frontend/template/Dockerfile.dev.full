@@ -1,4 +1,5 @@
-FROM node:20-bookworm
+ARG DEV_BASE_IMAGE=node:20-bookworm
+FROM ${DEV_BASE_IMAGE}
 
 WORKDIR /workspace
 
@@ -28,11 +29,12 @@ RUN corepack enable && corepack prepare pnpm@9.9.0 --activate
 
 ENV CI=1
 ENV PNPM_STORE_DIR=/pnpm-store
+ENV npm_config_store_dir=/pnpm-store
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-COPY package.json ./
-RUN pnpm install --no-frozen-lockfile \
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile \
     && pnpm exec playwright install chromium \
     && rm -rf node_modules
 
-CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install; fi; pnpm dev --host 0.0.0.0 --port 5173"]
+CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install --frozen-lockfile; fi; pnpm dev --host 0.0.0.0 --port 5173"]

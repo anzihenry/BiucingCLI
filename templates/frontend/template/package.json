@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "browser:install": "playwright install chromium",
     "browser:smoke": "playwright test -c playwright.smoke.config.ts",
+    "browser:smoke:production": "playwright test -c playwright.production.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -27,7 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
-    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.5",
@@ -39,7 +40,7 @@
     "eslint-plugin-react-refresh": "^0.4.11",
     "globals": "^15.9.0",
     "jsdom": "^25.0.1",
-    "playwright": "^1.55.0",
+    "playwright": "1.55.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.3.0",

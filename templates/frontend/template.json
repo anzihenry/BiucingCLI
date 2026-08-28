@@ -15,7 +15,8 @@
     "evidence": [
       "python unittest template rendering coverage",
       "real docker runtime image builds",
-      "real docker development image builds"
+      "real docker development image builds",
+      "real Playwright browser checks against the production Nginx image"
     ]
   },
   "operating_assumptions": [

@@ -40,6 +40,7 @@ DEV_DOCKERFILE=Dockerfile.dev.full make dev
 make bootstrap
 make bootstrap-full
 make install
+make lockfile-update
 make dev
 make dev-shell
 make lint
@@ -48,6 +49,7 @@ make test
 make build
 make browser-install
 make browser-smoke
+make browser-smoke-production
 make docker-build
 make docker-run
 ```
@@ -101,6 +103,7 @@ pnpm format:check
 - Vitest and Testing Library provide a fast component-test baseline.
 - Playwright provides a single-command browser smoke check for localhost verification.
 - `make browser-smoke` runs the Playwright smoke check inside the Docker development image.
+- `make browser-smoke-production` builds the Nginx runtime image, waits for its container health check, and verifies the rendered app plus the `nginx` response header in Chromium.
 
 ## Runtime Configuration
 
@@ -118,8 +121,9 @@ pnpm format:check
 ## Package Manager
 
 - This starter standardizes on `pnpm` via Corepack.
-- The generated `package.json` declares the expected `pnpm` and Node.js versions.
-- `make install` is still available when you intentionally refresh dependencies after editing `package.json`.
+- The generated `package.json` declares the expected `pnpm` and Node.js versions, and the committed `pnpm-lock.yaml` is the reproducible dependency source of truth.
+- `make install`, development images, and the production image use `--frozen-lockfile` and fail when `package.json` and `pnpm-lock.yaml` disagree.
+- After intentionally editing dependencies, run `make lockfile-update`, review both manifest and lockfile changes, then return to frozen installs.
 - Compose-scoped `node_modules`, pnpm, and Playwright cache volumes persist downloads across container runs without sharing state across worktrees.
 - Direct pnpm usage reads `.npmrc`, so package-store state stays in `.pnpm-store` under the current worktree.
 
@@ -128,8 +132,11 @@ pnpm format:check
 ```bash
 make browser-install
 make browser-smoke
+make browser-smoke-production
 ```
 
 - With the default dev image, `make browser-install` populates the shared Playwright cache volume.
 - With `Dockerfile.dev.full`, the initial build preloads that browser cache so smoke checks are ready sooner on first run.
 - `browser:smoke` starts a local Vite server on `127.0.0.1:4173`, opens Chromium, checks the starter homepage, and writes a screenshot under `test-results/`.
+- `browser-smoke-production` uses a separate Playwright configuration with no Vite server. It starts the built Nginx image in a worktree-scoped temporary container, waits for Docker health, runs Chromium from the development container against the published runtime port, verifies the Nginx response, and always removes the runtime container on exit.
+- `BUILDER_IMAGE`, `RUNTIME_IMAGE`, and `DEV_BASE_IMAGE` are overridable when CI uses an approved registry mirror. Defaults remain the official Docker Hub Node and Nginx images.

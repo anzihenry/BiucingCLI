@@ -2,6 +2,7 @@ import { defineConfig } from "playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
+  testMatch: "browser-smoke.spec.ts",
   fullyParallel: false,
   reporter: "list",
   use: {
