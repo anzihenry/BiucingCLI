@@ -21,17 +21,25 @@ After the first sync, keep `MATCH_ALLOW_WRITE=false` on developer and CI machine
 
 ```bash
 make release-doctor
+make release-generate
+make release-identity-check
 make archive
 make beta
 make release
 ```
 
 - `make release-doctor` validates local release credentials and signing configuration.
-- `make archive` generates the workspace, lints, tests, syncs App Store signing, and builds a signed archive.
+- `make release-generate` regenerates the workspace with the configured release bundle identifier and ignores any `DEBUG_BUNDLE_SUFFIX` inherited from a worktree or shell.
+- `make release-identity-check` verifies the Release target's resolved `PRODUCT_BUNDLE_IDENTIFIER` before signing material is requested.
+- `make archive` generates and verifies the Release workspace, lints, tests, syncs App Store signing, builds a signed archive, and verifies the xcarchive bundle identifier.
 - `make beta` runs `archive` and uploads the signed ipa/pkg to TestFlight.
 - `make release` runs `archive` and uploads the signed ipa/pkg to App Store Connect.
 
 By default, `make release` uploads the binary but does not submit it for review. Set `APP_STORE_SUBMIT_FOR_REVIEW=true` only after metadata, screenshots, review information, privacy details, and compliance answers are ready.
+
+## Release Identity Boundary
+
+`DEBUG_BUNDLE_SUFFIX` belongs only to local Debug/worktree workflows. Archive, beta, and release lanes always clear it, even when a caller exports a non-empty value. The delivery pipeline compares both the generated Release build settings and `Info.plist` inside the final xcarchive with `{{BUNDLE_IDENTIFIER}}`; any missing or different value stops the lane before upload.
 
 ## Local Secrets
 

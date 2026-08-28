@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- hardened Apple archive, TestFlight, and App Store release workflows so worktree debug bundle suffixes are always discarded, with Release workspace and xcarchive identity checks before signing and upload.
+
 ## 0.7.0 - 2026-08-01
 
 - completed release-delivery workflows for the Apple and Android starters, including signed archive/upload lanes for App Store Connect and Google Play tracks when local credentials are configured;

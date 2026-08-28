@@ -1,8 +1,7 @@
-import Foundation
 import ProjectDescription
 
 let appName = "{{SWIFT_MODULE_NAME}}"
-let debugBundleSuffix = ProcessInfo.processInfo.environment["DEBUG_BUNDLE_SUFFIX"] ?? ""
+let debugBundleSuffix = Environment.debugBundleSuffix.getString(default: "")
 
 let project = Project(
     name: appName,

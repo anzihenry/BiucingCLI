@@ -62,6 +62,8 @@ Simulator; set `DEBUG_BUNDLE_SUFFIX=` to keep the generated bundle identifier.
 ```bash
 make doctor
 make generate
+make release-generate
+make release-identity-check
 make build
 make lint
 make format
@@ -73,6 +75,8 @@ make release
 ```
 
 `make doctor` validates Xcode selection, `xcodebuild`, Tuist, Swift, SwiftLint, SwiftFormat, fastlane, and simulator/runtime visibility before you spend time on `make generate`, `make build`, or `make test`.
+
+`DEBUG_BUNDLE_SUFFIX` is a local Debug/worktree identity only. Normal `make generate`, `make build`, and `make test` workflows keep the suffix so parallel worktrees can install side by side. `make release-generate`, `make archive`, `make beta`, and `make release` always discard it and use the configured release bundle identifier.
 
 ## Configuration
 
@@ -99,9 +103,9 @@ Before a real beta or release handoff, the team needs to supply:
 
 Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and keep the real `.env`, API key JSON, and `.p8` files untracked. See `docs/release-delivery.md` for the full setup path.
 
-`make release-doctor` validates the local release environment before a native archive spends time building.
+`make release-doctor` validates the local release environment before a native archive spends time building. `make release-identity-check` separately verifies that the generated Release workspace resolves the exact configured bundle identifier.
 
-`make archive` runs project generation, lint, tests, signing sync, and a signed App Store archive build.
+`make archive` regenerates the workspace without a debug suffix, verifies the Release build settings before signing sync, runs lint and tests, builds a signed App Store archive, and verifies the archive bundle identifier before returning the artifact.
 
 `make beta` runs the archive lane and uploads the signed ipa/pkg to TestFlight.
 
@@ -119,5 +123,6 @@ Copy `fastlane/.env.example` to `fastlane/.env`, replace the placeholders, and k
 - `make doctor` is the fastest way to catch missing Xcode, Tuist, fastlane, or simulator setup before native commands fail later.
 - `fastlane/Appfile` reads `FASTLANE_USER` and `DEVELOPMENT_TEAM_ID` while keeping the generated bundle identifier as the stable app identity.
 - `fastlane/Fastfile` owns release credential checks, `match` signing sync, signed archive creation, TestFlight upload, and App Store Connect upload.
+- `scripts/verify-release-identity` prevents a worktree debug suffix from reaching signing or an uploaded archive by checking both Release build settings and the final xcarchive.
 - `{{APPLE_PLATFORM_OUTPUT_NOTE}}`
 - Generated `.xcodeproj` and `.xcworkspace` files should not be edited manually.

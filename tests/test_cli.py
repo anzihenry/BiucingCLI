@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import plistlib
 import subprocess
 import sys
 import tempfile
@@ -1865,6 +1866,9 @@ class CLITestCase(unittest.TestCase):
             test_destination = (
                 project_dir / "scripts" / "test-destination"
             ).read_text(encoding="utf-8")
+            release_identity_script = (
+                project_dir / "scripts" / "verify-release-identity"
+            ).read_text(encoding="utf-8")
 
             self.assertTrue(project_dir.exists())
             self.assertIn("Created apple project: pulse-mac", output)
@@ -1899,7 +1903,15 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("tuist generate --no-open", makefile)
             self.assertIn("platform=macOS", makefile)
             self.assertIn("release-doctor:", makefile)
+            self.assertIn("release-generate:", makefile)
+            self.assertIn("release-identity-check:", makefile)
+            self.assertIn(
+                "$(MAKE) --no-print-directory DEBUG_BUNDLE_SUFFIX= generate", makefile
+            )
             self.assertIn("archive:", makefile)
+            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane archive", makefile)
+            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane beta", makefile)
+            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane release", makefile)
             self.assertIn("WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel", makefile)
             self.assertIn("WORKTREE_LABEL ?= $(shell basename", makefile)
             self.assertIn("WORKTREE_ID ?= $(shell printf '%s' \"$(WORKTREE_ROOT)\" | shasum | cut -c1-8)", makefile)
@@ -1910,6 +1922,9 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("TUIST_HOME", makefile)
             self.assertIn("XDG_CACHE_HOME=$(TUIST_XDG_CACHE_HOME)", makefile)
             self.assertIn("DEBUG_BUNDLE_SUFFIX", makefile)
+            self.assertIn(
+                "Release bundle identifier: $(RELEASE_BUNDLE_IDENTIFIER)", makefile
+            )
             self.assertIn("worktree-info:", makefile)
             self.assertIn("worktree-doctor:", makefile)
             self.assertIn("clean-worktree:", makefile)
@@ -1925,7 +1940,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("--maxwidth 120", swiftformat_config)
             self.assertIn("let config = Config(", tuist_config)
             self.assertNotIn("fullHandle:", tuist_config)
-            self.assertIn("let debugBundleSuffix = ProcessInfo.processInfo.environment", project_swift)
+            self.assertIn(
+                'let debugBundleSuffix = Environment.debugBundleSuffix.getString(default: "")',
+                project_swift,
+            )
             self.assertIn('bundleId: "com.example.pulsemac\\(debugBundleSuffix)"', project_swift)
             self.assertIn('.local(path: "../Packages/AppServices")', project_swift)
             self.assertIn("destinations: .macOS", project_swift)
@@ -1978,6 +1996,12 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("lane :archive", fastfile)
             self.assertIn("sync_app_store_signing", fastfile)
             self.assertIn("build_signed_app", fastfile)
+            self.assertIn('sh("make release-generate")', fastfile)
+            self.assertIn('sh("make release-identity-check")', fastfile)
+            self.assertIn(
+                'sh("./scripts/verify-release-identity", "archive", ARCHIVE_PATH)',
+                fastfile,
+            )
             self.assertIn("upload_to_testflight", fastfile)
             self.assertIn("upload_to_app_store", fastfile)
             self.assertIn("api_key_path: app_store_api_key_path", fastfile)
@@ -1998,6 +2022,229 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("func testHomeViewModelUsesMockChecklistProvider()", app_tests)
             self.assertIn("StarterFact(label: \"Bundle ID\"", app_tests)
             self.assertIn("private struct MockReleaseChecklistProvider", app_tests)
+            self.assertIn(
+                'EXPECTED_BUNDLE_IDENTIFIER = "com.example.pulsemac"',
+                release_identity_script,
+            )
+            self.assertIn('when "workspace"', release_identity_script)
+            self.assertIn('when "archive"', release_identity_script)
+            self.assertTrue(
+                os.access(project_dir / "scripts" / "verify-release-identity", os.X_OK)
+            )
+
+    def test_apple_release_generation_discards_debug_bundle_suffix(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.run_cli(
+                [
+                    "create",
+                    "apple",
+                    "release-identity-app",
+                    "--output-dir",
+                    tmpdir,
+                    "--platform",
+                    "macos",
+                    "--bundle-identifier",
+                    "com.example.releaseidentity",
+                    "--non-interactive",
+                ]
+            )
+            project_dir = Path(tmpdir) / "release-identity-app"
+            fake_bin = Path(tmpdir) / "fake-bin"
+            fake_bin.mkdir()
+            tuist_log = Path(tmpdir) / "tuist.log"
+            fake_tuist = fake_bin / "tuist"
+            fake_tuist.write_text(
+                "#!/bin/sh\n"
+                "printf '%s|%s|%s\\n' \"$1\" \"${DEBUG_BUNDLE_SUFFIX-<unset>}\" "
+                "\"${TUIST_DEBUG_BUNDLE_SUFFIX-<unset>}\" "
+                ">> \"$TUIST_LOG\"\n",
+                encoding="utf-8",
+            )
+            fake_tuist.chmod(0o755)
+
+            environment = os.environ.copy()
+            environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
+            environment["TUIST_LOG"] = str(tuist_log)
+
+            debug_result = subprocess.run(
+                ["make", "generate", "WORKTREE_ID=alpha"],
+                cwd=project_dir,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(debug_result.returncode, 0, msg=debug_result.stderr)
+            self.assertEqual(
+                tuist_log.read_text(encoding="utf-8").splitlines(),
+                ["install|.alpha|.alpha", "generate|.alpha|.alpha"],
+            )
+
+            tuist_log.unlink()
+            release_result = subprocess.run(
+                [
+                    "make",
+                    "release-generate",
+                    "WORKTREE_ID=alpha",
+                    "DEBUG_BUNDLE_SUFFIX=.unexpected",
+                ],
+                cwd=project_dir,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(release_result.returncode, 0, msg=release_result.stderr)
+            self.assertIn(
+                "Release generation ignores DEBUG_BUNDLE_SUFFIX=.unexpected",
+                release_result.stdout,
+            )
+            self.assertEqual(
+                tuist_log.read_text(encoding="utf-8").splitlines(),
+                ["install||", "generate||"],
+            )
+
+    def test_apple_release_identity_script_checks_workspace_and_archive(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.run_cli(
+                [
+                    "create",
+                    "apple",
+                    "identity-check-app",
+                    "--output-dir",
+                    tmpdir,
+                    "--platform",
+                    "macos",
+                    "--bundle-identifier",
+                    "com.example.identitycheck",
+                    "--non-interactive",
+                ]
+            )
+            project_dir = Path(tmpdir) / "identity-check-app"
+            script = project_dir / "scripts" / "verify-release-identity"
+            fake_bin = Path(tmpdir) / "fake-bin"
+            fake_bin.mkdir()
+            fake_xcodebuild = fake_bin / "xcodebuild"
+            xcodebuild_payload = Path(tmpdir) / "xcodebuild.json"
+            fake_xcodebuild.write_text(
+                "#!/bin/sh\ncat \"$XCODEBUILD_PAYLOAD\"\n",
+                encoding="utf-8",
+            )
+            fake_xcodebuild.chmod(0o755)
+
+            environment = os.environ.copy()
+            environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
+            environment["XCODEBUILD_PAYLOAD"] = str(xcodebuild_payload)
+
+            def run_workspace(payload):
+                xcodebuild_payload.write_text(json.dumps(payload), encoding="utf-8")
+                return subprocess.run(
+                    [str(script), "workspace"],
+                    cwd=project_dir,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+
+            result = run_workspace(
+                [
+                    {
+                        "target": "IdentityCheckApp",
+                        "buildSettings": {
+                            "PRODUCT_BUNDLE_IDENTIFIER": "com.example.identitycheck"
+                        },
+                    }
+                ]
+            )
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertIn("workspace identity verified", result.stdout)
+
+            result = run_workspace(
+                [
+                    {
+                        "target": "IdentityCheckApp",
+                        "buildSettings": {
+                            "PRODUCT_BUNDLE_IDENTIFIER": (
+                                "com.example.identitycheck.alpha"
+                            )
+                        },
+                    }
+                ]
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Expected: com.example.identitycheck", result.stderr)
+            self.assertIn("Actual: com.example.identitycheck.alpha", result.stderr)
+
+            result = run_workspace(
+                [{"target": "IdentityCheckApp", "buildSettings": {}}]
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Actual: <missing>", result.stderr)
+
+            result = run_workspace(
+                [
+                    {"target": "IdentityCheckApp", "buildSettings": {}},
+                    {"target": "IdentityCheckApp", "buildSettings": {}},
+                ]
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("expected exactly one", result.stderr)
+
+            archive_dir = Path(tmpdir) / "IdentityCheckApp.xcarchive"
+            archive_dir.mkdir()
+            archive_plist = archive_dir / "Info.plist"
+
+            def write_archive(bundle_identifier=None):
+                properties = {}
+                if bundle_identifier is not None:
+                    properties["CFBundleIdentifier"] = bundle_identifier
+                with archive_plist.open("wb") as handle:
+                    plistlib.dump({"ApplicationProperties": properties}, handle)
+
+            write_archive("com.example.identitycheck")
+            result = subprocess.run(
+                [str(script), "archive", str(archive_dir)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+            self.assertIn("archive identity verified", result.stdout)
+
+            write_archive("com.example.identitycheck.alpha")
+            result = subprocess.run(
+                [str(script), "archive", str(archive_dir)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Actual: com.example.identitycheck.alpha", result.stderr)
+
+            write_archive()
+            result = subprocess.run(
+                [str(script), "archive", str(archive_dir)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Actual: <missing>", result.stderr)
+
+            archive_plist.unlink()
+            result = subprocess.run(
+                [str(script), "archive", str(archive_dir)],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("archive Info.plist is missing", result.stderr)
 
     def test_create_apple_ios_renders_platform_specific_output(self):
         with tempfile.TemporaryDirectory() as tmpdir:

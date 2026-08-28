@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "open3"
+
+EXPECTED_BUNDLE_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}"
+WORKSPACE = "{{PROJECT_NAME}}.xcworkspace"
+SCHEME = "{{SWIFT_MODULE_NAME}}"
+
+def fail_identity(message, actual: nil)
+  warn "Apple release identity check failed: #{message}"
+  warn "Expected: #{EXPECTED_BUNDLE_IDENTIFIER}"
+  warn "Actual: #{actual || '<missing>'}"
+  exit 1
+end
+
+def run_command(*command)
+  stdout, stderr, status = Open3.capture3(*command)
+  return stdout if status.success?
+
+  warn stderr unless stderr.empty?
+  fail_identity("command failed: #{command.join(' ')}")
+rescue Errno::ENOENT => error
+  fail_identity("command is unavailable: #{error.message}")
+end
+
+def verify_workspace
+  output = run_command(
+    "xcodebuild",
+    "-workspace", WORKSPACE,
+    "-scheme", SCHEME,
+    "-configuration", "Release",
+    "-showBuildSettings",
+    "-json"
+  )
+
+  settings = JSON.parse(output)
+  fail_identity("xcodebuild JSON root must be an array") unless settings.is_a?(Array)
+
+  app_targets = settings.select { |entry| entry["target"] == SCHEME }
+  unless app_targets.length == 1
+    fail_identity("expected exactly one Release build-settings entry for target #{SCHEME}")
+  end
+
+  actual = app_targets.first.fetch("buildSettings", {})["PRODUCT_BUNDLE_IDENTIFIER"]
+  unless actual == EXPECTED_BUNDLE_IDENTIFIER
+    fail_identity("Release build settings use the wrong bundle identifier", actual: actual)
+  end
+
+  puts "Apple Release workspace identity verified: #{actual}"
+rescue JSON::ParserError => error
+  fail_identity("xcodebuild returned invalid JSON: #{error.message}")
+end
+
+def verify_archive(path)
+  info_plist = File.join(path, "Info.plist")
+  fail_identity("archive Info.plist is missing: #{info_plist}") unless File.file?(info_plist)
+
+  actual = run_command(
+    "/usr/libexec/PlistBuddy",
+    "-c", "Print :ApplicationProperties:CFBundleIdentifier",
+    info_plist
+  ).strip
+  unless actual == EXPECTED_BUNDLE_IDENTIFIER
+    fail_identity("archive uses the wrong bundle identifier", actual: actual)
+  end
+
+  puts "Apple Release archive identity verified: #{actual}"
+end
+
+mode = ARGV.shift
+
+case mode
+when "workspace"
+  fail_identity("workspace mode does not accept extra arguments") unless ARGV.empty?
+  verify_workspace
+when "archive"
+  archive_path = ARGV.shift
+  if archive_path.to_s.empty? || !ARGV.empty?
+    fail_identity("archive mode requires exactly one xcarchive path")
+  end
+  verify_archive(archive_path)
+else
+  warn "Usage: ./scripts/verify-release-identity workspace"
+  warn "       ./scripts/verify-release-identity archive PATH_TO_XCARCHIVE"
+  exit 2
+end

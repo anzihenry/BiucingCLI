@@ -361,7 +361,14 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
     if definition.category == "native":
         required_entries.update({".mise.toml", "scripts"})
     if definition.name == "apple":
-        required_entries.update({"Tuist.swift", "Workspace.swift"})
+        required_entries.update(
+            {
+                "Tuist.swift",
+                "Workspace.swift",
+                "fastlane/Fastfile",
+                "scripts/verify-release-identity",
+            }
+        )
     if definition.name == "android":
         required_entries.update({"gradlew", "gradlew.bat", "scripts"})
 

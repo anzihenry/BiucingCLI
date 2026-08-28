@@ -85,11 +85,13 @@ platform :{{FASTLANE_PLATFORM}} do
   desc "Build a signed App Store archive without uploading"
   lane :archive do
     release_doctor
-    sh("make generate")
+    sh("make release-generate")
+    sh("make release-identity-check")
     sh("make lint")
     sh("make test")
     sync_app_store_signing
     build_signed_app
+    sh("./scripts/verify-release-identity", "archive", ARCHIVE_PATH)
   end
 
   desc "Build, sign, and upload a beta build to TestFlight"

@@ -16,6 +16,8 @@ SWIFTLINT_CACHE ?= $(WORKTREE_ROOT)/.swiftlint-cache/$(WORKTREE_ID)
 SWIFTFORMAT_CACHE ?= $(WORKTREE_ROOT)/.swiftformat.cache/$(WORKTREE_ID)
 DEBUG_BUNDLE_SUFFIX ?= .$(WORKTREE_ID)
 EFFECTIVE_BUNDLE_IDENTIFIER ?= {{BUNDLE_IDENTIFIER}}$(DEBUG_BUNDLE_SUFFIX)
+RELEASE_BUNDLE_IDENTIFIER := {{BUNDLE_IDENTIFIER}}
+TUIST_DEBUG_BUNDLE_SUFFIX := $(DEBUG_BUNDLE_SUFFIX)
 XCODEBUILD := xcodebuild -derivedDataPath $(DERIVED_DATA_PATH)
 TUIST_ENV := HOME=$(TUIST_HOME) XDG_CACHE_HOME=$(TUIST_XDG_CACHE_HOME) XDG_STATE_HOME=$(TUIST_XDG_STATE_HOME) XDG_CONFIG_HOME=$(TUIST_XDG_CONFIG_HOME) TMPDIR=$(TUIST_TMPDIR)
 TEST_DESTINATION ?= $(shell ./scripts/test-destination {{APPLE_PLATFORM}} 2>/dev/null || printf '%s' '{{XCODEBUILD_DESTINATION}}')
@@ -26,8 +28,9 @@ export TUIST_XDG_STATE_HOME
 export TUIST_XDG_CONFIG_HOME
 export TUIST_TMPDIR
 export DEBUG_BUNDLE_SUFFIX
+export TUIST_DEBUG_BUNDLE_SUFFIX
 
-.PHONY: bootstrap doctor generate clean build test lint format release-doctor archive beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor generate release-generate release-identity-check clean build test lint format release-doctor archive beta release worktree-info worktree-doctor clean-worktree
 
 bootstrap:
 	$(TUIST_ENV) WORKTREE_ID=$(WORKTREE_ID) ./scripts/bootstrap
@@ -39,6 +42,13 @@ generate:
 	mkdir -p "$(TUIST_HOME)" "$(TUIST_XDG_CACHE_HOME)" "$(TUIST_XDG_STATE_HOME)" "$(TUIST_XDG_CONFIG_HOME)" "$(TUIST_TMPDIR)"
 	$(TUIST_ENV) tuist install
 	$(TUIST_ENV) tuist generate --no-open
+
+release-generate:
+	@if [ -n "$(DEBUG_BUNDLE_SUFFIX)" ]; then printf '%s\n' "Release generation ignores DEBUG_BUNDLE_SUFFIX=$(DEBUG_BUNDLE_SUFFIX) and uses $(RELEASE_BUNDLE_IDENTIFIER)."; fi
+	$(MAKE) --no-print-directory DEBUG_BUNDLE_SUFFIX= generate
+
+release-identity-check:
+	./scripts/verify-release-identity workspace
 
 clean:
 	tuist clean
@@ -69,13 +79,16 @@ release-doctor:
 	fastlane release_doctor
 
 archive:
-	fastlane archive
+	@if [ -n "$(DEBUG_BUNDLE_SUFFIX)" ]; then printf '%s\n' "Archive ignores DEBUG_BUNDLE_SUFFIX=$(DEBUG_BUNDLE_SUFFIX) and uses $(RELEASE_BUNDLE_IDENTIFIER)."; fi
+	DEBUG_BUNDLE_SUFFIX= fastlane archive
 
 beta:
-	fastlane beta
+	@if [ -n "$(DEBUG_BUNDLE_SUFFIX)" ]; then printf '%s\n' "Beta delivery ignores DEBUG_BUNDLE_SUFFIX=$(DEBUG_BUNDLE_SUFFIX) and uses $(RELEASE_BUNDLE_IDENTIFIER)."; fi
+	DEBUG_BUNDLE_SUFFIX= fastlane beta
 
 release:
-	fastlane release
+	@if [ -n "$(DEBUG_BUNDLE_SUFFIX)" ]; then printf '%s\n' "App Store delivery ignores DEBUG_BUNDLE_SUFFIX=$(DEBUG_BUNDLE_SUFFIX) and uses $(RELEASE_BUNDLE_IDENTIFIER)."; fi
+	DEBUG_BUNDLE_SUFFIX= fastlane release
 
 worktree-info:
 	@printf '%s\n' "Project: {{PROJECT_NAME}}"
@@ -94,6 +107,7 @@ worktree-info:
 	@printf '%s\n' "SwiftFormat cache: $(SWIFTFORMAT_CACHE)"
 	@printf '%s\n' "Debug bundle suffix: $(DEBUG_BUNDLE_SUFFIX)"
 	@printf '%s\n' "Debug bundle identifier: $(EFFECTIVE_BUNDLE_IDENTIFIER)"
+	@printf '%s\n' "Release bundle identifier: $(RELEASE_BUNDLE_IDENTIFIER)"
 	@printf '%s\n' "Test destination: $(TEST_DESTINATION)"
 
 worktree-doctor:
