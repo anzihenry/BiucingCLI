@@ -16,7 +16,8 @@ echo "Go toolchain: $go_version"
 echo "Buf: available"
 
 if [[ -z "${GOCACHE:-}" ]]; then
-  export GOCACHE="$(pwd)/.cache/go-build"
+  GOCACHE="$(pwd)/.cache/go-build"
+  export GOCACHE
 fi
 mkdir -p "$GOCACHE"
 

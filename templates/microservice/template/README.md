@@ -58,7 +58,8 @@ make docker-run
 - `scripts/bootstrap`: host-oriented setup helper when you do not use Docker
 - `scripts/doctor`: local environment checks
 - `make proto`: generate protobuf code through `Buf` inside Docker
-- `make verify`: run doctor, proto generation, lint, and tests together inside Docker
+- `make test`: generate protobuf code, then run HTTP and in-memory gRPC contract tests inside Docker
+- `make verify`: run doctor, protobuf generation, lint, and tests together inside Docker
 - the development image prewarms `go mod download`; the first `make proto` may still fetch remote Buf plugin artifacts when the cache is empty
 - `GOPROXY` and `GOSUMDB` can be overridden on `make bootstrap`, `make dev`, `make up`, and `make docker-build` when your network needs a different Go module proxy or checksum policy
 
@@ -140,11 +141,23 @@ make clean-worktree
 ## Contracts
 
 The canonical service contract lives under `api/proto/service/v1/service.proto`.
+Because the template accepts a caller-defined protobuf package while keeping a stable starter file layout, Buf exempts only `PACKAGE_DIRECTORY_MATCH`; every other `STANDARD` lint rule remains enabled.
 
 Generate Go code with:
 
 ```bash
 make proto
+```
+
+The generated server registers `{{PROTO_PACKAGE}}.{{SERVICE_TYPE_NAME}}Service/Ping` on the configured gRPC port. The test suite calls the generated Go client over an in-memory gRPC listener and verifies the full method name plus the `message` and `service` response fields.
+
+With the service running, exercise the same contract from the command line:
+
+```bash
+grpcurl -plaintext \
+  -d '{"requestId":"local-check"}' \
+  127.0.0.1:{{GRPC_PORT}} \
+  {{PROTO_PACKAGE}}.{{SERVICE_TYPE_NAME}}Service/Ping
 ```
 
 ## Observability

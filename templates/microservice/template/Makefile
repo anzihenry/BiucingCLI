@@ -97,7 +97,7 @@ bootstrap:
 doctor:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
 
-dev:
+dev: proto
 	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) {{DEPENDENCY_STORE}} otel-collector
 
 dev-shell:
@@ -107,20 +107,20 @@ tidy:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go mod tidy
 
 proto:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) buf generate ./api
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "cd api && buf generate"
 
-lint:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "buf lint ./api && golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./..."
+lint: proto
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "cd api && buf lint && cd .. && golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./..."
 
-test:
+test: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
 
-verify: doctor proto lint test
+verify: doctor lint test
 
-run:
+run: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE)
 
-up:
+up: proto
 	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) {{DEPENDENCY_STORE}} otel-collector
 
 down:
@@ -129,10 +129,10 @@ down:
 logs:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) logs -f
 
-build:
+build: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
 
-docker-build:
+docker-build: proto
 	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) --build-arg GOPROXY=$(GOPROXY) --build-arg GOSUMDB=$(GOSUMDB) -t $(IMAGE_REF) .
 
 docker-run:

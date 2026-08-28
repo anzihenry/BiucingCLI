@@ -371,6 +371,17 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
         )
     if definition.name == "android":
         required_entries.update({"gradlew", "gradlew.bat", "scripts"})
+    if definition.name == "microservice":
+        required_entries.update(
+            {
+                "api/buf.gen.yaml",
+                "api/buf.yaml",
+                "api/proto/service/v1/service.proto",
+                "internal/transport/grpc.go",
+                "internal/transport/ping.go",
+                "tests/server_test.go",
+            }
+        )
 
     missing_entries = sorted(entry for entry in required_entries if entry not in relative_entries)
     if missing_entries:

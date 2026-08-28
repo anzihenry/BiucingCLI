@@ -4,6 +4,7 @@
 
 - hardened Apple archive, TestFlight, and App Store release workflows so worktree debug bundle suffixes are always discarded, with Release workspace and xcarchive identity checks before signing and upload.
 - hardened Apple, Android, and HarmonyOS starter ignore rules for credentials and signing files, and added verified restoration around HarmonyOS release signing injection.
+- implemented and tested the microservice starter's protobuf `Ping` gRPC contract, including real service registration and Buf generation prerequisites for runtime workflows.
 
 ## 0.7.0 - 2026-08-01
 

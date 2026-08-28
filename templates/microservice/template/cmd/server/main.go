@@ -7,6 +7,7 @@ import (
 
 	"{{MODULE_NAME}}/internal/config"
 	"{{MODULE_NAME}}/internal/router"
+	"{{MODULE_NAME}}/internal/service"
 	"{{MODULE_NAME}}/internal/telemetry"
 	"{{MODULE_NAME}}/internal/transport"
 )
@@ -36,7 +37,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	grpcServer := transport.NewGRPCServer(cfg.Service.Name)
+	pingService := service.NewPingService(cfg.Service.Name, "{{PROTO_PACKAGE}}")
+	grpcServer := transport.NewGRPCServer(cfg.Service.Name, pingService)
 	go func() {
 		log.Printf("starting %s gRPC server on :%s", cfg.Service.Name, cfg.Service.GRPCPort)
 		if err := grpcServer.Serve(grpcListener); err != nil {
