@@ -7,13 +7,14 @@
   "platforms": ["linux", "container"],
   "maturity": {
     "level": "validated",
-    "summary": "Dockerized worker starter with config loading, graceful shutdown, and generated-project test coverage."
+    "summary": "Dockerized worker starter with explicit retry semantics, bounded shutdown, and deterministic generated-project tests."
   },
   "validation": {
     "status": "generated-project-verified",
     "verification_tier": "generated-project",
     "evidence": [
       "python unittest template rendering coverage",
+      "deterministic injected-clock retry and scheduling tests",
       "real generated project go test validation"
     ]
   },

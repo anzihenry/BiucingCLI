@@ -391,6 +391,13 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
                 "internal/runtime/server_test.go",
             }
         )
+    if definition.name == "worker":
+        required_entries.update(
+            {
+                "internal/runtime/runner.go",
+                "internal/runtime/runner_test.go",
+            }
+        )
     if definition.name == "frontend":
         required_entries.update(
             {

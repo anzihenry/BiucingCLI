@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add explicit Worker retry exhaustion, exponential backoff, scheduled-cycle continuation, cancellation, and deterministic injected-clock tests.
 - Add bounded HTTP timeouts, signal-aware graceful shutdown, runtime health checks, and coordinated HTTP/gRPC draining to the Web Service and Microservice templates.
 - hardened Apple archive, TestFlight, and App Store release workflows so worktree debug bundle suffixes are always discarded, with Release workspace and xcarchive identity checks before signing and upload.
 - hardened Apple, Android, and HarmonyOS starter ignore rules for credentials and signing files, and added verified restoration around HarmonyOS release signing injection.

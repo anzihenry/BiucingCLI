@@ -54,11 +54,22 @@ make docker-run
 - `scheduled`: runs the starter task immediately and then on a repeating interval
 - `oneshot`: runs the starter task once and exits
 
+Each execution cycle has explicit retry semantics:
+
+- `retry_max_attempts` includes the initial attempt; set it to `1` to disable retries.
+- failed attempts use exponential backoff from `retry_initial_backoff_seconds`, capped by `retry_max_backoff_seconds`.
+- `oneshot` returns the final error after retries are exhausted, so the process exits non-zero.
+- `scheduled` logs an exhausted cycle, waits one `tick_interval_seconds` fixed delay, and starts the next cycle.
+- cancellation interrupts scheduled waits and retry backoff immediately. An active task receives a canceled context and has `shutdown_timeout_seconds` to return before shutdown fails.
+
 The generated defaults are:
 
 - `run_mode={{RUN_MODE}}`
 - `tick_interval_seconds={{TICK_INTERVAL_SECONDS}}`
 - `shutdown_timeout_seconds={{SHUTDOWN_TIMEOUT_SECONDS}}`
+- `retry_max_attempts=3`
+- `retry_initial_backoff_seconds=1`
+- `retry_max_backoff_seconds=30`
 
 You can override them with environment variables:
 
@@ -66,6 +77,9 @@ You can override them with environment variables:
 - `WORKER_RUN_MODE`
 - `WORKER_TICK_INTERVAL_SECONDS`
 - `WORKER_SHUTDOWN_TIMEOUT_SECONDS`
+- `WORKER_RETRY_MAX_ATTEMPTS`
+- `WORKER_RETRY_INITIAL_BACKOFF_SECONDS`
+- `WORKER_RETRY_MAX_BACKOFF_SECONDS`
 - `CONFIG_FILE`
 
 Example oneshot run:
@@ -141,6 +155,7 @@ The generated project includes:
 
 - config-loading tests under `internal/config`
 - runtime-loop tests under `internal/runtime`
+- deterministic retry, fixed-delay scheduling, cancellation, and shutdown-timeout tests using an injected clock; they do not sleep to advance worker time
 - a generated-project test under `tests/worker_test.go`
 
 `make verify` runs the local doctor checks plus `go test ./...` inside Docker.

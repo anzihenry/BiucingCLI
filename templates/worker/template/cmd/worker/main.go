@@ -28,6 +28,9 @@ func main() {
 		Mode:            cfg.Worker.RunMode,
 		TickInterval:    time.Duration(cfg.Worker.TickIntervalSeconds) * time.Second,
 		ShutdownTimeout: time.Duration(cfg.Worker.ShutdownTimeoutSeconds) * time.Second,
+		MaxAttempts:     cfg.Worker.RetryMaxAttempts,
+		InitialBackoff:  time.Duration(cfg.Worker.RetryInitialSeconds) * time.Second,
+		MaxBackoff:      time.Duration(cfg.Worker.RetryMaxSeconds) * time.Second,
 		Executor:        task.NewHeartbeatTask(cfg.Worker.Name),
 		Logger:          logger,
 	})
