@@ -7,13 +7,15 @@
   "platforms": ["linux", "container"],
   "maturity": {
     "level": "validated",
-    "summary": "Containerized microservice starter with gRPC, protobuf generation, and observability workflows."
+    "summary": "Containerized microservice starter with coordinated HTTP/gRPC shutdown, bounded timeouts, health checks, protobuf, and observability."
   },
   "validation": {
     "status": "real-build-verified",
     "verification_tier": "real-build",
     "evidence": [
       "python unittest template rendering coverage",
+      "generated-project HTTP and gRPC shutdown tests",
+      "HTTP and gRPC health checks",
       "real docker runtime image builds",
       "real docker development image builds"
     ]

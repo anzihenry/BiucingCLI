@@ -18,6 +18,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/test/bufconn"
 )
 
@@ -120,6 +121,15 @@ func TestGRPCPingContract(t *testing.T) {
 	defer cancel()
 
 	client := servicev1.New{{SERVICE_TYPE_NAME}}ServiceClient(connection)
+	healthClient := healthpb.NewHealthClient(connection)
+	healthResponse, err := healthClient.Check(ctx, &healthpb.HealthCheckRequest{Service: "{{SERVICE_NAME}}"})
+	if err != nil {
+		t.Fatalf("check gRPC health: %v", err)
+	}
+	if healthResponse.GetStatus() != healthpb.HealthCheckResponse_SERVING {
+		t.Fatalf("expected gRPC health status SERVING, got %s", healthResponse.GetStatus())
+	}
+
 	response, err := client.Ping(ctx, &servicev1.PingRequest{RequestId: "contract-test"})
 	if err != nil {
 		t.Fatalf("call Ping: %v", err)

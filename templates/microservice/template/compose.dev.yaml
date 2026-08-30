@@ -21,6 +21,7 @@ services:
     ports:
       - "${HOST_HTTP_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
       - "${HOST_GRPC_PORT:-{{GRPC_PORT}}}:{{GRPC_PORT}}"
+    stop_grace_period: 15s
     volumes:
       - .:/workspace
       - microservice-go-build:/workspace/.cache/go-build

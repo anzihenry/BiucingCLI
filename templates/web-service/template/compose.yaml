@@ -11,3 +11,4 @@ services:
       - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
     environment:
       CONFIG_FILE: /app/configs/config.yaml
+    stop_grace_period: 15s

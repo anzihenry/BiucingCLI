@@ -45,6 +45,22 @@ func TestLoadDefaultConfig(t *testing.T) {
 	if cfg.Service.Port != "8080" {
 		t.Fatalf("expected service port %q, got %q", "8080", cfg.Service.Port)
 	}
+	if cfg.Server.ShutdownTimeoutSeconds != 10 {
+		t.Fatalf("expected default shutdown timeout %d, got %d", 10, cfg.Server.ShutdownTimeoutSeconds)
+	}
+}
+
+func TestLoadRejectsNegativeTimeout(t *testing.T) {
+	configFile := filepath.Join(t.TempDir(), "invalid.yaml")
+	configData := []byte("service:\n  name: invalid-service\nserver:\n  shutdown_timeout_seconds: -1\n")
+	if err := os.WriteFile(configFile, configData, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", configFile)
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected a negative timeout to fail validation")
+	}
 }
 
 func TestLoadUsesConfigFileOverride(t *testing.T) {

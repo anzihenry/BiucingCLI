@@ -3,6 +3,13 @@ service:
   http_port: {{HTTP_PORT}}
   grpc_port: {{GRPC_PORT}}
 
+server:
+  read_timeout_seconds: 5
+  read_header_timeout_seconds: 5
+  write_timeout_seconds: 15
+  idle_timeout_seconds: 60
+  shutdown_timeout_seconds: 10
+
 telemetry:
   otlp_http_endpoint: {{OTEL_EXPORTER_ENDPOINT}}
 

@@ -7,13 +7,15 @@
   "platforms": ["linux", "container"],
   "maturity": {
     "level": "validated",
-    "summary": "Dockerized web service starter with live-reload, lint, test, and runtime image workflows."
+    "summary": "Dockerized web service starter with bounded HTTP timeouts, graceful shutdown, runtime health checks, lint, and tests."
   },
   "validation": {
     "status": "real-build-verified",
     "verification_tier": "real-build",
     "evidence": [
       "python unittest template rendering coverage",
+      "generated-project graceful shutdown and timeout tests",
+      "runtime image HTTP health check",
       "real docker runtime image builds",
       "real docker development image builds"
     ]

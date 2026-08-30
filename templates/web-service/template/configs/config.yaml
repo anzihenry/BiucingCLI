@@ -1,3 +1,10 @@
 service:
   name: {{SERVICE_NAME}}
   port: {{HTTP_PORT}}
+
+server:
+  read_timeout_seconds: 5
+  read_header_timeout_seconds: 5
+  write_timeout_seconds: 15
+  idle_timeout_seconds: 60
+  shutdown_timeout_seconds: 10

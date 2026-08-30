@@ -34,6 +34,25 @@ func TestLoadDefaultConfig(t *testing.T) {
 	if cfg.Service.GRPCPort != "9090" {
 		t.Fatalf("expected gRPC port %q, got %q", "9090", cfg.Service.GRPCPort)
 	}
+	if cfg.Server.ShutdownTimeoutSeconds != 10 {
+		t.Fatalf("expected default shutdown timeout %d, got %d", 10, cfg.Server.ShutdownTimeoutSeconds)
+	}
+}
+
+func TestLoadRejectsNegativeTimeout(t *testing.T) {
+	configFile := filepath.Join(t.TempDir(), "invalid.yaml")
+	if err := os.WriteFile(
+		configFile,
+		[]byte("service:\n  name: demo\nserver:\n  read_timeout_seconds: -1\n"),
+		0o644,
+	); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", configFile)
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected a negative timeout to fail validation")
+	}
 }
 
 func TestLoadUsesEnvironmentOverrides(t *testing.T) {

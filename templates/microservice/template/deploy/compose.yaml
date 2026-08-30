@@ -17,6 +17,7 @@ services:
     depends_on:
       - {{DEPENDENCY_STORE}}
       - otel-collector
+    stop_grace_period: 15s
 
   {{DEPENDENCY_STORE}}:
     image: {{DEPENDENCY_STORE_IMAGE}}

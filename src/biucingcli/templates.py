@@ -379,7 +379,16 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
                 "api/proto/service/v1/service.proto",
                 "internal/transport/grpc.go",
                 "internal/transport/ping.go",
+                "internal/runtime/server.go",
+                "internal/runtime/server_test.go",
                 "tests/server_test.go",
+            }
+        )
+    if definition.name == "web-service":
+        required_entries.update(
+            {
+                "internal/runtime/server.go",
+                "internal/runtime/server_test.go",
             }
         )
     if definition.name == "frontend":
