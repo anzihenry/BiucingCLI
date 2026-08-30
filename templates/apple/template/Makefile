@@ -30,7 +30,7 @@ export TUIST_TMPDIR
 export DEBUG_BUNDLE_SUFFIX
 export TUIST_DEBUG_BUNDLE_SUFFIX
 
-.PHONY: bootstrap doctor generate release-generate release-identity-check clean build test lint format release-doctor archive beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor generate release-generate release-identity-check clean build test lint verify format release-doctor archive beta release worktree-info worktree-doctor clean-worktree help
 
 bootstrap:
 	$(TUIST_ENV) WORKTREE_ID=$(WORKTREE_ID) ./scripts/bootstrap
@@ -70,6 +70,8 @@ test:
 lint:
 	mkdir -p "$(SWIFTLINT_CACHE)"
 	swiftlint lint --cache-path $(SWIFTLINT_CACHE)
+
+verify: doctor lint test build
 
 format:
 	mkdir -p "$(SWIFTFORMAT_CACHE)"
@@ -121,3 +123,6 @@ worktree-doctor:
 
 clean-worktree:
 	rm -rf "$(DERIVED_DATA_PATH)" "$(SWIFTPM_BUILD_PATH)" "$(TUIST_HOME)" "$(TUIST_XDG_CACHE_HOME)" "$(TUIST_XDG_STATE_HOME)" "$(TUIST_XDG_CONFIG_HOME)" "$(TUIST_TMPDIR)" "$(SWIFTLINT_CACHE)" "$(SWIFTFORMAT_CACHE)"
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"

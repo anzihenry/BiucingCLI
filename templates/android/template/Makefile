@@ -14,7 +14,7 @@ GRADLE := GRADLE_USER_HOME=$(GRADLE_USER_HOME) ./gradlew -Dorg.gradle.project.bi
 
 export GRADLE_USER_HOME
 
-.PHONY: bootstrap doctor wrapper verify-supply-chain clean build bundle-release artifact-info verify-release-artifact verify verify-release-signing test test-ui lint format install-debug release-doctor archive beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor wrapper verify-supply-chain clean build bundle-release artifact-info verify-release-artifact verify verify-release-signing test test-ui lint format install-debug release-doctor archive beta release worktree-info worktree-doctor clean-worktree help
 
 bootstrap:
 	./scripts/bootstrap
@@ -98,3 +98,6 @@ worktree-doctor:
 
 clean-worktree:
 	rm -rf "$(GRADLE_USER_HOME)" app/build core/*/build feature/*/build build
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"

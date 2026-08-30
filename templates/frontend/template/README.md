@@ -43,15 +43,19 @@ make install
 make lockfile-update
 make dev
 make dev-shell
+make doctor
 make lint
 make typecheck
 make test
+make verify
 make build
 make browser-install
 make browser-smoke
 make browser-smoke-production
 make docker-build
 make docker-run
+make clean
+make help
 ```
 
 ## Local Frontend URL

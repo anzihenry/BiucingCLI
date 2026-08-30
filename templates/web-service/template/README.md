@@ -42,6 +42,8 @@ make verify
 make build
 make docker-build
 make docker-run
+make clean
+make help
 ```
 
 The service reads configuration from `configs/config.yaml` by default.

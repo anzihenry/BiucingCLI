@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- unify metadata-driven input validation and the `bootstrap`, `doctor`, `lint`, `test`, `verify`, `build`, `clean`, and `help` Make command contract across all templates.
 - add Android Gradle distribution, wrapper JAR, and dependency checksum verification plus signer-certificate validation for release AABs; add HarmonyOS exact ohpm lock validation and SDK-backed HAP signer, profile, and bundle-identity verification.
 - Add explicit Worker retry exhaustion, exponential backoff, scheduled-cycle continuation, cancellation, and deterministic injected-clock tests.
 - Add bounded HTTP timeouts, signal-aware graceful shutdown, runtime health checks, and coordinated HTTP/gRPC draining to the Web Service and Microservice templates.

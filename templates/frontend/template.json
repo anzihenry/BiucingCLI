@@ -24,6 +24,16 @@
     "Browser smoke coverage and runtime packaging are part of the starter contract."
   ],
   "workflow_labels": ["bootstrap", "dev", "test", "build", "runtime"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -45,17 +55,20 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "validator": "project-name"
     },
     {
       "name": "display_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "display-name"
     },
     {
       "name": "package_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "npm-package"
     }
   ],
   "next_steps": [

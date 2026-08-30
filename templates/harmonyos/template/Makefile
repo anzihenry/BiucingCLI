@@ -19,7 +19,7 @@ export HVIGOR_HOME
 export OHPM_HOME
 export BIUCING_HARMONY_DEBUG_BUNDLE_SUFFIX := $(DEBUG_BUNDLE_SUFFIX)
 
-.PHONY: bootstrap doctor verify-supply-chain lint test build package artifact-info verify verify-release-artifact release-preflight release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
+.PHONY: bootstrap doctor verify-supply-chain lint test build package artifact-info verify verify-release-artifact release-preflight release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree help
 
 bootstrap:
 	./scripts/bootstrap
@@ -101,3 +101,6 @@ worktree-debug-identity:
 
 clean-worktree:
 	rm -rf "$(HVIGOR_HOME)" "$(OHPM_HOME)" "$(MODULE_BUILD_DIR)" build .biucing/release
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"

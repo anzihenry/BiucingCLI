@@ -60,6 +60,7 @@ Simulator; set `DEBUG_BUNDLE_SUFFIX=` to keep the generated bundle identifier.
 ## Standard Commands
 
 ```bash
+make bootstrap
 make doctor
 make generate
 make release-generate
@@ -68,10 +69,13 @@ make build
 make lint
 make format
 make test
+make verify
 make release-doctor
 make archive
 make beta
 make release
+make clean
+make help
 ```
 
 `make doctor` validates Xcode selection, `xcodebuild`, Tuist, Swift, SwiftLint, SwiftFormat, fastlane, and simulator/runtime visibility before you spend time on `make generate`, `make build`, or `make test`.

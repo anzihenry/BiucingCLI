@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Frontend environment doctor"
+
+failures=0
+fail() {
+  echo "[fail] $1" >&2
+  failures=$((failures + 1))
+}
+pass() {
+  echo "[pass] $1"
+}
+
+if command -v docker >/dev/null 2>&1; then
+  pass "docker is available"
+  if docker compose version >/dev/null 2>&1; then
+    pass "docker compose is available"
+  else
+    fail "docker compose is unavailable"
+  fi
+else
+  fail "docker is unavailable"
+fi
+
+for path in package.json pnpm-lock.yaml Dockerfile Dockerfile.dev compose.dev.yaml; do
+  if [[ -f "$path" ]]; then
+    pass "$path exists"
+  else
+    fail "$path is missing"
+  fi
+done
+
+if grep -q '"packageManager": "pnpm@9.9.0"' package.json && \
+   grep -q "lockfileVersion: '9.0'" pnpm-lock.yaml; then
+  pass "package manager and lockfile versions agree"
+else
+  fail "package.json and pnpm-lock.yaml must keep the pinned pnpm 9 contract"
+fi
+
+if (( failures > 0 )); then
+  echo "Doctor found ${failures} issue(s)." >&2
+  exit 1
+fi
+
+echo "Environment looks ready."

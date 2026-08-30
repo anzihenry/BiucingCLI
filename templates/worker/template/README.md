@@ -42,11 +42,14 @@ make bootstrap
 make dev
 make dev-shell
 make doctor
+make lint
 make test
 make verify
 make build
 make docker-build
 make docker-run
+make clean
+make help
 ```
 
 ## Execution Modes

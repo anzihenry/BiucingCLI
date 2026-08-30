@@ -71,6 +71,7 @@ Then regenerate `gradle/verification-metadata.xml` with Gradle's dependency-veri
 ## Standard Commands
 
 ```bash
+make bootstrap
 make doctor
 make verify-supply-chain
 make format
@@ -79,6 +80,7 @@ make build
 make test
 make test-ui
 make lint
+make verify
 make install-debug
 make verify-release-signing
 make release-doctor
@@ -87,6 +89,8 @@ make artifact-info
 make verify-release-artifact
 make beta
 make release
+make clean
+make help
 ```
 
 `make doctor` validates the active JDK, Android SDK root, `cmdline-tools/latest`, `adb`, emulator/AVD visibility, and the committed Gradle supply-chain controls before you spend time on builds.

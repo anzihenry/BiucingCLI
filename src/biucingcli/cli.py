@@ -12,6 +12,7 @@ from biucingcli.templates import load_templates
 from biucingcli.templates import render_template
 from biucingcli.templates import render_text
 from biucingcli.templates import resolve_variables_detailed
+from biucingcli.templates import validate_resolved_variables
 from biucingcli.templates import validate_templates
 
 
@@ -524,6 +525,7 @@ def top_level_template_entries(template_dir: Path) -> list[str]:
 def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     """Resolve a create request into a reusable context."""
     definition = load_template(args.template)
+    requested_project_name = args.project_name.strip()
     set_values = parse_set_values(args.set_values)
     allowed_keys = {variable.name for variable in definition.variables}
     unknown_keys = sorted(key for key in set_values if key not in allowed_keys)
@@ -531,8 +533,55 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         unknown_list = ", ".join(unknown_keys)
         raise ValueError(f"Unknown template variable(s) for {args.template}: {unknown_list}")
 
+    cli_inputs = {
+        "display_name": args.display_name,
+        "package_name": args.package_name,
+        "module_name": args.module_name,
+        "service_name": args.service_name,
+        "http_port": args.http_port,
+        "worker_name": args.worker_name,
+        "run_mode": args.run_mode,
+        "tick_interval_seconds": args.tick_interval_seconds,
+        "shutdown_timeout_seconds": args.shutdown_timeout_seconds,
+        "grpc_port": args.grpc_port,
+        "proto_package": args.proto_package,
+        "dependency_store": args.dependency_store,
+        "otel_exporter_endpoint": args.otel_exporter_endpoint,
+        "apple_platform": args.platform,
+        "bundle_identifier": args.bundle_identifier,
+        "minimum_os_version": args.minimum_os_version,
+        "development_team": args.development_team,
+        "organization_name": args.organization_name,
+        "swift_module_name": args.swift_module_name,
+        "application_id": args.application_id,
+        "compile_sdk": args.compile_sdk,
+        "min_sdk": args.min_sdk,
+        "target_sdk": args.target_sdk,
+        "version_code": args.version_code,
+        "version_name": args.version_name,
+        "java_version": args.java_version,
+        "android_namespace": args.android_namespace,
+        "kotlin_module_name": args.kotlin_module_name,
+        "bundle_name": args.bundle_name,
+        "harmony_module_name": args.harmony_module_name,
+        "ability_name": args.ability_name,
+        "compatible_sdk_version": args.compatible_sdk_version,
+        "target_sdk_version": args.target_sdk_version,
+        "min_api_version": args.min_api_version,
+        "harmony_version_code": args.harmony_version_code,
+        "harmony_version_name": args.harmony_version_name,
+    }
+    unsupported_cli_inputs = sorted(
+        key for key, value in cli_inputs.items() if value is not None and key not in allowed_keys
+    )
+    if unsupported_cli_inputs:
+        unsupported_list = ", ".join(unsupported_cli_inputs)
+        raise ValueError(
+            f"Unsupported option(s) for {args.template}: {unsupported_list}"
+        )
+
     requested_service_name = (
-        args.service_name or set_values.get("service_name") or args.project_name
+        args.service_name or set_values.get("service_name") or requested_project_name
     )
     requested_dependency_store = args.dependency_store or set_values.get("dependency_store")
     microservice_values = (
@@ -548,12 +597,12 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         else {}
     )
     provided_values: dict[str, str | None] = dict(set_values)
-    provided_values["project_name"] = args.project_name
+    provided_values["project_name"] = requested_project_name
 
     if args.display_name is not None:
         provided_values["display_name"] = args.display_name
     elif "display_name" not in provided_values:
-        provided_values["display_name"] = default_display_name(args.project_name)
+        provided_values["display_name"] = default_display_name(requested_project_name)
 
     if args.package_name is not None:
         provided_values["package_name"] = args.package_name
@@ -607,24 +656,28 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     values = dict(resolution_result.values)
     derived_values: dict[str, str] = {}
     if args.template == "microservice":
-        derived_values["service_type_name"] = default_swift_module_name(args.project_name)
+        derived_values["service_type_name"] = default_swift_module_name(requested_project_name)
     if args.template == "apple":
-        derived_values["swift_module_name"] = values.get("swift_module_name") or default_swift_module_name(
-            args.project_name
-        )
+        derived_values["swift_module_name"] = values.get(
+            "swift_module_name"
+        ) or default_swift_module_name(requested_project_name)
     if args.template == "android":
-        derived_values["kotlin_module_name"] = values.get("kotlin_module_name") or default_kotlin_module_name(
-            args.project_name
-        )
-    values.update(
-        derived_values
-    )
+        derived_values["kotlin_module_name"] = values.get(
+            "kotlin_module_name"
+        ) or default_kotlin_module_name(requested_project_name)
+    values.update(derived_values)
     if args.template == "apple":
         values.update(apple_platform_snippets(values))
     values.update({key: value for key, value in apple_values.items() if value is not None})
     values.update({key: value for key, value in microservice_values.items() if value is not None})
 
-    target_dir = Path(args.output_dir).resolve() / args.project_name
+    input_errors = validate_resolved_variables(definition, values)
+    if input_errors:
+        raise ValueError(
+            f"Invalid input value(s) for {definition.name}: " + "; ".join(input_errors)
+        )
+
+    target_dir = Path(args.output_dir).resolve() / values["project_name"]
     rendered_next_steps = [render_text(step, values) for step in definition.next_steps]
     system_derived_values = {
         key: values[key]
@@ -639,7 +692,7 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     }
     return {
         "definition": definition,
-        "project_name": args.project_name,
+        "project_name": values["project_name"],
         "target_dir": target_dir,
         "values": values,
         "resolved_variables": [item.to_dict() for item in resolution_result.resolved_variables],

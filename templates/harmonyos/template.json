@@ -23,6 +23,16 @@
     "Generated projects are structured for an ArkTS Stage model app with one entry module."
   ],
   "workflow_labels": ["bootstrap", "doctor", "lint", "test", "build", "verify", "release", "open"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -44,57 +54,70 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "validator": "project-name"
     },
     {
       "name": "display_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "display-name"
     },
     {
       "name": "bundle_name",
       "required": true,
-      "prompt": "HarmonyOS bundle name: "
+      "prompt": "HarmonyOS bundle name: ",
+      "validator": "java-package"
     },
     {
       "name": "harmony_module_name",
       "required": false,
-      "default": "entry"
+      "default": "entry",
+      "validator": "identifier"
     },
     {
       "name": "ability_name",
       "required": false,
-      "default": "EntryAbility"
+      "default": "EntryAbility",
+      "validator": "identifier"
     },
     {
       "name": "compatible_sdk_version",
       "required": false,
-      "default": "5.0.0(12)"
+      "default": "5.0.0(12)",
+      "validator": "harmony-sdk-version"
     },
     {
       "name": "target_sdk_version",
       "required": false,
-      "default": "5.0.0(12)"
+      "default": "5.0.0(12)",
+      "validator": "harmony-sdk-version"
     },
     {
       "name": "min_api_version",
       "required": false,
-      "default": "12"
+      "default": "12",
+      "validator": "positive-integer",
+      "maximum": 100
     },
     {
       "name": "harmony_version_code",
       "required": false,
-      "default": "1"
+      "default": "1",
+      "validator": "positive-integer",
+      "maximum": 2100000000
     },
     {
       "name": "harmony_version_name",
       "required": false,
-      "default": "1.0.0"
+      "default": "1.0.0",
+      "validator": "semantic-version"
     },
     {
       "name": "organization_name",
       "required": false,
-      "default": "Example Team"
+      "default": "Example Team",
+      "validator": "display-name"
     }
   ],
   "next_steps": [

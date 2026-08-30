@@ -37,7 +37,7 @@ export WORKER_RETRY_MAX_BACKOFF_SECONDS
 export GOCACHE
 export GOMODCACHE
 
-.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell test verify run build docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell lint test verify run build clean help docker-build docker-run
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -72,6 +72,9 @@ bootstrap:
 doctor:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
 
+lint:
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go vet ./...
+
 dev:
 	WORKER_RUN_MODE=$(WORKER_RUN_MODE) WORKER_TICK_INTERVAL_SECONDS=$(WORKER_TICK_INTERVAL_SECONDS) WORKER_SHUTDOWN_TIMEOUT_SECONDS=$(WORKER_SHUTDOWN_TIMEOUT_SECONDS) WORKER_RETRY_MAX_ATTEMPTS=$(WORKER_RETRY_MAX_ATTEMPTS) WORKER_RETRY_INITIAL_BACKOFF_SECONDS=$(WORKER_RETRY_INITIAL_BACKOFF_SECONDS) WORKER_RETRY_MAX_BACKOFF_SECONDS=$(WORKER_RETRY_MAX_BACKOFF_SECONDS) GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
 
@@ -81,13 +84,19 @@ dev-shell:
 test:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
 
-verify: doctor test
+verify: doctor lint test build
 
 run:
 	WORKER_RUN_MODE=$(WORKER_RUN_MODE) WORKER_TICK_INTERVAL_SECONDS=$(WORKER_TICK_INTERVAL_SECONDS) WORKER_SHUTDOWN_TIMEOUT_SECONDS=$(WORKER_SHUTDOWN_TIMEOUT_SECONDS) WORKER_RETRY_MAX_ATTEMPTS=$(WORKER_RETRY_MAX_ATTEMPTS) WORKER_RETRY_INITIAL_BACKOFF_SECONDS=$(WORKER_RETRY_INITIAL_BACKOFF_SECONDS) WORKER_RETRY_MAX_BACKOFF_SECONDS=$(WORKER_RETRY_MAX_BACKOFF_SECONDS) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE)
 
 build:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/worker
+
+clean:
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare the development environment" "  make doctor     Check required tools and project configuration" "  make lint       Run static analysis" "  make test       Run tests" "  make verify     Run the complete local verification contract" "  make build      Build the application" "  make clean      Remove generated runtime state" "  make help       Show this command summary"
 
 docker-build:
 	docker build --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) --build-arg GOPROXY=$(GOPROXY) --build-arg GOSUMDB=$(GOSUMDB) -t $(IMAGE_REF) .

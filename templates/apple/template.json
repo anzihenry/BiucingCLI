@@ -22,6 +22,16 @@
     "Generated projects should keep bootstrap, doctor, generate, lint, test, beta, and release workflows explicit."
   ],
   "workflow_labels": ["bootstrap", "doctor", "generate", "lint", "test", "build", "release", "open"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -43,46 +53,57 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "validator": "project-name"
     },
     {
       "name": "display_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "display-name"
     },
     {
       "name": "apple_platform",
       "required": false,
-      "default": "ios"
+      "default": "ios",
+      "validator": "choice",
+      "choices": ["ios", "macos", "watchos", "tvos"]
     },
     {
       "name": "apple_platform_name",
       "required": false,
-      "default": "iOS"
+      "default": "iOS",
+      "validator": "choice",
+      "choices": ["iOS", "macOS", "watchOS", "tvOS"]
     },
     {
       "name": "bundle_identifier",
       "required": true,
-      "prompt": "Bundle identifier: "
+      "prompt": "Bundle identifier: ",
+      "validator": "bundle-identifier"
     },
     {
       "name": "organization_name",
       "required": false,
-      "default": "Example Team"
+      "default": "Example Team",
+      "validator": "display-name"
     },
     {
       "name": "development_team",
       "required": false,
-      "default": "DEVELOPMENT_TEAM_ID"
+      "default": "DEVELOPMENT_TEAM_ID",
+      "validator": "team-id"
     },
     {
       "name": "minimum_os_version",
       "required": false,
-      "default": "26.0"
+      "default": "26.0",
+      "validator": "apple-version"
     },
     {
       "name": "swift_module_name",
-      "required": false
+      "required": false,
+      "validator": "identifier"
     }
   ],
   "next_steps": [

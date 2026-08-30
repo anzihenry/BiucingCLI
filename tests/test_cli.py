@@ -18,6 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from biucingcli.cli import apple_platform_config
 from biucingcli.cli import default_kotlin_module_name
 from biucingcli.cli import main
+from biucingcli.templates import REQUIRED_COMMAND_CONTRACT
+from biucingcli.templates import load_templates
 from biucingcli.templates import render_text
 from biucingcli.templates import validate_templates
 
@@ -255,6 +257,7 @@ class CLITestCase(unittest.TestCase):
                         },
                         "operating_assumptions": ["Synthetic test assumption."],
                         "workflow_labels": ["bootstrap", "wrong-label"],
+                        "commands": {"bootstrap": "./bootstrap"},
                         "worktree": {
                             "support_level": "wrong-level",
                             "isolation_dimensions": ["wrong-dimension"],
@@ -262,7 +265,11 @@ class CLITestCase(unittest.TestCase):
                             "cleanup": ["make clean-worktree"],
                         },
                         "variables": [
-                            {"name": "project_name", "required": True},
+                            {
+                                "name": "project_name",
+                                "required": True,
+                                "validator": "wrong-validator",
+                            },
                         ],
                         "next_steps": ["make bootstrap"],
                     }
@@ -301,9 +308,169 @@ class CLITestCase(unittest.TestCase):
                 joined,
             )
             self.assertIn(
-                "broken-service: missing required starter entries: README.md",
+                "broken-service: missing required starter entries: README.md, scripts/doctor",
                 joined,
             )
+            self.assertIn("commands missing required entries", joined)
+            self.assertIn(
+                "command 'bootstrap' must be exactly 'make bootstrap'",
+                joined,
+            )
+            self.assertIn("uses unsupported validator 'wrong-validator'", joined)
+
+    def test_all_templates_implement_the_common_make_command_contract(self):
+        expected_commands = set(REQUIRED_COMMAND_CONTRACT)
+
+        for definition in load_templates():
+            with self.subTest(template=definition.name):
+                self.assertEqual(set(definition.commands), expected_commands)
+                result = subprocess.run(
+                    ["make", "-s", "help"],
+                    cwd=definition.template_dir,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                for command in REQUIRED_COMMAND_CONTRACT:
+                    self.assertIn(f"make {command}", result.stdout)
+
+    def test_create_rejects_invalid_template_inputs_before_writing(self):
+        cases = [
+            (
+                ["create", "frontend", "bad/name", "--non-interactive"],
+                "project_name: must be a safe directory name",
+            ),
+            (
+                [
+                    "create",
+                    "web-service",
+                    "bad-port",
+                    "--module-name",
+                    "github.com/example/bad-port",
+                    "--http-port",
+                    "70000",
+                    "--non-interactive",
+                ],
+                "http_port: must be between 1 and 65535",
+            ),
+            (
+                [
+                    "create",
+                    "microservice",
+                    "bad-proto",
+                    "--module-name",
+                    "github.com/example/bad-proto",
+                    "--proto-package",
+                    "Bad-Package",
+                    "--non-interactive",
+                ],
+                "proto_package: must be a dotted lowercase Protobuf package",
+            ),
+            (
+                [
+                    "create",
+                    "worker",
+                    "bad-worker",
+                    "--module-name",
+                    "github.com/example/bad-worker",
+                    "--set",
+                    "run_mode=forever",
+                    "--non-interactive",
+                ],
+                "run_mode: must be one of: scheduled, oneshot",
+            ),
+            (
+                [
+                    "create",
+                    "apple",
+                    "bad-apple",
+                    "--bundle-identifier",
+                    "not-a-bundle-id",
+                    "--non-interactive",
+                ],
+                "bundle_identifier: must be a reverse-DNS identifier",
+            ),
+            (
+                [
+                    "create",
+                    "android",
+                    "bad-android",
+                    "--package-name",
+                    "com.example.badandroid",
+                    "--application-id",
+                    "invalid-id",
+                    "--non-interactive",
+                ],
+                "application_id: must be a dotted Java package",
+            ),
+            (
+                [
+                    "create",
+                    "harmonyos",
+                    "bad-harmony",
+                    "--bundle-name",
+                    "com.example.badharmony",
+                    "--compatible-sdk-version",
+                    "5.0",
+                    "--non-interactive",
+                ],
+                "compatible_sdk_version: must use HarmonyOS SDK notation",
+            ),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for argv, expected_error in cases:
+                with self.subTest(template=argv[1]):
+                    code, stdout, stderr = self.run_cli_failure(
+                        [*argv, "--output-dir", tmpdir]
+                    )
+                    self.assertEqual(code, 2)
+                    self.assertEqual(stdout, "")
+                    self.assertIn(expected_error, stderr)
+                    self.assertFalse((Path(tmpdir) / argv[2]).exists())
+
+    def test_create_normalizes_cli_and_set_values_before_validation(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "web-service",
+                    "  normalized-service  ",
+                    "--module-name",
+                    "  github.com/example/normalized-service  ",
+                    "--set",
+                    "http_port= 8181 ",
+                    "--output-dir",
+                    tmpdir,
+                    "--non-interactive",
+                ]
+            )
+            project_dir = Path(tmpdir) / "normalized-service"
+            config = (project_dir / "configs" / "config.yaml").read_text(encoding="utf-8")
+            go_mod = (project_dir / "go.mod").read_text(encoding="utf-8")
+
+            self.assertIn("Created web-service project: normalized-service", output)
+            self.assertIn("port: 8181", config)
+            self.assertIn("module github.com/example/normalized-service", go_mod)
+
+    def test_create_rejects_options_owned_by_another_template(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            code, stdout, stderr = self.run_cli_failure(
+                [
+                    "create",
+                    "frontend",
+                    "wrong-option-app",
+                    "--http-port",
+                    "8081",
+                    "--output-dir",
+                    tmpdir,
+                ]
+            )
+
+            self.assertEqual(code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn("Unsupported option(s) for frontend: http_port", stderr)
+            self.assertFalse((Path(tmpdir) / "wrong-option-app").exists())
 
     def test_version_prints_cli_version(self):
         stdout = io.StringIO()

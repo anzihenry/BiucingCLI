@@ -103,6 +103,7 @@ make release
 make signing-info
 make clean
 make open
+make help
 ```
 
 ## Testing

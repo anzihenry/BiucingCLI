@@ -47,7 +47,7 @@ BUILDER_IMAGE ?= golang:1.26-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 
-.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell tidy proto lint test verify run up down logs build docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap doctor dev dev-shell tidy proto lint test verify run up down logs build clean help docker-build docker-run
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -115,7 +115,7 @@ lint: proto
 test: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
 
-verify: doctor lint test
+verify: doctor lint test build
 
 run: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE)
@@ -131,6 +131,12 @@ logs:
 
 build: proto
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
+
+clean:
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare the development environment" "  make doctor     Check required tools and project configuration" "  make lint       Run static analysis" "  make test       Run tests" "  make verify     Run the complete local verification contract" "  make build      Build the application" "  make clean      Remove generated runtime state" "  make help       Show this command summary"
 
 docker-build: proto
 	docker build --platform $(DOCKER_PLATFORM) --build-arg BUILDER_IMAGE=$(BUILDER_IMAGE) --build-arg RUNTIME_IMAGE=$(RUNTIME_IMAGE) --build-arg GOPROXY=$(GOPROXY) --build-arg GOSUMDB=$(GOSUMDB) -t $(IMAGE_REF) .

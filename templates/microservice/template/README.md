@@ -47,6 +47,8 @@ make verify
 make build
 make docker-build
 make docker-run
+make clean
+make help
 ```
 
 ## Environment

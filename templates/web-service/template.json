@@ -25,6 +25,16 @@
     "Generated projects are expected to keep config, build, and verification workflows repo-local."
   ],
   "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -46,22 +56,26 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "validator": "project-name"
     },
     {
       "name": "module_name",
       "required": true,
-      "prompt": "Go module name: "
+      "prompt": "Go module name: ",
+      "validator": "go-module"
     },
     {
       "name": "service_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "slug"
     },
     {
       "name": "http_port",
       "required": false,
-      "default": "8080"
+      "default": "8080",
+      "validator": "port"
     }
   ],
   "next_steps": [

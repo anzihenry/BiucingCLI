@@ -31,7 +31,7 @@ export PNPM_HOME
 export PNPM_STORE_DIR
 export DEV_BASE_IMAGE
 
-.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install lockfile-update dev dev-shell lint typecheck test build preview browser-install browser-smoke browser-smoke-production format format-check docker-build docker-run
+.PHONY: worktree-info worktree-doctor worktree-compose-config clean-worktree bootstrap bootstrap-full install lockfile-update doctor dev dev-shell lint typecheck test verify build preview browser-install browser-smoke browser-smoke-production format format-check docker-build docker-run clean help
 
 worktree-info:
 	@printf '%s\n' "Worktree root: $(WORKTREE_ROOT)"
@@ -76,6 +76,9 @@ bootstrap:
 bootstrap-full:
 	DEV_DOCKERFILE=Dockerfile.dev.full $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
+doctor:
+	./scripts/doctor
+
 install:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm install --frozen-lockfile
 
@@ -96,6 +99,8 @@ typecheck:
 
 test:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm test
+
+verify: doctor lint typecheck test build
 
 build:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm build
@@ -123,3 +128,10 @@ docker-build:
 
 docker-run:
 	$(DOCKER) run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_REF)
+
+clean:
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans
+	@$(DOCKER) rm -f "$(RUNTIME_CONTAINER)" >/dev/null 2>&1 || true
+
+help:
+	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"

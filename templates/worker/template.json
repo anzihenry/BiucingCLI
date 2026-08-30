@@ -23,6 +23,16 @@
     "Generated projects are expected to keep config, verification, and container packaging repo-local."
   ],
   "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "worktree": {
     "support_level": "worktree-ready",
     "isolation_dimensions": [
@@ -43,32 +53,41 @@
   "variables": [
     {
       "name": "project_name",
-      "required": true
+      "required": true,
+      "validator": "project-name"
     },
     {
       "name": "module_name",
       "required": true,
-      "prompt": "Go module name: "
+      "prompt": "Go module name: ",
+      "validator": "go-module"
     },
     {
       "name": "worker_name",
       "required": false,
-      "default_from": "project_name"
+      "default_from": "project_name",
+      "validator": "slug"
     },
     {
       "name": "run_mode",
       "required": false,
-      "default": "scheduled"
+      "default": "scheduled",
+      "validator": "choice",
+      "choices": ["scheduled", "oneshot"]
     },
     {
       "name": "tick_interval_seconds",
       "required": false,
-      "default": "30"
+      "default": "30",
+      "validator": "positive-integer",
+      "maximum": 86400
     },
     {
       "name": "shutdown_timeout_seconds",
       "required": false,
-      "default": "10"
+      "default": "10",
+      "validator": "positive-integer",
+      "maximum": 3600
     }
   ],
   "next_steps": [

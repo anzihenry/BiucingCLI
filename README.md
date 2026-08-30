@@ -80,12 +80,14 @@ Generator UX status:
 - `biucing create ... --dry-run` previews resolved variables, target location, template file count, and next steps without writing files;
 - `biucing create ... --plan --json` returns a machine-readable preview payload for scripts and automation;
 - `biucing create ... --json` returns a machine-readable manifest after a real generation run;
-- non-interactive create failures now report all missing required values together.
+- non-interactive create failures now report all missing required values together;
+- all resolved inputs are normalized and validated before a target directory is created, including names, package identities, ports, versions, URLs, numeric bounds, and enumerated choices.
 
 Template consistency status:
 
 - template metadata now exposes verification tier, operating assumptions, and workflow labels;
-- `biucing validate` now checks the stronger metadata contract plus family-level required starter entries;
+- every template implements `make bootstrap`, `doctor`, `lint`, `test`, `verify`, `build`, `clean`, and `help` as a shared command contract;
+- `biucing validate` checks the stronger metadata contract, input validator definitions, matching `.PHONY` Make targets, and family-level required starter entries;
 - `biucing info <template>` now surfaces those consistency fields directly.
 
 Worktree-first status:

@@ -82,11 +82,21 @@ Suggested shape:
     "The starter is optimized for Go service development with Docker-based dev and runtime flows."
   ],
   "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
   "variables": [
-    { "name": "project_name", "required": true },
-    { "name": "module_name", "required": true },
-    { "name": "service_name", "required": false, "default_from": "project_name" },
-    { "name": "http_port", "required": false, "default": "8080" }
+    { "name": "project_name", "required": true, "validator": "project-name" },
+    { "name": "module_name", "required": true, "validator": "go-module" },
+    { "name": "service_name", "required": false, "default_from": "project_name", "validator": "slug" },
+    { "name": "http_port", "required": false, "default": "8080", "validator": "port" }
   ],
   "next_steps": [
     "go mod tidy",
@@ -108,6 +118,7 @@ At minimum, every template should define:
 - `worktree.support_level`, `worktree.isolation_dimensions`, `worktree.diagnostics`, `worktree.cleanup`
 - `operating_assumptions`
 - `workflow_labels`
+- `commands`
 - `variables`
 - `next_steps`
 
@@ -174,6 +185,34 @@ Current supported labels:
 - `open`
 - `lint`
 
+### Common Command Contract
+
+Every generated project exposes the same portable entrypoints through Make:
+
+- `make bootstrap`: prepare the local development environment;
+- `make doctor`: check required tools and project configuration;
+- `make lint`: run static analysis;
+- `make test`: run automated tests;
+- `make verify`: run the template's complete local verification gate, including a build;
+- `make build`: create the normal development build output;
+- `make clean`: remove generated runtime or build state;
+- `make help`: print the common command summary.
+
+The `commands` object must map each name to exactly `make <name>`. Each target must exist in the template Makefile and be declared `.PHONY`. Templates may expose additional platform-specific commands without changing this common contract.
+
+### Variable Validators
+
+Each variable declares a `validator`. Validation runs after defaults and derived values are resolved but before the target directory is created. User-provided values are trimmed first, so CLI flags, prompts, and `--set KEY=VALUE` follow the same rules.
+
+Supported validator families cover:
+
+- human and filesystem names: `text`, `display-name`, `project-name`, `slug`;
+- language/package identities: `identifier`, `npm-package`, `go-module`, `java-package`, `protobuf-package`, `bundle-identifier`, `team-id`;
+- versions and numbers: `semantic-version`, `apple-version`, `harmony-sdk-version`, `positive-integer`, `port`;
+- constrained and network values: `choice`, `url`.
+
+`choice` variables must define `choices`. Numeric variables may define inclusive `minimum` and `maximum` bounds. Defaults are checked against the same rules during `biucing validate`.
+
 ## Variable Replacement
 
 The first version should support simple placeholder replacement only.
@@ -224,6 +263,8 @@ It currently checks:
 
 - metadata completeness;
 - worktree metadata shape and supported values;
+- the eight-command metadata contract and matching `.PHONY` Make targets;
+- supported variable validators, choice sets, numeric bounds, and valid defaults;
 - variable-to-placeholder mapping support;
 - placeholder legality inside template files and `next_steps`;
 - template folder naming consistency;
@@ -507,11 +548,12 @@ email-worker/
 `biucing create <template> <project-name>` should:
 
 1. Load template metadata.
-2. Resolve defaults.
+2. Resolve defaults and derived values.
 3. Ask for missing high-value variables only.
-4. Copy the template tree into the target directory.
-5. Replace placeholders in text files.
-6. Print next steps.
+4. Normalize and validate every resolved input.
+5. Copy the template tree into the target directory.
+6. Replace placeholders in text files.
+7. Print next steps.
 
 ## Non-Goals
 

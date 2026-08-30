@@ -10,6 +10,7 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 @dataclass(frozen=True)
@@ -21,10 +22,20 @@ class TemplateVariable:
     default: str | None = None
     default_from: str | None = None
     prompt: str | None = None
+    validator: str = "text"
+    choices: list[str] = field(default_factory=list)
+    minimum: int | None = None
+    maximum: int | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable representation."""
-        return asdict(self)
+        return {
+            "name": self.name,
+            "required": self.required,
+            "default": self.default,
+            "default_from": self.default_from,
+            "prompt": self.prompt,
+        }
 
 
 @dataclass(frozen=True)
@@ -94,6 +105,7 @@ class TemplateDefinition:
     worktree: TemplateWorktree
     operating_assumptions: list[str]
     workflow_labels: list[str]
+    commands: dict[str, str]
     variables: list[TemplateVariable]
     next_steps: list[str]
     template_dir: Path
@@ -170,6 +182,40 @@ ALLOWED_WORKTREE_ISOLATION_DIMENSIONS = {
     "cleanup",
     "diagnostics",
 }
+ALLOWED_VARIABLE_VALIDATORS = {
+    "apple-version",
+    "bundle-identifier",
+    "choice",
+    "display-name",
+    "go-module",
+    "harmony-sdk-version",
+    "identifier",
+    "java-package",
+    "npm-package",
+    "port",
+    "positive-integer",
+    "project-name",
+    "protobuf-package",
+    "semantic-version",
+    "slug",
+    "team-id",
+    "text",
+    "url",
+}
+REQUIRED_COMMAND_CONTRACT = (
+    "bootstrap",
+    "doctor",
+    "lint",
+    "test",
+    "verify",
+    "build",
+    "clean",
+    "help",
+)
+MAKE_TARGET_PATTERN = re.compile(
+    r"^([A-Za-z0-9_.-]+(?:[ \t]+[A-Za-z0-9_.-]+)*):(?:[ \t]|$)",
+    re.MULTILINE,
+)
 
 
 def project_root() -> Path:
@@ -207,6 +253,7 @@ def load_template(name: str) -> TemplateDefinition:
         worktree=worktree,
         operating_assumptions=data["operating_assumptions"],
         workflow_labels=data["workflow_labels"],
+        commands=data.get("commands", {}),
         variables=variables,
         next_steps=data["next_steps"],
         template_dir=metadata_path.parent / "template",
@@ -224,6 +271,117 @@ def load_templates() -> list[TemplateDefinition]:
 def supported_placeholders() -> set[str]:
     """Return every placeholder the renderer knows how to replace."""
     return set(placeholder_map({}).keys())
+
+
+def variable_validation_error(variable: TemplateVariable, value: str) -> str | None:
+    """Return a concise validation error for one resolved template value."""
+    if value != value.strip():
+        return "must not start or end with whitespace"
+    if not value:
+        return "must not be empty"
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        return "must not contain control characters"
+    if variable.choices and value not in variable.choices:
+        return f"must be one of: {', '.join(variable.choices)}"
+
+    validator = variable.validator
+    patterns = {
+        "apple-version": (
+            r"^\d+(?:\.\d+){1,2}$",
+            "must be a numeric Apple OS version such as 17.0",
+        ),
+        "bundle-identifier": (
+            r"^[A-Za-z0-9][A-Za-z0-9-]*(?:\.[A-Za-z0-9][A-Za-z0-9-]*)+$",
+            "must be a reverse-DNS identifier such as com.example.app",
+        ),
+        "go-module": (
+            r"^[A-Za-z0-9][A-Za-z0-9.+~-]*(?:[./][A-Za-z0-9][A-Za-z0-9._+~-]*)+$",
+            "must be a Go module path such as github.com/example/service",
+        ),
+        "harmony-sdk-version": (
+            r"^\d+\.\d+\.\d+\(\d+\)$",
+            "must use HarmonyOS SDK notation such as 5.0.0(12)",
+        ),
+        "identifier": (
+            r"^[A-Za-z_][A-Za-z0-9_]*$",
+            "must be a valid language identifier",
+        ),
+        "java-package": (
+            r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+$",
+            "must be a dotted Java package such as com.example.app",
+        ),
+        "npm-package": (
+            r"^(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$",
+            "must be a lowercase npm package name",
+        ),
+        "protobuf-package": (
+            r"^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$",
+            "must be a dotted lowercase Protobuf package such as service.v1",
+        ),
+        "semantic-version": (
+            r"^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$",
+            "must be a semantic version such as 1.2.3",
+        ),
+        "slug": (
+            r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "must be a lowercase hyphenated slug",
+        ),
+        "team-id": (
+            r"^(?:[A-Z0-9]{10}|DEVELOPMENT_TEAM_ID)$",
+            "must be a 10-character Apple team ID or DEVELOPMENT_TEAM_ID",
+        ),
+    }
+    if validator in patterns:
+        pattern, message = patterns[validator]
+        if re.fullmatch(pattern, value) is None:
+            return message
+
+    if validator == "project-name":
+        if value in {".", ".."} or len(value) > 80 or re.fullmatch(
+            r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?", value
+        ) is None:
+            return (
+                "must be a safe directory name using letters, numbers, dots, "
+                "underscores, or hyphens"
+            )
+    elif validator == "display-name" and len(value) > 120:
+        return "must contain at most 120 characters"
+    elif validator == "npm-package" and len(value) > 214:
+        return "must contain at most 214 characters"
+    elif validator == "slug" and len(value) > 63:
+        return "must contain at most 63 characters"
+    elif validator in {"port", "positive-integer"}:
+        if re.fullmatch(r"\d+", value) is None:
+            return "must be an integer"
+        numeric_value = int(value)
+        minimum = variable.minimum if variable.minimum is not None else 1
+        maximum = variable.maximum
+        if validator == "port" and maximum is None:
+            maximum = 65535
+        if numeric_value < minimum or (maximum is not None and numeric_value > maximum):
+            upper = str(maximum) if maximum is not None else "unbounded"
+            return f"must be between {minimum} and {upper}"
+    elif validator == "url":
+        parsed = urlparse(value)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            return "must be an absolute http or https URL"
+
+    return None
+
+
+def validate_resolved_variables(
+    definition: TemplateDefinition, values: dict[str, str]
+) -> list[str]:
+    """Validate every resolved input according to its template metadata."""
+    errors: list[str] = []
+    for variable in definition.variables:
+        value = values.get(variable.name)
+        if value is None:
+            continue
+        reason = variable_validation_error(variable, value)
+        if reason:
+            errors.append(f"{variable.name}: {reason} (received {value!r})")
+    return errors
 
 
 def validate_template_definition(definition: TemplateDefinition) -> list[str]:
@@ -319,6 +477,17 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
     if len(definition.workflow_labels) != len(set(definition.workflow_labels)):
         errors.append(f"{definition.name}: workflow_labels must not contain duplicates")
 
+    missing_commands = sorted(set(REQUIRED_COMMAND_CONTRACT) - set(definition.commands))
+    if missing_commands:
+        errors.append(
+            f"{definition.name}: commands missing required entries: {', '.join(missing_commands)}"
+        )
+    for command_name, command in sorted(definition.commands.items()):
+        if command != f"make {command_name}":
+            errors.append(
+                f"{definition.name}: command '{command_name}' must be exactly 'make {command_name}'"
+            )
+
     variable_names = [variable.name for variable in definition.variables]
     duplicate_names = sorted({name for name in variable_names if variable_names.count(name) > 1})
     if duplicate_names:
@@ -337,7 +506,58 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
             errors.append(
                 f"{definition.name}: variable '{variable.name}' default_from unknown variable '{variable.default_from}'"
             )
+        if variable.validator not in ALLOWED_VARIABLE_VALIDATORS:
+            errors.append(
+                f"{definition.name}: variable '{variable.name}' uses unsupported validator '{variable.validator}'"
+            )
+        if variable.validator == "choice" and not variable.choices:
+            errors.append(
+                f"{definition.name}: variable '{variable.name}' choice validator requires choices"
+            )
+        if variable.minimum is not None and variable.maximum is not None:
+            if variable.minimum > variable.maximum:
+                errors.append(
+                    f"{definition.name}: variable '{variable.name}' minimum must not exceed maximum"
+                )
+        if variable.default is not None:
+            reason = variable_validation_error(variable, variable.default)
+            if reason:
+                errors.append(
+                    f"{definition.name}: default for variable '{variable.name}' {reason}"
+                )
 
+    return errors
+
+
+def validate_template_command_contract(definition: TemplateDefinition) -> list[str]:
+    """Validate metadata commands against concrete phony Make targets."""
+    makefile_path = definition.template_dir / "Makefile"
+    if not makefile_path.is_file():
+        return [f"{definition.name}: Makefile is missing for command contract validation"]
+
+    content = makefile_path.read_text(encoding="utf-8")
+    targets: set[str] = set()
+    phony_targets: set[str] = set()
+    for match in MAKE_TARGET_PATTERN.finditer(content):
+        names = match.group(1).split()
+        if names == [".PHONY"]:
+            line_end = content.find("\n", match.end())
+            if line_end < 0:
+                line_end = len(content)
+            phony_targets.update(content[match.end():line_end].split())
+        else:
+            targets.update(names)
+
+    errors: list[str] = []
+    for command_name in sorted(definition.commands):
+        if command_name not in targets:
+            errors.append(
+                f"{definition.name}: command target '{command_name}' is missing from Makefile"
+            )
+        elif command_name not in phony_targets:
+            errors.append(
+                f"{definition.name}: command target '{command_name}' must be declared .PHONY"
+            )
     return errors
 
 
@@ -353,7 +573,7 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
         for path in definition.template_dir.rglob("*")
     }
 
-    required_entries = {"README.md", "Makefile", ".gitignore"}
+    required_entries = {"README.md", "Makefile", ".gitignore", "scripts/doctor"}
     if "docker" in definition.tags:
         required_entries.update({".dockerignore", "compose.dev.yaml"})
     if definition.category == "backend":
@@ -463,6 +683,7 @@ def validate_templates() -> list[str]:
         errors.extend(validate_template_definition(definition))
         errors.extend(validate_template_placeholders(definition))
         errors.extend(validate_template_required_files(definition))
+        errors.extend(validate_template_command_contract(definition))
 
     for metadata_path in sorted(templates_root().glob("*/template.json")):
         folder_name = metadata_path.parent.name
@@ -498,8 +719,9 @@ def resolve_variables_detailed(
     missing_required: list[str] = []
     for variable in definition.variables:
         value = provided.get(variable.name)
-        if value:
-            resolved[variable.name] = value
+        normalized_value = value.strip() if value is not None else ""
+        if normalized_value:
+            resolved[variable.name] = normalized_value
             resolution_sources[variable.name] = "provided"
             continue
 
