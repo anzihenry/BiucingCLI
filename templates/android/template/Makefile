@@ -14,7 +14,7 @@ GRADLE := GRADLE_USER_HOME=$(GRADLE_USER_HOME) ./gradlew -Dorg.gradle.project.bi
 
 export GRADLE_USER_HOME
 
-.PHONY: bootstrap doctor wrapper clean build bundle-release artifact-info verify verify-release-signing test test-ui lint format install-debug release-doctor archive beta release worktree-info worktree-doctor clean-worktree
+.PHONY: bootstrap doctor wrapper verify-supply-chain clean build bundle-release artifact-info verify-release-artifact verify verify-release-signing test test-ui lint format install-debug release-doctor archive beta release worktree-info worktree-doctor clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
@@ -24,6 +24,11 @@ doctor:
 
 wrapper:
 	./scripts/sync-gradle-wrapper
+
+verify-supply-chain:
+	./scripts/verify-gradle-supply-chain
+
+clean build bundle-release verify-release-signing test test-ui lint format install-debug: verify-supply-chain
 
 clean:
 	$(GRADLE) clean
@@ -37,7 +42,10 @@ bundle-release:
 artifact-info:
 	./scripts/artifact-info
 
-verify: doctor lint test build
+verify-release-artifact:
+	./scripts/verify-release-artifact
+
+verify: verify-supply-chain doctor lint test build
 
 verify-release-signing:
 	$(GRADLE) :app:verifyReleaseSigning

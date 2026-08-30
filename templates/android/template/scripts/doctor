@@ -109,8 +109,10 @@ fi
 
 if [[ ! -f "./gradle/wrapper/gradle-wrapper.jar" ]]; then
   fail "gradle-wrapper.jar is missing. Restore the committed wrapper files or run 'make wrapper' to regenerate them."
+elif ./scripts/verify-gradle-supply-chain >/dev/null 2>&1; then
+  pass "Gradle distribution, wrapper, and dependency checksums are pinned"
 else
-  pass "Gradle wrapper files are present"
+  fail "Gradle supply-chain verification failed. Run ./scripts/verify-gradle-supply-chain for details."
 fi
 
 if command -v fastlane >/dev/null 2>&1; then

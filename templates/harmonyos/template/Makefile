@@ -19,13 +19,18 @@ export HVIGOR_HOME
 export OHPM_HOME
 export BIUCING_HARMONY_DEBUG_BUNDLE_SUFFIX := $(DEBUG_BUNDLE_SUFFIX)
 
-.PHONY: bootstrap doctor lint test build package artifact-info verify release-preflight release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
+.PHONY: bootstrap doctor verify-supply-chain lint test build package artifact-info verify verify-release-artifact release-preflight release signing-info clean open worktree-info worktree-doctor worktree-debug-identity clean-worktree
 
 bootstrap:
 	./scripts/bootstrap
 
 doctor:
 	./scripts/doctor
+
+verify-supply-chain:
+	./scripts/verify-supply-chain
+
+lint test build release-preflight release: verify-supply-chain
 
 lint:
 	./scripts/lint
@@ -41,7 +46,10 @@ package: build
 artifact-info:
 	./scripts/artifact-info
 
-verify: doctor lint test build artifact-info
+verify-release-artifact:
+	./scripts/verify-release-artifact
+
+verify: verify-supply-chain doctor lint test build artifact-info
 
 release-preflight:
 	./scripts/release-preflight

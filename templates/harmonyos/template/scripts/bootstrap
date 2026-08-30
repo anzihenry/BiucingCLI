@@ -8,5 +8,31 @@ if ! command -v ohpm >/dev/null 2>&1; then
   exit 1
 fi
 
-ohpm install
+./scripts/verify-supply-chain
+lock_backup="$(mktemp "${TMPDIR:-/tmp}/biucing-ohpm-lock.XXXXXX")"
+cp -p oh-package-lock.json5 "$lock_backup"
+restore_lock() {
+  local status=$?
+  trap - EXIT HUP INT TERM
+  if ! cmp -s "$lock_backup" oh-package-lock.json5; then
+    cp -p "$lock_backup" oh-package-lock.json5
+  fi
+  rm -f "$lock_backup"
+  exit "$status"
+}
+trap restore_lock EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+lock_before="$(shasum -a 256 oh-package-lock.json5 | awk '{ print $1 }')"
+ohpm install --lockfile_stable_order --resolve_conflict_strict
+lock_after="$(shasum -a 256 oh-package-lock.json5 | awk '{ print $1 }')"
+if [[ "$lock_after" != "$lock_before" ]]; then
+  echo "ohpm changed oh-package-lock.json5 during bootstrap." >&2
+  echo "Review the dependency change, regenerate integrity metadata deliberately, and commit it before retrying." >&2
+  exit 1
+fi
+./scripts/verify-supply-chain
+trap - EXIT HUP INT TERM
+rm -f "$lock_backup"
 ./scripts/doctor

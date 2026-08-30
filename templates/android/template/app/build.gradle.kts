@@ -79,6 +79,17 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasCompleteReleaseSigning) {
+                storeFile = rootProject.file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = debugApplicationIdSuffix
@@ -94,17 +105,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-    }
-
-    signingConfigs {
-        create("release") {
-            if (hasCompleteReleaseSigning) {
-                storeFile = rootProject.file(releaseStoreFile!!)
-                storePassword = releaseStorePassword
-                keyAlias = releaseKeyAlias
-                keyPassword = releaseKeyPassword
-            }
         }
     }
 

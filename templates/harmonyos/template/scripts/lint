@@ -41,6 +41,8 @@ required_files=(
   "scripts/artifact-info"
   "scripts/release-build"
   "scripts/release-preflight"
+  "scripts/verify-release-artifact"
+  "scripts/verify-supply-chain"
   "scripts/test"
 )
 
@@ -52,7 +54,7 @@ for path in "${required_files[@]}"; do
   fi
 done
 
-for executable_script in scripts/artifact-info scripts/release-build scripts/release-preflight scripts/test; do
+for executable_script in scripts/artifact-info scripts/release-build scripts/release-preflight scripts/test scripts/verify-release-artifact scripts/verify-supply-chain; do
   if [[ -x "$executable_script" ]]; then
     pass "$executable_script is executable"
   else

@@ -2,10 +2,12 @@ import io
 import json
 import os
 import plistlib
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 from pathlib import Path
@@ -414,6 +416,12 @@ class CLITestCase(unittest.TestCase):
             sync_wrapper = (
                 project_dir / "scripts" / "sync-gradle-wrapper"
             ).read_text(encoding="utf-8")
+            gradle_supply_chain = (
+                project_dir / "scripts" / "verify-gradle-supply-chain"
+            ).read_text(encoding="utf-8")
+            release_artifact_verifier = (
+                project_dir / "scripts" / "verify-release-artifact"
+            ).read_text(encoding="utf-8")
             release_signing_example = (
                 project_dir / "docs" / "release-signing.properties.example"
             ).read_text(encoding="utf-8")
@@ -467,6 +475,8 @@ class CLITestCase(unittest.TestCase):
                 "feature/settings/src/main/java/settings/SettingsRoute.kt",
                 "gradle.properties",
                 "gradle/libs.versions.toml",
+                "gradle/verification-metadata.xml",
+                "gradle/wrapper/gradle-wrapper.jar.sha256",
                 "gradle/wrapper/gradle-wrapper.properties",
                 "gradlew",
                 "gradlew.bat",
@@ -475,6 +485,8 @@ class CLITestCase(unittest.TestCase):
                 "scripts/doctor",
                 "scripts/setup-android-sdk",
                 "scripts/sync-gradle-wrapper",
+                "scripts/verify-gradle-supply-chain",
+                "scripts/verify-release-artifact",
                 "settings.gradle.kts",
             }
 
@@ -498,6 +510,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make archive", readme)
             self.assertIn("make verify", readme)
             self.assertIn("make verify-release-signing", readme)
+            self.assertIn("make verify-supply-chain", readme)
+            self.assertIn("make verify-release-artifact", readme)
             self.assertIn("make artifact-info", readme)
             self.assertIn("Google Play `internal` track", readme)
             self.assertIn("production` track as a `draft`", readme)
@@ -579,6 +593,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("make bundle-release", fastfile)
             self.assertIn("make verify-release-signing", fastfile)
             self.assertIn("make artifact-info", fastfile)
+            self.assertIn("make verify-release-artifact", fastfile)
             self.assertIn("upload_to_play_store", fastfile)
             self.assertIn('PLAY_STORE_BETA_TRACK", "internal"', fastfile)
             self.assertIn('PLAY_STORE_RELEASE_TRACK", "production"', fastfile)
@@ -601,6 +616,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("adb is available", doctor)
             self.assertIn("Emulator command is available", doctor)
             self.assertIn("gradle-wrapper.jar is missing", doctor)
+            self.assertIn("Gradle supply-chain verification failed", doctor)
             self.assertIn("fastlane is not available", doctor)
             self.assertIn("Doctor found", doctor)
             self.assertIn("biucing.release.storeFile=signing/release.keystore", release_signing_example)
@@ -619,7 +635,10 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("$(GRADLE) bundleRelease", android_makefile)
             self.assertIn("verify-release-signing:", android_makefile)
             self.assertIn("artifact-info:", android_makefile)
-            self.assertIn("verify: doctor lint test build", android_makefile)
+            self.assertIn("verify-supply-chain:", android_makefile)
+            self.assertIn("verify-release-signing test test-ui lint format install-debug: verify-supply-chain", android_makefile)
+            self.assertIn("verify-release-artifact:", android_makefile)
+            self.assertIn("verify: verify-supply-chain doctor lint test build", android_makefile)
             self.assertIn("release-doctor:", android_makefile)
             self.assertIn("archive:", android_makefile)
             self.assertIn("$(GRADLE) connectedDebugAndroidTest", android_makefile)
@@ -628,10 +647,17 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("androidTestImplementation(libs.androidx.compose.ui.test.junit4)", app_build)
             self.assertIn("debugImplementation(libs.androidx.compose.ui.test.manifest)", app_build)
             self.assertIn("Android App Bundle artifact check", artifact_info)
-            self.assertIn("BundleConfig.pb", artifact_info)
-            self.assertIn('unzip -p "$artifact_path" "BundleConfig.pb"', artifact_info)
-            self.assertIn("gradle wrapper --gradle-version 8.10.2", sync_wrapper)
-            self.assertIn('-jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar"', gradlew)
+            self.assertIn("./scripts/verify-release-artifact", artifact_info)
+            self.assertIn("gradle wrapper", sync_wrapper)
+            self.assertIn("--gradle-version 8.10.2", sync_wrapper)
+            self.assertIn("--gradle-distribution-sha256-sum", sync_wrapper)
+            self.assertIn("Android Gradle supply-chain verification", gradle_supply_chain)
+            self.assertIn("gradle/verification-metadata.xml", gradle_supply_chain)
+            self.assertIn("Gradle wrapper JAR checksum mismatch", gradle_supply_chain)
+            self.assertIn("Android release artifact signature verification", release_artifact_verifier)
+            self.assertIn("AAB signer certificate does not match", release_artifact_verifier)
+            self.assertIn("jarsigner", release_artifact_verifier)
+            self.assertIn("org.gradle.wrapper.GradleWrapperMain", gradlew)
             self.assertTrue(expected_files.issubset(generated_files))
             self.assertIn("gradle/wrapper/gradle-wrapper.jar", generated_files)
             self.assertTrue(os.access(project_dir / "gradlew", os.X_OK))
@@ -639,6 +665,8 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(os.access(project_dir / "scripts" / "artifact-info", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "sync-gradle-wrapper", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "verify-gradle-supply-chain", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "verify-release-artifact", os.X_OK))
 
     def test_create_android_prompts_for_package_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -782,6 +810,12 @@ class CLITestCase(unittest.TestCase):
             release_build = (project_dir / "scripts" / "release-build").read_text(
                 encoding="utf-8"
             )
+            supply_chain = (project_dir / "scripts" / "verify-supply-chain").read_text(
+                encoding="utf-8"
+            )
+            release_artifact_verifier = (
+                project_dir / "scripts" / "verify-release-artifact"
+            ).read_text(encoding="utf-8")
             starter_test = (
                 project_dir / "entry" / "src" / "test" / "List.test.ets"
             ).read_text(encoding="utf-8")
@@ -846,9 +880,12 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("./scripts/lint", makefile)
             self.assertIn("./scripts/test", makefile)
             self.assertIn("./scripts/artifact-info", makefile)
-            self.assertIn("verify: doctor lint test build artifact-info", makefile)
+            self.assertIn("verify: verify-supply-chain doctor lint test build artifact-info", makefile)
             self.assertIn("./scripts/release-preflight", makefile)
             self.assertIn("./scripts/release-build", makefile)
+            self.assertIn("./scripts/verify-supply-chain", makefile)
+            self.assertIn("./scripts/verify-release-artifact", makefile)
+            self.assertIn("release-preflight release: verify-supply-chain", makefile)
             self.assertIn("WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel", makefile)
             self.assertIn("WORKTREE_LABEL ?= $(shell basename", makefile)
             self.assertIn("WORKTREE_ID ?= $(shell printf '%s' \"$(WORKTREE_ROOT)\" | shasum | cut -c1-8)", makefile)
@@ -880,6 +917,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("entry/src/main/ets/core/config/", readme)
             self.assertIn("entry/src/main/ets/core/designsystem/", readme)
             self.assertIn("ohpm install", bootstrap)
+            self.assertIn("--lockfile_stable_order --resolve_conflict_strict", bootstrap)
+            self.assertIn("ohpm changed oh-package-lock.json5", bootstrap)
             self.assertIn("HarmonyOS environment doctor", doctor)
             self.assertIn("DevEco Studio is installed", doctor)
             self.assertIn("ohpm is available", doctor)
@@ -900,6 +939,8 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("scripts/release-preflight", lint)
             self.assertIn("scripts/test", lint)
             self.assertIn("scripts/artifact-info", lint)
+            self.assertIn("scripts/verify-supply-chain", lint)
+            self.assertIn("scripts/verify-release-artifact", lint)
             self.assertIn("Hypium test dependency and starter test suite are present", lint)
             self.assertIn("no unrendered template placeholders found", lint)
             self.assertIn("Running HarmonyOS ArkTS unit tests with hvigor", test_script)
@@ -921,6 +962,15 @@ class CLITestCase(unittest.TestCase):
             self.assertIn("biucing.harmony.signing.certpath", release_build)
             self.assertIn("type: 'HarmonyOS'", release_build)
             self.assertIn("buildMode=release", release_build)
+            self.assertIn("./scripts/verify-release-artifact", release_build)
+            self.assertIn("./scripts/verify-supply-chain", release_build)
+            self.assertIn("HarmonyOS ohpm supply-chain verification", supply_chain)
+            self.assertIn("sha512", supply_chain)
+            self.assertIn("https://ohpm.openharmony.cn/ohpm/", supply_chain)
+            self.assertIn("HarmonyOS release artifact signature verification", release_artifact_verifier)
+            self.assertIn("verify-app", release_artifact_verifier)
+            self.assertIn("verify-profile", release_artifact_verifier)
+            self.assertIn("com.example.demoharmony", release_artifact_verifier)
             self.assertIn("biucing.harmony.signing.certpath", signing_example)
             self.assertIn("change-me-32-characters-minimum", signing_example)
             self.assertIn("biucing.harmony.signing.signAlg=SHA256withECDSA", signing_example)
@@ -931,6 +981,8 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(os.access(project_dir / "scripts" / "artifact-info", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "release-preflight", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "release-build", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "verify-supply-chain", os.X_OK))
+            self.assertTrue(os.access(project_dir / "scripts" / "verify-release-artifact", os.X_OK))
 
     def test_create_harmonyos_prompts_for_bundle_name(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -2626,6 +2678,192 @@ class CLITestCase(unittest.TestCase):
                     )
                     self.assertEqual(result.returncode, 1, relative_path)
 
+    def test_android_supply_chain_and_signed_aab_verification(self):
+        if not all(shutil.which(tool) for tool in ("keytool", "jarsigner")):
+            self.skipTest("JDK signing tools are unavailable")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.run_cli(
+                [
+                    "create", "android", "verified-android", "--output-dir", tmpdir,
+                    "--package-name", "com.example.verifiedandroid",
+                    "--application-id", "com.example.verifiedandroid.app",
+                ]
+            )
+            project_dir = Path(tmpdir) / "verified-android"
+            supply_script = project_dir / "scripts" / "verify-gradle-supply-chain"
+            result = subprocess.run(
+                [str(supply_script)], cwd=project_dir, capture_output=True, text=True, check=False
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            wrapper_properties = project_dir / "gradle" / "wrapper" / "gradle-wrapper.properties"
+            original_properties = wrapper_properties.read_text(encoding="utf-8")
+            wrapper_properties.write_text(
+                original_properties.replace("distributionSha256Sum=31c557", "distributionSha256Sum=deadbe"),
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [str(supply_script)], cwd=project_dir, capture_output=True, text=True, check=False
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Unexpected Gradle distribution SHA-256", result.stderr)
+            wrapper_properties.write_text(original_properties, encoding="utf-8")
+
+            artifact_path = project_dir / "app" / "build" / "outputs" / "bundle" / "release" / "app-release.aab"
+            artifact_path.parent.mkdir(parents=True)
+            with zipfile.ZipFile(artifact_path, "w") as archive:
+                archive.writestr("BundleConfig.pb", b"bundle")
+                archive.writestr("base/manifest/AndroidManifest.xml", b"manifest")
+
+            stores = []
+            for index in (1, 2):
+                store_path = Path(tmpdir) / f"release-{index}.jks"
+                subprocess.run(
+                    [
+                        "keytool", "-genkeypair", "-alias", "release", "-keyalg", "RSA",
+                        "-keystore", str(store_path), "-storepass", "test-password",
+                        "-keypass", "test-password", "-dname", f"CN=Release {index}",
+                        "-validity", "1",
+                    ],
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                stores.append(store_path)
+            subprocess.run(
+                [
+                    "jarsigner", "-keystore", str(stores[0]), "-storepass", "test-password",
+                    "-keypass", "test-password", str(artifact_path), "release",
+                ],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+
+            verifier = project_dir / "scripts" / "verify-release-artifact"
+            env = os.environ.copy()
+            env.update(
+                {
+                    "BIUCING_RELEASE_STORE_FILE": str(stores[0]),
+                    "BIUCING_RELEASE_STORE_PASSWORD": "test-password",
+                    "BIUCING_RELEASE_KEY_ALIAS": "release",
+                }
+            )
+            result = subprocess.run(
+                [str(verifier), str(artifact_path)], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("matches the configured release certificate", result.stdout)
+
+            env["BIUCING_RELEASE_STORE_FILE"] = str(stores[1])
+            result = subprocess.run(
+                [str(verifier), str(artifact_path)], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("does not match the configured release key", result.stderr)
+
+    def test_harmonyos_supply_chain_and_hap_identity_verification(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_dir = self.create_harmony_release_fixture(tmpdir, "verified-harmony")
+            supply_script = project_dir / "scripts" / "verify-supply-chain"
+            result = subprocess.run(
+                [str(supply_script)], cwd=project_dir, capture_output=True, text=True, check=False
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            lock_path = project_dir / "oh-package-lock.json5"
+            original_lock = lock_path.read_text(encoding="utf-8")
+            lock_path.write_text(
+                original_lock.replace("https://ohpm.openharmony.cn/ohpm/", "https://example.invalid/"),
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [str(supply_script)], cwd=project_dir, capture_output=True, text=True, check=False
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("outside the approved ohpm registry", result.stderr)
+            lock_path.write_text(original_lock, encoding="utf-8")
+
+            fake_bin = Path(tmpdir) / "fake-bin"
+            fake_bin.mkdir()
+            fake_ohpm = fake_bin / "ohpm"
+            fake_ohpm.write_text(
+                "#!/usr/bin/env bash\nprintf '\\n' >> oh-package-lock.json5\n",
+                encoding="utf-8",
+            )
+            fake_ohpm.chmod(0o755)
+            env = os.environ.copy()
+            env["PATH"] = f"{fake_bin}{os.pathsep}{env['PATH']}"
+            result = subprocess.run(
+                [str(project_dir / "scripts" / "bootstrap")], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("changed oh-package-lock.json5", result.stderr)
+            self.assertEqual(lock_path.read_text(encoding="utf-8"), original_lock)
+
+            artifact_path = project_dir / "entry" / "build" / "release" / "verified.hap"
+            artifact_path.parent.mkdir(parents=True)
+            with zipfile.ZipFile(artifact_path, "w") as archive:
+                archive.writestr("module.json", '{"module":{"name":"entry"}}')
+
+            fake_sign_tool = Path(tmpdir) / "fake-hap-sign-tool"
+            fake_sign_tool.write_text(
+                """#!/usr/bin/env bash
+set -euo pipefail
+command="$1"; shift
+value_for() { local expected="$1"; shift; while [[ "$#" -gt 1 ]]; do if [[ "$1" == "$expected" ]]; then printf '%s' "$2"; return; fi; shift; done; }
+if [[ "$command" == "verify-app" ]]; then
+  if [[ "${FAKE_SIGNER_MISMATCH:-0}" == "1" ]]; then printf '%s' bad-signer > "$(value_for -outCertChain "$@")"; else cp signing/release.cer "$(value_for -outCertChain "$@")"; fi
+  cp signing/release.p7b "$(value_for -outProfile "$@")"
+elif [[ "$command" == "verify-profile" ]]; then
+  printf '{"profile":{"bundle-name":"%s"}}\n' "${FAKE_BUNDLE_NAME:-com.example.verifiedharmony}" > "$(value_for -outFile "$@")"
+fi
+""",
+                encoding="utf-8",
+            )
+            fake_sign_tool.chmod(0o755)
+            fake_keytool = Path(tmpdir) / "fake-keytool"
+            fake_keytool.write_text(
+                """#!/usr/bin/env bash
+set -euo pipefail
+path="${@: -1}"
+if [[ -f "$path" ]] && grep -q bad-signer "$path"; then printf '%s\n' 'SHA256: DD:EE:FF'; else printf '%s\n' 'SHA256: AA:BB:CC'; fi
+""",
+                encoding="utf-8",
+            )
+            fake_keytool.chmod(0o755)
+
+            verifier = project_dir / "scripts" / "verify-release-artifact"
+            env = os.environ.copy()
+            env["HAP_SIGN_TOOL"] = str(fake_sign_tool)
+            env["KEYTOOL"] = str(fake_keytool)
+            result = subprocess.run(
+                [str(verifier), str(artifact_path)], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            env["FAKE_SIGNER_MISMATCH"] = "1"
+            result = subprocess.run(
+                [str(verifier), str(artifact_path)], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("does not match the configured release certificate", result.stderr)
+
+            env.pop("FAKE_SIGNER_MISMATCH")
+            env["FAKE_BUNDLE_NAME"] = "com.example.wrong"
+            result = subprocess.run(
+                [str(verifier), str(artifact_path)], cwd=project_dir, env=env,
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("bundle identity does not match", result.stderr)
+
     def test_harmonyos_release_restores_profile_after_success_and_failure(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = self.create_harmony_release_fixture(
@@ -2653,16 +2891,51 @@ if [[ -n "${FAKE_HVIGOR_SIGNAL:-}" ]]; then
   kill -s "$FAKE_HVIGOR_SIGNAL" "$PPID"
   sleep 0.2
 fi
+mkdir -p entry/build/default/outputs/default /tmp/biucing-empty-hap
+printf '%s' 'fixture' > /tmp/biucing-empty-hap/module.json
+(cd /tmp/biucing-empty-hap && zip -q "${OLDPWD}/entry/build/default/outputs/default/entry-default-signed.hap" -r .)
 """,
                 encoding="utf-8",
             )
             fake_hvigor.chmod(0o755)
+            fake_sign_tool = Path(tmpdir) / "fake-hap-sign-tool"
+            fake_sign_tool.write_text(
+                """#!/usr/bin/env bash
+set -euo pipefail
+command="$1"
+shift
+value_for() {
+  local expected="$1"
+  shift
+  while [[ "$#" -gt 1 ]]; do
+    if [[ "$1" == "$expected" ]]; then printf '%s' "$2"; return; fi
+    shift
+  done
+}
+if [[ "$command" == "verify-app" ]]; then
+  cp signing/release.cer "$(value_for -outCertChain "$@")"
+  cp signing/release.p7b "$(value_for -outProfile "$@")"
+elif [[ "$command" == "verify-profile" ]]; then
+  printf '%s\n' '{"profile":{"bundle-name":"com.example.releaserestoreharmony"}}' > "$(value_for -outFile "$@")"
+fi
+""",
+                encoding="utf-8",
+            )
+            fake_sign_tool.chmod(0o755)
+            fake_keytool = Path(tmpdir) / "fake-keytool"
+            fake_keytool.write_text(
+                "#!/usr/bin/env bash\nprintf '%s\\n' 'SHA256: AA:BB:CC'\n",
+                encoding="utf-8",
+            )
+            fake_keytool.chmod(0o755)
             release_script = project_dir / "scripts" / "release-build"
 
             for should_fail in (False, True):
                 with self.subTest(should_fail=should_fail):
                     env = os.environ.copy()
                     env["HVIGOR"] = str(fake_hvigor)
+                    env["HAP_SIGN_TOOL"] = str(fake_sign_tool)
+                    env["KEYTOOL"] = str(fake_keytool)
                     if should_fail:
                         env["FAKE_HVIGOR_FAIL"] = "1"
                     result = subprocess.run(

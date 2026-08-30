@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+artifact_path="${1:-app/build/outputs/bundle/release/app-release.aab}"
+properties_path="local.properties"
+keytool_bin="${KEYTOOL:-keytool}"
+jarsigner_bin="${JARSIGNER:-jarsigner}"
+
+property_value() {
+  local property_name="$1"
+  local environment_name="$2"
+  local environment_value="${!environment_name:-}"
+  if [[ -n "$environment_value" ]]; then
+    printf '%s' "$environment_value"
+  elif [[ -f "$properties_path" ]]; then
+    awk -F= -v key="$property_name" '
+      $0 !~ /^[[:space:]]*#/ && $1 ~ "^[[:space:]]*" key "[[:space:]]*$" {
+        sub(/^[^=]*=/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; exit
+      }
+    ' "$properties_path"
+  fi
+}
+
+normalize_fingerprint() {
+  tr '[:lower:]' '[:upper:]' | tr -d ':[:space:]'
+}
+
+certificate_fingerprint() {
+  sed -nE 's/.*SHA-?256:[[:space:]]*([0-9A-Fa-f:]+).*/\1/p' | head -n 1 | normalize_fingerprint
+}
+
+echo "Android release artifact signature verification"
+
+if [[ ! -s "$artifact_path" ]]; then
+  echo "AAB is missing or empty: $artifact_path" >&2
+  exit 1
+fi
+if ! unzip -tqq "$artifact_path"; then
+  echo "AAB archive validation failed: $artifact_path" >&2
+  exit 1
+fi
+for entry in BundleConfig.pb base/manifest/AndroidManifest.xml; do
+  if ! unzip -p "$artifact_path" "$entry" >/dev/null; then
+    echo "AAB does not contain required entry: $entry" >&2
+    exit 1
+  fi
+done
+
+for tool in "$keytool_bin" "$jarsigner_bin"; do
+  if ! command -v "$tool" >/dev/null 2>&1 && [[ ! -x "$tool" ]]; then
+    echo "Required JDK signing tool is unavailable: $tool" >&2
+    exit 1
+  fi
+done
+
+store_file="$(property_value biucing.release.storeFile BIUCING_RELEASE_STORE_FILE)"
+store_password="$(property_value biucing.release.storePassword BIUCING_RELEASE_STORE_PASSWORD)"
+key_alias="$(property_value biucing.release.keyAlias BIUCING_RELEASE_KEY_ALIAS)"
+if [[ -z "$store_file" || -z "$store_password" || -z "$key_alias" ]]; then
+  echo "Release keystore path, store password, and key alias are required for artifact verification." >&2
+  exit 1
+fi
+if [[ "$store_file" != /* ]]; then
+  store_file="$PWD/$store_file"
+fi
+if [[ ! -f "$store_file" ]]; then
+  echo "Release keystore does not exist: $store_file" >&2
+  exit 1
+fi
+
+verification_output="$(mktemp "${TMPDIR:-/tmp}/biucing-jarsigner.XXXXXX")"
+cleanup() {
+  rm -f "$verification_output"
+  unset BIUCING_KEYSTORE_PASSWORD_INPUT
+}
+trap cleanup EXIT HUP INT TERM
+
+LC_ALL=C "$jarsigner_bin" -verify -verbose -certs "$artifact_path" >"$verification_output" 2>&1 || {
+  echo "AAB cryptographic signature verification failed." >&2
+  sed -n '1,20p' "$verification_output" >&2
+  exit 1
+}
+if ! grep -q 'jar verified' "$verification_output" || grep -q 'unsigned entry' "$verification_output"; then
+  echo "AAB is not fully JAR-signed." >&2
+  exit 1
+fi
+
+export BIUCING_KEYSTORE_PASSWORD_INPUT="$store_password"
+expected_fingerprint="$(LC_ALL=C "$keytool_bin" -list -v -keystore "$store_file" -alias "$key_alias" -storepass:env BIUCING_KEYSTORE_PASSWORD_INPUT 2>/dev/null | certificate_fingerprint)"
+actual_fingerprint="$(LC_ALL=C "$keytool_bin" -printcert -jarfile "$artifact_path" 2>/dev/null | certificate_fingerprint)"
+unset BIUCING_KEYSTORE_PASSWORD_INPUT
+
+if [[ -z "$expected_fingerprint" || -z "$actual_fingerprint" ]]; then
+  echo "Unable to read the expected or actual signer SHA-256 fingerprint." >&2
+  exit 1
+fi
+if [[ "$actual_fingerprint" != "$expected_fingerprint" ]]; then
+  echo "AAB signer certificate does not match the configured release key." >&2
+  echo "expected: $expected_fingerprint" >&2
+  echo "actual:   $actual_fingerprint" >&2
+  exit 1
+fi
+
+echo "AAB signature is valid and matches the configured release certificate."

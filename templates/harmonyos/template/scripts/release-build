@@ -8,6 +8,7 @@ BACKUP_DIR=".biucing/release"
 BACKUP_PROFILE="${BACKUP_DIR}/build-profile.json5.backup"
 GENERATED_PROFILE="${BACKUP_DIR}/build-profile.json5.generated"
 RESTORE_PROFILE="${BACKUP_DIR}/build-profile.json5.restore"
+BUILD_MARKER="${BACKUP_DIR}/release-build.started"
 
 if [[ ! -f "local.properties" ]]; then
   cat >&2 <<'EOF'
@@ -19,6 +20,7 @@ EOF
   exit 1
 fi
 
+./scripts/verify-supply-chain
 ./scripts/release-preflight
 
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1 || \
@@ -49,7 +51,7 @@ restore_build_profile() {
   local restore_status=0
 
   trap - EXIT HUP INT TERM
-  rm -f "$GENERATED_PROFILE" "$RESTORE_PROFILE"
+  rm -f "$GENERATED_PROFILE" "$RESTORE_PROFILE" "$BUILD_MARKER"
 
   if [[ -f "$BACKUP_PROFILE" ]]; then
     if cp -p "$BACKUP_PROFILE" "$RESTORE_PROFILE" && \
@@ -162,6 +164,36 @@ NODE
 
 mv -f "$GENERATED_PROFILE" "$BUILD_PROFILE"
 
+touch "$BUILD_MARKER"
 "$HVIGOR_BIN" assembleHap --mode module -p "module=${MODULE_NAME}" -p buildMode=release
+release_artifact="$(MODULE_BUILD_ROOT="${MODULE_NAME}/build" BUILD_MARKER_PATH="$BUILD_MARKER" node <<'NODE'
+const fs = require('fs');
+const path = require('path');
+const markerTime = fs.statSync(process.env.BUILD_MARKER_PATH).mtimeMs;
+const candidates = [];
+
+function visit(directory) {
+  if (!fs.existsSync(directory)) return;
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const candidate = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      visit(candidate);
+    } else if (entry.isFile() && candidate.endsWith('.hap')) {
+      const modified = fs.statSync(candidate).mtimeMs;
+      if (modified > markerTime) candidates.push({ candidate, modified });
+    }
+  }
+}
+
+visit(process.env.MODULE_BUILD_ROOT);
+candidates.sort((left, right) => right.modified - left.modified);
+if (candidates.length > 0) process.stdout.write(candidates[0].candidate);
+NODE
+)"
+if [[ -z "$release_artifact" ]]; then
+  echo "Release build did not produce a new HAP artifact." >&2
+  exit 1
+fi
+./scripts/verify-release-artifact "$release_artifact"
 
 echo "Release build finished. Restoring build-profile.json5."

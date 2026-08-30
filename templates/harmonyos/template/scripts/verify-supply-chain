@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "HarmonyOS ohpm supply-chain verification"
+
+node <<'NODE'
+const fs = require('fs');
+
+const manifestPath = 'oh-package.json5';
+const lockPath = 'oh-package-lock.json5';
+const allowedRegistryPrefix = 'https://ohpm.openharmony.cn/ohpm/';
+const failures = [];
+
+function load(path) {
+  try {
+    return JSON.parse(fs.readFileSync(path, 'utf8'));
+  } catch (_error) {
+    failures.push(`${path} is missing or is not valid JSON.`);
+    return {};
+  }
+}
+
+const manifest = load(manifestPath);
+const lock = load(lockPath);
+const declared = { ...(manifest.dependencies || {}), ...(manifest.devDependencies || {}) };
+const specifiers = lock.specifiers || {};
+const packages = lock.packages || {};
+
+if (lock.lockfileVersion !== 3) {
+  failures.push(`${lockPath} must use lockfileVersion 3.`);
+}
+if (lock?.meta?.stableOrder !== true) {
+  failures.push(`${lockPath} must enable meta.stableOrder.`);
+}
+
+for (const [name, version] of Object.entries(declared)) {
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(String(version))) {
+    failures.push(`${name} must use an exact version; found ${version}.`);
+    continue;
+  }
+  const key = `${name}@${version}`;
+  if (specifiers[key] !== key) {
+    failures.push(`${key} is not pinned by lockfile specifiers.`);
+  }
+  if (!packages[key]) {
+    failures.push(`${key} is missing from lockfile packages.`);
+  }
+}
+
+for (const [key, pkg] of Object.entries(packages)) {
+  if (!/^sha512-[A-Za-z0-9+/]+={0,2}$/.test(String(pkg.integrity || ''))) {
+    failures.push(`${key} is missing a valid sha512 integrity value.`);
+  }
+  if (!String(pkg.resolved || '').startsWith(allowedRegistryPrefix)) {
+    failures.push(`${key} resolves outside the approved ohpm registry.`);
+  }
+  if (pkg.registryType !== 'ohpm') {
+    failures.push(`${key} must use registryType ohpm.`);
+  }
+}
+
+if (failures.length > 0) {
+  for (const failure of failures) {
+    console.error(`[fail] ${failure}`);
+  }
+  process.exit(1);
+}
+
+console.log(`Pinned ${Object.keys(packages).length} package(s) with registry and integrity checks.`);
+NODE

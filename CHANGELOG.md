@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- add Android Gradle distribution, wrapper JAR, and dependency checksum verification plus signer-certificate validation for release AABs; add HarmonyOS exact ohpm lock validation and SDK-backed HAP signer, profile, and bundle-identity verification.
 - Add explicit Worker retry exhaustion, exponential backoff, scheduled-cycle continuation, cancellation, and deterministic injected-clock tests.
 - Add bounded HTTP timeouts, signal-aware graceful shutdown, runtime health checks, and coordinated HTTP/gRPC draining to the Web Service and Microservice templates.
 - hardened Apple archive, TestFlight, and App Store release workflows so worktree debug bundle suffixes are always discarded, with Release workspace and xcarchive identity checks before signing and upload.

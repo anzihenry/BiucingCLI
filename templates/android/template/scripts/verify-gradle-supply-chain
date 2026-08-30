@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+properties_path="gradle/wrapper/gradle-wrapper.properties"
+wrapper_path="gradle/wrapper/gradle-wrapper.jar"
+wrapper_checksum_path="gradle/wrapper/gradle-wrapper.jar.sha256"
+metadata_path="gradle/verification-metadata.xml"
+expected_distribution_url='https\://services.gradle.org/distributions/gradle-8.10.2-bin.zip'
+expected_distribution_sha256='31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26'
+
+echo "Android Gradle supply-chain verification"
+
+for path in "$properties_path" "$wrapper_path" "$wrapper_checksum_path" "$metadata_path"; do
+  if [[ ! -f "$path" ]]; then
+    echo "Required Gradle verification file is missing: $path" >&2
+    exit 1
+  fi
+done
+
+property_value() {
+  local key="$1"
+  sed -n "s/^${key}=//p" "$properties_path" | tail -n 1
+}
+
+actual_distribution_url="$(property_value distributionUrl)"
+actual_distribution_sha256="$(property_value distributionSha256Sum)"
+if [[ "$actual_distribution_url" != "$expected_distribution_url" ]]; then
+  echo "Unexpected Gradle distribution URL." >&2
+  echo "expected: $expected_distribution_url" >&2
+  echo "actual:   $actual_distribution_url" >&2
+  exit 1
+fi
+if [[ "$actual_distribution_sha256" != "$expected_distribution_sha256" ]]; then
+  echo "Unexpected Gradle distribution SHA-256." >&2
+  echo "expected: $expected_distribution_sha256" >&2
+  echo "actual:   ${actual_distribution_sha256:-<missing>}" >&2
+  exit 1
+fi
+
+expected_wrapper_sha256="$(awk 'NF { print $1; exit }' "$wrapper_checksum_path")"
+actual_wrapper_sha256="$(shasum -a 256 "$wrapper_path" | awk '{ print $1 }')"
+if [[ ! "$expected_wrapper_sha256" =~ ^[0-9a-f]{64}$ ]] || \
+   [[ "$actual_wrapper_sha256" != "$expected_wrapper_sha256" ]]; then
+  echo "Gradle wrapper JAR checksum mismatch." >&2
+  echo "expected: ${expected_wrapper_sha256:-<missing>}" >&2
+  echo "actual:   $actual_wrapper_sha256" >&2
+  exit 1
+fi
+
+if ! grep -q '<verify-metadata>true</verify-metadata>' "$metadata_path" || \
+   ! grep -q '<sha256 value="[0-9a-f]\{64\}"' "$metadata_path"; then
+  echo "$metadata_path must enable metadata verification and pin SHA-256 checksums." >&2
+  exit 1
+fi
+
+if grep -Eq '(^|[="[:space:]])(latest\.|[+*]|[^"[:space:]]+-SNAPSHOT)' gradle/libs.versions.toml; then
+  echo "Dynamic or snapshot versions are not allowed in gradle/libs.versions.toml." >&2
+  exit 1
+fi
+
+echo "Gradle distribution, wrapper JAR, and dependency metadata are pinned."

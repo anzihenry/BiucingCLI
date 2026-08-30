@@ -21,15 +21,18 @@ Google Play requires an app record to exist before API-driven delivery. Complete
 
 ```bash
 make release-doctor
+make verify-supply-chain
 make archive
 make artifact-info
+make verify-release-artifact
 make beta
 make release
 ```
 
 - `make release-doctor` verifies the service-account JSON, the four release-signing inputs, upload keystore, private key alias, and any enabled metadata directory.
-- `make archive` runs lint and unit tests, validates the signing key, then builds a signed `app-release.aab` without uploading it.
-- `make artifact-info` verifies the AAB is readable, confirms its `BundleConfig.pb` entry, and prints a SHA-256 checksum.
+- `make verify-supply-chain` validates the pinned Gradle distribution and wrapper JAR, exact dependency versions, and Gradle dependency checksum metadata.
+- `make archive` runs lint and unit tests, validates the signing key, builds a signed `app-release.aab`, then verifies its cryptographic signature and signer certificate without uploading it.
+- `make verify-release-artifact` checks AAB structure and compares the embedded signer SHA-256 fingerprint with the configured upload key. `make artifact-info` performs the same gate before printing the handoff checksum.
 - `make beta` runs the archive lane and uploads the AAB to the `internal` track by default.
 - `make release` runs the archive lane and uploads the AAB to the `production` track as a `draft` by default.
 
@@ -59,3 +62,7 @@ Keep these out of version control and store them in the CI secret manager:
 For direct Gradle use, keep signing values in `~/.gradle/gradle.properties`; never add them to the tracked project-level `gradle.properties`. Keep `.env.example` and signing-property examples as placeholders only.
 
 Ignore rules only protect untracked files and do not override `git add -f`. If real credentials have already been committed, revoke or rotate them first, remove them from the index, and assess whether repository history must be rewritten.
+
+## Dependency Verification Maintenance
+
+The committed wrapper properties include the Gradle distribution SHA-256, while `gradle-wrapper.jar.sha256` pins the official wrapper executable. Gradle automatically enforces the artifact checksums in `gradle/verification-metadata.xml`. When intentionally upgrading a plugin or dependency, generate new SHA-256 metadata in a clean review branch, inspect the repository coordinates and checksum diff, and only then commit it. A checksum should never be copied from a failed build or an untrusted mirror.

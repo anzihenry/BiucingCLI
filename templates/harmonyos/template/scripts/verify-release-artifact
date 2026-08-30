@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+EXPECTED_BUNDLE_NAME="{{BUNDLE_NAME}}"
+properties_path="local.properties"
+keytool_bin="${KEYTOOL:-keytool}"
+
+property_value() {
+  local key="$1"
+  awk -F= -v expected="$key" '
+    $0 !~ /^[[:space:]]*#/ && $1 ~ "^[[:space:]]*" expected "[[:space:]]*$" {
+      sub(/^[^=]*=/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; exit
+    }
+  ' "$properties_path"
+}
+
+fingerprint_from_certificate() {
+  LC_ALL=C "$keytool_bin" -printcert -file "$1" 2>/dev/null \
+    | sed -nE 's/.*SHA-?256:[[:space:]]*([0-9A-Fa-f:]+).*/\1/p' \
+    | head -n 1 \
+    | tr '[:lower:]' '[:upper:]' \
+    | tr -d ':[:space:]'
+}
+
+find_sign_tool() {
+  if [[ -n "${HAP_SIGN_TOOL:-}" ]]; then
+    printf '%s' "$HAP_SIGN_TOOL"
+    return
+  fi
+  local sdk_root="${DEVECO_SDK_HOME:-${HOS_SDK_HOME:-${OHOS_SDK_HOME:-}}}"
+  local candidate
+  for candidate in \
+    "$sdk_root/default/openharmony/toolchains/lib/hap-sign-tool.jar" \
+    "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/lib/hap-sign-tool.jar"; do
+    if [[ -f "$candidate" ]]; then
+      printf '%s' "$candidate"
+      return
+    fi
+  done
+}
+
+artifact_path="${1:-}"
+if [[ -z "$artifact_path" ]]; then
+  artifact_path="$(find "{{HARMONY_MODULE_NAME}}/build" -type f -name '*.hap' -print 2>/dev/null | sort | tail -n 1)"
+fi
+
+echo "HarmonyOS release artifact signature verification"
+
+if [[ -z "$artifact_path" || ! -s "$artifact_path" ]]; then
+  echo "Signed HAP artifact is missing or empty." >&2
+  exit 1
+fi
+if ! unzip -tqq "$artifact_path"; then
+  echo "HAP archive validation failed: $artifact_path" >&2
+  exit 1
+fi
+if [[ ! -f "$properties_path" ]]; then
+  echo "$properties_path is required to verify the expected signer and profile." >&2
+  exit 1
+fi
+if ! command -v "$keytool_bin" >/dev/null 2>&1 && [[ ! -x "$keytool_bin" ]]; then
+  echo "keytool is required to compare signing certificate fingerprints." >&2
+  exit 1
+fi
+
+cert_path="$(property_value biucing.harmony.signing.certpath)"
+profile_path="$(property_value biucing.harmony.signing.profile)"
+for variable_name in cert_path profile_path; do
+  value="${!variable_name:-}"
+  if [[ -z "$value" ]]; then
+    echo "Missing signing property for $variable_name." >&2
+    exit 1
+  fi
+  if [[ "$value" != /* ]]; then
+    printf -v "$variable_name" '%s' "$PWD/$value"
+  fi
+  if [[ ! -f "${!variable_name}" ]]; then
+    echo "Configured signing input does not exist: ${!variable_name}" >&2
+    exit 1
+  fi
+done
+
+sign_tool="$(find_sign_tool)"
+if [[ -z "$sign_tool" || ( ! -f "$sign_tool" && ! -x "$sign_tool" ) ]]; then
+  echo "hap-sign-tool is unavailable. Set HAP_SIGN_TOOL or DEVECO_SDK_HOME." >&2
+  exit 1
+fi
+
+verification_dir="$(mktemp -d "${TMPDIR:-/tmp}/biucing-hap-verify.XXXXXX")"
+chmod 700 "$verification_dir"
+out_certchain="$verification_dir/certificate-chain.cer"
+out_profile="$verification_dir/profile.p7b"
+profile_result="$verification_dir/profile-verification.json"
+cleanup() {
+  rm -f "$out_certchain" "$out_profile" "$profile_result"
+  rmdir "$verification_dir" 2>/dev/null || true
+}
+trap cleanup EXIT HUP INT TERM
+
+if [[ "$sign_tool" == *.jar ]]; then
+  java -jar "$sign_tool" verify-app \
+    -inFile "$artifact_path" \
+    -outCertChain "$out_certchain" \
+    -outProfile "$out_profile" \
+    -inForm zip >/dev/null
+else
+  "$sign_tool" verify-app \
+    -inFile "$artifact_path" \
+    -outCertChain "$out_certchain" \
+    -outProfile "$out_profile" \
+    -inForm zip >/dev/null
+fi
+
+if [[ ! -s "$out_certchain" || ! -s "$out_profile" ]]; then
+  echo "hap-sign-tool did not export a signer certificate chain and profile." >&2
+  exit 1
+fi
+
+expected_fingerprint="$(fingerprint_from_certificate "$cert_path")"
+actual_fingerprint="$(fingerprint_from_certificate "$out_certchain")"
+if [[ -z "$expected_fingerprint" || -z "$actual_fingerprint" ]]; then
+  echo "Unable to read the configured or embedded signer certificate fingerprint." >&2
+  exit 1
+fi
+if [[ "$actual_fingerprint" != "$expected_fingerprint" ]]; then
+  echo "HAP signer certificate does not match the configured release certificate." >&2
+  echo "expected: $expected_fingerprint" >&2
+  echo "actual:   $actual_fingerprint" >&2
+  exit 1
+fi
+if ! cmp -s "$profile_path" "$out_profile"; then
+  echo "HAP embedded signing profile does not match the configured release profile." >&2
+  exit 1
+fi
+
+if [[ "$sign_tool" == *.jar ]]; then
+  java -jar "$sign_tool" verify-profile -inFile "$out_profile" -outFile "$profile_result" >/dev/null
+else
+  "$sign_tool" verify-profile -inFile "$out_profile" -outFile "$profile_result" >/dev/null
+fi
+if [[ ! -s "$profile_result" ]]; then
+  echo "hap-sign-tool did not produce a verified profile result." >&2
+  exit 1
+fi
+EXPECTED_BUNDLE_NAME="$EXPECTED_BUNDLE_NAME" PROFILE_RESULT="$profile_result" node <<'NODE'
+const fs = require('fs');
+const result = JSON.parse(fs.readFileSync(process.env.PROFILE_RESULT, 'utf8'));
+const found = [];
+function visit(value) {
+  if (Array.isArray(value)) {
+    value.forEach(visit);
+  } else if (typeof value === 'string' && value.trim().startsWith('{')) {
+    try { visit(JSON.parse(value)); } catch (_error) { /* not an embedded JSON object */ }
+  } else if (value && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) {
+      if (key.toLowerCase().replace(/[-_.]/g, '') === 'bundlename') {
+        found.push(String(child));
+      }
+      visit(child);
+    }
+  }
+}
+visit(result);
+if (!found.includes(process.env.EXPECTED_BUNDLE_NAME)) {
+  console.error('Verified HAP profile bundle identity does not match the template release bundle.');
+  console.error(`expected: ${process.env.EXPECTED_BUNDLE_NAME}`);
+  console.error(`actual:   ${found.length > 0 ? found.join(', ') : '<missing>'}`);
+  process.exit(1);
+}
+NODE
+
+echo "HAP signature is valid; signer and embedded profile match local release inputs."
+echo "Bundle: $EXPECTED_BUNDLE_NAME"

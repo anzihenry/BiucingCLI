@@ -66,12 +66,13 @@ If the team later upgrades Gradle and needs to refresh the wrapper files, run:
 make wrapper
 ```
 
-Then commit the updated `gradle/wrapper/gradle-wrapper.jar`, `gradle-wrapper.properties`, and launcher scripts.
+Then regenerate `gradle/verification-metadata.xml` with Gradle's dependency-verification workflow, review every new checksum, and commit the updated wrapper and verification files together. The template pins the Gradle distribution SHA-256 and the official wrapper JAR SHA-256; `make verify-supply-chain` rejects a changed URL, checksum, dynamic version, or incomplete dependency metadata.
 
 ## Standard Commands
 
 ```bash
 make doctor
+make verify-supply-chain
 make format
 make build
 ./gradlew assembleRelease
@@ -83,11 +84,12 @@ make verify-release-signing
 make release-doctor
 make archive
 make artifact-info
+make verify-release-artifact
 make beta
 make release
 ```
 
-`make doctor` validates the active JDK, Android SDK root, `cmdline-tools/latest`, `adb`, emulator/AVD visibility, and the committed Gradle wrapper before you spend time on Gradle builds.
+`make doctor` validates the active JDK, Android SDK root, `cmdline-tools/latest`, `adb`, emulator/AVD visibility, and the committed Gradle supply-chain controls before you spend time on builds.
 `make test-ui` runs `connectedDebugAndroidTest`, so boot an emulator or connect a device first. AVDs created through Android Studio Device Manager work well for the generated Compose smoke test.
 If `adb devices` reports `unauthorized`, accept the host key prompt on the emulator or restart adb before re-running `make test-ui`.
 
@@ -122,13 +124,13 @@ Before a real Google Play handoff, the team also needs to supply:
 
 Copy `fastlane/.env.example` to `fastlane/.env`, place the service-account JSON under the ignored `credentials/` directory and the upload keystore under the ignored `signing/` directory, then replace the placeholders. See `docs/release-delivery.md` for the complete setup path.
 
-`make verify` is the default local quality gate: it runs doctor, lint, unit tests, and a debug build.
+`make verify` is the default local quality gate: it verifies the Gradle distribution, wrapper JAR, dependency checksums, then runs doctor, lint, unit tests, and a debug build. `gradle/verification-metadata.xml` enables strict checksum verification for downloaded plugins and dependencies.
 
 `make verify-release-signing` opens the configured keystore and verifies that the configured alias is a usable private-key entry without printing any signing secret.
 
 `make release-doctor` checks the service-account JSON path, release-signing inputs, upload keystore, private key, and enabled metadata configuration before a native bundle spends time building.
 
-`make archive` runs lint, unit tests, signing verification, and `bundleRelease`, then verifies that a signed `app-release.aab` is a readable Android App Bundle and prints its checksum without uploading it.
+`make archive` runs lint, unit tests, signing-input verification, and `bundleRelease`, then cryptographically verifies every AAB JAR signature and compares its signer SHA-256 fingerprint with the configured upload-key certificate before printing the artifact checksum. A mismatch fails before any Play upload.
 
 `make beta` runs the archive lane and uploads the AAB to the Google Play `internal` track by default.
 
@@ -149,8 +151,9 @@ Copy `fastlane/.env.example` to `fastlane/.env`, place the service-account JSON 
 - The starter design system is intentionally small, but it is structured so teams can grow tokens and reusable components without rewriting the first screens.
 - Dark mode is part of the starter theme contract, so new components should prefer `MaterialTheme.colorScheme` and shared tokens over hard-coded colors.
 - `gradle/wrapper/gradle-wrapper.jar` is committed in the starter and should stay versioned in the repo.
+- `gradle/wrapper/gradle-wrapper.jar.sha256`, `distributionSha256Sum`, and `gradle/verification-metadata.xml` are reviewable supply-chain inputs; never regenerate or accept checksum changes blindly.
 - `docs/release-signing.properties.example` documents the expected signing keys without committing secrets.
 - `.gitignore` protects the recommended `credentials/` and `signing/` directories, keystores, local signing property files, and Fastlane credential JSON. It cannot protect files already tracked or force-added.
 - `fastlane/Fastfile` owns Google Play credential checks, signed AAB creation, internal-track delivery, and draft production delivery.
-- `scripts/artifact-info` verifies a release AAB is readable, contains `BundleConfig.pb`, and prints a checksum for handoff records.
+- `scripts/verify-release-artifact` verifies AAB archive structure, its JAR signature, and the exact upload certificate; `scripts/artifact-info` records the verified artifact checksum.
 - Google Play store listings can be managed from `fastlane/metadata/android` after `fastlane supply init`; Data safety, content ratings, policy declarations, and review answers remain Play Console responsibilities.

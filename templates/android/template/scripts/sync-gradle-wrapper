@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ -f "./gradle/wrapper/gradle-wrapper.jar" ]]; then
-  echo "Gradle wrapper jar already present."
+if [[ -f "./gradle/wrapper/gradle-wrapper.jar" ]] && ./scripts/verify-gradle-supply-chain; then
+  echo "Gradle wrapper and dependency verification files are already valid."
   exit 0
 fi
 
@@ -12,5 +12,8 @@ if ! command -v gradle >/dev/null 2>&1; then
   exit 1
 fi
 
-gradle wrapper --gradle-version 8.10.2
-echo "Generated Gradle wrapper files. Commit gradle/wrapper/gradle-wrapper.jar."
+gradle wrapper \
+  --gradle-version 8.10.2 \
+  --gradle-distribution-sha256-sum 31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26
+./scripts/verify-gradle-supply-chain
+echo "Generated and verified Gradle wrapper files. Commit every changed wrapper file."
