@@ -141,4 +141,4 @@ The `0.7.0` release additionally records fresh `real-build` evidence for all thr
 - If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
 - For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
-- For the latest concrete version-prep walkthrough, use [0.7.0-release-prep.md](0.7.0-release-prep.md).
+- For the latest concrete version-prep walkthrough, use [0.8.0-release-prep.md](0.8.0-release-prep.md).

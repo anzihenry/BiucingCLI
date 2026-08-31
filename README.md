@@ -6,7 +6,7 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.7.0`.
+The current repository release target is `0.8.0`.
 
 ```bash
 biucing --version
@@ -132,6 +132,8 @@ Local HarmonyOS validation status:
 - [0.6.1 Release Prep](docs/0.6.1-release-prep.md)
 - [0.7.0 Release Notes](docs/0.7.0-release-notes.md)
 - [0.7.0 Release Prep](docs/0.7.0-release-prep.md)
+- [0.8.0 Release Notes](docs/0.8.0-release-notes.md)
+- [0.8.0 Release Prep](docs/0.8.0-release-prep.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)
