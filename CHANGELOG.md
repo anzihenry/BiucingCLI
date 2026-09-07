@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 - 2026-09-07
+
 - bundle all seven templates inside wheel and source-distribution artifacts so installed CLI commands no longer depend on the source repository layout;
 - normalize resolved inputs before computing platform and dependency-derived values;
 - add stable user-facing failures for unknown templates, invalid metadata, target conflicts, and generation I/O errors;
