@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-package:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Run static checks
+        run: uvx ruff==0.16.6 check --select E4,E7,E9,F src tests scripts
+      - name: Run repository tests
+        run: python -m unittest discover -s tests
+      - name: Validate bundled templates
+        run: PYTHONPATH=src python -m biucingcli.cli validate
+      - name: Verify installed distribution
+        run: ./scripts/verify-distribution

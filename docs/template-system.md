@@ -9,7 +9,7 @@ The first version does not need a complex template engine. It needs predictable 
 ## Directory Shape
 
 ```text
-templates/
+src/biucingcli/template_data/
   frontend/
     template.json
     template/
@@ -19,6 +19,8 @@ templates/
     template/
       ...
 ```
+
+Templates live inside the Python package so wheel and source-distribution installs expose the same resources as a source checkout. The generator must not derive template paths from a Git repository root.
 
 ## Template Metadata
 

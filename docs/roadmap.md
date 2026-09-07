@@ -89,8 +89,6 @@ Implementation status:
 - native evidence is split into `static`, `doctor`, and `real-build` tiers;
 - HarmonyOS debug bundle rewriting is explicitly deferred behind a read-only diagnostic boundary.
 
-## Current
-
 ### 0.7.0 - Native Release Readiness
 
 `0.7.0` completes the native templates' local verification and pre-distribution workflows.
@@ -108,6 +106,33 @@ Release anchors:
 - [0.7.0 Release Prep](0.7.0-release-prep.md)
 
 External account credentials and actual store submissions remain intentionally outside the committed template configuration.
+
+### 0.8.0 - Cross-Template Runtime And Release Hardening
+
+`0.8.0` strengthened validated generator inputs, the common Make command contract, production browser coverage, backend lifecycle behavior, Worker retry semantics, and native release verification.
+
+Release anchors:
+
+- [0.8.0 Release Notes](0.8.0-release-notes.md)
+- [0.8.0 Release Prep](0.8.0-release-prep.md)
+
+## Current
+
+### 0.9.0 - Distribution And Generator-Core Hardening
+
+`0.9.0` treats the installed distribution as the primary product boundary.
+
+The release is focused on:
+
+- bundling all seven templates in wheel and source distributions;
+- deriving platform and dependency values only after input normalization;
+- stable user-facing errors and atomic project generation;
+- installed-artifact verification on Python 3.11 through 3.14.
+
+Planning anchors:
+
+- [0.9.0 Plan](0.9.0-plan.md)
+- [0.9.0 Release Prep](0.9.0-release-prep.md)
 
 ## Deferred
 

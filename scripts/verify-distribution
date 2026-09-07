@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Build and smoke-test BiucingCLI from its installed wheel."""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+import tarfile
+import tempfile
+import zipfile
+from pathlib import Path
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_TEMPLATES = {
+    "android",
+    "apple",
+    "frontend",
+    "harmonyos",
+    "microservice",
+    "web-service",
+    "worker",
+}
+PLACEHOLDER_PATTERN = re.compile(r"\{\{[A-Z0-9_]+\}\}")
+
+
+def run(*args: str, cwd: Path | None = None, env: dict[str, str] | None = None) -> str:
+    """Run one verification command and return stdout."""
+    try:
+        result = subprocess.run(
+            args,
+            cwd=cwd,
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        if exc.stdout:
+            print(exc.stdout, file=sys.stderr, end="")
+        if exc.stderr:
+            print(exc.stderr, file=sys.stderr, end="")
+        raise
+    return result.stdout
+
+
+def assert_archives_contain_templates(wheel: Path, source_dist: Path) -> None:
+    """Assert both distribution formats contain package-owned template resources."""
+    with zipfile.ZipFile(wheel) as archive:
+        wheel_names = set(archive.namelist())
+    with tarfile.open(source_dist) as archive:
+        source_names = {member.name for member in archive.getmembers()}
+
+    required_suffixes = {
+        "src/biucingcli/template_data/frontend/template.json",
+        "src/biucingcli/template_data/frontend/template/.gitignore",
+        "src/biucingcli/template_data/android/template/gradle/wrapper/gradle-wrapper.jar",
+    }
+    for suffix in required_suffixes:
+        wheel_suffix = suffix.removeprefix("src/")
+        if not any(name.endswith(wheel_suffix) for name in wheel_names):
+            raise AssertionError(f"wheel is missing {wheel_suffix}")
+        if not any(name.endswith(suffix) for name in source_names):
+            raise AssertionError(f"source distribution is missing {suffix}")
+
+
+def assert_generated_project(project: Path) -> None:
+    """Check common generated-project invariants without installing template toolchains."""
+    for relative_path in ("README.md", "Makefile", ".gitignore", "scripts/doctor"):
+        if not (project / relative_path).is_file():
+            raise AssertionError(f"{project.name} is missing {relative_path}")
+    if not os.access(project / "scripts" / "doctor", os.X_OK):
+        raise AssertionError(f"{project.name}/scripts/doctor is not executable")
+
+    for path in project.rglob("*"):
+        if not path.is_file():
+            continue
+        try:
+            content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if PLACEHOLDER_PATTERN.search(content):
+            raise AssertionError(f"{project.name} contains an unresolved placeholder in {path}")
+
+    run("make", "-s", "help", cwd=project)
+
+
+def main() -> None:
+    """Build artifacts, install the wheel, and verify the installed CLI."""
+    with tempfile.TemporaryDirectory(prefix="biucing-distribution-") as temporary_directory:
+        audit_root = Path(temporary_directory)
+        dist_dir = audit_root / "dist"
+        environment = dict(os.environ)
+
+        run("uv", "build", "--out-dir", str(dist_dir), cwd=REPOSITORY_ROOT, env=environment)
+        wheel = next(dist_dir.glob("*.whl"))
+        source_dist = next(dist_dir.glob("*.tar.gz"))
+        assert_archives_contain_templates(wheel, source_dist)
+
+        virtual_environment = audit_root / "venv"
+        run(sys.executable, "-m", "venv", str(virtual_environment))
+        executable_dir = "Scripts" if os.name == "nt" else "bin"
+        pip = virtual_environment / executable_dir / "pip"
+        biucing = virtual_environment / executable_dir / "biucing"
+        run(str(pip), "install", "--no-deps", str(wheel), cwd=audit_root)
+
+        run_dir = audit_root / "outside-source-tree"
+        run_dir.mkdir()
+        list_payload = json.loads(run(str(biucing), "list", "--json", cwd=run_dir))
+        template_names = {item["name"] for item in list_payload["templates"]}
+        if template_names != EXPECTED_TEMPLATES:
+            raise AssertionError(f"installed template set differs: {sorted(template_names)}")
+        run(str(biucing), "validate", cwd=run_dir)
+
+        projects_dir = run_dir / "projects"
+        projects_dir.mkdir()
+        create_commands = {
+            "frontend": [],
+            "web-service": ["--module-name", "github.com/example/audit-web"],
+            "microservice": [
+                "--module-name",
+                "github.com/example/audit-microservice",
+                "--proto-package",
+                "audit.v1",
+            ],
+            "worker": ["--module-name", "github.com/example/audit-worker"],
+            "apple": ["--bundle-identifier", "com.example.auditapple"],
+            "android": ["--package-name", "com.example.auditandroid"],
+            "harmonyos": ["--bundle-name", "com.example.auditharmony"],
+        }
+        for template_name, options in create_commands.items():
+            project_name = f"audit-{template_name}"
+            run(
+                str(biucing),
+                "create",
+                template_name,
+                project_name,
+                "--output-dir",
+                str(projects_dir),
+                "--non-interactive",
+                *options,
+                cwd=run_dir,
+            )
+            assert_generated_project(projects_dir / project_name)
+
+        android_wrapper = (
+            projects_dir
+            / "audit-android"
+            / "gradle"
+            / "wrapper"
+            / "gradle-wrapper.jar"
+        )
+        if not android_wrapper.is_file():
+            raise AssertionError("installed artifact did not generate gradle-wrapper.jar")
+
+    print("Distribution verification passed for wheel, sdist, and all seven templates.")
+
+
+if __name__ == "__main__":
+    main()

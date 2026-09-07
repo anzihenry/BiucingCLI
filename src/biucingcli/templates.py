@@ -3,14 +3,34 @@
 from __future__ import annotations
 
 import json
+import os
 import re
-import stat
 import shutil
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
+import stat
+import tempfile
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
+
+
+class BiucingError(Exception):
+    """Base class for expected, user-facing CLI failures."""
+
+
+class UnknownTemplateError(BiucingError):
+    """Raised when a requested template does not exist."""
+
+
+class InvalidTemplateError(BiucingError):
+    """Raised when bundled template metadata cannot be loaded."""
+
+
+class GenerationError(BiucingError):
+    """Raised when a project cannot be generated safely."""
+
+
+class GenerationConflictError(GenerationError):
+    """Raised when generation would overwrite an existing path."""
 
 
 @dataclass(frozen=True)
@@ -218,46 +238,46 @@ MAKE_TARGET_PATTERN = re.compile(
 )
 
 
-def project_root() -> Path:
-    """Return the repository root."""
-    return Path(__file__).resolve().parents[2]
-
-
 def templates_root() -> Path:
-    """Return the templates directory."""
-    return project_root() / "templates"
+    """Return the templates bundled inside the installed package."""
+    return Path(__file__).resolve().parent / "template_data"
 
 
 def load_template(name: str) -> TemplateDefinition:
     """Load one template definition by name."""
     metadata_path = templates_root() / name / "template.json"
     if not metadata_path.exists():
-        raise KeyError(f"Unknown template: {name}")
+        raise UnknownTemplateError(f"unknown template '{name}'")
 
-    with metadata_path.open("r", encoding="utf-8") as handle:
-        data = json.load(handle)
+    try:
+        with metadata_path.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
 
-    variables = [TemplateVariable(**variable) for variable in data["variables"]]
-    maturity = TemplateMaturity(**data["maturity"])
-    validation = TemplateValidation(**data["validation"])
-    worktree = TemplateWorktree(**data.get("worktree", {}))
-    return TemplateDefinition(
-        name=data["name"],
-        description=data["description"],
-        stack=data["stack"],
-        category=data["category"],
-        tags=data["tags"],
-        platforms=data["platforms"],
-        maturity=maturity,
-        validation=validation,
-        worktree=worktree,
-        operating_assumptions=data["operating_assumptions"],
-        workflow_labels=data["workflow_labels"],
-        commands=data.get("commands", {}),
-        variables=variables,
-        next_steps=data["next_steps"],
-        template_dir=metadata_path.parent / "template",
-    )
+        variables = [TemplateVariable(**variable) for variable in data["variables"]]
+        maturity = TemplateMaturity(**data["maturity"])
+        validation = TemplateValidation(**data["validation"])
+        worktree = TemplateWorktree(**data.get("worktree", {}))
+        return TemplateDefinition(
+            name=data["name"],
+            description=data["description"],
+            stack=data["stack"],
+            category=data["category"],
+            tags=data["tags"],
+            platforms=data["platforms"],
+            maturity=maturity,
+            validation=validation,
+            worktree=worktree,
+            operating_assumptions=data["operating_assumptions"],
+            workflow_labels=data["workflow_labels"],
+            commands=data.get("commands", {}),
+            variables=variables,
+            next_steps=data["next_steps"],
+            template_dir=metadata_path.parent / "template",
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise InvalidTemplateError(
+            f"invalid metadata for template '{name}': {exc}"
+        ) from exc
 
 
 def load_templates() -> list[TemplateDefinition]:
@@ -657,7 +677,7 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
         placeholders = sorted(set(PLACEHOLDER_PATTERN.findall(content)))
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
-            relative_path = path.relative_to(project_root()).as_posix()
+            relative_path = path.relative_to(templates_root()).as_posix()
             errors.append(
                 f"{definition.name}: unsupported placeholder(s) in {relative_path}: {', '.join(unsupported)}"
             )
@@ -842,20 +862,41 @@ def render_template(
 ) -> None:
     """Copy and render a template into the target directory."""
     if target_dir.exists():
-        raise FileExistsError(f"Target directory already exists: {target_dir}")
+        raise GenerationConflictError(f"target directory already exists: {target_dir}")
+    if not target_dir.parent.exists():
+        raise GenerationError(f"output directory does not exist: {target_dir.parent}")
+    if not target_dir.parent.is_dir():
+        raise GenerationError(f"output path is not a directory: {target_dir.parent}")
 
-    shutil.copytree(definition.template_dir, target_dir)
+    staging_root: Path | None = None
+    try:
+        staging_root = Path(
+            tempfile.mkdtemp(prefix=f".{target_dir.name}.biucing-", dir=target_dir.parent)
+        )
+        rendered_dir = staging_root / "project"
+        shutil.copytree(definition.template_dir, rendered_dir)
 
-    for path in target_dir.rglob("*"):
-        if not path.is_file():
-            continue
+        for path in rendered_dir.rglob("*"):
+            if not path.is_file():
+                continue
 
-        try:
-            content = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
+            try:
+                content = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
 
-        path.write_text(render_text(content, values), encoding="utf-8")
-        if path.name == "gradlew" or "scripts" in path.parts:
-            current_mode = path.stat().st_mode
-            path.chmod(current_mode | stat.S_IXUSR)
+            path.write_text(render_text(content, values), encoding="utf-8")
+            if path.name == "gradlew" or "scripts" in path.parts:
+                current_mode = path.stat().st_mode
+                path.chmod(current_mode | stat.S_IXUSR)
+
+        if target_dir.exists():
+            raise GenerationConflictError(f"target directory already exists: {target_dir}")
+        os.replace(rendered_dir, target_dir)
+    except BiucingError:
+        raise
+    except OSError as exc:
+        raise GenerationError(f"could not generate project at {target_dir}: {exc}") from exc
+    finally:
+        if staging_root is not None:
+            shutil.rmtree(staging_root, ignore_errors=True)

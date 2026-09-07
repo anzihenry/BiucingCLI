@@ -70,13 +70,6 @@
       "choices": ["ios", "macos", "watchos", "tvos"]
     },
     {
-      "name": "apple_platform_name",
-      "required": false,
-      "default": "iOS",
-      "validator": "choice",
-      "choices": ["iOS", "macOS", "watchOS", "tvOS"]
-    },
-    {
       "name": "bundle_identifier",
       "required": true,
       "prompt": "Bundle identifier: ",

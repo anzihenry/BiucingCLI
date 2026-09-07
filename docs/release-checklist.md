@@ -23,7 +23,7 @@ Use this map before every version bump so the release does not update only part 
 | CLI version expectation | `tests/test_cli.py` | Expected `biucing --version` output |
 | Release operations docs | `docs/release-checklist.md`, `docs/verification-matrix.md` | Update if the verification bar or release flow changed |
 
-For `0.8.0`, also review:
+For `0.9.0`, also review:
 
 - `docs/0.6.0-plan.md`
 - `docs/0.6.0-worktree-tasks.md`
@@ -36,6 +36,8 @@ For `0.8.0`, also review:
 - `docs/0.7.0-release-prep.md`
 - `docs/0.8.0-release-notes.md`
 - `docs/0.8.0-release-prep.md`
+- `docs/0.9.0-plan.md`
+- `docs/0.9.0-release-prep.md`
 - `README.md` links under `Design Docs`
 
 ## 1. Scope The Release
@@ -71,7 +73,9 @@ These checks should pass for every release, even if no template changed.
 
 ```bash
 python3 -m unittest discover -s tests
+uvx ruff==0.16.6 check --select E4,E7,E9,F src tests scripts
 PYTHONPATH=src python3 -m biucingcli.cli validate
+./scripts/verify-distribution
 PYTHONPATH=src python3 -m biucingcli.cli list
 PYTHONPATH=src python3 -m biucingcli.cli list --json
 PYTHONPATH=src python3 -m biucingcli.cli info web-service
@@ -86,13 +90,16 @@ Release bar:
 - all unit tests pass;
 - `validate` reports `Template validation passed.`;
 - `list/info` golden-backed output still matches the intended product surface;
-- no new metadata or placeholder inconsistencies are introduced.
+- no new metadata or placeholder inconsistencies are introduced;
+- the installed wheel can validate and generate every template outside the source tree.
 
 Recommended local command block:
 
 ```bash
 python3 -m unittest discover -s tests
+uvx ruff==0.16.6 check --select E4,E7,E9,F src tests scripts
 PYTHONPATH=src python3 -m biucingcli.cli validate
+./scripts/verify-distribution
 PYTHONPATH=src python3 -m biucingcli.cli list
 PYTHONPATH=src python3 -m biucingcli.cli list --json
 PYTHONPATH=src python3 -m biucingcli.cli info web-service
@@ -188,7 +195,7 @@ Release bar:
 - native worktree evidence is labeled as `static`, `doctor`, or `real-build` using [verification-matrix.md](verification-matrix.md).
 - HarmonyOS evidence includes `make worktree-debug-identity` and treats per-worktree bundle rewriting as deferred unless a configured DevEco/hvigor workstation has verified the metadata hook.
 
-Use [0.8.0-release-prep.md](0.8.0-release-prep.md) for the latest concrete evidence run.
+Use [0.9.0-release-prep.md](0.9.0-release-prep.md) for the latest concrete evidence run.
 
 ## 7. Review Docs And Messaging
 

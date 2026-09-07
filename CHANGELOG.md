@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- bundle all seven templates inside wheel and source-distribution artifacts so installed CLI commands no longer depend on the source repository layout;
+- normalize resolved inputs before computing platform and dependency-derived values;
+- add stable user-facing failures for unknown templates, invalid metadata, target conflicts, and generation I/O errors;
+- render projects through a temporary staging directory and publish them atomically;
+- add cross-version CI and an installed-artifact verification gate covering all seven templates.
+
 ## 0.8.0 - 2026-08-31
 
 - unify metadata-driven input validation and the `bootstrap`, `doctor`, `lint`, `test`, `verify`, `build`, `clean`, and `help` Make command contract across all templates.

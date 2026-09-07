@@ -253,13 +253,6 @@
           "prompt": null
         },
         {
-          "name": "apple_platform_name",
-          "required": false,
-          "default": "iOS",
-          "default_from": null,
-          "prompt": null
-        },
-        {
           "name": "bundle_identifier",
           "required": true,
           "default": null,

@@ -7,13 +7,17 @@ import json
 from pathlib import Path
 
 from biucingcli import __version__
-from biucingcli.templates import load_template
-from biucingcli.templates import load_templates
-from biucingcli.templates import render_template
-from biucingcli.templates import render_text
-from biucingcli.templates import resolve_variables_detailed
-from biucingcli.templates import validate_resolved_variables
-from biucingcli.templates import validate_templates
+from biucingcli.templates import (
+    BiucingError,
+    InvalidTemplateError,
+    load_template,
+    load_templates,
+    render_template,
+    render_text,
+    resolve_variables_detailed,
+    validate_resolved_variables,
+    validate_templates,
+)
 
 
 def default_display_name(project_name: str) -> str:
@@ -580,22 +584,6 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
             f"Unsupported option(s) for {args.template}: {unsupported_list}"
         )
 
-    requested_service_name = (
-        args.service_name or set_values.get("service_name") or requested_project_name
-    )
-    requested_dependency_store = args.dependency_store or set_values.get("dependency_store")
-    microservice_values = (
-        microservice_dependency_config(requested_dependency_store, requested_service_name)
-        if args.template == "microservice"
-        else {}
-    )
-    requested_platform = args.platform or set_values.get("apple_platform")
-    requested_minimum_os_version = args.minimum_os_version or set_values.get("minimum_os_version")
-    apple_values = (
-        apple_platform_config(requested_platform, requested_minimum_os_version)
-        if args.template == "apple"
-        else {}
-    )
     provided_values: dict[str, str | None] = dict(set_values)
     provided_values["project_name"] = requested_project_name
 
@@ -619,10 +607,9 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         "proto_package": args.proto_package,
         "dependency_store": args.dependency_store,
         "otel_exporter_endpoint": args.otel_exporter_endpoint,
-        "apple_platform": requested_platform,
-        "apple_platform_name": apple_values.get("apple_platform_name"),
+        "apple_platform": args.platform,
         "bundle_identifier": args.bundle_identifier,
-        "minimum_os_version": requested_minimum_os_version,
+        "minimum_os_version": args.minimum_os_version,
         "development_team": args.development_team,
         "organization_name": args.organization_name,
         "application_id": args.application_id,
@@ -656,20 +643,32 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     values = dict(resolution_result.values)
     derived_values: dict[str, str] = {}
     if args.template == "microservice":
-        derived_values["service_type_name"] = default_swift_module_name(requested_project_name)
+        derived_values.update(
+            microservice_dependency_config(
+                values.get("dependency_store"),
+                values.get("service_name", values["project_name"]),
+            )
+        )
+        derived_values["service_type_name"] = default_swift_module_name(
+            values["project_name"]
+        )
     if args.template == "apple":
+        derived_values.update(
+            apple_platform_config(
+                values.get("apple_platform"),
+                values.get("minimum_os_version"),
+            )
+        )
         derived_values["swift_module_name"] = values.get(
             "swift_module_name"
-        ) or default_swift_module_name(requested_project_name)
+        ) or default_swift_module_name(values["project_name"])
     if args.template == "android":
         derived_values["kotlin_module_name"] = values.get(
             "kotlin_module_name"
-        ) or default_kotlin_module_name(requested_project_name)
+        ) or default_kotlin_module_name(values["project_name"])
     values.update(derived_values)
     if args.template == "apple":
         values.update(apple_platform_snippets(values))
-    values.update({key: value for key, value in apple_values.items() if value is not None})
-    values.update({key: value for key, value in microservice_values.items() if value is not None})
 
     input_errors = validate_resolved_variables(definition, values)
     if input_errors:
@@ -681,13 +680,7 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     rendered_next_steps = [render_text(step, values) for step in definition.next_steps]
     system_derived_values = {
         key: values[key]
-        for key in sorted(
-            {
-                *derived_values.keys(),
-                *apple_values.keys(),
-                *microservice_values.keys(),
-            }
-        )
+        for key in sorted(derived_values)
         if key in values
     }
     return {
@@ -811,38 +804,45 @@ def main(argv: list[str] | None = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    if args.command is None:
-        print(format_template_summary())
-        return
+    try:
+        if args.command is None:
+            print(format_template_summary())
+            return
 
-    if args.command == "list":
-        print(format_template_summary_json() if args.json else format_template_summary())
-        return
+        if args.command == "list":
+            print(format_template_summary_json() if args.json else format_template_summary())
+            return
 
-    if args.command == "info":
-        print(format_template_info_json(args.template) if args.json else format_template_info(args.template))
-        return
+        if args.command == "info":
+            output = (
+                format_template_info_json(args.template)
+                if args.json
+                else format_template_info(args.template)
+            )
+            print(output)
+            return
 
-    if args.command == "validate":
-        errors = validate_templates()
-        if args.json:
-            print(format_validation_report_json(errors))
-        else:
-            print(format_validation_report(errors))
-        if errors:
-            parser.exit(1)
-        return
+        if args.command == "validate":
+            errors = validate_templates()
+            if args.json:
+                print(format_validation_report_json(errors))
+            else:
+                print(format_validation_report(errors))
+            if errors:
+                parser.exit(1)
+            return
 
-    if args.command == "create":
-        try:
+        if args.command == "create":
             if args.dry_run or args.plan:
                 preview_mode = "dry-run" if args.dry_run else "plan"
                 print(preview_project(args, preview_mode))
             else:
                 print(create_project_output(args))
-        except ValueError as exc:
-            parser.exit(2, f"error: {exc}\n")
-        return
+            return
+    except InvalidTemplateError as exc:
+        parser.exit(1, f"error: {exc}\n")
+    except (BiucingError, ValueError) as exc:
+        parser.exit(2, f"error: {exc}\n")
 
 
 if __name__ == "__main__":

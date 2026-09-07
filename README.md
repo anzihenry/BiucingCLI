@@ -6,13 +6,31 @@ The project is being restarted from a clean slate with a narrower goal: generate
 
 ## Version
 
-The current repository release target is `0.8.0`.
+The current repository release target is `0.9.0`.
 
 ```bash
 biucing --version
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for the latest release summary.
+
+## Installation
+
+Install the current checkout as an isolated command with `uv`:
+
+```bash
+git clone <repository-url> BiucingCLI
+cd BiucingCLI
+uv tool install .
+biucing --version
+```
+
+For contributor work, run directly from the source tree:
+
+```bash
+PYTHONPATH=src python3 -m biucingcli.cli list
+python3 -m unittest discover -s tests
+```
 
 ## Product Direction
 
@@ -134,6 +152,9 @@ Local HarmonyOS validation status:
 - [0.7.0 Release Prep](docs/0.7.0-release-prep.md)
 - [0.8.0 Release Notes](docs/0.8.0-release-notes.md)
 - [0.8.0 Release Prep](docs/0.8.0-release-prep.md)
+- [0.9.0 Plan](docs/0.9.0-plan.md)
+- [0.9.0 Release Notes](docs/0.9.0-release-notes.md)
+- [0.9.0 Release Prep](docs/0.9.0-release-prep.md)
 - [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
 - [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
 - [Release Checklist](docs/release-checklist.md)

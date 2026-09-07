@@ -231,6 +231,150 @@ class CLITestCase(unittest.TestCase):
         self.assertEqual(payload["error_count"], 0)
         self.assertEqual(payload["errors"], [])
 
+    def test_bundled_template_resources_are_complete(self):
+        definitions = load_templates()
+
+        self.assertEqual(len(definitions), 7)
+        for definition in definitions:
+            with self.subTest(template=definition.name):
+                self.assertTrue((definition.template_dir / "README.md").is_file())
+                self.assertTrue((definition.template_dir / "Makefile").is_file())
+                self.assertTrue((definition.template_dir / ".gitignore").is_file())
+        android = next(item for item in definitions if item.name == "android")
+        self.assertTrue(
+            (android.template_dir / "gradle" / "wrapper" / "gradle-wrapper.jar").is_file()
+        )
+
+    def test_unknown_template_errors_are_user_facing(self):
+        cases = [
+            ["info", "does-not-exist"],
+            ["create", "does-not-exist", "demo", "--non-interactive"],
+        ]
+
+        for argv in cases:
+            with self.subTest(argv=argv):
+                code, stdout, stderr = self.run_cli_failure(argv)
+                self.assertEqual(code, 2)
+                self.assertEqual(stdout, "")
+                self.assertEqual(stderr, "error: unknown template 'does-not-exist'\n")
+                self.assertNotIn("Traceback", stderr)
+
+    def test_invalid_template_metadata_is_user_facing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            templates_root = Path(tmpdir)
+            broken_dir = templates_root / "broken"
+            broken_dir.mkdir()
+            (broken_dir / "template.json").write_text("{not-json", encoding="utf-8")
+
+            with patch("biucingcli.templates.templates_root", return_value=templates_root):
+                code, stdout, stderr = self.run_cli_failure(["info", "broken"])
+
+        self.assertEqual(code, 1)
+        self.assertEqual(stdout, "")
+        self.assertIn("error: invalid metadata for template 'broken'", stderr)
+        self.assertNotIn("Traceback", stderr)
+
+    def test_create_reports_target_conflict_without_traceback(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "demo").mkdir()
+            code, stdout, stderr = self.run_cli_failure(
+                ["create", "frontend", "demo", "--output-dir", tmpdir]
+            )
+
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("error: target directory already exists:", stderr)
+        self.assertNotIn("Traceback", stderr)
+
+    def test_create_reports_missing_output_directory_without_traceback(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            missing_output = Path(tmpdir) / "missing"
+            code, stdout, stderr = self.run_cli_failure(
+                ["create", "frontend", "demo", "--output-dir", str(missing_output)]
+            )
+
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("error: output directory does not exist:", stderr)
+        self.assertNotIn("Traceback", stderr)
+
+    def test_create_cleans_staging_directory_after_io_failure(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch(
+                "biucingcli.templates.shutil.copytree",
+                side_effect=OSError("synthetic copy failure"),
+            ):
+                code, stdout, stderr = self.run_cli_failure(
+                    ["create", "frontend", "demo", "--output-dir", tmpdir]
+                )
+
+            self.assertEqual(list(Path(tmpdir).iterdir()), [])
+
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("synthetic copy failure", stderr)
+        self.assertNotIn("Traceback", stderr)
+
+    def test_microservice_derivations_use_normalized_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "microservice",
+                    "demo",
+                    "--output-dir",
+                    tmpdir,
+                    "--module-name",
+                    "github.com/example/demo",
+                    "--proto-package",
+                    "demo.v1",
+                    "--service-name",
+                    "  api  ",
+                    "--set",
+                    "dependency_store= redis ",
+                    "--non-interactive",
+                    "--plan",
+                    "--json",
+                ]
+            )
+
+        payload = json.loads(output)
+        service_name = next(
+            item for item in payload["resolved_variables"] if item["name"] == "service_name"
+        )
+        self.assertEqual(service_name["value"], "api")
+        self.assertEqual(payload["derived_values"]["dependency_store"], "redis")
+        self.assertEqual(
+            payload["derived_values"]["dependency_store_dsn"],
+            "redis://localhost:6379/0",
+        )
+
+    def test_apple_derivations_use_normalized_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = self.run_cli(
+                [
+                    "create",
+                    "apple",
+                    "demo",
+                    "--output-dir",
+                    tmpdir,
+                    "--bundle-identifier",
+                    "com.example.demo",
+                    "--set",
+                    "apple_platform= macos ",
+                    "--set",
+                    "minimum_os_version= 26.1 ",
+                    "--non-interactive",
+                    "--plan",
+                    "--json",
+                ]
+            )
+
+        payload = json.loads(output)
+        self.assertEqual(payload["derived_values"]["apple_platform"], "macos")
+        self.assertEqual(payload["derived_values"]["apple_platform_name"], "macOS")
+        self.assertEqual(payload["derived_values"]["minimum_os_version"], "26.1")
+
     def test_validate_reports_new_contract_errors_for_invalid_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             templates_root = Path(tmpdir) / "templates"
@@ -481,7 +625,7 @@ class CLITestCase(unittest.TestCase):
                 main(["--version"])
 
         self.assertEqual(excinfo.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "biucing 0.8.0\n")
+        self.assertEqual(stdout.getvalue(), "biucing 0.9.0\n")
         self.assertEqual(stderr.getvalue(), "")
 
     def test_create_android_renders_template(self):
