@@ -4,7 +4,6 @@ import os
 import plistlib
 import shutil
 import subprocess
-import sys
 import tempfile
 import unittest
 import zipfile
@@ -12,8 +11,6 @@ from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from biucingcli.cli import apple_platform_config
 from biucingcli.cli import default_kotlin_module_name

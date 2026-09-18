@@ -1,0 +1,125 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag containing the uv workflow (vX.Y.Z)"
+        required: true
+        type: string
+      target:
+        description: "Package index"
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ inputs.target || 'pypi' }}-${{ inputs.tag || github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.26.x"
+          cache: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.16"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Check release version
+        run: |
+          uv run --locked python - <<'PY'
+          import os
+          import re
+          import tomllib
+          from pathlib import Path
+          from biucingcli import __version__
+          tag = os.environ["RELEASE_TAG"]
+          version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+          if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
+              raise SystemExit("Expected a stable release tag vX.Y.Z")
+          if tag != f"v{version}" or version != __version__:
+              raise SystemExit("Tag, package version and runtime version must agree")
+          PY
+      - run: uv run --locked ruff check --select E4,E7,E9,F src tests scripts
+      - run: uv run --locked python -m unittest discover -s tests
+      - run: uv run --locked biucing validate
+      - name: Build with locked build dependencies
+        run: uv build --no-sources --no-build-isolation --out-dir release-dist
+      - name: Verify the exact artifacts to be uploaded
+        run: uv run --locked python scripts/verify-distribution --dist-dir release-dist
+      - uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.11'
+        with:
+          name: python-distributions
+          path: release-dist/*
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.target || 'pypi' }}
+    permissions:
+      id-token: write
+    env:
+      PUBLISH_TARGET: ${{ inputs.target || 'pypi' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: dist
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.16"
+      - name: Publish using a short-lived OIDC credential
+        shell: bash
+        run: |
+          if [ "$PUBLISH_TARGET" = testpypi ]; then
+            uv publish --trusted-publishing always \
+              --publish-url https://test.pypi.org/legacy/ \
+              --check-url https://test.pypi.org/simple/ dist/*
+          else
+            uv publish --trusted-publishing always dist/*
+          fi
+      - name: Verify installation from the selected index
+        shell: bash
+        run: |
+          wheel=(dist/*.whl)
+          uv venv --python 3.11 smoke
+          version="${wheel[0]#dist/biucingcli-}"
+          version="${version%%-*}"
+          index=https://pypi.org/simple/
+          if [ "$PUBLISH_TARGET" = testpypi ]; then
+            index=https://test.pypi.org/simple/
+          fi
+          for attempt in 1 2 3 4 5; do
+            if uv pip install --python smoke/bin/python --refresh --no-deps \
+              --index-url "$index" "biucingcli==$version"; then
+              break
+            fi
+            if [ "$attempt" = 5 ]; then exit 1; fi
+            sleep 10
+          done
+          smoke/bin/biucing --version
+          smoke/bin/biucing validate
+          smoke/bin/biucing list --json

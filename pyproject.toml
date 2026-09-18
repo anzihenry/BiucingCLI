@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=77"]
+requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,6 +12,21 @@ dependencies = []
 
 [project.scripts]
 biucing = "biucingcli.cli:main"
+
+[dependency-groups]
+dev = ["ruff==0.16.6", "twine>=6.1,<7"]
+# Keep setuptools aligned with build-system.requires for isolated installs too.
+build = ["setuptools==84.0.0", "wheel>=0.45"]
+
+[tool.uv]
+required-version = ">=0.12.16,<0.13"
+default-groups = ["dev", "build"]
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
 
 [tool.setuptools]
 package-dir = {"" = "src"}

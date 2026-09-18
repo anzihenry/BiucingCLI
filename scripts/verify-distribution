@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -92,20 +93,34 @@ def main() -> None:
     """Build artifacts, install the wheel, and verify the installed CLI."""
     with tempfile.TemporaryDirectory(prefix="biucing-distribution-") as temporary_directory:
         audit_root = Path(temporary_directory)
-        dist_dir = audit_root / "dist"
+        parser = argparse.ArgumentParser(description=__doc__)
+        parser.add_argument("--dist-dir", type=Path, help="Verify existing artifacts without rebuilding")
+        args = parser.parse_args()
+        dist_dir = args.dist_dir.resolve() if args.dist_dir else audit_root / "dist"
         environment = dict(os.environ)
+        environment.pop("PYTHONPATH", None)
 
-        run("uv", "build", "--out-dir", str(dist_dir), cwd=REPOSITORY_ROOT, env=environment)
-        wheel = next(dist_dir.glob("*.whl"))
-        source_dist = next(dist_dir.glob("*.tar.gz"))
+        if not args.dist_dir:
+            run(
+                "uv", "build", "--no-sources", "--no-build-isolation",
+                "--python", sys.executable, "--out-dir", str(dist_dir),
+                cwd=REPOSITORY_ROOT, env=environment,
+            )
+        wheels = list(dist_dir.glob("*.whl"))
+        source_dists = list(dist_dir.glob("*.tar.gz"))
+        if len(wheels) != 1 or len(source_dists) != 1:
+            raise AssertionError("expected exactly one wheel and one source distribution")
+        wheel, source_dist = wheels[0], source_dists[0]
+        run(sys.executable, "-m", "twine", "check", "--strict", str(wheel), str(source_dist))
         assert_archives_contain_templates(wheel, source_dist)
 
         virtual_environment = audit_root / "venv"
-        run(sys.executable, "-m", "venv", str(virtual_environment))
+        run("uv", "venv", "--python", sys.executable, str(virtual_environment))
         executable_dir = "Scripts" if os.name == "nt" else "bin"
-        pip = virtual_environment / executable_dir / "pip"
+        python = virtual_environment / executable_dir / ("python.exe" if os.name == "nt" else "python")
         biucing = virtual_environment / executable_dir / "biucing"
-        run(str(pip), "install", "--no-deps", str(wheel), cwd=audit_root)
+        run("uv", "pip", "install", "--python", str(python), "--no-deps", str(wheel), cwd=audit_root)
+        os.environ.pop("PYTHONPATH", None)
 
         run_dir = audit_root / "outside-source-tree"
         run_dir.mkdir()

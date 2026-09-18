@@ -19,18 +19,34 @@ See [CHANGELOG.md](CHANGELOG.md) for the latest release summary.
 Install the current checkout as an isolated command with `uv`:
 
 ```bash
-git clone <repository-url> BiucingCLI
+git clone https://github.com/anzihenry/BiucingCLI.git
 cd BiucingCLI
 uv tool install .
 biucing --version
 ```
 
-For contributor work, run directly from the source tree:
+For contributor work, use uv 0.12.16 (the version pinned in CI). Python defaults
+to 3.11 via `.python-version`; CI tests 3.11–3.14. uv installs the project and
+locked development/build dependencies into `.venv`:
 
 ```bash
-PYTHONPATH=src python3 -m biucingcli.cli list
-python3 -m unittest discover -s tests
+uv sync --locked
+uv run --locked biucing list
+uv run --locked python -m unittest discover -s tests
+uv run --locked ruff check --select E4,E7,E9,F src tests scripts
+uv run --locked biucing validate
+uv run --locked python scripts/verify-distribution
 ```
+
+Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
+`pyproject.toml` and `uv.lock` together. For deliberate upgrades use
+`uv lock --upgrade-package PACKAGE`, followed by `uv sync --locked` and tests.
+The `build` group locks setuptools and wheel. Build from that synced environment
+with `uv build --no-sources --no-build-isolation`; plain isolated `uv build`
+does not use the build dependency versions from `uv.lock`.
+
+See [the uv development and publishing guide](docs/uv-workflow.md) for local
+builds, TestPyPI rehearsal, and automated PyPI publishing with `uv publish`.
 
 ## Product Direction
 

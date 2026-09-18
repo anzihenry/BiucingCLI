@@ -11,15 +11,15 @@ These checks apply to every release regardless of which template changed.
 
 | Area | Command or proof | Release bar |
 | --- | --- | --- |
-| Unit test suite | `python3 -m unittest discover -s tests` | Must pass |
-| Template metadata validation | `PYTHONPATH=src python3 -m biucingcli.cli validate` | Must pass with zero errors |
+| Unit test suite | `uv run --locked python -m unittest discover -s tests` | Must pass |
+| Template metadata validation | `uv run --locked biucing validate` | Must pass with zero errors |
 | Human-readable list output | Golden-backed `tests/test_cli.py` coverage for `biucing list` | Must pass |
 | JSON list output | Golden-backed `tests/test_cli.py` coverage for `biucing list --json` | Must pass |
 | Human-readable info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service` | Must pass |
 | JSON info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service --json` | Must pass |
 | Worker info output | Python test coverage for `biucing info worker` and `biucing info worker --json` | Must pass |
 | HarmonyOS info output | Python test coverage for `biucing info harmonyos` | Must pass |
-| Worktree metadata | `PYTHONPATH=src python3 -m biucingcli.cli list --json` plus golden coverage | Every shipped template declares `worktree-ready` |
+| Worktree metadata | `uv run --locked biucing list --json` plus golden coverage | Every shipped template declares `worktree-ready` |
 | Scriptable create flow | Python test coverage for `--set` and `--non-interactive` | Must pass |
 | Preview and manifest flow | Python test coverage for `--dry-run`, `--plan --json`, and `create --json` | Must pass |
 | Version surface | `biucing --version` test expectation and version files aligned | Must pass |
@@ -92,13 +92,13 @@ These are the default commands to reach for when fresh proof is needed.
 
 | Template | Suggested generation command | Suggested verification commands |
 | --- | --- | --- |
-| `frontend` | `PYTHONPATH=src python3 -m biucingcli.cli create frontend demo-frontend --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-frontend` | `make test`, `make docker-build` |
-| `web-service` | `PYTHONPATH=src python3 -m biucingcli.cli create web-service demo-service --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service` | `make verify`, `make docker-build` |
-| `microservice` | `PYTHONPATH=src python3 -m biucingcli.cli create microservice demo-microservice --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-microservice --set module_name=github.com/example/demo-microservice --set proto_package=demo.v1` | `make verify`, `make up`, `make docker-build` |
-| `worker` | `PYTHONPATH=src python3 -m biucingcli.cli create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
-| `apple` | `PYTHONPATH=src python3 -m biucingcli.cli create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
-| `android` | `PYTHONPATH=src python3 -m biucingcli.cli create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
-| `harmonyos` | `PYTHONPATH=src python3 -m biucingcli.cli create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, `make lint`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
+| `frontend` | `uv run --locked biucing create frontend demo-frontend --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-frontend` | `make test`, `make docker-build` |
+| `web-service` | `uv run --locked biucing create web-service demo-service --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service` | `make verify`, `make docker-build` |
+| `microservice` | `uv run --locked biucing create microservice demo-microservice --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-microservice --set module_name=github.com/example/demo-microservice --set proto_package=demo.v1` | `make verify`, `make up`, `make docker-build` |
+| `worker` | `uv run --locked biucing create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
+| `apple` | `uv run --locked biucing create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
+| `android` | `uv run --locked biucing create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
+| `harmonyos` | `uv run --locked biucing create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, `make lint`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
 
 When using these commands for release evidence, prefer a fresh empty output directory per template so the proof is easy to explain and reproduce.
 
@@ -125,7 +125,7 @@ The current repository metadata declares:
 
 The current repo-level automated baseline includes:
 
-- template rendering coverage in `python3 -m unittest discover -s tests`;
+- template rendering coverage in `uv run --locked python -m unittest discover -s tests`;
 - metadata and placeholder consistency coverage through `biucing validate`;
 - golden checks for `list/info` human-readable and JSON output;
 - scripted create-flow coverage for `--set` and `--non-interactive`;

@@ -1,1 +1,3 @@
 graft src/biucingcli/template_data
+include uv.lock
+include .python-version

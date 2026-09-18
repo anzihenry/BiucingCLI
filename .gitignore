@@ -5,6 +5,7 @@ __pycache__/
 .ruff_cache/
 .coverage
 dist/
+release-dist/
 build/
 *.egg-info/
 .venv/

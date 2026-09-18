@@ -19,6 +19,7 @@ Use this map before every version bump so the release does not update only part 
 | README version target | `README.md` | Current repository release target and any user-facing release wording |
 | Changelog entry | `CHANGELOG.md` | New version heading, date, and user-visible changes |
 | Package version | `pyproject.toml` | `[project].version` |
+| Dependency lock | `uv.lock` | Run `uv lock` after version/dependency changes |
 | Runtime version constant | `src/biucingcli/__init__.py` | `__version__` |
 | CLI version expectation | `tests/test_cli.py` | Expected `biucing --version` output |
 | Release operations docs | `docs/release-checklist.md`, `docs/verification-matrix.md` | Update if the verification bar or release flow changed |
@@ -58,6 +59,7 @@ Update these files together so the repo does not land in a half-bumped state:
 - `README.md`
 - `CHANGELOG.md`
 - `pyproject.toml`
+- `uv.lock` (refresh with `uv lock`)
 - `src/biucingcli/__init__.py`
 - `tests/test_cli.py`
 
@@ -71,18 +73,20 @@ Check that:
 
 These checks should pass for every release, even if no template changed.
 
+First run `uv sync --locked` to install the project and its development/build tools.
+
 ```bash
-python3 -m unittest discover -s tests
-uvx ruff==0.16.6 check --select E4,E7,E9,F src tests scripts
-PYTHONPATH=src python3 -m biucingcli.cli validate
-./scripts/verify-distribution
-PYTHONPATH=src python3 -m biucingcli.cli list
-PYTHONPATH=src python3 -m biucingcli.cli list --json
-PYTHONPATH=src python3 -m biucingcli.cli info web-service
-PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
-PYTHONPATH=src python3 -m biucingcli.cli info worker
-PYTHONPATH=src python3 -m biucingcli.cli info worker --json
-PYTHONPATH=src python3 -m biucingcli.cli info harmonyos
+uv run --locked python -m unittest discover -s tests
+uv run --locked ruff check --select E4,E7,E9,F src tests scripts
+uv run --locked biucing validate
+uv run --locked python scripts/verify-distribution
+uv run --locked biucing list
+uv run --locked biucing list --json
+uv run --locked biucing info web-service
+uv run --locked biucing info web-service --json
+uv run --locked biucing info worker
+uv run --locked biucing info worker --json
+uv run --locked biucing info harmonyos
 ```
 
 Release bar:
@@ -96,17 +100,17 @@ Release bar:
 Recommended local command block:
 
 ```bash
-python3 -m unittest discover -s tests
-uvx ruff==0.16.6 check --select E4,E7,E9,F src tests scripts
-PYTHONPATH=src python3 -m biucingcli.cli validate
-./scripts/verify-distribution
-PYTHONPATH=src python3 -m biucingcli.cli list
-PYTHONPATH=src python3 -m biucingcli.cli list --json
-PYTHONPATH=src python3 -m biucingcli.cli info web-service
-PYTHONPATH=src python3 -m biucingcli.cli info web-service --json
-PYTHONPATH=src python3 -m biucingcli.cli info worker
-PYTHONPATH=src python3 -m biucingcli.cli info worker --json
-PYTHONPATH=src python3 -m biucingcli.cli info harmonyos
+uv run --locked python -m unittest discover -s tests
+uv run --locked ruff check --select E4,E7,E9,F src tests scripts
+uv run --locked biucing validate
+uv run --locked python scripts/verify-distribution
+uv run --locked biucing list
+uv run --locked biucing list --json
+uv run --locked biucing info web-service
+uv run --locked biucing info web-service --json
+uv run --locked biucing info worker
+uv run --locked biucing info worker --json
+uv run --locked biucing info harmonyos
 biucing --version
 ```
 
@@ -117,10 +121,10 @@ The current scriptability surface makes preview, scripting, and manifest output 
 Minimum checks:
 
 ```bash
-PYTHONPATH=src python3 -m biucingcli.cli create frontend demo-app --output-dir /tmp/biucing-release-check --dry-run
-PYTHONPATH=src python3 -m biucingcli.cli create web-service demo-service --output-dir /tmp/biucing-release-check --module-name github.com/example/demo-service --plan --json
-PYTHONPATH=src python3 -m biucingcli.cli create frontend demo-app --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-app
-PYTHONPATH=src python3 -m biucingcli.cli create web-service demo-service --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service
+uv run --locked biucing create frontend demo-app --output-dir /tmp/biucing-release-check --dry-run
+uv run --locked biucing create web-service demo-service --output-dir /tmp/biucing-release-check --module-name github.com/example/demo-service --plan --json
+uv run --locked biucing create frontend demo-app --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-app
+uv run --locked biucing create web-service demo-service --output-dir /tmp/biucing-release-check --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service
 ```
 
 Release bar:
@@ -212,7 +216,7 @@ Recommended sequence:
 
 ```bash
 git status --short
-git add README.md CHANGELOG.md pyproject.toml src/biucingcli/__init__.py tests/test_cli.py docs/release-checklist.md docs/verification-matrix.md
+git add README.md CHANGELOG.md pyproject.toml uv.lock src/biucingcli/__init__.py tests/test_cli.py docs/release-checklist.md docs/verification-matrix.md
 git commit -m "Prepare release X.Y.Z"
 git tag -a vX.Y.Z -m "Release X.Y.Z"
 ```
@@ -226,10 +230,14 @@ Before pushing, double-check:
 
 ## 9. Publish
 
-Proven publication sequence for this repo:
+Configure PyPI/TestPyPI Trusted Publishing following [uv-workflow.md](uv-workflow.md)
+before the first automated release. Run the Publish workflow manually against
+the release tag with `target=testpypi` to rehearse. Publishing the GitHub Release
+then triggers the uv build, verification, and production `uv publish` workflow:
 
 ```bash
 git push origin main --follow-tags
+# Rehearse Publish with target=testpypi before creating the release below.
 gh release create vX.Y.Z --title "BiucingCLI X.Y.Z" --notes-file CHANGELOG.md
 ```
 
@@ -256,15 +264,15 @@ Use this template in the PR body, release-prep note, or rollout summary:
 - Target version: `X.Y.Z`
 - Verification date: `YYYY-MM-DD`
 - Repo-level checks:
-  - `python3 -m unittest discover -s tests`
-  - `PYTHONPATH=src python3 -m biucingcli.cli validate`
-  - `PYTHONPATH=src python3 -m biucingcli.cli list`
-  - `PYTHONPATH=src python3 -m biucingcli.cli list --json`
-  - `PYTHONPATH=src python3 -m biucingcli.cli info web-service`
-  - `PYTHONPATH=src python3 -m biucingcli.cli info web-service --json`
-  - `PYTHONPATH=src python3 -m biucingcli.cli info worker`
-  - `PYTHONPATH=src python3 -m biucingcli.cli info worker --json`
-  - `PYTHONPATH=src python3 -m biucingcli.cli info harmonyos`
+  - `uv run --locked python -m unittest discover -s tests`
+  - `uv run --locked biucing validate`
+  - `uv run --locked biucing list`
+  - `uv run --locked biucing list --json`
+  - `uv run --locked biucing info web-service`
+  - `uv run --locked biucing info web-service --json`
+  - `uv run --locked biucing info worker`
+  - `uv run --locked biucing info worker --json`
+  - `uv run --locked biucing info harmonyos`
 - Fresh template proof:
   - `template-name`: `commands run and result`
 - Worktree proof:

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- manage development and build dependencies with uv sync and a committed uv.lock;
+- run CI and installed-artifact checks through uv with locked build tools;
+- add verified TestPyPI/PyPI publishing through uv publish and Trusted Publishing.
+
 ## 0.9.0 - 2026-09-07
 
 - bundle all seven templates inside wheel and source-distribution artifacts so installed CLI commands no longer depend on the source repository layout;
