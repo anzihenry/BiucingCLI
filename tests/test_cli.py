@@ -299,7 +299,7 @@ class CLITestCase(unittest.TestCase):
     def test_create_cleans_staging_directory_after_io_failure(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             with patch(
-                "biucingcli.templates.shutil.copytree",
+                "biucingcli.generation.shutil.copytree",
                 side_effect=OSError("synthetic copy failure"),
             ):
                 code, stdout, stderr = self.run_cli_failure(

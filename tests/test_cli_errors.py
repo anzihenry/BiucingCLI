@@ -142,7 +142,7 @@ class CLIErrorTests(unittest.TestCase):
                 'from biucingcli.cli import main\n'
                 'def interrupt(*args, **kwargs):\n'
                 '    os.kill(os.getpid(), signal.SIGINT)\n'
-                'with patch("biucingcli.templates.shutil.copytree", side_effect=interrupt):\n'
+                'with patch("biucingcli.generation.shutil.copytree", side_effect=interrupt):\n'
                 '    main()\n')
         with tempfile.TemporaryDirectory() as tmp:
             result = self.invoke("create", "frontend", "demo", "--output-dir", tmp,

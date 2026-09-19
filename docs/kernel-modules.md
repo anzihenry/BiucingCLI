@@ -1,4 +1,4 @@
-# Kernel modules: stage 1
+# Kernel modules: stages 1–2
 
 Stage 1 extracts foundation modules without changing generation algorithms,
 template resources, serialization or CLI contracts.
@@ -8,12 +8,18 @@ template resources, serialization or CLI contracts.
 | `errors.py` | Existing domain exception hierarchy | None |
 | `models.py` | Existing metadata and variable result dataclasses | None |
 | `catalog.py` | Package resource paths and metadata loading | errors, models |
+| `variables.py` | Pure variable constraint validation | models |
+| `rendering.py` | Placeholder map and single-pass text rendering | escaping |
+| `validation.py` | Metadata, required files, Make and placeholder checks | catalog, models, variables, rendering, escaping |
+| `generation.py` | Copy/render, permissions, staging, publication and cleanup | errors, models, rendering |
 
 `cli.py` now imports loading and errors directly from their owning modules.
 `templates.py` explicitly re-exports the previous model, exception and loader
 names as identical objects, preserving existing import and exception-catching
-behavior. Validation, variable resolution and rendering remain there for later
-stages. The foundation modules never import CLI or the compatibility module.
+behavior. Stage 2 also re-exports moved validation, rendering and filesystem
+functions/constants. Only interactive variable resolution remains implemented
+there for later extraction. New modules never import CLI or the compatibility
+module; CLI imports their functions directly, except the remaining resolver.
 
 ## Resource loading and test fixtures
 
@@ -33,9 +39,23 @@ sorted metadata-path order and existing unknown/invalid metadata error handling.
 Tests that need to redirect the existing aggregate validator patch
 `biucingcli.catalog.templates_root`, not `biucingcli.templates.templates_root`.
 Import compatibility does not imply compatibility for monkeypatching internal
-module globals. Other fault-injection seams remain unchanged at this stage.
+module globals. Filesystem failure/cancellation injection now patches
+`biucingcli.generation.shutil.copytree` instead of the old templates location.
 
 `tests/test_catalog.py` covers isolated imports, identical compatibility exports,
 exception inheritance, sorted loading, working-directory independence, explicit
 fixture roots and malformed metadata. Stage 0 generation snapshots remain
 unchanged; installed-artifact verification also exercises the extracted modules.
+
+## Stage 2 boundaries
+
+The placeholder table and template-specific required-file branches are moved
+without redesign. Declarative contracts and template rules belong to later
+stages. `variables.py` currently owns only constraints, not interactive resolution.
+`generation.py` currently owns filesystem execution, not the future typed plan.
+
+`tests/test_generation.py` verifies independent imports and compatibility export
+identity, exact binary copying, executable modes, empty directories, single-pass
+insertion, source preservation, existing/late target conflicts, and cleanup on
+OSError or KeyboardInterrupt during copy, text rendering and final publication.
+Existing CLI error/EOF/SIGINT tests continue to verify user-facing behavior.

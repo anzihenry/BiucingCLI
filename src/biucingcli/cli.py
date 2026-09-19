@@ -19,13 +19,11 @@ from biucingcli.errors import (
     MissingInputError,
     UnknownTemplateError,
 )
-from biucingcli.templates import (
-    render_template,
-    render_text,
-    resolve_variables_detailed,
-    validate_resolved_variables,
-    validate_templates,
-)
+from biucingcli.generation import render_template
+from biucingcli.rendering import render_text
+from biucingcli.variables import validate_resolved_variables
+from biucingcli.validation import validate_templates
+from biucingcli.templates import resolve_variables_detailed
 
 
 def default_display_name(project_name: str) -> str:

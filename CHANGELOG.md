@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- separate variable constraints, template validation, text rendering and filesystem
+  generation, preserving legacy exports and adding multi-stage cleanup regressions.
+
 - extract template models, domain errors and resource loading into independent
   modules, retaining legacy imports and adding explicit fixture-root loading.
 
