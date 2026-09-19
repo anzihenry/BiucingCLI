@@ -1,0 +1,3725 @@
+{
+  "frontend": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "frontend",
+        "description": "React + TypeScript starter for independent projects",
+        "category": "frontend",
+        "stack": [
+          "React",
+          "TypeScript"
+        ],
+        "platforms": [
+          "web"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "package_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make test",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 41,
+      "template_top_level_entries": [
+        ".dockerignore",
+        ".env.example",
+        ".gitignore",
+        ".npmrc",
+        ".pnpm-store",
+        ".prettierignore",
+        ".prettierrc.json",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Dockerfile.dev.full",
+        "Makefile",
+        "README.md",
+        "compose.dev.yaml",
+        "eslint.config.js",
+        "index.html",
+        "nginx.conf",
+        "package.json",
+        "playwright.production.config.ts",
+        "playwright.smoke.config.ts",
+        "pnpm-lock.yaml",
+        "public",
+        "scripts",
+        "src",
+        "tests",
+        "tsconfig.json",
+        "vite.config.ts"
+      ]
+    },
+    "entries": {
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "673dc030096ae4d2a564bd88e22bbeb44e1ccc89fb20baf947aa023491ef5093",
+        "execute_bits": "0o0"
+      },
+      ".env.example": {
+        "kind": "file",
+        "sha256": "5df43efa989ffa4f3b57cf9247cb883b23c8f4a08e5a7971341c2b6ca7824001",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "0c3bb33ed22cac5e469231563bf9dc542eb72a645e1dac74a3e615f8efbc8a6c",
+        "execute_bits": "0o0"
+      },
+      ".npmrc": {
+        "kind": "file",
+        "sha256": "7cd4fecae7ef541691b098bb473d26742f6eb01a02cef038ad1df4ea7f7070e6",
+        "execute_bits": "0o0"
+      },
+      ".pnpm-store": {
+        "kind": "directory"
+      },
+      ".pnpm-store/v3": {
+        "kind": "directory"
+      },
+      ".prettierignore": {
+        "kind": "file",
+        "sha256": "a2409cab6567095750a1a50cbfb5c19cefdb84e10fb48a6cac3f92c4939dfea3",
+        "execute_bits": "0o0"
+      },
+      ".prettierrc.json": {
+        "kind": "file",
+        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "17ae9fd3c4ff479c49fd6e41ad2a53aae94bb56017c73157faebadfa929cc590",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "9c0b9e643cccc462e124597273a534b6cb4497d8713b82c927733549874a2298",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev.full": {
+        "kind": "file",
+        "sha256": "476ba03d236ae37c1184efeb93ad7ef7f143c4e405de1e68f2de0791220ad96b",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "1d3fa360c2554006707755e0446b1d00c9a7963bae6004ba7d92ad61a16d9f37",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "8f3ac2529af6cf587f74ec330f1e94b96f32c9370c5e5e185de19f440f297f3a",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "b3b909216458816a60c7e5e3356789ccd3887ad684de6408882e201d783222c6",
+        "execute_bits": "0o0"
+      },
+      "eslint.config.js": {
+        "kind": "file",
+        "sha256": "3fd5505eaed512d788def7921636a8722b07bca31559821736cd95007b5eff7e",
+        "execute_bits": "0o0"
+      },
+      "index.html": {
+        "kind": "file",
+        "sha256": "2f762edddb27f5b15d7eb83774a7d9c4a5a3a66af8611a7dd0577bea91fce2be",
+        "execute_bits": "0o0"
+      },
+      "nginx.conf": {
+        "kind": "file",
+        "sha256": "5f83763d42cd00d70b2e63e30971df9bd0e11bd61891bcb27b7ba66309383ffc",
+        "execute_bits": "0o0"
+      },
+      "package.json": {
+        "kind": "file",
+        "sha256": "8678286f76f3b7a0c8ed9ef266322cedb6a3884f1a7dc87f30596575c213419e",
+        "execute_bits": "0o0"
+      },
+      "playwright.production.config.ts": {
+        "kind": "file",
+        "sha256": "f28848135c33da71cb1f9bf48b0db14fe795e78fd4ac6f27ccb48862ba62cf47",
+        "execute_bits": "0o0"
+      },
+      "playwright.smoke.config.ts": {
+        "kind": "file",
+        "sha256": "a307f3aaeddbf1b727aec7ee0e364214b4409a7aea955a7d602fe5644958d6ee",
+        "execute_bits": "0o0"
+      },
+      "pnpm-lock.yaml": {
+        "kind": "file",
+        "sha256": "8fcdf677de22a4ff4d163d3b076204f69db0c9f3749b790d08f9e2c8d3b4c2af",
+        "execute_bits": "0o0"
+      },
+      "public": {
+        "kind": "directory"
+      },
+      "public/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/browser-smoke-production": {
+        "kind": "file",
+        "sha256": "053c203240c47922e0900d34d71f2df25bb3aa0f32fd215a96ad937ded6af16d",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "1c7b3b9a6732a9aa946517cfa1a2a558e0f1431dc102d753d2e1c0bee7839adf",
+        "execute_bits": "0o111"
+      },
+      "src": {
+        "kind": "directory"
+      },
+      "src/App.test.tsx": {
+        "kind": "file",
+        "sha256": "9f3afeba111677023dbf779916efc20ee6e43e38c743efff48bad9cadb04c2c5",
+        "execute_bits": "0o0"
+      },
+      "src/App.tsx": {
+        "kind": "file",
+        "sha256": "4fe40d778c052cafa08709119b4fdaec2a21324943d3d52d55e7300c8784495c",
+        "execute_bits": "0o0"
+      },
+      "src/components": {
+        "kind": "directory"
+      },
+      "src/components/MetricCard.tsx": {
+        "kind": "file",
+        "sha256": "fa2e0689269a755b57f137dfc239eba619c384507298663a75146862c18e3021",
+        "execute_bits": "0o0"
+      },
+      "src/components/TaskPanel.tsx": {
+        "kind": "file",
+        "sha256": "7aa3f5fe03f8fbca85dbb98eeccb1bfded0c2448ca550fb589f41c1c91cd1c41",
+        "execute_bits": "0o0"
+      },
+      "src/config": {
+        "kind": "directory"
+      },
+      "src/config/env.ts": {
+        "kind": "file",
+        "sha256": "176743f73f0102285388ea52c45fe2a7020ca04ddf096e2437aaed1ddabd2b79",
+        "execute_bits": "0o0"
+      },
+      "src/hooks": {
+        "kind": "directory"
+      },
+      "src/hooks/useProjectOverview.ts": {
+        "kind": "file",
+        "sha256": "32a68894ad8752ed2812516b1b989b81cb92913d69e6b1ccafb76bc0dbda2167",
+        "execute_bits": "0o0"
+      },
+      "src/index.css": {
+        "kind": "file",
+        "sha256": "6784c4b7ecbdbb88fdca0c2e51e7fa6dc25fe4a22f9685c8c5ff1877cfde98c5",
+        "execute_bits": "0o0"
+      },
+      "src/main.tsx": {
+        "kind": "file",
+        "sha256": "61d8bdc968d0006c50538d00ca97decbc65ca101757c055e87fa3e0f1af429b9",
+        "execute_bits": "0o0"
+      },
+      "src/pages": {
+        "kind": "directory"
+      },
+      "src/pages/HomePage.tsx": {
+        "kind": "file",
+        "sha256": "bf24d581bce6ee7d0490ecbea8f33ebd1802d29ed8fded008e38f8aedaeaea10",
+        "execute_bits": "0o0"
+      },
+      "src/router": {
+        "kind": "directory"
+      },
+      "src/router/AppRouter.tsx": {
+        "kind": "file",
+        "sha256": "a60f72f5e7a4185d89b98341af0a43f27e4a85422d4706214887dda762eceb4f",
+        "execute_bits": "0o0"
+      },
+      "src/services": {
+        "kind": "directory"
+      },
+      "src/services/api": {
+        "kind": "directory"
+      },
+      "src/services/api/client.ts": {
+        "kind": "file",
+        "sha256": "74d895edf909f3a12e45f974175d75cc4f86130181710f4635d6b3bac253a97d",
+        "execute_bits": "0o0"
+      },
+      "src/services/projectOverview.ts": {
+        "kind": "file",
+        "sha256": "b4a8777811e3db4f1d5452fc529c492ccfabf2401849ffec20ddf7ef3b8eba20",
+        "execute_bits": "0o0"
+      },
+      "src/test": {
+        "kind": "directory"
+      },
+      "src/test/setup.ts": {
+        "kind": "file",
+        "sha256": "9b328c4843431fa76d8de00008fc159e95f99a840211085ff3b8f25e53d14409",
+        "execute_bits": "0o0"
+      },
+      "src/types": {
+        "kind": "directory"
+      },
+      "src/types/projectOverview.ts": {
+        "kind": "file",
+        "sha256": "1074a3cd99bb4dd6c54d3f3774d77dee12001310327c6cb9c6aa01a9f67c1768",
+        "execute_bits": "0o0"
+      },
+      "src/vite-env.d.ts": {
+        "kind": "file",
+        "sha256": "0209610c59ec3f55fc39c3f3ff52882a1ea8f608985acbf070c7dc3182087d3c",
+        "execute_bits": "0o0"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "25dba5169c806c995c540f240810745213a35f584eaeaa3179d5df044f2f5afd",
+        "execute_bits": "0o0"
+      },
+      "tests/production-browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "35915540a0f4741af5dc2332fcdb6a22a2615aa42b3d100f04a7803a27d54cb2",
+        "execute_bits": "0o0"
+      },
+      "tsconfig.json": {
+        "kind": "file",
+        "sha256": "9665597ba397119a137d724b8987ad6584f84a987aef5cd3d481ad52eedda218",
+        "execute_bits": "0o0"
+      },
+      "vite.config.ts": {
+        "kind": "file",
+        "sha256": "f3121b836660e1abb6f0d249227b8d682dfd7b963a56d2b95d56010d287a839a",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "web-service": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "web-service",
+        "description": "Go + Gin web service starter",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Gin"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "service_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 34,
+      "template_top_level_entries": [
+        ".air.toml",
+        ".dockerignore",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "cmd",
+        "compose.dev.yaml",
+        "compose.yaml",
+        "configs",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".air.toml": {
+        "kind": "file",
+        "sha256": "3bbff65bdb8eeda235dc2e1c940bba2b3dffb44f047bad06b0ca2d88b100b90b",
+        "execute_bits": "0o0"
+      },
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "4be2b7d7fdda7921a1509c85aa4368b9d7a6e134d23760f444b19137797f5ec0",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "93a6765b0d67c2c839bfb3c2698287c3a5627931ce0c605ceacf8f63727494b8",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "bca78589dc1c0b2c9d082922d98044b11e187a204364878b79463aee1dbe4185",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "dd1cb4a47cf6529f3e0e79181bd80c4d6d414cf48b1624176000638aa6ca705e",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "19aac858d6946d33f61f020d695d46980f0085e48db02dd794652ce1da892375",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "4a1504fa37d489b738bb4123a1d9afc83893cab65521c71ee245eb4843dc99ad",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "73162d52293f5d822dd6138c9834ec45222e9bd0172d4e6b20d30c173c2306ce",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/server": {
+        "kind": "directory"
+      },
+      "cmd/server/main.go": {
+        "kind": "file",
+        "sha256": "5dedfbba493266a0392c40671c47f2fe28d64bfa0fbf1d15b468b907d99a20cd",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "04e68275d7f3bf7a6862aa5565c7cb573dc457043f66c514a4277925e41135f6",
+        "execute_bits": "0o0"
+      },
+      "compose.yaml": {
+        "kind": "file",
+        "sha256": "2bba4ae27b5ae212000268d66563ea8394f88d791414e576b9fe5e42df3cbb93",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "71fa6d00769c4f41792662cc5540eaec7a0d0e34749b925d8304a203ea23b208",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "9215e4832645051e077aa2027c968e2b4f972a60791e2bd90f01847a0dfb92b6",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "85ba8434ae98d851d0c8fc61841fe3c50168a6cdcabca9eb3188252abe7b1ab1",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "ceba6da857fff4fe4ff1821385a43e255c1838891b96901b8249d587f00ff825",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "2a362ad5a2905d66bddee1473a719532432e0b3b9e4035b0d6d634938af2a86f",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "938f00aa74eae154b19ea2f3c69cafc4f51df3e888c12c892d54751484b13b36",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "aea7a563af32f058687ebeeab33dc76f2ec867a47486b72c34dc978aa129c4f4",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/user.go": {
+        "kind": "file",
+        "sha256": "cc72d7e7b2870c7547dc919fa5ca14e668006622296c7520cf685d4fe1c38e62",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "11328df8eac6e0eb3f9ed36e650f8e360107c7c5a36adf70a81de157a573eaf5",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "f5421863c8ecaf1f520e88e9671d243355482072d6f326c7ae0f64497286c56f",
+        "execute_bits": "0o0"
+      },
+      "internal/model/user.go": {
+        "kind": "file",
+        "sha256": "c3220b2127954f97f2c3072eebccb9d5dee84646175a2f065b9bfb9fcbdad7ae",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal/repository/user.go": {
+        "kind": "file",
+        "sha256": "5f05ec85a7bfb5dc16f5b9a33ab4109e32e8d1ac280b6df6aef660cbe38f2696",
+        "execute_bits": "0o0"
+      },
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
+        "kind": "file",
+        "sha256": "d1b6ca4796443c6e69dbc933593225d45fcd67d8c49446889ec28153cc9b55e4",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
+        "kind": "file",
+        "sha256": "0ad26d499b79145764c79203372fcd4474e19429354b1ec27f8a729664234fdf",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "8eca89f4d2cc816ea11df92de73f2bb8025f948fb22a47dfeaa2ef4de789eca8",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "4dbf619e8753743f3440f9ac78ceb467ecf8b99ecc9939cfc5eaefe032d29229",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "5334c957ffd3e47976d4c630806a2eda6ee60553fbf54eb556a8a982fa500c01",
+        "execute_bits": "0o0"
+      },
+      "internal/service/user.go": {
+        "kind": "file",
+        "sha256": "aaf5b9fdc948fdca8a2c1b63c1ca02a23f2ea7504d9a435b3e67ca02daadf370",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "8ea1d9174d6a00be644a99e0a0e9e12203814ca61be0a30879977350f3e800b9",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "14af5ddc61af41b75f9bbfac7b6eed25790293ec93525812e0234936b495d323",
+        "execute_bits": "0o111"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/server_test.go": {
+        "kind": "file",
+        "sha256": "aa0f4af6d2f0bd226f5048a58723870b7f5438e020ad6bf3ef53e5ec8f3af2d8",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "worker": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "worker",
+        "description": "Go background worker starter with scheduled and oneshot execution modes",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Docker"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "worker_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "run_mode",
+          "value": "scheduled",
+          "source": "default"
+        },
+        {
+          "name": "tick_interval_seconds",
+          "value": "30",
+          "source": "default"
+        },
+        {
+          "name": "shutdown_timeout_seconds",
+          "value": "10",
+          "source": "default"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 21,
+      "template_top_level_entries": [
+        ".dockerignore",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "cmd",
+        "compose.dev.yaml",
+        "configs",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "47a9d017888101584f63daabccdd9e0c6fe43e06c1e8bf39e34677c129c69944",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "fff8911a39b13b9f252aeb5507743e70487c159691fc9bebe75b5ecb026442b7",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "93a6765b0d67c2c839bfb3c2698287c3a5627931ce0c605ceacf8f63727494b8",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "3bee9037e86b52fdd1b8e9236f2fea4f813759b01280845716e350a783c9720e",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "029e64617ed245ed29c1074b95f6dc05baba10035d3244405479a881ab8fcb36",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "f514c64a40d19a461ed569193c26baecc37de980b9dc26949d35de15ac82f097",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "5f9791e715ec20aa93e150861fff76ff76aa45b21407613ce00fd9409c081b75",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "166dd849aef5c921173c6ac9eabd385151aeb111fceb46941df40d2131a15a80",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/worker": {
+        "kind": "directory"
+      },
+      "cmd/worker/main.go": {
+        "kind": "file",
+        "sha256": "f5ec017c8bb3db8a53ead5fee60f6928947602632d5b4a997555d7d41598eb9e",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "7cf39fd0be49e0644dd16bb0be110a7ce495896c365113924e2a4a842df483ba",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.json": {
+        "kind": "file",
+        "sha256": "a3a03afd73aa184b7c78163e6a649bf4033697e4aa6040cc8e16c023ab938869",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "f32bc3d6fca863ca7e79d9799ba9c2e787e086efa47e225a1639f375e395333b",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "203ad03273bc78a5ada684ad6fab4c8e2efe6b2fa5ce290e39a02f6f192b37ae",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "2e4b0d6b6d72f7ea5d9121e14e6926267ed44efa8ba61991271fd2e98590110c",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/runner.go": {
+        "kind": "file",
+        "sha256": "339d858ffdb522f917ac214259b845320514a3b2e4e01893716e360403df7ec4",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/runner_test.go": {
+        "kind": "file",
+        "sha256": "aca77822f3bd903c0f228687a3e047b7db1b818b1e4c20f3c2dcfc8eca1fc305",
+        "execute_bits": "0o0"
+      },
+      "internal/task": {
+        "kind": "directory"
+      },
+      "internal/task/heartbeat.go": {
+        "kind": "file",
+        "sha256": "d86ef9f68147effc38db334e9172959d5037ae4395bcf28cbebfb4cd79b6bc20",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "c09c53b3ef5c78bd50d85279f9fa3a06b7ce4f43297dd9a4b107104dd2f562b1",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "32b715f99a2746aa4d923a8de3c8c74aa13739831900e339153394a949b8814b",
+        "execute_bits": "0o100"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/worker_test.go": {
+        "kind": "file",
+        "sha256": "de85bb56e6b98178b993960d749d39bc04533b9bb95fefce5da528693cebf03e",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "android": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "android",
+        "description": "Kotlin Android app starter for mid-sized teams",
+        "category": "native",
+        "stack": [
+          "Kotlin",
+          "Android",
+          "Gradle",
+          "Jetpack Compose",
+          "fastlane"
+        ],
+        "platforms": [
+          "android"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "package_name",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "application_id",
+          "value": "com.example.demo",
+          "source": "default_from:package_name"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        },
+        {
+          "name": "compile_sdk",
+          "value": "35",
+          "source": "default"
+        },
+        {
+          "name": "min_sdk",
+          "value": "26",
+          "source": "default"
+        },
+        {
+          "name": "target_sdk",
+          "value": "35",
+          "source": "default"
+        },
+        {
+          "name": "version_code",
+          "value": "1",
+          "source": "default"
+        },
+        {
+          "name": "version_name",
+          "value": "1.0.0",
+          "source": "default"
+        },
+        {
+          "name": "java_version",
+          "value": "17",
+          "source": "default"
+        },
+        {
+          "name": "android_namespace",
+          "value": "com.example.demo",
+          "source": "default_from:package_name"
+        }
+      ],
+      "derived_values": {
+        "kotlin_module_name": "Demo"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make format",
+        "make build",
+        "make test",
+        "make test-ui",
+        "open -a \"Android Studio\" ."
+      ],
+      "template_file_count": 51,
+      "template_top_level_entries": [
+        ".editorconfig",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Makefile",
+        "README.md",
+        "app",
+        "build.gradle.kts",
+        "core",
+        "docs",
+        "fastlane",
+        "feature",
+        "gradle",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat",
+        "scripts",
+        "settings.gradle.kts"
+      ]
+    },
+    "entries": {
+      ".editorconfig": {
+        "kind": "file",
+        "sha256": "35f50cc0bbedb023e0fe268c862aaa7f50c8b697690d0a69f16fdc293a60e994",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "b7776e4ec44f061c5fcd24bb791237e2e49686ae7155e82adf70e0d373f44ee6",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "732b8bf108d57cfb36664c46220bcc7accf5e698be1eeb75d44769f8e2637f50",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "7953c38c9fafbfad9133353e2e7a01b56e109688197cc21c9cee2d8b3c66ac16",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "ce9aaf467d073bee3cba5f8b46650299d80ca43cd6c5c5321d7eec72095728f6",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "823b76c6389a1a40d4a57ceb908ce766e7fc7a4162780fdbb03c22f4f75930b0",
+        "execute_bits": "0o0"
+      },
+      "app": {
+        "kind": "directory"
+      },
+      "app/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "3bf6de70a14c3f03774b333daa93cf2a2008ee099c41f0d47de55a9e0ce53767",
+        "execute_bits": "0o0"
+      },
+      "app/proguard-rules.pro": {
+        "kind": "file",
+        "sha256": "898bcabb80488d0477ec02ccd4d0718d2cf0a7ad065f41de813e0d5f937be526",
+        "execute_bits": "0o0"
+      },
+      "app/src": {
+        "kind": "directory"
+      },
+      "app/src/androidTest": {
+        "kind": "directory"
+      },
+      "app/src/androidTest/java": {
+        "kind": "directory"
+      },
+      "app/src/androidTest/java/app": {
+        "kind": "directory"
+      },
+      "app/src/androidTest/java/app/HomeRouteUiTest.kt": {
+        "kind": "file",
+        "sha256": "e818984823a3c4b45268341aae185c649b679a1662960e26a65927324b9f995c",
+        "execute_bits": "0o0"
+      },
+      "app/src/main": {
+        "kind": "directory"
+      },
+      "app/src/main/AndroidManifest.xml": {
+        "kind": "file",
+        "sha256": "27046e162f60efac1263e377cabbf5adbf9adcdbd548764e7ba7bb3e19103bdd",
+        "execute_bits": "0o0"
+      },
+      "app/src/main/java": {
+        "kind": "directory"
+      },
+      "app/src/main/java/app": {
+        "kind": "directory"
+      },
+      "app/src/main/java/app/MainActivity.kt": {
+        "kind": "file",
+        "sha256": "601bc05f7cb2fe8a01d1c7e2943411da1653602e7bb7882b26c596844394af77",
+        "execute_bits": "0o0"
+      },
+      "app/src/main/res": {
+        "kind": "directory"
+      },
+      "app/src/main/res/values": {
+        "kind": "directory"
+      },
+      "app/src/main/res/values/strings.xml": {
+        "kind": "file",
+        "sha256": "f6368600a0dec0d73c4d58a6e87d0b130cfee75947645341ce04e577da8e4477",
+        "execute_bits": "0o0"
+      },
+      "app/src/main/res/values/themes.xml": {
+        "kind": "file",
+        "sha256": "57de281e3a6d264388ecaba4864a18cde859a343413feb6c398ef08738038cc0",
+        "execute_bits": "0o0"
+      },
+      "app/src/test": {
+        "kind": "directory"
+      },
+      "app/src/test/java": {
+        "kind": "directory"
+      },
+      "app/src/test/java/app": {
+        "kind": "directory"
+      },
+      "app/src/test/java/app/AppSmokeTest.kt": {
+        "kind": "file",
+        "sha256": "64883e393cdd0d23ebc456eba139530ed7c15097a398984f34ca7bc9cd137f1d",
+        "execute_bits": "0o0"
+      },
+      "build.gradle.kts": {
+        "kind": "file",
+        "sha256": "0e27b6dda3880c26a140047ab9d2bb41780e2060e4d51fd8e2bdada490fa0958",
+        "execute_bits": "0o0"
+      },
+      "core": {
+        "kind": "directory"
+      },
+      "core/designsystem": {
+        "kind": "directory"
+      },
+      "core/designsystem/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "90a0a0b1dc1380d36d219c311eaa7cdb9eab9fe19b9549ad98ec86dd6d6da2d3",
+        "execute_bits": "0o0"
+      },
+      "core/designsystem/src": {
+        "kind": "directory"
+      },
+      "core/designsystem/src/main": {
+        "kind": "directory"
+      },
+      "core/designsystem/src/main/java": {
+        "kind": "directory"
+      },
+      "core/designsystem/src/main/java/designsystem": {
+        "kind": "directory"
+      },
+      "core/designsystem/src/main/java/designsystem/Components.kt": {
+        "kind": "file",
+        "sha256": "f9bd3ff452a76e44860b7803a3e8ae882a72bcb90ad1d6523a502aa71dec5e04",
+        "execute_bits": "0o0"
+      },
+      "core/designsystem/src/main/java/designsystem/DesignTokens.kt": {
+        "kind": "file",
+        "sha256": "ab2e5a6910fff5e2e4a7e4056165d6e1c04b8ebeabacd5d842fe0b91d6956aae",
+        "execute_bits": "0o0"
+      },
+      "core/designsystem/src/main/java/designsystem/Theme.kt": {
+        "kind": "file",
+        "sha256": "e4d70bfc38b642cf8286c0e1d9023f2a3b9a2c95a80ad3a2748deb8685ec2cda",
+        "execute_bits": "0o0"
+      },
+      "core/model": {
+        "kind": "directory"
+      },
+      "core/model/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "930d68a392e415307d089ee77d9149e2fdb7b1bb6f1dafa1fc73ec961ccb050e",
+        "execute_bits": "0o0"
+      },
+      "core/model/src": {
+        "kind": "directory"
+      },
+      "core/model/src/main": {
+        "kind": "directory"
+      },
+      "core/model/src/main/java": {
+        "kind": "directory"
+      },
+      "core/model/src/main/java/model": {
+        "kind": "directory"
+      },
+      "core/model/src/main/java/model/Greeting.kt": {
+        "kind": "file",
+        "sha256": "f7f35e24c64830d85335e07ae5422f93ebba95aff5cbb4142eb8f6272976af5f",
+        "execute_bits": "0o0"
+      },
+      "core/model/src/test": {
+        "kind": "directory"
+      },
+      "core/model/src/test/java": {
+        "kind": "directory"
+      },
+      "core/model/src/test/java/model": {
+        "kind": "directory"
+      },
+      "core/model/src/test/java/model/GreetingTest.kt": {
+        "kind": "file",
+        "sha256": "8cabde98a5e5e3e2987f8ec98672de0ad080bbe08e27f54b871f650d3bc421dc",
+        "execute_bits": "0o0"
+      },
+      "core/network": {
+        "kind": "directory"
+      },
+      "core/network/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "048496f8f70e127a80a3525c9301550fb6c38a63b82de1b373d848fed15996e2",
+        "execute_bits": "0o0"
+      },
+      "core/network/src": {
+        "kind": "directory"
+      },
+      "core/network/src/main": {
+        "kind": "directory"
+      },
+      "core/network/src/main/java": {
+        "kind": "directory"
+      },
+      "core/network/src/main/java/network": {
+        "kind": "directory"
+      },
+      "core/network/src/main/java/network/AppEnvironment.kt": {
+        "kind": "file",
+        "sha256": "89fe749dd64ac63666410221c5c55c82e001121136bd574205f7cb3cba948033",
+        "execute_bits": "0o0"
+      },
+      "core/testing": {
+        "kind": "directory"
+      },
+      "core/testing/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "69e577c862d08ea77d07bf6419fd32335e832f4940a51838cb30c0a2787f8ef9",
+        "execute_bits": "0o0"
+      },
+      "core/testing/src": {
+        "kind": "directory"
+      },
+      "core/testing/src/main": {
+        "kind": "directory"
+      },
+      "core/testing/src/main/java": {
+        "kind": "directory"
+      },
+      "core/testing/src/main/java/testing": {
+        "kind": "directory"
+      },
+      "core/testing/src/main/java/testing/FakeAppEnvironmentProvider.kt": {
+        "kind": "file",
+        "sha256": "9343fefaa80494f4b39cd731e0e7b2c87470bf379c7ec3fffd2a62c3a1cd835f",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-delivery.md": {
+        "kind": "file",
+        "sha256": "f8e4df1817aec059f1209b7789cc0a04ced911a8abc9dccf0c4971c8db4bc194",
+        "execute_bits": "0o0"
+      },
+      "docs/release-signing.properties.example": {
+        "kind": "file",
+        "sha256": "4d78b734e08801ecd7827ca93bcdabe5f80d7007d4d15f2a1fd88d0d6e23a2a4",
+        "execute_bits": "0o0"
+      },
+      "fastlane": {
+        "kind": "directory"
+      },
+      "fastlane/.env.example": {
+        "kind": "file",
+        "sha256": "fa1acc6ef6b2f098616b6be17bcc314ef347f432e064e7e342b993297f698cb0",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Appfile": {
+        "kind": "file",
+        "sha256": "a23d10834df460f7ab4e8a053d3a51d074ee1350606062ccb39345cd44698dc0",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Fastfile": {
+        "kind": "file",
+        "sha256": "8da62711523dcb745b094b7959030426d9e12b3b6a3bf3bb57b361c768a87f16",
+        "execute_bits": "0o0"
+      },
+      "feature": {
+        "kind": "directory"
+      },
+      "feature/home": {
+        "kind": "directory"
+      },
+      "feature/home/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "54c810fc431239c24c77c4dba0b46df905ea84b7e4cce8e77c180f108e027290",
+        "execute_bits": "0o0"
+      },
+      "feature/home/src": {
+        "kind": "directory"
+      },
+      "feature/home/src/main": {
+        "kind": "directory"
+      },
+      "feature/home/src/main/java": {
+        "kind": "directory"
+      },
+      "feature/home/src/main/java/home": {
+        "kind": "directory"
+      },
+      "feature/home/src/main/java/home/HomeRoute.kt": {
+        "kind": "file",
+        "sha256": "82ad4f35cf07d2c64abc2a4374b4015b8ac578a83e1539b517425fb13de56e45",
+        "execute_bits": "0o0"
+      },
+      "feature/settings": {
+        "kind": "directory"
+      },
+      "feature/settings/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "a80d9840272dfbf57f741b9d7aae85c1c4216231b0290458fe0f5936a20de8f6",
+        "execute_bits": "0o0"
+      },
+      "feature/settings/src": {
+        "kind": "directory"
+      },
+      "feature/settings/src/main": {
+        "kind": "directory"
+      },
+      "feature/settings/src/main/java": {
+        "kind": "directory"
+      },
+      "feature/settings/src/main/java/settings": {
+        "kind": "directory"
+      },
+      "feature/settings/src/main/java/settings/SettingsRoute.kt": {
+        "kind": "file",
+        "sha256": "7e8371554c588fac2c500e9d4ff13362ea5eb7b5fd85a57976ef19a7f9adf3fd",
+        "execute_bits": "0o0"
+      },
+      "gradle": {
+        "kind": "directory"
+      },
+      "gradle/libs.versions.toml": {
+        "kind": "file",
+        "sha256": "2bf7af5ef4a1388809ae1496fbfda1e854730e29e997c257d030e73f91b1b1e6",
+        "execute_bits": "0o0"
+      },
+      "gradle/verification-metadata.xml": {
+        "kind": "file",
+        "sha256": "61ce1a44fc0a126460549301aa1ac83ccc6be11cf74b31f8b12f40719e23abb1",
+        "execute_bits": "0o0"
+      },
+      "gradle/wrapper": {
+        "kind": "directory"
+      },
+      "gradle/wrapper/gradle-wrapper.jar": {
+        "kind": "file",
+        "sha256": "2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046",
+        "execute_bits": "0o0"
+      },
+      "gradle/wrapper/gradle-wrapper.jar.sha256": {
+        "kind": "file",
+        "sha256": "5616461d99ea30dfbbf1adc6563ca829094a867fe60f02b040cad00d3a51f87c",
+        "execute_bits": "0o0"
+      },
+      "gradle/wrapper/gradle-wrapper.properties": {
+        "kind": "file",
+        "sha256": "1fa995971c6145ec3c19ca41b9293a5e10c87d16046ecc29d3c765b693c435d7",
+        "execute_bits": "0o0"
+      },
+      "gradle.properties": {
+        "kind": "file",
+        "sha256": "873a7670f6111b286ac3bb9cc4a7f143d8f673c55ca501a4b2a28ca62179c30b",
+        "execute_bits": "0o0"
+      },
+      "gradlew": {
+        "kind": "file",
+        "sha256": "a3648413b47ef77af21d5ebc36c687c7d103aaef3e17f33de7d4f080a6f300a3",
+        "execute_bits": "0o111"
+      },
+      "gradlew.bat": {
+        "kind": "file",
+        "sha256": "2209f919a22528af59a2af2ad97e8d056cca18e39f7d87aa3fd549a73b180150",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/artifact-info": {
+        "kind": "file",
+        "sha256": "c8518819adc20eefc9222de4ad021228de7dddfd6899bc7385e897a6364cbba4",
+        "execute_bits": "0o111"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "f1c1cd71f3201a040882fd1499e294756b904920e269830437cbdf495f5a84f9",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "52b6bd977410028c8e99363cfbed73c4dd0bb352887fb7b114d56f72ab87770f",
+        "execute_bits": "0o100"
+      },
+      "scripts/setup-android-sdk": {
+        "kind": "file",
+        "sha256": "0c2e5923e033c1ab61bb7f06a4e0920b9b0432d5b3cf0a620299a8d7d6917bad",
+        "execute_bits": "0o100"
+      },
+      "scripts/sync-gradle-wrapper": {
+        "kind": "file",
+        "sha256": "38416ae1a17283177bfa9d12cb63c1cd14a9fd5de46c5e79f4aa40fff99841fa",
+        "execute_bits": "0o100"
+      },
+      "scripts/verify-gradle-supply-chain": {
+        "kind": "file",
+        "sha256": "00670e929aa9e1f14f5e259652c5a21359615356a9fe1d9a3deb21db18843c30",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-artifact": {
+        "kind": "file",
+        "sha256": "da82cb651734407f6bb9b0a466d1624afd8d3ea98093a4fe56057faeecf2f912",
+        "execute_bits": "0o111"
+      },
+      "settings.gradle.kts": {
+        "kind": "file",
+        "sha256": "db512b518cb92f5f1f2abb3c422d5568a8bea97561f0135c4764ff4670280b57",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "harmonyos": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "harmonyos",
+        "description": "ArkTS HarmonyOS app starter for DevEco Studio projects",
+        "category": "native",
+        "stack": [
+          "ArkTS",
+          "ArkUI",
+          "HarmonyOS",
+          "DevEco Studio",
+          "hvigor",
+          "ohpm"
+        ],
+        "platforms": [
+          "harmonyos"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "bundle_name",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "harmony_module_name",
+          "value": "entry",
+          "source": "default"
+        },
+        {
+          "name": "ability_name",
+          "value": "EntryAbility",
+          "source": "default"
+        },
+        {
+          "name": "compatible_sdk_version",
+          "value": "5.0.0(12)",
+          "source": "default"
+        },
+        {
+          "name": "target_sdk_version",
+          "value": "5.0.0(12)",
+          "source": "default"
+        },
+        {
+          "name": "min_api_version",
+          "value": "12",
+          "source": "default"
+        },
+        {
+          "name": "harmony_version_code",
+          "value": "1",
+          "source": "default"
+        },
+        {
+          "name": "harmony_version_name",
+          "value": "1.0.0",
+          "source": "default"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make lint",
+        "make test",
+        "make build",
+        "make artifact-info",
+        "make verify",
+        "make release-preflight",
+        "open -a \"DevEco Studio\" ."
+      ],
+      "template_file_count": 39,
+      "template_top_level_entries": [
+        ".gitignore",
+        ".mise.toml",
+        "AppScope",
+        "Makefile",
+        "README.md",
+        "build-profile.json5",
+        "code-linter.json5",
+        "docs",
+        "entry",
+        "hvigor",
+        "hvigorfile.ts",
+        "oh-package-lock.json5",
+        "oh-package.json5",
+        "scripts"
+      ]
+    },
+    "entries": {
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "93283e476ff3e2eadc3633a070434e5df38d354b3da91ebc8518e12cfe7e56da",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "ce98956f06283b132562f74ba10fe88b2c9569b36439cbe7d3585c8a15a6d1fc",
+        "execute_bits": "0o0"
+      },
+      "AppScope": {
+        "kind": "directory"
+      },
+      "AppScope/app.json5": {
+        "kind": "file",
+        "sha256": "a87e86a6fdeea3b91feb50c2c624cda305ed049413e8f17690211db110c0ec6b",
+        "execute_bits": "0o0"
+      },
+      "AppScope/resources": {
+        "kind": "directory"
+      },
+      "AppScope/resources/base": {
+        "kind": "directory"
+      },
+      "AppScope/resources/base/element": {
+        "kind": "directory"
+      },
+      "AppScope/resources/base/element/string.json": {
+        "kind": "file",
+        "sha256": "8510befc5d4ba40525e14314b7119b5dae0dafc20323012e2acd2a7082aa352b",
+        "execute_bits": "0o0"
+      },
+      "AppScope/resources/base/media": {
+        "kind": "directory"
+      },
+      "AppScope/resources/base/media/background.svg": {
+        "kind": "file",
+        "sha256": "83f3db3866a27187c23c05bc05ea78ff6d8330e33c22fa84bcc7a719b9974271",
+        "execute_bits": "0o0"
+      },
+      "AppScope/resources/base/media/foreground.svg": {
+        "kind": "file",
+        "sha256": "d641be492d03a7a756558664c4d0b8d2ce277a898c3ad32695b5a5b68a7f2223",
+        "execute_bits": "0o0"
+      },
+      "AppScope/resources/base/media/layered_image.json": {
+        "kind": "file",
+        "sha256": "e583b2f5d6d9896d8f92c4598d664a6cf3cd61acdeb84538f2f30bfa68ac2bd2",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "3c0b45b7f48e0c6e9b69309bba8f4ce2b40ae54662257e86136c66afa6d59382",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "5958a5138be65b97be94d5917ef29c95c946bf410e3ca0456caa02c0e8fcb6d2",
+        "execute_bits": "0o0"
+      },
+      "build-profile.json5": {
+        "kind": "file",
+        "sha256": "76e446e1938d864d837c385897903ad8bba00ea39d85e5fb59702ae3629eaaff",
+        "execute_bits": "0o0"
+      },
+      "code-linter.json5": {
+        "kind": "file",
+        "sha256": "fd45000fc073faeb768713320a0cb07657bcb7a5d9127e721de44cef07f3ea7f",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-signing.local.properties.example": {
+        "kind": "file",
+        "sha256": "3b09553613a0f7a53fe75b941c72af8690c92d72e8f932a4addeb3d9707b3c4a",
+        "execute_bits": "0o0"
+      },
+      "entry": {
+        "kind": "directory"
+      },
+      "entry/build-profile.json5": {
+        "kind": "file",
+        "sha256": "46d1b87a9913197745942b7aad13d81bf029e71fd07436ed5cf5bfbbb15d01eb",
+        "execute_bits": "0o0"
+      },
+      "entry/hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "43991ae4e8fe1cfef2560248345825f41ebabc8001c92bc7c9fbe21af298c7c9",
+        "execute_bits": "0o0"
+      },
+      "entry/oh-package.json5": {
+        "kind": "file",
+        "sha256": "1066a75d78e47e7d25c25c957da7af77357d237d23d129c58de4ffea26596461",
+        "execute_bits": "0o0"
+      },
+      "entry/src": {
+        "kind": "directory"
+      },
+      "entry/src/main": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/core": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/core/config": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/core/config/AppConfig.ets": {
+        "kind": "file",
+        "sha256": "25b3c9e1db904d1fca7eee4c05170d8db9b104914e168d1f8f51e683e99ede9a",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/ets/core/designsystem": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/core/designsystem/Tokens.ets": {
+        "kind": "file",
+        "sha256": "72650aff5449ad586baac901346f5fc76bb78559f20199745ca0b8ba808c5266",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/ets/entryability": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/entryability/EntryAbility.ets": {
+        "kind": "file",
+        "sha256": "688798bbbf8eb6cbfd1b7df251b1e38524decbc01cf87e78f30266fb3bc00f6f",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/ets/pages": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/pages/Index.ets": {
+        "kind": "file",
+        "sha256": "fc61b0f829aa668b84c184622be2631a9d9f6cabeba558b7d828b92a6300ec89",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/ets/pages/Settings.ets": {
+        "kind": "file",
+        "sha256": "638bde79ee277438288ef05792f7f7963f7167889d4c85c073f24ee10d5af9bc",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/module.json5": {
+        "kind": "file",
+        "sha256": "2a6a909ab7bc90ce7049e54294fc90478c1e778acd4d3743fed82762809b940c",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/resources": {
+        "kind": "directory"
+      },
+      "entry/src/main/resources/base": {
+        "kind": "directory"
+      },
+      "entry/src/main/resources/base/element": {
+        "kind": "directory"
+      },
+      "entry/src/main/resources/base/element/color.json": {
+        "kind": "file",
+        "sha256": "a146eb3f31f3ba8e488a9bf827f88f46b5776996f27ce9546b6ba2f3a80ee711",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/resources/base/element/string.json": {
+        "kind": "file",
+        "sha256": "0c610eba278803c7ee8a8653d3e0d264386566e86944dd3b4b6f0cf16dff78ad",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/resources/base/media": {
+        "kind": "directory"
+      },
+      "entry/src/main/resources/base/media/app_icon.svg": {
+        "kind": "file",
+        "sha256": "cb0f96d9878d39a7c5d5e70d476e3607e2a03bd7ac335f9629e014e5fd61ba7f",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/resources/base/profile": {
+        "kind": "directory"
+      },
+      "entry/src/main/resources/base/profile/main_pages.json": {
+        "kind": "file",
+        "sha256": "aec3e4783f812b5ced83d73b22c3a0bed55e899296ef6fa19943027b21064102",
+        "execute_bits": "0o0"
+      },
+      "entry/src/test": {
+        "kind": "directory"
+      },
+      "entry/src/test/List.test.ets": {
+        "kind": "file",
+        "sha256": "62217d4f506a651c2c80d5e141ea0b0a3350a29098c9e0203a7c832b16929537",
+        "execute_bits": "0o0"
+      },
+      "hvigor": {
+        "kind": "directory"
+      },
+      "hvigor/hvigor-config.json5": {
+        "kind": "file",
+        "sha256": "875d669a4a58a7cfac802ffdbc6fbf2e5272f98a00831a99c0b3814ebd6d0278",
+        "execute_bits": "0o0"
+      },
+      "hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "2438d9d66674d5cf7d40d426a925f3ccfa2015791f62fa38473c3a27d7474b09",
+        "execute_bits": "0o0"
+      },
+      "oh-package-lock.json5": {
+        "kind": "file",
+        "sha256": "6891f9db4f84bb2bfea5c3c7befa41a41fd100672b1c7c8a93147b5b578f0bdb",
+        "execute_bits": "0o0"
+      },
+      "oh-package.json5": {
+        "kind": "file",
+        "sha256": "916c9d5b35b119a326d175ada373c5ccac6b3d087dbf49163fe5c61de9a91fc7",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/artifact-info": {
+        "kind": "file",
+        "sha256": "8c54e9fb7dd3b59340d5f0ddd834ed6e14b90279830523a68081f0a8fc035910",
+        "execute_bits": "0o111"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "19af6414a9a4b3c93ceb8590c092a7c0a64db5b774da081d7f43cbbf83ed945a",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "874f23140bc2d6c868ac74b871087d13f6ca7d961e98fae2574ac4bf1c6abb79",
+        "execute_bits": "0o100"
+      },
+      "scripts/lint": {
+        "kind": "file",
+        "sha256": "3e9f82499ffb54589b1257acb77a6da52dcd17a67c13843684c7638d197975df",
+        "execute_bits": "0o100"
+      },
+      "scripts/release-build": {
+        "kind": "file",
+        "sha256": "5a3ba6c5232f2fdcc6188b2a197a9fa112da7dade227d9ed4bdf088a612ba27f",
+        "execute_bits": "0o111"
+      },
+      "scripts/release-preflight": {
+        "kind": "file",
+        "sha256": "bd51186d4b2fa921330798766a7e3fc024bbe5eb8a1d5008225aef5e9ea2cc3c",
+        "execute_bits": "0o111"
+      },
+      "scripts/test": {
+        "kind": "file",
+        "sha256": "f1ec2abc8f7924d027111aeaf577e1ac13d97b8e9a4e987776f1b0a6b53cc281",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-artifact": {
+        "kind": "file",
+        "sha256": "4a9e05512e24cebf5130e42fe6f727c346af142d441b9eea0c71e558d7024958",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-supply-chain": {
+        "kind": "file",
+        "sha256": "e5ba01ce28d418142c1456a8cc46b793376cef1a82ab50babb1d3c206f872228",
+        "execute_bits": "0o111"
+      }
+    }
+  },
+  "apple-ios": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "apple",
+        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "category": "native",
+        "stack": [
+          "Swift",
+          "Tuist",
+          "SwiftPM",
+          "fastlane"
+        ],
+        "platforms": [
+          "ios",
+          "macos",
+          "watchos",
+          "tvos"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "apple_platform",
+          "value": "ios",
+          "source": "provided"
+        },
+        {
+          "name": "bundle_identifier",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        },
+        {
+          "name": "development_team",
+          "value": "DEVELOPMENT_TEAM_ID",
+          "source": "default"
+        },
+        {
+          "name": "minimum_os_version",
+          "value": "26.0",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "app_store_platform": "ios",
+        "apple_platform": "ios",
+        "apple_platform_name": "iOS",
+        "fastlane_platform": "ios",
+        "minimum_os_version": "26.0",
+        "swift_module_name": "Demo",
+        "swiftpm_supported_platform": ".iOS(\"26.0\")",
+        "tuist_deployment_targets": ".iOS(\"26.0\")",
+        "tuist_destinations": ".iOS",
+        "xcodebuild_destination": "generic/platform=iOS Simulator"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make generate",
+        "make lint",
+        "make test",
+        "open demo.xcworkspace"
+      ],
+      "template_file_count": 31,
+      "template_top_level_entries": [
+        ".gitignore",
+        ".mise.toml",
+        ".swiftformat",
+        ".swiftlint.yml",
+        "App",
+        "Brewfile",
+        "Makefile",
+        "Packages",
+        "README.md",
+        "Tuist.swift",
+        "Workspace.swift",
+        "docs",
+        "fastlane",
+        "scripts"
+      ]
+    },
+    "entries": {
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "execute_bits": "0o0"
+      },
+      ".swiftformat": {
+        "kind": "file",
+        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "execute_bits": "0o0"
+      },
+      ".swiftlint.yml": {
+        "kind": "file",
+        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "execute_bits": "0o0"
+      },
+      "App": {
+        "kind": "directory"
+      },
+      "App/Config": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+        "kind": "file",
+        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "execute_bits": "0o0"
+      },
+      "App/Config/XCConfig": {
+        "kind": "directory"
+      },
+      "App/Config/XCConfig/Base.xcconfig": {
+        "kind": "file",
+        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "execute_bits": "0o0"
+      },
+      "App/Project.swift": {
+        "kind": "file",
+        "sha256": "4588854158b3699fdba22d19f33edb17021a026101195e04f7d8beccb0715233",
+        "execute_bits": "0o0"
+      },
+      "App/Targets": {
+        "kind": "directory"
+      },
+      "App/Targets/App": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeView.swift": {
+        "kind": "file",
+        "sha256": "1771e931b75c01f7555804c17ef4d5fbbc3cebb2c45dd6aa5230d27d34807bda",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeViewModel.swift": {
+        "kind": "file",
+        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/AppTests": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources/AppTests.swift": {
+        "kind": "file",
+        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "febda1a33acb182b2ec3e5296d3416be8e4f75d29d7301973b2b98f45a7ebbe2",
+        "execute_bits": "0o0"
+      },
+      "Packages": {
+        "kind": "directory"
+      },
+      "Packages/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Package.swift": {
+        "kind": "file",
+        "sha256": "689daecb1559395b548143ff637d8abbc6209828de11a1aa3c53578dd0897558",
+        "execute_bits": "0o0"
+      },
+      "Packages/AppServices/Sources": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
+        "kind": "file",
+        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Package.swift": {
+        "kind": "file",
+        "sha256": "48d5cecfe1caca6794ea569982d1a036ff8c1a4df44ca11e4874faf941538d95",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem/Sources": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
+        "kind": "file",
+        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "43895124a569171da6d7c7c8166b0b5d7909bd6287c8836db4e076a86b3ea4fb",
+        "execute_bits": "0o0"
+      },
+      "Tuist.swift": {
+        "kind": "file",
+        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "execute_bits": "0o0"
+      },
+      "Workspace.swift": {
+        "kind": "file",
+        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-delivery.md": {
+        "kind": "file",
+        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "execute_bits": "0o0"
+      },
+      "fastlane": {
+        "kind": "directory"
+      },
+      "fastlane/.env.example": {
+        "kind": "file",
+        "sha256": "5134535730fd6959d5f17e40fc5927d4fbaada4367912e2fd7246e9008560aaf",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Appfile": {
+        "kind": "file",
+        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Fastfile": {
+        "kind": "file",
+        "sha256": "157e882c0044b04d110cd592c86d41c9e234fc1695c30e1fbb5e5948aa263d13",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Matchfile": {
+        "kind": "file",
+        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "b728ed8a9aa828fe30af20be5ac7cda5845f1959efb6a83cdc773355c56bbe96",
+        "execute_bits": "0o111"
+      },
+      "scripts/setup-xcode": {
+        "kind": "file",
+        "sha256": "b1fdae6a4bb9ce7112a65fa86cb0cb52764dcbf051fbe327b834d300b3d7e6a9",
+        "execute_bits": "0o111"
+      },
+      "scripts/test-destination": {
+        "kind": "file",
+        "sha256": "44fb1e46df206dce40ff9b35da46447a3b43bc25ee1cef67f54ed58a2f1b8e51",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-identity": {
+        "kind": "file",
+        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "execute_bits": "0o111"
+      }
+    }
+  },
+  "apple-macos": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "apple",
+        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "category": "native",
+        "stack": [
+          "Swift",
+          "Tuist",
+          "SwiftPM",
+          "fastlane"
+        ],
+        "platforms": [
+          "ios",
+          "macos",
+          "watchos",
+          "tvos"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "apple_platform",
+          "value": "macos",
+          "source": "provided"
+        },
+        {
+          "name": "bundle_identifier",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        },
+        {
+          "name": "development_team",
+          "value": "DEVELOPMENT_TEAM_ID",
+          "source": "default"
+        },
+        {
+          "name": "minimum_os_version",
+          "value": "26.0",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "app_store_platform": "osx",
+        "apple_platform": "macos",
+        "apple_platform_name": "macOS",
+        "fastlane_platform": "mac",
+        "minimum_os_version": "26.0",
+        "swift_module_name": "Demo",
+        "swiftpm_supported_platform": ".macOS(\"26.0\")",
+        "tuist_deployment_targets": ".macOS(\"26.0\")",
+        "tuist_destinations": ".macOS",
+        "xcodebuild_destination": "platform=macOS"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make generate",
+        "make lint",
+        "make test",
+        "open demo.xcworkspace"
+      ],
+      "template_file_count": 31,
+      "template_top_level_entries": [
+        ".gitignore",
+        ".mise.toml",
+        ".swiftformat",
+        ".swiftlint.yml",
+        "App",
+        "Brewfile",
+        "Makefile",
+        "Packages",
+        "README.md",
+        "Tuist.swift",
+        "Workspace.swift",
+        "docs",
+        "fastlane",
+        "scripts"
+      ]
+    },
+    "entries": {
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "execute_bits": "0o0"
+      },
+      ".swiftformat": {
+        "kind": "file",
+        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "execute_bits": "0o0"
+      },
+      ".swiftlint.yml": {
+        "kind": "file",
+        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "execute_bits": "0o0"
+      },
+      "App": {
+        "kind": "directory"
+      },
+      "App/Config": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+        "kind": "file",
+        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "execute_bits": "0o0"
+      },
+      "App/Config/XCConfig": {
+        "kind": "directory"
+      },
+      "App/Config/XCConfig/Base.xcconfig": {
+        "kind": "file",
+        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "execute_bits": "0o0"
+      },
+      "App/Project.swift": {
+        "kind": "file",
+        "sha256": "e1bd47af3a08d4a523008b11d8213844cc7d35f7fbf1bc01ca8f7fbd668f0baf",
+        "execute_bits": "0o0"
+      },
+      "App/Targets": {
+        "kind": "directory"
+      },
+      "App/Targets/App": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "ccfb8a93559aac9a37882ecb3c42996baec0845c7f54f8dd94c69de3743fb0dc",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeView.swift": {
+        "kind": "file",
+        "sha256": "4b77ebdb61c54924aa49dff8c93329f5c4d4eb7140221aafa728aadf06c96994",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeViewModel.swift": {
+        "kind": "file",
+        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/AppTests": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources/AppTests.swift": {
+        "kind": "file",
+        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "51ed169cfcf5df12e049c93ae77d619001288a7f0b32b89702eca6b04b897a6b",
+        "execute_bits": "0o0"
+      },
+      "Packages": {
+        "kind": "directory"
+      },
+      "Packages/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Package.swift": {
+        "kind": "file",
+        "sha256": "d9b3768c3cb11f10f5b0f991a4259233d33e9a2270d2d5498fc6d38691d4f5b7",
+        "execute_bits": "0o0"
+      },
+      "Packages/AppServices/Sources": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
+        "kind": "file",
+        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Package.swift": {
+        "kind": "file",
+        "sha256": "c697e440fcedb4e0e7a5e24cda1040bc6bcde660f8945d23894d43a6e9b6104c",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem/Sources": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
+        "kind": "file",
+        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "8267e4a398ba1a37b47ed6824cccf9bd7e4d73927164a44f8e92c5f7fa3da4b4",
+        "execute_bits": "0o0"
+      },
+      "Tuist.swift": {
+        "kind": "file",
+        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "execute_bits": "0o0"
+      },
+      "Workspace.swift": {
+        "kind": "file",
+        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-delivery.md": {
+        "kind": "file",
+        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "execute_bits": "0o0"
+      },
+      "fastlane": {
+        "kind": "directory"
+      },
+      "fastlane/.env.example": {
+        "kind": "file",
+        "sha256": "5134535730fd6959d5f17e40fc5927d4fbaada4367912e2fd7246e9008560aaf",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Appfile": {
+        "kind": "file",
+        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Fastfile": {
+        "kind": "file",
+        "sha256": "56df6659a93e0a0b7a99d6552f488c9e89c42ed81cece9cce94fa52815ec7076",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Matchfile": {
+        "kind": "file",
+        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "44eff142a2a02ab17461b3c3c538ab549e9979588e6e325e350cea44f2cc8d8d",
+        "execute_bits": "0o111"
+      },
+      "scripts/setup-xcode": {
+        "kind": "file",
+        "sha256": "b1fdae6a4bb9ce7112a65fa86cb0cb52764dcbf051fbe327b834d300b3d7e6a9",
+        "execute_bits": "0o111"
+      },
+      "scripts/test-destination": {
+        "kind": "file",
+        "sha256": "44fb1e46df206dce40ff9b35da46447a3b43bc25ee1cef67f54ed58a2f1b8e51",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-identity": {
+        "kind": "file",
+        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "execute_bits": "0o111"
+      }
+    }
+  },
+  "apple-watchos": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "apple",
+        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "category": "native",
+        "stack": [
+          "Swift",
+          "Tuist",
+          "SwiftPM",
+          "fastlane"
+        ],
+        "platforms": [
+          "ios",
+          "macos",
+          "watchos",
+          "tvos"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "apple_platform",
+          "value": "watchos",
+          "source": "provided"
+        },
+        {
+          "name": "bundle_identifier",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        },
+        {
+          "name": "development_team",
+          "value": "DEVELOPMENT_TEAM_ID",
+          "source": "default"
+        },
+        {
+          "name": "minimum_os_version",
+          "value": "26.0",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "app_store_platform": "ios",
+        "apple_platform": "watchos",
+        "apple_platform_name": "watchOS",
+        "fastlane_platform": "ios",
+        "minimum_os_version": "26.0",
+        "swift_module_name": "Demo",
+        "swiftpm_supported_platform": ".watchOS(\"26.0\")",
+        "tuist_deployment_targets": ".watchOS(\"26.0\")",
+        "tuist_destinations": ".watchOS",
+        "xcodebuild_destination": "generic/platform=watchOS Simulator"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make generate",
+        "make lint",
+        "make test",
+        "open demo.xcworkspace"
+      ],
+      "template_file_count": 31,
+      "template_top_level_entries": [
+        ".gitignore",
+        ".mise.toml",
+        ".swiftformat",
+        ".swiftlint.yml",
+        "App",
+        "Brewfile",
+        "Makefile",
+        "Packages",
+        "README.md",
+        "Tuist.swift",
+        "Workspace.swift",
+        "docs",
+        "fastlane",
+        "scripts"
+      ]
+    },
+    "entries": {
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "execute_bits": "0o0"
+      },
+      ".swiftformat": {
+        "kind": "file",
+        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "execute_bits": "0o0"
+      },
+      ".swiftlint.yml": {
+        "kind": "file",
+        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "execute_bits": "0o0"
+      },
+      "App": {
+        "kind": "directory"
+      },
+      "App/Config": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+        "kind": "file",
+        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "execute_bits": "0o0"
+      },
+      "App/Config/XCConfig": {
+        "kind": "directory"
+      },
+      "App/Config/XCConfig/Base.xcconfig": {
+        "kind": "file",
+        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "execute_bits": "0o0"
+      },
+      "App/Project.swift": {
+        "kind": "file",
+        "sha256": "f41e498e1d6087691607d69e1ed85a83e58e389c2aeb626a32fc9e6ff0f0aa10",
+        "execute_bits": "0o0"
+      },
+      "App/Targets": {
+        "kind": "directory"
+      },
+      "App/Targets/App": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeView.swift": {
+        "kind": "file",
+        "sha256": "6f29c59325b48437b701e9b7856d0df3d9d8aaf2f48b97b5a7a07fae8d964580",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeViewModel.swift": {
+        "kind": "file",
+        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/AppTests": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources/AppTests.swift": {
+        "kind": "file",
+        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "aab8d1d70b1af83fb33f87ea03061b180f7911bd1946ec0555fbd4401ee37181",
+        "execute_bits": "0o0"
+      },
+      "Packages": {
+        "kind": "directory"
+      },
+      "Packages/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Package.swift": {
+        "kind": "file",
+        "sha256": "128a66cb648769f33929f5de6787a5610eb41353e567ad1a5914c562cab3cb4e",
+        "execute_bits": "0o0"
+      },
+      "Packages/AppServices/Sources": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
+        "kind": "file",
+        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Package.swift": {
+        "kind": "file",
+        "sha256": "4a87c8bcf53916aee10a8c32380f3d840b0367400920a4fdd0061a3ac1408f39",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem/Sources": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
+        "kind": "file",
+        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "a3e3224bf24f18b63ecd46d677f54136c73eae73e69786536ad46a2a9d3ecb7e",
+        "execute_bits": "0o0"
+      },
+      "Tuist.swift": {
+        "kind": "file",
+        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "execute_bits": "0o0"
+      },
+      "Workspace.swift": {
+        "kind": "file",
+        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-delivery.md": {
+        "kind": "file",
+        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "execute_bits": "0o0"
+      },
+      "fastlane": {
+        "kind": "directory"
+      },
+      "fastlane/.env.example": {
+        "kind": "file",
+        "sha256": "5134535730fd6959d5f17e40fc5927d4fbaada4367912e2fd7246e9008560aaf",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Appfile": {
+        "kind": "file",
+        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Fastfile": {
+        "kind": "file",
+        "sha256": "157e882c0044b04d110cd592c86d41c9e234fc1695c30e1fbb5e5948aa263d13",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Matchfile": {
+        "kind": "file",
+        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "7c55366bcef44e1d7b8fa41a6bacc693b4b413e2810ab4ee711a08aa8936af35",
+        "execute_bits": "0o111"
+      },
+      "scripts/setup-xcode": {
+        "kind": "file",
+        "sha256": "b1fdae6a4bb9ce7112a65fa86cb0cb52764dcbf051fbe327b834d300b3d7e6a9",
+        "execute_bits": "0o111"
+      },
+      "scripts/test-destination": {
+        "kind": "file",
+        "sha256": "44fb1e46df206dce40ff9b35da46447a3b43bc25ee1cef67f54ed58a2f1b8e51",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-identity": {
+        "kind": "file",
+        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "execute_bits": "0o111"
+      }
+    }
+  },
+  "apple-tvos": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "apple",
+        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "category": "native",
+        "stack": [
+          "Swift",
+          "Tuist",
+          "SwiftPM",
+          "fastlane"
+        ],
+        "platforms": [
+          "ios",
+          "macos",
+          "watchos",
+          "tvos"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "apple_platform",
+          "value": "tvos",
+          "source": "provided"
+        },
+        {
+          "name": "bundle_identifier",
+          "value": "com.example.demo",
+          "source": "provided"
+        },
+        {
+          "name": "organization_name",
+          "value": "Example Team",
+          "source": "default"
+        },
+        {
+          "name": "development_team",
+          "value": "DEVELOPMENT_TEAM_ID",
+          "source": "default"
+        },
+        {
+          "name": "minimum_os_version",
+          "value": "26.0",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "app_store_platform": "appletvos",
+        "apple_platform": "tvos",
+        "apple_platform_name": "tvOS",
+        "fastlane_platform": "ios",
+        "minimum_os_version": "26.0",
+        "swift_module_name": "Demo",
+        "swiftpm_supported_platform": ".tvOS(\"26.0\")",
+        "tuist_deployment_targets": ".tvOS(\"26.0\")",
+        "tuist_destinations": ".tvOS",
+        "xcodebuild_destination": "generic/platform=tvOS Simulator"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make doctor",
+        "make generate",
+        "make lint",
+        "make test",
+        "open demo.xcworkspace"
+      ],
+      "template_file_count": 31,
+      "template_top_level_entries": [
+        ".gitignore",
+        ".mise.toml",
+        ".swiftformat",
+        ".swiftlint.yml",
+        "App",
+        "Brewfile",
+        "Makefile",
+        "Packages",
+        "README.md",
+        "Tuist.swift",
+        "Workspace.swift",
+        "docs",
+        "fastlane",
+        "scripts"
+      ]
+    },
+    "entries": {
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "execute_bits": "0o0"
+      },
+      ".swiftformat": {
+        "kind": "file",
+        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "execute_bits": "0o0"
+      },
+      ".swiftlint.yml": {
+        "kind": "file",
+        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "execute_bits": "0o0"
+      },
+      "App": {
+        "kind": "directory"
+      },
+      "App/Config": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers": {
+        "kind": "directory"
+      },
+      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+        "kind": "file",
+        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "execute_bits": "0o0"
+      },
+      "App/Config/XCConfig": {
+        "kind": "directory"
+      },
+      "App/Config/XCConfig/Base.xcconfig": {
+        "kind": "file",
+        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "execute_bits": "0o0"
+      },
+      "App/Project.swift": {
+        "kind": "file",
+        "sha256": "80c41238ec8d89d06bcbd3d09fbb8592778ab9ec2cbb40d432db53d2bcd323f2",
+        "execute_bits": "0o0"
+      },
+      "App/Targets": {
+        "kind": "directory"
+      },
+      "App/Targets/App": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Resources/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/App/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeView.swift": {
+        "kind": "file",
+        "sha256": "ff82910c139b6d8a6afa3a35eec8fd019375e3b86b014b948fc0d0cc9fd496c5",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/App/Sources/HomeViewModel.swift": {
+        "kind": "file",
+        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
+        "execute_bits": "0o0"
+      },
+      "App/Targets/AppTests": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources": {
+        "kind": "directory"
+      },
+      "App/Targets/AppTests/Sources/AppTests.swift": {
+        "kind": "file",
+        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "7674c218e56dc97a00a3ee8a71064c9ec0d490bbe1bfcc747c7bc4d41c001b5f",
+        "execute_bits": "0o0"
+      },
+      "Packages": {
+        "kind": "directory"
+      },
+      "Packages/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Package.swift": {
+        "kind": "file",
+        "sha256": "43ee5f363e32bb63020336cecf46f07cf1945c3fc7a7745d05c6fe5bc05c39c9",
+        "execute_bits": "0o0"
+      },
+      "Packages/AppServices/Sources": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices": {
+        "kind": "directory"
+      },
+      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
+        "kind": "file",
+        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Package.swift": {
+        "kind": "file",
+        "sha256": "2f491a44764df86d65cf33b911e9b612f61d07196bebd4adcee33069f156b465",
+        "execute_bits": "0o0"
+      },
+      "Packages/DesignSystem/Sources": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
+        "kind": "file",
+        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "8c409a21e139f0159802d67509b8cf1b8c0a7e3d853a667ff01b8f54f9fc59c1",
+        "execute_bits": "0o0"
+      },
+      "Tuist.swift": {
+        "kind": "file",
+        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "execute_bits": "0o0"
+      },
+      "Workspace.swift": {
+        "kind": "file",
+        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "execute_bits": "0o0"
+      },
+      "docs": {
+        "kind": "directory"
+      },
+      "docs/release-delivery.md": {
+        "kind": "file",
+        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "execute_bits": "0o0"
+      },
+      "fastlane": {
+        "kind": "directory"
+      },
+      "fastlane/.env.example": {
+        "kind": "file",
+        "sha256": "5134535730fd6959d5f17e40fc5927d4fbaada4367912e2fd7246e9008560aaf",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Appfile": {
+        "kind": "file",
+        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Fastfile": {
+        "kind": "file",
+        "sha256": "382bcc287a4aaaa7a642bee55855ea53f8a5cb0ad7dca049297284fe4c7f317a",
+        "execute_bits": "0o0"
+      },
+      "fastlane/Matchfile": {
+        "kind": "file",
+        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "56859d9f17298bbab8b2c4728d7961b02236f9e778f07583f0b060fff4adb10a",
+        "execute_bits": "0o111"
+      },
+      "scripts/setup-xcode": {
+        "kind": "file",
+        "sha256": "b1fdae6a4bb9ce7112a65fa86cb0cb52764dcbf051fbe327b834d300b3d7e6a9",
+        "execute_bits": "0o111"
+      },
+      "scripts/test-destination": {
+        "kind": "file",
+        "sha256": "44fb1e46df206dce40ff9b35da46447a3b43bc25ee1cef67f54ed58a2f1b8e51",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-release-identity": {
+        "kind": "file",
+        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "execute_bits": "0o111"
+      }
+    }
+  },
+  "microservice-postgres": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "microservice",
+        "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Gin",
+          "Protobuf",
+          "Buf",
+          "Docker Compose",
+          "OpenTelemetry"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "service_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "proto_package",
+          "value": "demo.v1",
+          "source": "provided"
+        },
+        {
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        },
+        {
+          "name": "grpc_port",
+          "value": "9090",
+          "source": "default"
+        },
+        {
+          "name": "dependency_store",
+          "value": "postgres",
+          "source": "provided"
+        },
+        {
+          "name": "otel_exporter_endpoint",
+          "value": "http://localhost:4318",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "dependency_store": "postgres",
+        "dependency_store_container_dsn": "postgres://postgres:postgres@postgres:5432/demo?sslmode=disable",
+        "dependency_store_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable",
+        "dependency_store_env_block": "    environment:\n      POSTGRES_DB: demo\n      POSTGRES_USER: postgres\n      POSTGRES_PASSWORD: postgres",
+        "dependency_store_image": "postgres:16-alpine",
+        "dependency_store_port": "5432",
+        "service_type_name": "Demo"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make up",
+        "make docker-build"
+      ],
+      "template_file_count": 37,
+      "template_top_level_entries": [
+        ".air.toml",
+        ".dockerignore",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "api",
+        "cmd",
+        "compose.dev.yaml",
+        "configs",
+        "deploy",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".air.toml": {
+        "kind": "file",
+        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "execute_bits": "0o0"
+      },
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "415175cd64aea4459800f49eb11fa9d7c9ae31d9ea1be1ae05a337eeccb3cd49",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "9a55851ef9ad704684053a2c9c1ba944a4017e2a667998ddcb64c055d46ef986",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "ab98617780de6bde59bb5eafcf7f412eb1f1ea483a207655e74b113dd707e8e5",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "8e449367b85c00880c4f5b51921bb4d2552fe056814bb87b78bd8693e58ea3ac",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "7045ea850b4a7fbceafbbb1a4146d5ed8a92f9c76917ccc464233fffe7f1d956",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "22c678871c8495525b78361515b05d9990d6da2452836f26334d6517cafd7005",
+        "execute_bits": "0o0"
+      },
+      "api": {
+        "kind": "directory"
+      },
+      "api/buf.gen.yaml": {
+        "kind": "file",
+        "sha256": "dcb7fdc54b10397d076dff80a72d923755710a7c0b5d27226bd32f262b651414",
+        "execute_bits": "0o0"
+      },
+      "api/buf.yaml": {
+        "kind": "file",
+        "sha256": "886e923eed72224b498d35b47999159b51917129a0509fc0279a31c020636773",
+        "execute_bits": "0o0"
+      },
+      "api/proto": {
+        "kind": "directory"
+      },
+      "api/proto/service": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1/service.proto": {
+        "kind": "file",
+        "sha256": "92fe3c925150c596e7fbcac67de69ca4a0b96cdedde81755add5f84421111591",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/server": {
+        "kind": "directory"
+      },
+      "cmd/server/main.go": {
+        "kind": "file",
+        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "4c9f916334d739e54bc95938a8ff0226a905f1d08f2b6a1b5198b78dd5ca6d0a",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "403cda4d9488980e6e11472743c31713e60b8c663efabdcc0693b30f1ee1bece",
+        "execute_bits": "0o0"
+      },
+      "deploy": {
+        "kind": "directory"
+      },
+      "deploy/compose.yaml": {
+        "kind": "file",
+        "sha256": "65204211974b901d0486fa8d474738052332a5115b8fa4ddf65863603918b1dc",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "e79fd15d4244026a89312b24a27e1a5f83e1b49cb26920e428a47ada0ea650b8",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "dbc65a3369e2ec2971c61af3bc9e716d73bacd5761655d60dcc4756d424d0c1f",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "2424035ba8157a0776e304a822bc42ee8f158c5aa8f8dd0abc47158b9ee49395",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "dc9bddf538f9b3317384e61c4ff7fdaa360902463b3c8a11c5b73ee496330d97",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "94a4f6978b17288bbc41d2c2293c219a16a57adaa57e7df801a8f89b0e2c9a25",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "4b030bcc22490a5f21225f225617ca11ca424c9c5d6031cfc2aa82caa97246fa",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "c2789da3fbcc72c6a3be246211ce32c3781c5d1451a9ff5f60d099160c2e98f9",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
+        "kind": "file",
+        "sha256": "f39b0caebc9ec00a5fac54b9f5d9352c7aa861bc9935892a1fcc7ccc0bab7da5",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
+        "kind": "file",
+        "sha256": "9578119104982101c8da0476b07fff3d31d1a9f4beda6863f17164d0b35007e1",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "895ce61cb4f7986a7aa5e35c7ae1668e345f53ad626267cde195bcb4b7717e7c",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "d52e6de35dded3e129f5a108725f5c24fa85b0b24a91b456dfcf112f56d7373f",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "execute_bits": "0o0"
+      },
+      "internal/transport": {
+        "kind": "directory"
+      },
+      "internal/transport/grpc.go": {
+        "kind": "file",
+        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/ping.go": {
+        "kind": "file",
+        "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "execute_bits": "0o100"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/server_test.go": {
+        "kind": "file",
+        "sha256": "0d2c99d26e69f2a017af26bfae06dc0c21411fd1429b495b51da16dc3ceca194",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "microservice-redis": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "microservice",
+        "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Gin",
+          "Protobuf",
+          "Buf",
+          "Docker Compose",
+          "OpenTelemetry"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "service_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "proto_package",
+          "value": "demo.v1",
+          "source": "provided"
+        },
+        {
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        },
+        {
+          "name": "grpc_port",
+          "value": "9090",
+          "source": "default"
+        },
+        {
+          "name": "dependency_store",
+          "value": "redis",
+          "source": "provided"
+        },
+        {
+          "name": "otel_exporter_endpoint",
+          "value": "http://localhost:4318",
+          "source": "default"
+        }
+      ],
+      "derived_values": {
+        "dependency_store": "redis",
+        "dependency_store_container_dsn": "redis://redis:6379/0",
+        "dependency_store_dsn": "redis://localhost:6379/0",
+        "dependency_store_env_block": "",
+        "dependency_store_image": "redis:7-alpine",
+        "dependency_store_port": "6379",
+        "service_type_name": "Demo"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make up",
+        "make docker-build"
+      ],
+      "template_file_count": 37,
+      "template_top_level_entries": [
+        ".air.toml",
+        ".dockerignore",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "api",
+        "cmd",
+        "compose.dev.yaml",
+        "configs",
+        "deploy",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".air.toml": {
+        "kind": "file",
+        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "execute_bits": "0o0"
+      },
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "415175cd64aea4459800f49eb11fa9d7c9ae31d9ea1be1ae05a337eeccb3cd49",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "9a55851ef9ad704684053a2c9c1ba944a4017e2a667998ddcb64c055d46ef986",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "ab98617780de6bde59bb5eafcf7f412eb1f1ea483a207655e74b113dd707e8e5",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "8e449367b85c00880c4f5b51921bb4d2552fe056814bb87b78bd8693e58ea3ac",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "c04b5c2d7e9fd0270a82e9d7e39cace1dfce4beefa42fa54bf0f911727851a22",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "463229ac245479ee80fdd3cdc779e27391aac61672dd2c21b463893fd12f873d",
+        "execute_bits": "0o0"
+      },
+      "api": {
+        "kind": "directory"
+      },
+      "api/buf.gen.yaml": {
+        "kind": "file",
+        "sha256": "dcb7fdc54b10397d076dff80a72d923755710a7c0b5d27226bd32f262b651414",
+        "execute_bits": "0o0"
+      },
+      "api/buf.yaml": {
+        "kind": "file",
+        "sha256": "886e923eed72224b498d35b47999159b51917129a0509fc0279a31c020636773",
+        "execute_bits": "0o0"
+      },
+      "api/proto": {
+        "kind": "directory"
+      },
+      "api/proto/service": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1/service.proto": {
+        "kind": "file",
+        "sha256": "92fe3c925150c596e7fbcac67de69ca4a0b96cdedde81755add5f84421111591",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/server": {
+        "kind": "directory"
+      },
+      "cmd/server/main.go": {
+        "kind": "file",
+        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "bbf998036084d3aaa91347e7a5f11a832ccfab67301dd65d980765e9afc049a5",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "884716c3b42c70d566f5fc8e3c89d36ca1ea9cc8968382b69f2aefc01b282f9c",
+        "execute_bits": "0o0"
+      },
+      "deploy": {
+        "kind": "directory"
+      },
+      "deploy/compose.yaml": {
+        "kind": "file",
+        "sha256": "55ad4d34d1584ad80d88067c45037e2de4185762b3e55bde07d1695ecb5646bd",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "e79fd15d4244026a89312b24a27e1a5f83e1b49cb26920e428a47ada0ea650b8",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "dbc65a3369e2ec2971c61af3bc9e716d73bacd5761655d60dcc4756d424d0c1f",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "0b233340b11dd7f9d84a0be964cbb130a73ce69711411bd65d48c9fee788244e",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "dc9bddf538f9b3317384e61c4ff7fdaa360902463b3c8a11c5b73ee496330d97",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "94a4f6978b17288bbc41d2c2293c219a16a57adaa57e7df801a8f89b0e2c9a25",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "4b030bcc22490a5f21225f225617ca11ca424c9c5d6031cfc2aa82caa97246fa",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "c2789da3fbcc72c6a3be246211ce32c3781c5d1451a9ff5f60d099160c2e98f9",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
+        "kind": "file",
+        "sha256": "f39b0caebc9ec00a5fac54b9f5d9352c7aa861bc9935892a1fcc7ccc0bab7da5",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
+        "kind": "file",
+        "sha256": "9578119104982101c8da0476b07fff3d31d1a9f4beda6863f17164d0b35007e1",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "895ce61cb4f7986a7aa5e35c7ae1668e345f53ad626267cde195bcb4b7717e7c",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "d52e6de35dded3e129f5a108725f5c24fa85b0b24a91b456dfcf112f56d7373f",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "execute_bits": "0o0"
+      },
+      "internal/transport": {
+        "kind": "directory"
+      },
+      "internal/transport/grpc.go": {
+        "kind": "file",
+        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/ping.go": {
+        "kind": "file",
+        "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "execute_bits": "0o100"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/server_test.go": {
+        "kind": "file",
+        "sha256": "dbe457c0077cb03f49280e521fa7590799a9fe0601d59b08b1303c980804a711",
+        "execute_bits": "0o0"
+      }
+    }
+  }
+}

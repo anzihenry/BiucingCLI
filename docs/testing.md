@@ -1,5 +1,8 @@
 # Test suites and configuration validation
 
+For kernel extraction contracts and generated-output snapshots, see
+[the stage 0 baseline](kernel-refactor-baseline.md).
+
 Install the locked development/build environment with `uv sync --locked`.
 
 ## Core: Linux and macOS
