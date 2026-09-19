@@ -12,7 +12,7 @@ export function HomePage() {
           <section className="hero">
             <p className="hero__eyebrow">BiucingCLI</p>
             <div className="hero__headline">
-              <h1>{{DISPLAY_NAME}}</h1>
+              <h1>{"{{DISPLAY_NAME_JSON}}"}</h1>
               <p>Loading your starter workspace...</p>
             </div>
           </section>

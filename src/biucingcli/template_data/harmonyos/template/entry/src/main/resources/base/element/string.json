@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "{{DISPLAY_NAME}} entry module"
+      "value": "{{DISPLAY_NAME_JSON}} entry module"
     },
     {
       "name": "ability_desc",
-      "value": "{{DISPLAY_NAME}} main ability"
+      "value": "{{DISPLAY_NAME_JSON}} main ability"
     }
   ]
 }

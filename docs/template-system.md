@@ -24,6 +24,37 @@ Templates live inside the Python package so wheel and source-distribution instal
 
 ## Template Metadata
 
+### Context-aware text insertion
+
+Free-form display names, organization names, and telemetry URLs require explicit
+context suffixes in source/config files. Escaped placeholders provide **contents**;
+the surrounding string quotes remain in the template:
+
+| Context | Example | Notes |
+| --- | --- | --- |
+| JSON/JSON5, double-quoted JS/TS/Go, quoted YAML | `"{{DISPLAY_NAME_JSON}}"` | JSON-compatible string escaping |
+| JSX expression | `{"{{DISPLAY_NAME_JSON}}"}` | Keep text out of JSX markup |
+| HTML/XML | `{{DISPLAY_NAME_XML}}` | Escape markup and attribute delimiters |
+| Swift | `"{{DISPLAY_NAME_SWIFT}}"` | Escape strings and prevent interpolation |
+| Kotlin | `"{{DISPLAY_NAME_KOTLIN}}"` | Also escape `$` interpolation |
+| Single-quoted JS/ArkTS | `'{{DISPLAY_NAME_JS_SINGLE}}'` | Escape apostrophes and backslashes |
+| Android string resource | `{{DISPLAY_NAME_ANDROID}}` | Includes resource quoting and XML escaping; use `formatted="false"` |
+| Dockerfile ENV | `"{{OTEL_EXPORTER_ENDPOINT_DOCKER}}"` | Prevent `$` environment expansion |
+
+Android manifests reference `@string/app_name`. Frontend title assertions compare
+literal strings instead of constructing regular expressions from user text.
+Trusted generated code snippets retain their raw placeholders; escape any user
+strings when constructing those snippets (for example, Swift WindowGroup titles).
+
+Substitution is single-pass: `{{PROJECT_NAME}}` inside an input value remains
+literal text. `validate` rejects raw free-text placeholders outside Markdown.
+README prose and human-readable output retain raw user text. New insertion
+contexts must define their own escaping rule instead of reusing an unrelated one.
+
+Regression tests parse generated XML/JSON and evaluate JavaScript/Swift literals
+when those runtimes are available. To also compile Android resources, run
+`AAPT2=/path/to/sdk/build-tools/VERSION/aapt2 uv run --locked python -m unittest discover -s tests -p test_escaping.py`.
+
 Each template should contain a `template.json` file with:
 
 - template name;

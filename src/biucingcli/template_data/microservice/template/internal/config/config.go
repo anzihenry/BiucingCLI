@@ -77,7 +77,7 @@ func Load() (Config, error) {
 		cfg.Telemetry.OTLPHTTPEndpoint = override
 	}
 	if cfg.Telemetry.OTLPHTTPEndpoint == "" {
-		cfg.Telemetry.OTLPHTTPEndpoint = "{{OTEL_EXPORTER_ENDPOINT}}"
+		cfg.Telemetry.OTLPHTTPEndpoint = "{{OTEL_EXPORTER_ENDPOINT_JSON}}"
 	}
 	if override := os.Getenv("STORE_DSN"); override != "" {
 		cfg.Store.DSN = override

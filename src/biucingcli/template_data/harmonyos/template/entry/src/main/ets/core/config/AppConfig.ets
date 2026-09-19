@@ -1,5 +1,5 @@
 export class AppConfig {
-  static readonly displayName: string = '{{DISPLAY_NAME}}';
+  static readonly displayName: string = '{{DISPLAY_NAME_JS_SINGLE}}';
   static readonly bundleName: string = '{{BUNDLE_NAME}}';
   static readonly worktreeBundleSuffix: string = '';
   static readonly moduleName: string = '{{HARMONY_MODULE_NAME}}';

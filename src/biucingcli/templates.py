@@ -12,6 +12,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
+from biucingcli.escaping import CONTEXT_ESCAPERS, FREE_TEXT_KEYS
+
 
 class BiucingError(Exception):
     """Base class for expected, user-facing CLI failures."""
@@ -675,6 +677,13 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
             continue
 
         placeholders = sorted(set(PLACEHOLDER_PATTERN.findall(content)))
+        raw_free_text = {"{{" + key.upper() + "}}" for key in FREE_TEXT_KEYS}
+        unescaped = sorted(raw_free_text.intersection(placeholders))
+        if unescaped and path.suffix != ".md":
+            errors.append(
+                f"{definition.name}: free-text placeholder(s) require an explicit context "
+                f"in {path.relative_to(definition.template_dir)}: {', '.join(unescaped)}"
+            )
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
             relative_path = path.relative_to(templates_root()).as_posix()
@@ -790,7 +799,7 @@ def resolve_variables_detailed(
 
 def placeholder_map(values: dict[str, str]) -> dict[str, str]:
     """Map internal variable names to template placeholders."""
-    return {
+    placeholders = {
         "{{PROJECT_NAME}}": values.get("project_name", ""),
         "{{DISPLAY_NAME}}": values.get("display_name", ""),
         "{{PACKAGE_NAME}}": values.get("package_name", ""),
@@ -845,14 +854,17 @@ def placeholder_map(values: dict[str, str]) -> dict[str, str]:
         "{{APPLE_HOME_BODY}}": values.get("apple_home_body", ""),
         "{{APPLE_PLATFORM_OUTPUT_NOTE}}": values.get("apple_platform_output_note", ""),
     }
+    for key in FREE_TEXT_KEYS:
+        for context, escape in CONTEXT_ESCAPERS.items():
+            placeholders["{{" + key.upper() + "_" + context + "}}"] = escape(values.get(key, ""))
+    return placeholders
 
 
 def render_text(text: str, values: dict[str, str]) -> str:
     """Replace placeholders in a text snippet."""
-    content = text
-    for placeholder, value in placeholder_map(values).items():
-        content = content.replace(placeholder, value)
-    return content
+    placeholders = placeholder_map(values)
+    # Replace only tokens from the template, never tokens inside inserted data.
+    return PLACEHOLDER_PATTERN.sub(lambda match: placeholders.get(match[0], match[0]), text)
 
 
 def render_template(

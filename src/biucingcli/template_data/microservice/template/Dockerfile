@@ -36,7 +36,7 @@ EXPOSE {{HTTP_PORT}}
 EXPOSE {{GRPC_PORT}}
 
 ENV CONFIG_FILE=/app/configs/config.yaml
-ENV OTEL_EXPORTER_OTLP_ENDPOINT={{OTEL_EXPORTER_ENDPOINT}}
+ENV OTEL_EXPORTER_OTLP_ENDPOINT="{{OTEL_EXPORTER_ENDPOINT_DOCKER}}"
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
     CMD ["/app/server", "healthcheck", "http://127.0.0.1:{{HTTP_PORT}}/healthz"]

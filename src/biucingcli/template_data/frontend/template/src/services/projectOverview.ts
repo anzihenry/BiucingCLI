@@ -4,7 +4,7 @@ import type { ProjectOverview } from "../types/projectOverview";
 
 export function getProjectOverviewFallback(): ProjectOverview {
   return {
-    title: "{{DISPLAY_NAME}}",
+    title: "{{DISPLAY_NAME_JSON}}",
     description:
       "A practical React + TypeScript starter with a small UI structure, a lightweight service layer, and room to grow without cleanup first.",
     tags: ["React", "TypeScript", "Vite", "BiucingCLI"],

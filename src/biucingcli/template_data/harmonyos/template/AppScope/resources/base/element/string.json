@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "app_name",
-      "value": "{{DISPLAY_NAME}}"
+      "value": "{{DISPLAY_NAME_JSON}}"
     }
   ]
 }

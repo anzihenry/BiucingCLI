@@ -5,7 +5,7 @@ let debugBundleSuffix = Environment.debugBundleSuffix.getString(default: "")
 
 let project = Project(
     name: appName,
-    organizationName: "{{ORGANIZATION_NAME}}",
+    organizationName: "{{ORGANIZATION_NAME_SWIFT}}",
     packages: [
         .local(path: "../Packages/AppServices"),
         .local(path: "../Packages/DesignSystem")
@@ -26,7 +26,7 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [:],
-                    "CFBundleDisplayName": "{{DISPLAY_NAME}}"
+                    "CFBundleDisplayName": "{{DISPLAY_NAME_SWIFT}}"
                 ]
             ),
             sources: ["Targets/App/Sources/**"],

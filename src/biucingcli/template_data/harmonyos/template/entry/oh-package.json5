@@ -1,9 +1,9 @@
 {
   "name": "{{HARMONY_MODULE_NAME}}",
   "version": "{{HARMONY_VERSION_NAME}}",
-  "description": "{{DISPLAY_NAME}} entry module",
+  "description": "{{DISPLAY_NAME_JSON}} entry module",
   "main": "",
-  "author": "{{ORGANIZATION_NAME}}",
+  "author": "{{ORGANIZATION_NAME_JSON}}",
   "license": "MIT",
   "dependencies": {}
 }

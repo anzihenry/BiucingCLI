@@ -2,9 +2,9 @@
   "modelVersion": "5.0.0",
   "name": "{{PROJECT_NAME}}",
   "version": "{{HARMONY_VERSION_NAME}}",
-  "description": "{{DISPLAY_NAME}} HarmonyOS application",
+  "description": "{{DISPLAY_NAME_JSON}} HarmonyOS application",
   "main": "",
-  "author": "{{ORGANIZATION_NAME}}",
+  "author": "{{ORGANIZATION_NAME_JSON}}",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {

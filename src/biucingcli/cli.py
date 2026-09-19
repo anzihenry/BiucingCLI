@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from biucingcli import __version__
+from biucingcli.escaping import swift_string
 from biucingcli.templates import (
     BiucingError,
     InvalidTemplateError,
@@ -109,7 +110,7 @@ def apple_platform_config(platform: str | None, minimum_os_version: str | None) 
 def apple_platform_snippets(values: dict[str, str]) -> dict[str, str]:
     """Return platform-specific Apple template snippets using resolved values."""
     platform = values.get("apple_platform", "ios")
-    display_name = values.get("display_name", "App")
+    display_name = swift_string(values.get("display_name", "App"))
 
     if platform == "macos":
         return {

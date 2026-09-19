@@ -9,7 +9,7 @@ const TAG = '{{ABILITY_NAME}}';
 
 export default class {{ABILITY_NAME}} extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, TAG, 'Ability created for {{DISPLAY_NAME}}.');
+    hilog.info(DOMAIN, TAG, 'Ability created for {{DISPLAY_NAME_JS_SINGLE}}.');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -19,7 +19,7 @@ export default class {{ABILITY_NAME}} extends UIAbility {
         return;
       }
 
-      hilog.info(DOMAIN, TAG, 'Loaded {{DISPLAY_NAME}} content.');
+      hilog.info(DOMAIN, TAG, 'Loaded {{DISPLAY_NAME_JS_SINGLE}} content.');
     });
   }
 

@@ -7,9 +7,9 @@ test("production image serves the starter through nginx", async ({
 
   expect(response?.ok()).toBe(true);
   expect(response?.headers()["server"]).toContain("nginx");
-  await expect(page).toHaveTitle(/{{DISPLAY_NAME}}/);
+  await expect(page).toHaveTitle("{{DISPLAY_NAME_JSON}}");
   await expect(
-    page.getByRole("heading", { name: "{{DISPLAY_NAME}}" }),
+    page.getByRole("heading", { name: "{{DISPLAY_NAME_JSON}}" }),
   ).toBeVisible();
   await expect(page.getByText("Build Queue")).toBeVisible();
   await expect(page.getByText("Project Notes")).toBeVisible();

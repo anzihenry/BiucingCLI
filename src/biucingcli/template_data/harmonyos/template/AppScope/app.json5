@@ -1,7 +1,7 @@
 {
   "app": {
     "bundleName": "{{BUNDLE_NAME}}",
-    "vendor": "{{ORGANIZATION_NAME}}",
+    "vendor": "{{ORGANIZATION_NAME_JSON}}",
     "versionCode": {{HARMONY_VERSION_CODE}},
     "versionName": "{{HARMONY_VERSION_NAME}}",
     "icon": "$media:layered_image",

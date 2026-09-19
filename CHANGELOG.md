@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- escape free-text template inputs for their XML, Android resource, JSON,
+  JavaScript, Kotlin, Swift, YAML, and Dockerfile contexts;
+- preserve placeholder-like user text with single-pass rendering and add
+  special-character generation regression coverage.
+
 ## 0.9.1 - 2026-09-19
 
 - manage development and build dependencies with uv sync and a committed uv.lock;

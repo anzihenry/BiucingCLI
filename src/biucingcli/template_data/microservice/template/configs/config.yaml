@@ -11,7 +11,7 @@ server:
   shutdown_timeout_seconds: 10
 
 telemetry:
-  otlp_http_endpoint: {{OTEL_EXPORTER_ENDPOINT}}
+  otlp_http_endpoint: "{{OTEL_EXPORTER_ENDPOINT_JSON}}"
 
 store:
   driver: {{DEPENDENCY_STORE}}
