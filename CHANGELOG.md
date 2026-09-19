@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- expose variable validators, choices, and effective numeric bounds in list/info JSON;
+- add schema_version and generator_version to every JSON result and error envelope.
+
 - handle terminal EOF and Ctrl+C without tracebacks, with exit codes 2 and 130;
 - disable prompts for JSON mode and non-terminal stdin, and send prompts to stderr;
 - emit versioned JSON errors on stderr, including argument parsing and validation failures;

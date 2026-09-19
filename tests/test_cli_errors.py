@@ -11,6 +11,8 @@ import time
 import unittest
 from pathlib import Path
 
+from biucingcli import __version__
+
 
 class CLIErrorTests(unittest.TestCase):
     def invoke(self, *args, code=None):
@@ -25,6 +27,7 @@ class CLIErrorTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
         payload = json.loads(result.stderr)
         self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["generator_version"], __version__)
         self.assertIs(payload["ok"], False)
         self.assertEqual(payload["error"]["code"], code)
         self.assertTrue(payload["error"]["message"])

@@ -24,7 +24,7 @@ biucing info unknown --json >result.json 2>error.json
 The command exits with code 2, leaves `result.json` empty, and writes:
 
 ```json
-{"schema_version": 1, "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
+{"schema_version": 1, "generator_version": "0.9.1", "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
 ```
 
 | Exit | Error code | Meaning |
@@ -42,7 +42,9 @@ The command exits with code 2, leaves `result.json` empty, and writes:
 | 130 | `cancelled` | User interrupted the operation |
 
 Existing generation failures retain exit code 2 for compatibility. Success uses
-exit code 0, and existing successful JSON payloads remain unchanged. `--help` and
+exit code 0. All JSON payloads include `schema_version` and `generator_version`;
+existing successful business fields remain in place. See [the JSON contract](json-contract.md).
+`--help` and
 `--version` retain their normal human-readable successful output. Unexpected
 programming errors are not converted into misleading input errors.
 

@@ -58,14 +58,29 @@ class TemplateVariable:
     minimum: int | None = None
     maximum: int | None = None
 
+    def numeric_bounds(self) -> tuple[int | None, int | None]:
+        """Return effective numeric limits, including validator defaults."""
+        if self.validator not in {"port", "positive-integer"}:
+            return self.minimum, self.maximum
+        minimum = self.minimum if self.minimum is not None else 1
+        maximum = self.maximum
+        if self.validator == "port" and maximum is None:
+            maximum = 65535
+        return minimum, maximum
+
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable representation."""
+        minimum, maximum = self.numeric_bounds()
         return {
             "name": self.name,
             "required": self.required,
             "default": self.default,
             "default_from": self.default_from,
             "prompt": self.prompt,
+            "validator": self.validator,
+            "choices": list(self.choices),
+            "minimum": minimum,
+            "maximum": maximum,
         }
 
 
@@ -385,10 +400,7 @@ def variable_validation_error(variable: TemplateVariable, value: str) -> str | N
         if re.fullmatch(r"\d+", value) is None:
             return "must be an integer"
         numeric_value = int(value)
-        minimum = variable.minimum if variable.minimum is not None else 1
-        maximum = variable.maximum
-        if validator == "port" and maximum is None:
-            maximum = 65535
+        minimum, maximum = variable.numeric_bounds()
         if numeric_value < minimum or (maximum is not None and numeric_value > maximum):
             upper = str(maximum) if maximum is not None else "unbounded"
             return f"must be between {minimum} and {upper}"

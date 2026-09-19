@@ -1,4 +1,6 @@
 {
+  "schema_version": 1,
+  "generator_version": "0.9.1",
   "templates": [
     {
       "name": "android",
@@ -69,91 +71,143 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "display_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "package_name",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Android package name: "
+          "prompt": "Android package name: ",
+          "validator": "java-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "application_id",
           "required": false,
           "default": null,
           "default_from": "package_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "java-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "organization_name",
           "required": false,
           "default": "Example Team",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "compile_sdk",
           "required": false,
           "default": "35",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 100
         },
         {
           "name": "min_sdk",
           "required": false,
           "default": "26",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 100
         },
         {
           "name": "target_sdk",
           "required": false,
           "default": "35",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 100
         },
         {
           "name": "version_code",
           "required": false,
           "default": "1",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 2100000000
         },
         {
           "name": "version_name",
           "required": false,
           "default": "1.0.0",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "semantic-version",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "java_version",
           "required": false,
           "default": "17",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 8,
+          "maximum": 30
         },
         {
           "name": "android_namespace",
           "required": false,
           "default": null,
           "default_from": "package_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "java-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "kotlin_module_name",
           "required": false,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "identifier",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [
@@ -190,7 +244,7 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Multi-platform Apple starter with doctor, generate, lint, and test workflows."
+        "summary": "Multi-platform Apple starter with doctor, generate, lint, test, beta, and release workflows."
       },
       "validation": {
         "status": "generated-project-verified",
@@ -220,7 +274,7 @@
       },
       "operating_assumptions": [
         "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
-        "Generated projects should keep bootstrap, doctor, generate, lint, and test workflows explicit."
+        "Generated projects should keep bootstrap, doctor, generate, lint, test, beta, and release workflows explicit."
       ],
       "workflow_labels": [
         "bootstrap",
@@ -228,6 +282,8 @@
         "generate",
         "lint",
         "test",
+        "build",
+        "release",
         "open"
       ],
       "variables": [
@@ -236,56 +292,93 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "display_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "apple_platform",
           "required": false,
           "default": "ios",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "ios",
+            "macos",
+            "watchos",
+            "tvos"
+          ],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "bundle_identifier",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Bundle identifier: "
+          "prompt": "Bundle identifier: ",
+          "validator": "bundle-identifier",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "organization_name",
           "required": false,
           "default": "Example Team",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "development_team",
           "required": false,
           "default": "DEVELOPMENT_TEAM_ID",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "team-id",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "minimum_os_version",
           "required": false,
           "default": "26.0",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "apple-version",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "swift_module_name",
           "required": false,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "identifier",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [
@@ -324,7 +417,8 @@
         "evidence": [
           "python unittest template rendering coverage",
           "real docker runtime image builds",
-          "real docker development image builds"
+          "real docker development image builds",
+          "real Playwright browser checks against the production Nginx image"
         ]
       },
       "worktree": {
@@ -362,21 +456,33 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "display_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "package_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "npm-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [
@@ -411,14 +517,15 @@
       ],
       "maturity": {
         "level": "experimental",
-        "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, and generated-project render coverage."
+        "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, Hypium test wiring, build verification, artifact checks, and local release-signing preflight."
       },
       "validation": {
         "status": "generated-project-verified",
         "verification_tier": "generated-project",
         "evidence": [
           "python unittest template rendering coverage",
-          "repo-level template metadata and placeholder validation"
+          "repo-level template metadata and placeholder validation",
+          "generated-project bootstrap, lint, test, build, artifact, and release-preflight commands"
         ]
       },
       "worktree": {
@@ -447,7 +554,9 @@
         "bootstrap",
         "doctor",
         "lint",
+        "test",
         "build",
+        "verify",
         "release",
         "open"
       ],
@@ -457,84 +566,132 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "display_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "bundle_name",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "HarmonyOS bundle name: "
+          "prompt": "HarmonyOS bundle name: ",
+          "validator": "java-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "harmony_module_name",
           "required": false,
           "default": "entry",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "identifier",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "ability_name",
           "required": false,
           "default": "EntryAbility",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "identifier",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "compatible_sdk_version",
           "required": false,
           "default": "5.0.0(12)",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "harmony-sdk-version",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "target_sdk_version",
           "required": false,
           "default": "5.0.0(12)",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "harmony-sdk-version",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "min_api_version",
           "required": false,
           "default": "12",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 100
         },
         {
           "name": "harmony_version_code",
           "required": false,
           "default": "1",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 2100000000
         },
         {
           "name": "harmony_version_name",
           "required": false,
           "default": "1.0.0",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "semantic-version",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "organization_name",
           "required": false,
           "default": "Example Team",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "display-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [
         "make bootstrap",
         "make doctor",
         "make lint",
+        "make test",
         "make build",
+        "make artifact-info",
+        "make verify",
+        "make release-preflight",
         "open -a \"DevEco Studio\" ."
       ]
     },
@@ -563,13 +720,15 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Containerized microservice starter with gRPC, protobuf generation, and observability workflows."
+        "summary": "Containerized microservice starter with coordinated HTTP/gRPC shutdown, bounded timeouts, health checks, protobuf, and observability."
       },
       "validation": {
         "status": "real-build-verified",
         "verification_tier": "real-build",
         "evidence": [
           "python unittest template rendering coverage",
+          "generated-project HTTP and gRPC shutdown tests",
+          "HTTP and gRPC health checks",
           "real docker runtime image builds",
           "real docker development image builds"
         ]
@@ -610,56 +769,91 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "module_name",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Go module name: "
+          "prompt": "Go module name: ",
+          "validator": "go-module",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "service_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "slug",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "proto_package",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Proto package: "
+          "prompt": "Proto package: ",
+          "validator": "protobuf-package",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "http_port",
           "required": false,
           "default": "8080",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "port",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 65535
         },
         {
           "name": "grpc_port",
           "required": false,
           "default": "9090",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "port",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 65535
         },
         {
           "name": "dependency_store",
           "required": false,
           "default": "postgres",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "postgres",
+            "redis"
+          ],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "otel_exporter_endpoint",
           "required": false,
           "default": "http://localhost:4318",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "url",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [
@@ -690,13 +884,15 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Dockerized web service starter with live-reload, lint, test, and runtime image workflows."
+        "summary": "Dockerized web service starter with bounded HTTP timeouts, graceful shutdown, runtime health checks, lint, and tests."
       },
       "validation": {
         "status": "real-build-verified",
         "verification_tier": "real-build",
         "evidence": [
           "python unittest template rendering coverage",
+          "generated-project graceful shutdown and timeout tests",
+          "runtime image HTTP health check",
           "real docker runtime image builds",
           "real docker development image builds"
         ]
@@ -736,28 +932,44 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "module_name",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Go module name: "
+          "prompt": "Go module name: ",
+          "validator": "go-module",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "service_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "slug",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "http_port",
           "required": false,
           "default": "8080",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "port",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 65535
         }
       ],
       "next_steps": [
@@ -788,13 +1000,14 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Dockerized worker starter with config loading, graceful shutdown, and generated-project test coverage."
+        "summary": "Dockerized worker starter with explicit retry semantics, bounded shutdown, and deterministic generated-project tests."
       },
       "validation": {
         "status": "generated-project-verified",
         "verification_tier": "generated-project",
         "evidence": [
           "python unittest template rendering coverage",
+          "deterministic injected-clock retry and scheduling tests",
           "real generated project go test validation"
         ]
       },
@@ -832,42 +1045,69 @@
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "project-name",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "module_name",
           "required": true,
           "default": null,
           "default_from": null,
-          "prompt": "Go module name: "
+          "prompt": "Go module name: ",
+          "validator": "go-module",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "worker_name",
           "required": false,
           "default": null,
           "default_from": "project_name",
-          "prompt": null
+          "prompt": null,
+          "validator": "slug",
+          "choices": [],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "run_mode",
           "required": false,
           "default": "scheduled",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "scheduled",
+            "oneshot"
+          ],
+          "minimum": null,
+          "maximum": null
         },
         {
           "name": "tick_interval_seconds",
           "required": false,
           "default": "30",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 86400
         },
         {
           "name": "shutdown_timeout_seconds",
           "required": false,
           "default": "10",
           "default_from": null,
-          "prompt": null
+          "prompt": null,
+          "validator": "positive-integer",
+          "choices": [],
+          "minimum": 1,
+          "maximum": 3600
         }
       ],
       "next_steps": [

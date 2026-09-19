@@ -315,6 +315,14 @@ def parse_set_values(items: list[str]) -> dict[str, str]:
     return values
 
 
+JSON_SCHEMA_VERSION = 1
+
+
+def output_metadata() -> dict[str, object]:
+    """Version the JSON contract independently of the generator release."""
+    return {"schema_version": JSON_SCHEMA_VERSION, "generator_version": __version__}
+
+
 class CLIUsageError(ValueError):
     """Argument parsing failure handled by the common CLI error boundary."""
 
@@ -334,7 +342,7 @@ def exit_with_error(parser, json_mode, code, message, status, details=None):
         error = {"code": code, "message": message}
         if details is not None:
             error["details"] = details
-        diagnostic = json.dumps({"schema_version": 1, "ok": False, "error": error})
+        diagnostic = json.dumps({**output_metadata(), "ok": False, "error": error})
     else:
         diagnostic = f"error: {message}"
     parser.exit(status, diagnostic + "\n")
@@ -477,7 +485,7 @@ def format_template_summary() -> str:
 
 def format_template_summary_json() -> str:
     """Return a machine-readable template list."""
-    payload = {"templates": [definition.to_dict() for definition in load_templates()]}
+    payload = {**output_metadata(), "templates": [definition.to_dict() for definition in load_templates()]}
     return json.dumps(payload, indent=2)
 
 
@@ -525,7 +533,7 @@ def format_template_info(template_name: str) -> str:
 def format_template_info_json(template_name: str) -> str:
     """Return a machine-readable template detail payload."""
     definition = load_template(template_name)
-    return json.dumps(definition.to_dict(), indent=2)
+    return json.dumps({**output_metadata(), **definition.to_dict()}, indent=2)
 
 
 def format_validation_report(errors: list[str]) -> str:
@@ -541,6 +549,7 @@ def format_validation_report(errors: list[str]) -> str:
 def format_validation_report_json(errors: list[str]) -> str:
     """Return a machine-readable validation report."""
     payload = {
+        **output_metadata(),
         "ok": not errors,
         "error_count": len(errors),
         "errors": errors,
@@ -733,6 +742,7 @@ def create_manifest(context: dict[str, object], mode: str) -> dict[str, object]:
     definition = context["definition"]
     assert hasattr(definition, "name")
     return {
+        **output_metadata(),
         "operation": mode,
         "template": {
             "name": definition.name,

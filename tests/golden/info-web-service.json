@@ -1,4 +1,6 @@
 {
+  "schema_version": 1,
+  "generator_version": "0.9.1",
   "name": "web-service",
   "description": "Go + Gin web service starter",
   "stack": [
@@ -18,13 +20,15 @@
   ],
   "maturity": {
     "level": "validated",
-    "summary": "Dockerized web service starter with live-reload, lint, test, and runtime image workflows."
+    "summary": "Dockerized web service starter with bounded HTTP timeouts, graceful shutdown, runtime health checks, lint, and tests."
   },
   "validation": {
     "status": "real-build-verified",
     "verification_tier": "real-build",
     "evidence": [
       "python unittest template rendering coverage",
+      "generated-project graceful shutdown and timeout tests",
+      "runtime image HTTP health check",
       "real docker runtime image builds",
       "real docker development image builds"
     ]
@@ -64,28 +68,44 @@
       "required": true,
       "default": null,
       "default_from": null,
-      "prompt": null
+      "prompt": null,
+      "validator": "project-name",
+      "choices": [],
+      "minimum": null,
+      "maximum": null
     },
     {
       "name": "module_name",
       "required": true,
       "default": null,
       "default_from": null,
-      "prompt": "Go module name: "
+      "prompt": "Go module name: ",
+      "validator": "go-module",
+      "choices": [],
+      "minimum": null,
+      "maximum": null
     },
     {
       "name": "service_name",
       "required": false,
       "default": null,
       "default_from": "project_name",
-      "prompt": null
+      "prompt": null,
+      "validator": "slug",
+      "choices": [],
+      "minimum": null,
+      "maximum": null
     },
     {
       "name": "http_port",
       "required": false,
       "default": "8080",
       "default_from": null,
-      "prompt": null
+      "prompt": null,
+      "validator": "port",
+      "choices": [],
+      "minimum": 1,
+      "maximum": 65535
     }
   ],
   "next_steps": [

@@ -64,6 +64,9 @@ For scripts, use `--json`; it disables interactive prompts. Successful JSON
 results go to stdout. Failures leave stdout empty and write one JSON error
 object to stderr with `schema_version`, `ok: false`, and `error.code/message`.
 See [the CLI error contract](docs/cli-errors.md) for exit codes and examples.
+All JSON results include `schema_version` and `generator_version`; list/info
+also expose each variable's validator, choices, and effective numeric bounds.
+See [the JSON contract](docs/json-contract.md) for compatibility and field semantics.
 
 ## Product Direction
 
