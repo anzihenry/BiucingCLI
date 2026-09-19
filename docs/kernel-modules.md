@@ -1,4 +1,4 @@
-# Kernel modules: stages 1–2
+# Kernel modules: stages 1–3
 
 Stage 1 extracts foundation modules without changing generation algorithms,
 template resources, serialization or CLI contracts.
@@ -59,3 +59,43 @@ identity, exact binary copying, executable modes, empty directories, single-pass
 insertion, source preservation, existing/late target conflicts, and cleanup on
 OSError or KeyboardInterrupt during copy, text rendering and final publication.
 Existing CLI error/EOF/SIGINT tests continue to verify user-facing behavior.
+
+## Stage 3: pure template-specific derivations
+
+`template_rules/apple.py`, `android.py` and `microservice.py` now own their
+platform/module/dependency derivations. Shared type-name conversion and the
+`RuleResult` dataclass live in `template_rules/common.py`. Existing CLI helper
+imports are explicit aliases, not duplicated implementations.
+
+`template_rules/registry.py` holds an immutable implementation registry and a
+separate immutable template-to-rule assignment table. The CLI makes one call to
+`derive_template_values` after resolving variables, without template-name
+branches. Unassigned templates receive an empty result. An assigned but missing
+implementation raises `InvalidTemplateError`; no dynamic imports are allowed.
+Assignments remain built-in Python declarations until stage 4 introduces
+declarative metadata. Unknown template requests still fail in catalog loading,
+before this fallback can be reached by the CLI.
+
+Rules accept already resolved/normalized string values and return `RuleResult`:
+
+- `derived_values`: merged over resolved inputs, included in manifest derivations;
+- `render_only_values`: merged afterwards, used for rendering but excluded from
+  manifest derivations (preserves the existing Apple snippet behavior).
+
+Apple derives platform settings and Swift module name, then builds snippets
+using those settings. Android derives Kotlin module name. Microservice derives
+dependency-store settings and service type name. Explicit module names and OS
+versions retain their previous priority. Original resolved-variable source
+records are not rewritten by derivation. Generic input validation still runs
+after the merge, and unsupported platform/store choices keep existing errors.
+
+Rules do not read terminal input, write files or run commands. The dispatcher
+copies the input mapping; rule functions also avoid modifying their arguments
+and return fresh results. No new validation policy, plugin lifecycle or output
+schema is introduced. Template-specific required-file checks and the global
+placeholder table remain unchanged for stage 4.
+
+`tests/test_template_rules.py` directly covers each platform/store, explicit and
+default names, snippet separation/escaping, invalid selections, registry fallback
+and missing assignments, input/result isolation, helper aliases and independent
+imports. Existing 11-case generation snapshots remain the end-to-end contract.

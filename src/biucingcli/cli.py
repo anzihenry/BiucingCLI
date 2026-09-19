@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 
 from biucingcli import __version__
-from biucingcli.escaping import swift_string
 from biucingcli.catalog import load_template, load_templates
 from biucingcli.errors import (
     BiucingError,
@@ -24,280 +23,19 @@ from biucingcli.rendering import render_text
 from biucingcli.variables import validate_resolved_variables
 from biucingcli.validation import validate_templates
 from biucingcli.templates import resolve_variables_detailed
+from biucingcli.template_rules.registry import derive_template_values
+from biucingcli.template_rules.apple import (
+    default_swift_module_name as default_swift_module_name,
+    apple_platform_config as apple_platform_config,
+    apple_platform_snippets as apple_platform_snippets,
+)
+from biucingcli.template_rules.android import default_kotlin_module_name as default_kotlin_module_name
+from biucingcli.template_rules.microservice import microservice_dependency_config as microservice_dependency_config
 
 
 def default_display_name(project_name: str) -> str:
     """Return a human-friendly display name from a directory name."""
     return project_name.replace("-", " ").replace("_", " ").title()
-
-
-def default_swift_module_name(project_name: str) -> str:
-    """Return a Swift-safe module name derived from a directory name."""
-    parts = [part for part in project_name.replace("_", "-").split("-") if part]
-    if not parts:
-        return "App"
-    return "".join(part[:1].upper() + part[1:] for part in parts)
-
-
-def default_kotlin_module_name(project_name: str) -> str:
-    """Return a Kotlin-safe module name derived from a directory name."""
-    parts = [part for part in project_name.replace("_", "-").split("-") if part]
-    if not parts:
-        return "App"
-    return "".join(part[:1].upper() + part[1:] for part in parts)
-
-
-def apple_platform_config(platform: str | None, minimum_os_version: str | None) -> dict[str, str]:
-    """Return derived Apple platform values for template rendering."""
-    requested = (platform or "ios").lower()
-    supported = {
-        "ios": {
-            "apple_platform": "ios",
-            "apple_platform_name": "iOS",
-            "fastlane_platform": "ios",
-            "app_store_platform": "ios",
-            "minimum_os_version": "26.0",
-            "tuist_destinations": ".iOS",
-            "tuist_deployment_targets": '.iOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "generic/platform=iOS Simulator",
-            "swiftpm_supported_platform": '.iOS("{{MINIMUM_OS_VERSION}}")',
-        },
-        "macos": {
-            "apple_platform": "macos",
-            "apple_platform_name": "macOS",
-            "fastlane_platform": "mac",
-            "app_store_platform": "osx",
-            "minimum_os_version": "26.0",
-            "tuist_destinations": ".macOS",
-            "tuist_deployment_targets": '.macOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "platform=macOS",
-            "swiftpm_supported_platform": '.macOS("{{MINIMUM_OS_VERSION}}")',
-        },
-        "watchos": {
-            "apple_platform": "watchos",
-            "apple_platform_name": "watchOS",
-            "fastlane_platform": "ios",
-            "app_store_platform": "ios",
-            "minimum_os_version": "26.0",
-            "tuist_destinations": ".watchOS",
-            "tuist_deployment_targets": '.watchOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "generic/platform=watchOS Simulator",
-            "swiftpm_supported_platform": '.watchOS("{{MINIMUM_OS_VERSION}}")',
-        },
-        "tvos": {
-            "apple_platform": "tvos",
-            "apple_platform_name": "tvOS",
-            "fastlane_platform": "ios",
-            "app_store_platform": "appletvos",
-            "minimum_os_version": "26.0",
-            "tuist_destinations": ".tvOS",
-            "tuist_deployment_targets": '.tvOS("{{MINIMUM_OS_VERSION}}")',
-            "xcodebuild_destination": "generic/platform=tvOS Simulator",
-            "swiftpm_supported_platform": '.tvOS("{{MINIMUM_OS_VERSION}}")',
-        },
-    }
-    if requested not in supported:
-        raise ValueError(
-            "Unsupported Apple platform. Expected one of: ios, macos, watchos, tvos"
-        )
-
-    resolved = dict(supported[requested])
-    resolved["minimum_os_version"] = minimum_os_version or resolved["minimum_os_version"]
-    resolved["tuist_deployment_targets"] = resolved["tuist_deployment_targets"].replace(
-        "{{MINIMUM_OS_VERSION}}", resolved["minimum_os_version"]
-    )
-    resolved["swiftpm_supported_platform"] = resolved["swiftpm_supported_platform"].replace(
-        "{{MINIMUM_OS_VERSION}}", resolved["minimum_os_version"]
-    )
-    return resolved
-
-
-def apple_platform_snippets(values: dict[str, str]) -> dict[str, str]:
-    """Return platform-specific Apple template snippets using resolved values."""
-    platform = values.get("apple_platform", "ios")
-    display_name = swift_string(values.get("display_name", "App"))
-
-    if platform == "macos":
-        return {
-            "apple_scene_body": "\n".join(
-                [
-                    f'        WindowGroup("{display_name}") {{',
-                    "            HomeView()",
-                    "        }",
-                    "        .defaultSize(width: 1100, height: 720)",
-                ]
-            ),
-            "apple_home_body": "\n".join(
-                [
-                    "    var body: some View {",
-                    "        NavigationSplitView {",
-                    '            List {',
-                    '                Section("Workspace") {',
-                    '                    Label("Overview", systemImage: "sidebar.left")',
-                    '                    Label("Release Checklist", systemImage: "checkmark.circle")',
-                    "                }",
-                    "            }",
-                    "            .navigationSplitViewColumnWidth(min: 220, ideal: 240)",
-                    "        } detail: {",
-                    "            ScrollView {",
-                    "                VStack(alignment: .leading, spacing: 20) {",
-                    "                    Text(viewModel.title)",
-                    "                        .font(BiucingTheme.titleFont)",
-                    "",
-                    "                    Text(viewModel.subtitle)",
-                    "                        .font(BiucingTheme.bodyFont)",
-                    "                        .foregroundStyle(.secondary)",
-                    "",
-                    '                    GroupBox("Project Summary") {',
-                    "                        VStack(alignment: .leading, spacing: 8) {",
-                    "                            ForEach(viewModel.facts, id: \\.label) { fact in",
-                    '                                Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
-                    "                            }",
-                    "                        }",
-                    "                        .font(BiucingTheme.captionFont)",
-                    "                    }",
-                    "",
-                    '                    GroupBox("Release Checklist") {',
-                    "                        VStack(alignment: .leading, spacing: 8) {",
-                    "                            ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
-                    '                                Label(item, systemImage: "checkmark.circle")',
-                    "                            }",
-                    "                        }",
-                    "                        .font(BiucingTheme.captionFont)",
-                    "                    }",
-                    "                }",
-                    "                .frame(maxWidth: 680, alignment: .leading)",
-                    "                .padding(24)",
-                    "            }",
-                    '            .navigationTitle("Overview")',
-                    "        }",
-                    "    }",
-                ]
-            ),
-            "apple_platform_output_note": (
-                "macOS starters use a split-view workspace with a fixed desktop window size."
-            ),
-        }
-
-    if platform == "ios":
-        return {
-            "apple_scene_body": "\n".join(
-                [
-                    "        WindowGroup {",
-                    "            HomeView()",
-                    "        }",
-                ]
-            ),
-            "apple_home_body": "\n".join(
-                [
-                    "    var body: some View {",
-                    "        NavigationStack {",
-                    "            List {",
-                    '                Section("Project Summary") {',
-                    "                    ForEach(viewModel.facts, id: \\.label) { fact in",
-                    '                        Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
-                    "                    }",
-                    "                }",
-                    "",
-                    '                Section("Release Checklist") {',
-                    "                    ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
-                    '                        Label(item, systemImage: "checkmark.circle")',
-                    "                    }",
-                    "                }",
-                    "            }",
-                    "            .listStyle(.insetGrouped)",
-                    '            .navigationTitle("Starter Overview")',
-                    "        }",
-                    "    }",
-                ]
-            ),
-            "apple_platform_output_note": (
-                "iOS starters use a stacked overview screen tuned for simulator-first mobile flows."
-            ),
-        }
-
-    return {
-        "apple_scene_body": "\n".join(
-            [
-                "        WindowGroup {",
-                "            HomeView()",
-                "        }",
-            ]
-        ),
-        "apple_home_body": "\n".join(
-            [
-                "    var body: some View {",
-                "        NavigationStack {",
-                "            VStack(alignment: .leading, spacing: 16) {",
-                "                Text(viewModel.title)",
-                "                    .font(BiucingTheme.titleFont)",
-                "",
-                "                Text(viewModel.subtitle)",
-                "                    .font(BiucingTheme.bodyFont)",
-                "                    .foregroundStyle(.secondary)",
-                "",
-                "                VStack(alignment: .leading, spacing: 8) {",
-                "                    ForEach(viewModel.facts, id: \\.label) { fact in",
-                '                        Label("\\(fact.label): \\(fact.value)", systemImage: fact.systemImage)',
-                "                    }",
-                "                }",
-                "                .font(BiucingTheme.captionFont)",
-                "",
-                "                VStack(alignment: .leading, spacing: 8) {",
-                '                    Text("Release Checklist")',
-                "                        .font(BiucingTheme.sectionTitleFont)",
-                "",
-                "                    ForEach(viewModel.releaseChecklist(), id: \\.self) { item in",
-                '                        Label(item, systemImage: "checkmark.circle")',
-                "                    }",
-                "                }",
-                "                .font(BiucingTheme.captionFont)",
-                "            }",
-                "            .padding(24)",
-                '            .navigationTitle("Overview")',
-                "        }",
-                "    }",
-            ]
-        ),
-        "apple_platform_output_note": (
-            f"{values.get('apple_platform_name', 'Apple')} starters currently keep the shared overview layout."
-        ),
-    }
-
-
-def microservice_dependency_config(store: str | None, service_name: str) -> dict[str, str]:
-    """Return derived local dependency values for the microservice template."""
-    selected = (store or "postgres").lower()
-    supported = {
-        "postgres": {
-            "dependency_store": "postgres",
-            "dependency_store_image": "postgres:16-alpine",
-            "dependency_store_port": "5432",
-            "dependency_store_dsn": f"postgres://postgres:postgres@localhost:5432/{service_name}?sslmode=disable",
-            "dependency_store_container_dsn": (
-                f"postgres://postgres:postgres@postgres:5432/{service_name}?sslmode=disable"
-            ),
-            "dependency_store_env_block": "\n".join(
-                [
-                    "    environment:",
-                    f"      POSTGRES_DB: {service_name}",
-                    "      POSTGRES_USER: postgres",
-                    "      POSTGRES_PASSWORD: postgres",
-                ]
-            ),
-        },
-        "redis": {
-            "dependency_store": "redis",
-            "dependency_store_image": "redis:7-alpine",
-            "dependency_store_port": "6379",
-            "dependency_store_dsn": "redis://localhost:6379/0",
-            "dependency_store_container_dsn": "redis://redis:6379/0",
-            "dependency_store_env_block": "",
-        },
-    }
-    if selected not in supported:
-        raise ValueError("Unsupported dependency store. Expected one of: postgres, redis")
-    return dict(supported[selected])
 
 
 def parse_set_values(items: list[str]) -> dict[str, str]:
@@ -681,34 +419,10 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         interactive=not (args.non_interactive or args.json) and sys.stdin.isatty(),
     )
     values = dict(resolution_result.values)
-    derived_values: dict[str, str] = {}
-    if args.template == "microservice":
-        derived_values.update(
-            microservice_dependency_config(
-                values.get("dependency_store"),
-                values.get("service_name", values["project_name"]),
-            )
-        )
-        derived_values["service_type_name"] = default_swift_module_name(
-            values["project_name"]
-        )
-    if args.template == "apple":
-        derived_values.update(
-            apple_platform_config(
-                values.get("apple_platform"),
-                values.get("minimum_os_version"),
-            )
-        )
-        derived_values["swift_module_name"] = values.get(
-            "swift_module_name"
-        ) or default_swift_module_name(values["project_name"])
-    if args.template == "android":
-        derived_values["kotlin_module_name"] = values.get(
-            "kotlin_module_name"
-        ) or default_kotlin_module_name(values["project_name"])
+    rule_result = derive_template_values(args.template, values)
+    derived_values = rule_result.derived_values
     values.update(derived_values)
-    if args.template == "apple":
-        values.update(apple_platform_snippets(values))
+    values.update(rule_result.render_only_values)
 
     input_errors = validate_resolved_variables(definition, values)
     if input_errors:

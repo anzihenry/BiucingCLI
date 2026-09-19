@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- extract Apple, Android and microservice derivations into pure built-in rules
+  selected by a static registry, preserving generated output and JSON metadata.
+
 - separate variable constraints, template validation, text rendering and filesystem
   generation, preserving legacy exports and adding multi-stage cleanup regressions.
 
