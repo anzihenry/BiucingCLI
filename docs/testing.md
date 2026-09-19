@@ -2,6 +2,8 @@
 
 For kernel extraction contracts and generated-output snapshots, see
 [the stage 0 baseline](kernel-refactor-baseline.md).
+Current foundation boundaries and fixture-root APIs are documented in
+[kernel modules](kernel-modules.md).
 
 Install the locked development/build environment with `uv sync --locked`.
 

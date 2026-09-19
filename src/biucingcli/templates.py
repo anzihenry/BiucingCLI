@@ -9,187 +9,35 @@ import shutil
 import stat
 import sys
 import tempfile
-from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
+from biucingcli import catalog
+from biucingcli.catalog import (
+    templates_root as templates_root,
+    load_template as load_template,
+    load_templates as load_templates,
+)
+from biucingcli.errors import (
+    BiucingError as BiucingError,
+    UnknownTemplateError as UnknownTemplateError,
+    InvalidTemplateError as InvalidTemplateError,
+    GenerationError as GenerationError,
+    GenerationConflictError as GenerationConflictError,
+    MissingInputError as MissingInputError,
+    InputEndedError as InputEndedError,
+)
+from biucingcli.models import (
+    TemplateVariable as TemplateVariable,
+    ResolvedVariable as ResolvedVariable,
+    TemplateMaturity as TemplateMaturity,
+    TemplateValidation as TemplateValidation,
+    TemplateWorktree as TemplateWorktree,
+    TemplateDefinition as TemplateDefinition,
+    VariableResolutionResult as VariableResolutionResult,
+)
+
 from biucingcli.escaping import CONTEXT_ESCAPERS, FREE_TEXT_KEYS
-
-
-class BiucingError(Exception):
-    """Base class for expected, user-facing CLI failures."""
-
-
-class UnknownTemplateError(BiucingError):
-    """Raised when a requested template does not exist."""
-
-
-class InvalidTemplateError(BiucingError):
-    """Raised when bundled template metadata cannot be loaded."""
-
-
-class GenerationError(BiucingError):
-    """Raised when a project cannot be generated safely."""
-
-
-class GenerationConflictError(GenerationError):
-    """Raised when generation would overwrite an existing path."""
-
-
-class MissingInputError(ValueError):
-    """Required variables were not supplied."""
-
-
-class InputEndedError(BiucingError):
-    """Interactive input ended before a required value was supplied."""
-
-
-@dataclass(frozen=True)
-class TemplateVariable:
-    """A declared template variable."""
-
-    name: str
-    required: bool = False
-    default: str | None = None
-    default_from: str | None = None
-    prompt: str | None = None
-    validator: str = "text"
-    choices: list[str] = field(default_factory=list)
-    minimum: int | None = None
-    maximum: int | None = None
-
-    def numeric_bounds(self) -> tuple[int | None, int | None]:
-        """Return effective numeric limits, including validator defaults."""
-        if self.validator not in {"port", "positive-integer"}:
-            return self.minimum, self.maximum
-        minimum = self.minimum if self.minimum is not None else 1
-        maximum = self.maximum
-        if self.validator == "port" and maximum is None:
-            maximum = 65535
-        return minimum, maximum
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        minimum, maximum = self.numeric_bounds()
-        return {
-            "name": self.name,
-            "required": self.required,
-            "default": self.default,
-            "default_from": self.default_from,
-            "prompt": self.prompt,
-            "validator": self.validator,
-            "choices": list(self.choices),
-            "minimum": minimum,
-            "maximum": maximum,
-        }
-
-
-@dataclass(frozen=True)
-class ResolvedVariable:
-    """A resolved template variable plus its source."""
-
-    name: str
-    value: str
-    source: str
-
-    def to_dict(self) -> dict[str, str]:
-        """Return a JSON-serializable representation."""
-        return asdict(self)
-
-
-@dataclass(frozen=True)
-class TemplateMaturity:
-    """User-facing maturity metadata for a template."""
-
-    level: str
-    summary: str
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        return asdict(self)
-
-
-@dataclass(frozen=True)
-class TemplateValidation:
-    """User-facing validation metadata for a template."""
-
-    status: str
-    verification_tier: str
-    evidence: list[str]
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        return asdict(self)
-
-
-@dataclass(frozen=True)
-class TemplateWorktree:
-    """Worktree isolation metadata for a template."""
-
-    support_level: str = ""
-    isolation_dimensions: list[str] = field(default_factory=list)
-    diagnostics: list[str] = field(default_factory=list)
-    cleanup: list[str] = field(default_factory=list)
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        return asdict(self)
-
-
-@dataclass(frozen=True)
-class TemplateDefinition:
-    """Template metadata and file locations."""
-
-    name: str
-    description: str
-    stack: list[str]
-    category: str
-    tags: list[str]
-    platforms: list[str]
-    maturity: TemplateMaturity
-    validation: TemplateValidation
-    worktree: TemplateWorktree
-    operating_assumptions: list[str]
-    workflow_labels: list[str]
-    commands: dict[str, str]
-    variables: list[TemplateVariable]
-    next_steps: list[str]
-    template_dir: Path
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        return {
-            "name": self.name,
-            "description": self.description,
-            "stack": self.stack,
-            "category": self.category,
-            "tags": self.tags,
-            "platforms": self.platforms,
-            "maturity": self.maturity.to_dict(),
-            "validation": self.validation.to_dict(),
-            "worktree": self.worktree.to_dict(),
-            "operating_assumptions": self.operating_assumptions,
-            "workflow_labels": self.workflow_labels,
-            "variables": [variable.to_dict() for variable in self.variables],
-            "next_steps": self.next_steps,
-        }
-
-
-@dataclass(frozen=True)
-class VariableResolutionResult:
-    """Resolved template variables and missing required inputs."""
-
-    values: dict[str, str]
-    resolved_variables: list[ResolvedVariable]
-    missing_required: list[str]
-
-    def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
-        return {
-            "values": self.values,
-            "resolved_variables": [item.to_dict() for item in self.resolved_variables],
-            "missing_required": self.missing_required,
-        }
 
 
 PLACEHOLDER_PATTERN = re.compile(r"\{\{[A-Z0-9_]+\}\}")
@@ -262,56 +110,6 @@ MAKE_TARGET_PATTERN = re.compile(
     r"^([A-Za-z0-9_.-]+(?:[ \t]+[A-Za-z0-9_.-]+)*):(?:[ \t]|$)",
     re.MULTILINE,
 )
-
-
-def templates_root() -> Path:
-    """Return the templates bundled inside the installed package."""
-    return Path(__file__).resolve().parent / "template_data"
-
-
-def load_template(name: str) -> TemplateDefinition:
-    """Load one template definition by name."""
-    metadata_path = templates_root() / name / "template.json"
-    if not metadata_path.exists():
-        raise UnknownTemplateError(f"unknown template '{name}'")
-
-    try:
-        with metadata_path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
-
-        variables = [TemplateVariable(**variable) for variable in data["variables"]]
-        maturity = TemplateMaturity(**data["maturity"])
-        validation = TemplateValidation(**data["validation"])
-        worktree = TemplateWorktree(**data.get("worktree", {}))
-        return TemplateDefinition(
-            name=data["name"],
-            description=data["description"],
-            stack=data["stack"],
-            category=data["category"],
-            tags=data["tags"],
-            platforms=data["platforms"],
-            maturity=maturity,
-            validation=validation,
-            worktree=worktree,
-            operating_assumptions=data["operating_assumptions"],
-            workflow_labels=data["workflow_labels"],
-            commands=data.get("commands", {}),
-            variables=variables,
-            next_steps=data["next_steps"],
-            template_dir=metadata_path.parent / "template",
-        )
-    except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError) as exc:
-        raise InvalidTemplateError(
-            f"invalid metadata for template '{name}': {exc}"
-        ) from exc
-
-
-def load_templates() -> list[TemplateDefinition]:
-    """Load every available template."""
-    definitions: list[TemplateDefinition] = []
-    for metadata_path in sorted(templates_root().glob("*/template.json")):
-        definitions.append(load_template(metadata_path.parent.name))
-    return definitions
 
 
 def supported_placeholders() -> set[str]:
@@ -707,7 +505,7 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
             )
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
-            relative_path = path.relative_to(templates_root()).as_posix()
+            relative_path = path.relative_to(catalog.templates_root()).as_posix()
             errors.append(
                 f"{definition.name}: unsupported placeholder(s) in {relative_path}: {', '.join(unsupported)}"
             )
@@ -735,7 +533,7 @@ def validate_templates() -> list[str]:
         errors.extend(validate_template_required_files(definition))
         errors.extend(validate_template_command_contract(definition))
 
-    for metadata_path in sorted(templates_root().glob("*/template.json")):
+    for metadata_path in sorted(catalog.templates_root().glob("*/template.json")):
         folder_name = metadata_path.parent.name
         definition_name = json.loads(metadata_path.read_text(encoding="utf-8"))["name"]
         if definition_name != folder_name:

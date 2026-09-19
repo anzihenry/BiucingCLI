@@ -264,7 +264,7 @@ class CLITestCase(unittest.TestCase):
             broken_dir.mkdir()
             (broken_dir / "template.json").write_text("{not-json", encoding="utf-8")
 
-            with patch("biucingcli.templates.templates_root", return_value=templates_root):
+            with patch("biucingcli.catalog.templates_root", return_value=templates_root):
                 code, stdout, stderr = self.run_cli_failure(["info", "broken"])
 
         self.assertEqual(code, 1)
@@ -429,7 +429,7 @@ class CLITestCase(unittest.TestCase):
             (rendered_dir / "configs").mkdir()
             (rendered_dir / "scripts").mkdir()
 
-            with patch("biucingcli.templates.templates_root", return_value=templates_root):
+            with patch("biucingcli.catalog.templates_root", return_value=templates_root):
                 errors = validate_templates()
 
             joined = "\n".join(errors)

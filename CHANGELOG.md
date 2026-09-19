@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- extract template models, domain errors and resource loading into independent
+  modules, retaining legacy imports and adding explicit fixture-root loading.
+
 - parse generated JSON, JSON5, YAML, TOML, XML and plist configurations in
   regression tests and installed-wheel verification;
 - split Python-only Linux/macOS core CI from macOS tool integration release gates;

@@ -9,7 +9,8 @@ from pathlib import Path
 
 from biucingcli import __version__
 from biucingcli.escaping import swift_string
-from biucingcli.templates import (
+from biucingcli.catalog import load_template, load_templates
+from biucingcli.errors import (
     BiucingError,
     InvalidTemplateError,
     GenerationConflictError,
@@ -17,8 +18,8 @@ from biucingcli.templates import (
     InputEndedError,
     MissingInputError,
     UnknownTemplateError,
-    load_template,
-    load_templates,
+)
+from biucingcli.templates import (
     render_template,
     render_text,
     resolve_variables_detailed,
