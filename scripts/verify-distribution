@@ -14,6 +14,8 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+from config_validation import validate_configurations
+
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_TEMPLATES = {
@@ -68,7 +70,7 @@ def assert_archives_contain_templates(wheel: Path, source_dist: Path) -> None:
             raise AssertionError(f"source distribution is missing {suffix}")
 
 
-def assert_generated_project(project: Path) -> None:
+def assert_generated_project(project: Path, check_make: bool = False) -> None:
     """Check common generated-project invariants without installing template toolchains."""
     for relative_path in ("README.md", "Makefile", ".gitignore", "scripts/doctor"):
         if not (project / relative_path).is_file():
@@ -86,7 +88,12 @@ def assert_generated_project(project: Path) -> None:
         if PLACEHOLDER_PATTERN.search(content):
             raise AssertionError(f"{project.name} contains an unresolved placeholder in {path}")
 
-    run("make", "-s", "help", cwd=project)
+    counts = validate_configurations(project)
+    if not counts:
+        raise AssertionError(f"{project.name} contains no parsed configuration files")
+    print(f"{project.name}: parsed {sum(counts.values())} configuration files ({counts})")
+    if check_make:
+        run("make", "-s", "help", cwd=project)
 
 
 def main() -> None:
@@ -95,6 +102,7 @@ def main() -> None:
         audit_root = Path(temporary_directory)
         parser = argparse.ArgumentParser(description=__doc__)
         parser.add_argument("--dist-dir", type=Path, help="Verify existing artifacts without rebuilding")
+        parser.add_argument("--check-make", action="store_true", help="Also run platform-dependent make help checks")
         args = parser.parse_args()
         dist_dir = args.dist_dir.resolve() if args.dist_dir else audit_root / "dist"
         environment = dict(os.environ)
@@ -159,7 +167,7 @@ def main() -> None:
                 *options,
                 cwd=run_dir,
             )
-            assert_generated_project(projects_dir / project_name)
+            assert_generated_project(projects_dir / project_name, check_make=args.check_make)
 
         android_wrapper = (
             projects_dir

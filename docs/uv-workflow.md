@@ -10,7 +10,7 @@ the interpreter when needed. CI overrides the default to test 3.11–3.14.
 uv sync --locked
 uv run --locked biucing --version
 uv run --locked ruff check --select E4,E7,E9,F src tests scripts
-uv run --locked python -m unittest discover -s tests
+uv run --locked python scripts/run-tests --suite core
 uv run --locked biucing validate
 uv run --locked python scripts/verify-distribution
 ```
@@ -18,8 +18,10 @@ uv run --locked python scripts/verify-distribution
 `uv sync` installs the project in editable mode and the default `dev` and `build`
 groups. Ruff and Twine are development tools (Twine only checks metadata;
 uploads use uv). Setuptools and wheel belong to `build`. These groups do not
-become runtime dependencies for CLI users. Full repository tests require macOS
-and Go, as some generated-project checks use Apple system tools and `go test`.
+become runtime dependencies for CLI users. PyYAML and json5 are development-only
+configuration parsers. Core tests run on Linux/macOS without native tools;
+the separate platform suite requires macOS and its documented toolchain.
+See [testing.md](testing.md) for commands and prerequisites.
 
 - Add a runtime dependency: `uv add PACKAGE`.
 - Add a developer tool: `uv add --dev PACKAGE`.
@@ -56,7 +58,9 @@ wheel from that sdist.
 The verifier requires exactly one wheel and one sdist, checks metadata with
 Twine, inspects embedded template resources, creates an isolated environment
 using `uv venv`, installs the wheel with `uv pip`, and generates all seven
-templates outside the repository. Without `--dist-dir`, it builds into a
+templates outside the repository and parses their generated configuration files.
+Add `--check-make` on macOS to also verify generated Make entrypoints.
+Without `--dist-dir`, it builds into a
 temporary directory and removes those artifacts when finished.
 
 `uv publish --dry-run` checks the upload path without publishing; it does not
@@ -95,8 +99,9 @@ has `id-token: write`; neither a stored API token nor a password is needed.
 5. Confirm both the upload and post-upload installation checks succeed.
 
 Only stable `vX.Y.Z` tags are accepted, and the tag, package metadata, and runtime
-version must agree. All four Python matrix jobs must pass before upload. The
-Python 3.11 job's tested wheel and sdist are transferred as a GitHub artifact
+version must agree. All eight Linux/macOS Python matrix jobs and the macOS
+platform job must pass before upload. The macOS Python 3.11 job's tested wheel
+and sdist are transferred as a GitHub artifact
 and uploaded unchanged. The publishing job then installs the exact version
 from the selected index and checks version, template listing, and validation.
 

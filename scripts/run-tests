@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Run Python-only core, macOS tool integrations, or optional Android SDK tests."""
+
+import argparse
+import os
+from pathlib import Path
+import shutil
+import sys
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def flatten(suite):
+    for item in suite:
+        if isinstance(item, unittest.TestSuite):
+            yield from flatten(item)
+        else:
+            yield item
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--suite", choices=["core", "platform", "android", "all"], default="all")
+    parser.add_argument("--list", action="store_true", help="List selected tests without running")
+    args = parser.parse_args()
+    sys.path.insert(0, str(ROOT))
+    loader = unittest.TestLoader()
+    tests = list(flatten(loader.discover(str(ROOT / "tests"))))
+    if loader.errors:
+        parser.exit(1, "\n".join(loader.errors))
+    selected = []
+    for test in tests:
+        method = getattr(test, test._testMethodName)
+        suite = getattr(method, "test_suite", "core")
+        if suite not in {"core", "platform", "android"}:
+            parser.error(f"unknown suite for {test.id()}: {suite}")
+        if args.suite in {"all", suite}:
+            selected.append(test)
+    if not selected:
+        parser.error("no tests selected")
+    print(f"Suite {args.suite}: {len(selected)} of {len(tests)} tests", flush=True)
+    if args.list:
+        for test in selected:
+            print(test.id())
+        return
+    if args.suite == "platform":
+        if sys.platform != "darwin":
+            parser.error("platform suite requires macOS (including PlistBuddy)")
+        missing = [tool for tool in ("go", "node", "swift", "git", "make", "zsh", "keytool", "jarsigner")
+                   if not shutil.which(tool)]
+        if missing or not Path("/usr/libexec/PlistBuddy").is_file():
+            parser.error(f"missing platform prerequisites: {missing}, check PlistBuddy too")
+    if args.suite == "android" and not shutil.which(os.environ.get("AAPT2", "")):
+        parser.error("set AAPT2 to an executable Android resource compiler")
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite(selected))
+    # Dedicated jobs must not silently succeed by skipping their entire coverage.
+    if not result.wasSuccessful() or (args.suite != "all" and result.skipped):
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()

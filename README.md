@@ -42,11 +42,14 @@ locked development/build dependencies into `.venv`:
 ```bash
 uv sync --locked
 uv run --locked biucing list
-uv run --locked python -m unittest discover -s tests
+uv run --locked python scripts/run-tests --suite core
 uv run --locked ruff check --select E4,E7,E9,F src tests scripts
 uv run --locked biucing validate
 uv run --locked python scripts/verify-distribution
 ```
+
+Core checks run on Linux and macOS without native SDKs. See [testing](docs/testing.md)
+for macOS tool integrations and optional Android resource compilation.
 
 Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
 `pyproject.toml` and `uv.lock` together. For deliberate upgrades use

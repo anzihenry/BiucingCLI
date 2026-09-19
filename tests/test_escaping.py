@@ -13,6 +13,7 @@ from contextlib import redirect_stdout
 from html.parser import HTMLParser
 from pathlib import Path
 from dataclasses import replace
+from suite_support import android_test, platform_test
 
 from biucingcli.cli import main
 from biucingcli.escaping import swift_string
@@ -75,6 +76,7 @@ class EscapingTests(unittest.TestCase):
             errors = validate_template_placeholders(definition)
             self.assertTrue(any("require an explicit context" in error for error in errors))
 
+    @android_test
     @unittest.skipUnless(os.environ.get("AAPT2"), "Set AAPT2 to validate native Android resources")
     def test_android_resources_compile_with_aapt2(self):
         for value in SAMPLES:
@@ -116,6 +118,7 @@ class EscapingTests(unittest.TestCase):
                 data = json.loads((project / "AppScope/resources/base/element/string.json").read_text())
                 self.assertEqual(data["string"][0]["value"], value)
 
+    @platform_test
     @unittest.skipUnless(shutil.which("node"), "Node required for JS string evaluation")
     def test_frontend_and_arkts_literals_evaluate_to_original_text(self):
         for value in SAMPLES:
@@ -143,6 +146,7 @@ class EscapingTests(unittest.TestCase):
                                             capture_output=True, text=True, check=True)
                     self.assertEqual(json.loads(result.stdout), [value] * len(literals))
 
+    @platform_test
     @unittest.skipUnless(shutil.which("swift"), "Swift required for literal evaluation")
     def test_swift_literals_and_generated_window_title(self):
         literals = []

@@ -11,7 +11,10 @@ These checks apply to every release regardless of which template changed.
 
 | Area | Command or proof | Release bar |
 | --- | --- | --- |
-| Unit test suite | `uv run --locked python -m unittest discover -s tests` | Must pass |
+| Core test suite | `uv run --locked python scripts/run-tests --suite core` | Linux/macOS, Python 3.11–3.14 |
+| Platform test suite | `uv run --locked python scripts/run-tests --suite platform` | macOS, Python 3.11; no skips |
+| Generated configuration parsing | `uv run --locked python scripts/verify-distribution` | Installed wheel output parses in every core matrix job |
+| Generated Make entrypoints | `uv run --locked python scripts/verify-distribution --check-make` | macOS platform gate |
 | Template metadata validation | `uv run --locked biucing validate` | Must pass with zero errors |
 | Human-readable list output | Golden-backed `tests/test_cli.py` coverage for `biucing list` | Must pass |
 | JSON list output | Golden-backed `tests/test_cli.py` coverage for `biucing list --json` | Must pass |

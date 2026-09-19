@@ -75,6 +75,12 @@ These checks should pass for every release, even if no template changed.
 
 First run `uv sync --locked` to install the project and its development/build tools.
 
+The full command blocks below require macOS tools. For the split release gates,
+run `python scripts/run-tests --suite core` through uv on Linux/macOS and
+`python scripts/run-tests --suite platform` through uv on macOS. Run the artifact
+verifier with `--check-make` on macOS as well. See [testing.md](testing.md).
+Both suites and generated configuration parsing must pass before publishing.
+
 ```bash
 uv run --locked python -m unittest discover -s tests
 uv run --locked ruff check --select E4,E7,E9,F src tests scripts

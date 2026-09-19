@@ -11,6 +11,7 @@ from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import patch
+from suite_support import platform_test
 
 from biucingcli.cli import apple_platform_config
 from biucingcli.cli import default_kotlin_module_name
@@ -459,6 +460,7 @@ class CLITestCase(unittest.TestCase):
             )
             self.assertIn("uses unsupported validator 'wrong-validator'", joined)
 
+    @platform_test
     def test_all_templates_implement_the_common_make_command_contract(self):
         expected_commands = set(REQUIRED_COMMAND_CONTRACT)
 
@@ -2222,6 +2224,7 @@ class CLITestCase(unittest.TestCase):
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "doctor", os.X_OK))
 
+    @platform_test
     def test_create_worker_renders_template_and_generated_tests_pass(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = self.run_cli(
@@ -2601,6 +2604,7 @@ class CLITestCase(unittest.TestCase):
                 os.access(project_dir / "scripts" / "verify-release-identity", os.X_OK)
             )
 
+    @platform_test
     def test_apple_release_generation_discards_debug_bundle_suffix(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             self.run_cli(
@@ -2673,6 +2677,7 @@ class CLITestCase(unittest.TestCase):
                 ["install||", "generate||"],
             )
 
+    @platform_test
     def test_apple_release_identity_script_checks_workspace_and_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             self.run_cli(
@@ -2862,6 +2867,7 @@ class CLITestCase(unittest.TestCase):
             self.assertIn('navigationTitle("Starter Overview")', home_view)
             self.assertNotIn("NavigationSplitView", home_view)
 
+    @platform_test
     def test_native_templates_ignore_credentials_without_hiding_public_fixtures(self):
         cases = {
             "apple": {
@@ -2986,6 +2992,7 @@ class CLITestCase(unittest.TestCase):
                     )
                     self.assertEqual(result.returncode, 1, relative_path)
 
+    @platform_test
     def test_android_supply_chain_and_signed_aab_verification(self):
         if not all(shutil.which(tool) for tool in ("keytool", "jarsigner")):
             self.skipTest("JDK signing tools are unavailable")
@@ -3073,6 +3080,7 @@ class CLITestCase(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("does not match the configured release key", result.stderr)
 
+    @platform_test
     def test_harmonyos_supply_chain_and_hap_identity_verification(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = self.create_harmony_release_fixture(tmpdir, "verified-harmony")
@@ -3172,6 +3180,7 @@ if [[ -f "$path" ]] && grep -q bad-signer "$path"; then printf '%s\n' 'SHA256: D
             self.assertEqual(result.returncode, 1)
             self.assertIn("bundle identity does not match", result.stderr)
 
+    @platform_test
     def test_harmonyos_release_restores_profile_after_success_and_failure(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = self.create_harmony_release_fixture(
@@ -3277,6 +3286,7 @@ fi
                     self.assertEqual(build_profile_path.read_bytes(), original_profile)
                     self.assertFalse((project_dir / ".biucing" / "release").exists())
 
+    @platform_test
     def test_harmonyos_release_rejects_residue_and_dirty_build_profile(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = self.create_harmony_release_fixture(

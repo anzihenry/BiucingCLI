@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- parse generated JSON, JSON5, YAML, TOML, XML and plist configurations in
+  regression tests and installed-wheel verification;
+- split Python-only Linux/macOS core CI from macOS tool integration release gates;
+- add explicit suite selection and prevent dedicated suites from silently skipping tests.
+
 - expose variable validators, choices, and effective numeric bounds in list/info JSON;
 - add schema_version and generator_version to every JSON result and error envelope.
 

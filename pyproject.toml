@@ -14,7 +14,7 @@ dependencies = []
 biucing = "biucingcli.cli:main"
 
 [dependency-groups]
-dev = ["ruff==0.16.6", "twine>=6.1,<7"]
+dev = ["ruff==0.16.6", "twine>=6.1,<7", "PyYAML>=6,<7", "json5>=0.12,<1"]
 # Keep setuptools aligned with build-system.requires for isolated installs too.
 build = ["setuptools==84.0.0", "wheel>=0.45"]
 
