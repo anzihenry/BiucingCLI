@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.1 - 2026-09-19
+
 - manage development and build dependencies with uv sync and a committed uv.lock;
 - run CI and installed-artifact checks through uv with locked build tools;
 - add verified TestPyPI/PyPI publishing through uv publish and Trusted Publishing.
