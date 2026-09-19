@@ -58,7 +58,15 @@ does not use the build dependency versions from `uv.lock`.
 See [the uv development and publishing guide](docs/uv-workflow.md) for local
 builds, TestPyPI rehearsal, and automated PyPI publishing with `uv publish`.
 
+## Errors and Automation
+
+For scripts, use `--json`; it disables interactive prompts. Successful JSON
+results go to stdout. Failures leave stdout empty and write one JSON error
+object to stderr with `schema_version`, `ok: false`, and `error.code/message`.
+See [the CLI error contract](docs/cli-errors.md) for exit codes and examples.
+
 ## Product Direction
+
 
 BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:
 

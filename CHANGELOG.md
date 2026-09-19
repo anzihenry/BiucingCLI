@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- handle terminal EOF and Ctrl+C without tracebacks, with exit codes 2 and 130;
+- disable prompts for JSON mode and non-terminal stdin, and send prompts to stderr;
+- emit versioned JSON errors on stderr, including argument parsing and validation failures;
+- require complete long option names so JSON error-mode detection is unambiguous.
+
 - escape free-text template inputs for their XML, Android resource, JSON,
   JavaScript, Kotlin, Swift, YAML, and Dockerfile contexts;
 - preserve placeholder-like user text with single-pass rendering and add

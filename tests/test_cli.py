@@ -35,7 +35,7 @@ class CLITestCase(unittest.TestCase):
             if stdin_values is None:
                 main(argv)
             else:
-                with patch("builtins.input", side_effect=stdin_values):
+                with patch("builtins.input", side_effect=stdin_values), patch("sys.stdin.isatty", return_value=True):
                     main(argv)
         return output.getvalue()
 

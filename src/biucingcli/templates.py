@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import stat
+import sys
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -33,6 +34,14 @@ class GenerationError(BiucingError):
 
 class GenerationConflictError(GenerationError):
     """Raised when generation would overwrite an existing path."""
+
+
+class MissingInputError(ValueError):
+    """Required variables were not supplied."""
+
+
+class InputEndedError(BiucingError):
+    """Interactive input ended before a required value was supplied."""
 
 
 @dataclass(frozen=True)
@@ -769,15 +778,25 @@ def resolve_variables_detailed(
                 missing_required.append(variable.name)
                 continue
             prompt = variable.prompt or f"{variable.name}: "
-            answer = input(prompt).strip()
+            print(prompt, end="", file=sys.stderr, flush=True)
+            try:
+                answer = input().strip()
+            except EOFError as exc:
+                print(file=sys.stderr)
+                raise InputEndedError(
+                    f"Input ended while reading {variable.name}; supply it with a flag or --set."
+                ) from exc
+            except KeyboardInterrupt:
+                print(file=sys.stderr)
+                raise
             if not answer:
-                raise ValueError(f"Missing required value for {variable.name}")
+                raise MissingInputError(f"Missing required value for {variable.name}")
             resolved[variable.name] = answer
             resolution_sources[variable.name] = "prompted"
 
     if missing_required:
         missing_list = ", ".join(missing_required)
-        raise ValueError(
+        raise MissingInputError(
             f"Missing required values in non-interactive mode: {missing_list}"
         )
 

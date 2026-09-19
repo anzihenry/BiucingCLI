@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from biucingcli import __version__
@@ -11,6 +12,11 @@ from biucingcli.escaping import swift_string
 from biucingcli.templates import (
     BiucingError,
     InvalidTemplateError,
+    GenerationConflictError,
+    GenerationError,
+    InputEndedError,
+    MissingInputError,
+    UnknownTemplateError,
     load_template,
     load_templates,
     render_template,
@@ -309,9 +315,34 @@ def parse_set_values(items: list[str]) -> dict[str, str]:
     return values
 
 
+class CLIUsageError(ValueError):
+    """Argument parsing failure handled by the common CLI error boundary."""
+
+
+class CLIParser(argparse.ArgumentParser):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+    def error(self, message):
+        raise CLIUsageError(message)
+
+
+def exit_with_error(parser, json_mode, code, message, status, details=None):
+    """Emit exactly one diagnostic on stderr, leaving stdout for successful results."""
+    if json_mode:
+        error = {"code": code, "message": message}
+        if details is not None:
+            error["details"] = details
+        diagnostic = json.dumps({"schema_version": 1, "ok": False, "error": error})
+    else:
+        diagnostic = f"error: {message}"
+    parser.exit(status, diagnostic + "\n")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser."""
-    parser = argparse.ArgumentParser(prog="biucing", description="Project scaffold generator.")
+    parser = CLIParser(prog="biucing", description="Project scaffold generator.")
     parser.add_argument(
         "--version",
         action="version",
@@ -639,7 +670,7 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     resolution_result = resolve_variables_detailed(
         definition,
         provided_values,
-        interactive=not args.non_interactive,
+        interactive=not (args.non_interactive or args.json) and sys.stdin.isatty(),
     )
     values = dict(resolution_result.values)
     derived_values: dict[str, str] = {}
@@ -803,9 +834,12 @@ def create_project_output(args: argparse.Namespace) -> str:
 def main(argv: list[str] | None = None) -> None:
     """Run the CLI."""
     parser = build_parser()
-    args = parser.parse_args(argv)
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    option_arguments = arguments[:arguments.index("--")] if "--" in arguments else arguments
+    json_mode = "--json" in option_arguments
 
     try:
+        args = parser.parse_args(arguments)
         if args.command is None:
             print(format_template_summary())
             return
@@ -825,6 +859,9 @@ def main(argv: list[str] | None = None) -> None:
 
         if args.command == "validate":
             errors = validate_templates()
+            if errors and args.json:
+                exit_with_error(parser, True, "validation_failed", "Template validation failed.",
+                                1, details=errors)
             if args.json:
                 print(format_validation_report_json(errors))
             else:
@@ -840,10 +877,23 @@ def main(argv: list[str] | None = None) -> None:
             else:
                 print(create_project_output(args))
             return
-    except InvalidTemplateError as exc:
-        parser.exit(1, f"error: {exc}\n")
-    except (BiucingError, ValueError) as exc:
-        parser.exit(2, f"error: {exc}\n")
+    except KeyboardInterrupt:
+        exit_with_error(parser, json_mode, "cancelled", "Operation cancelled.", 130)
+    except (InputEndedError, EOFError) as exc:
+        exit_with_error(parser, json_mode, "input_ended", str(exc) or "Input ended.", 2)
+    except (BiucingError, ValueError, OSError) as exc:
+        categories = (
+            (CLIUsageError, "usage_error", 2),
+            (InvalidTemplateError, "invalid_template", 1),
+            (UnknownTemplateError, "unknown_template", 2),
+            (GenerationConflictError, "target_conflict", 2),
+            (GenerationError, "generation_failed", 2),
+            (MissingInputError, "missing_input", 2),
+            (OSError, "io_error", 1),
+        )
+        code, status = next(((code, status) for kind, code, status in categories
+                             if isinstance(exc, kind)), ("invalid_input", 2))
+        exit_with_error(parser, json_mode, code, str(exc), status)
 
 
 if __name__ == "__main__":
