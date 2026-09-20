@@ -1,10 +1,10 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 2 plan/validation/execution integration implemented with fixtures;
-shipped frontend rendering modes are not implemented**.
+Status: **stage 3 shared toolchain and CSR complete; macOS quality/build/browser
+checks and Docker Linux arm64 development/production builds and browser checks pass**.
 Recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
-the current frontend does not accept `--set rendering=...`.
+the current frontend accepts only `--set rendering=csr` (also the default).
 
 ## Scope and decisions
 
@@ -232,8 +232,8 @@ replacement. No claim of atomic no-replace publication is added.
 
 ## CLI and JSON contract
 
-Commands for the future frontend resources (the variant mechanism is currently
-covered by fixture templates; frontend itself has no rendering selector yet):
+Target commands after all modes ship (today only `csr` is accepted; `ssg` and
+`ssr` fail as invalid choices without creating files):
 
 ```bash
 biucing info frontend
@@ -425,3 +425,81 @@ failure paths. All official template resources and existing goldens remain
 unchanged. Stage 3 begins the intentional frontend resource migration; installed
 three-mode frontend/container/browser coverage remains stages 3–6, not a claim
 made by the current seven-template distribution verifier.
+
+## Stage 3 implementation boundary
+
+The shipped frontend is now variant-enabled, with **only CSR** declared and
+defaulted. Both `biucing create frontend demo` and explicit `--set rendering=csr`
+generate the same file inventory. `ssg`, `ssr` and unknown values are rejected
+before writes. There are no new generator branches or CLI flags in this stage.
+
+Common resources own package.json/lockfile, pnpm workspace settings, Vite/TS/lint/
+format/Vitest, document/error/loading shell, theme, checked-in shadcn Button/Dialog
+and MIT notice, the welcome feature, project constants, and shared browser tests.
+The CSR layer owns route declaration/modules, React Router configuration,
+Make/Docker/Compose/Nginx/doctor, env guidance, README and browser launch presets.
+No overrides or JSON merges are needed. The old `src/` tree and source index.html
+are intentionally removed; application output is `build/client/`. Existing API
+mock/dashboard code is replaced with a small counter/dialog/routes example;
+there is no invented backend API contract in the new preset.
+
+Pinned central versions: Node 24.19.x, pnpm 11.21.0, React 19.3.0, React Router
+8.4.0, TypeScript 7.0.2, Vite 8.3.0, Tailwind 4.3.3, Vitest 5.0.1 and Playwright
+1.63.0. TS 6.0.2 remains a specifically named compatibility alias for lint's API;
+the typecheck command invokes TS 7 by its explicit path. The lint command checks
+the compiler version and a no-floating-promises negative control. React Hooks
+7.1.1 is used because 7.0.1 did not declare ESLint 10 support. Strict peer checks
+pass without overrides or suppressed peer ranges. The shadcn CLI/Zod workaround
+is not a dependency or override of generated applications.
+
+pnpm 11 ignores store configuration in the old `.npmrc`; it is now declared as
+`storeDir: ${PNPM_STORE_DIR:-.pnpm-store}` in pnpm-workspace.yaml and verified both
+locally and with an explicit environment override. Docker uses its scoped store
+volume. Existing Make command names, scoped Compose/image/cache names, explicit
+ports, diagnostics and cleanup remain. Frozen install runs on dev startup rather
+than trusting the existence of a potentially stale node_modules directory.
+
+Generated formatting is independent of display-name substitution in browser
+tests: they import the shared project constant instead of duplicating user text.
+The user-text declaration is locally prettier-ignored so its escaping/length
+cannot force a post-generation manual format step. JSX renders the string as text.
+
+Local verification on macOS (2026-09-21): clean frozen install, strict peers,
+format/lint (including negative control), TS 7/route types, component test and
+production build passed. Desktop 1280x800 and mobile 390x844 browser checks passed
+against both development and production-build Vite preview using installed Chrome.
+Production-build desktop/mobile tests also passed with the downloaded Playwright
+Chromium via `PLAYWRIGHT_CHANNEL=chromium`. The optional separate Headless Shell
+download was stopped during cleanup; the default no-channel launch was not tested.
+An additional interactive browser check confirmed Escape focus restoration,
+deep-link refresh, no overflow and no console errors.
+
+Docker follow-up on 2026-09-21 (Docker Desktop 29.8.0, Linux arm64): a freshly
+generated project with quotes, Chinese text, angle brackets, backslash, dollar
+sign and placeholder-like display text passed the normal development image build,
+frozen install, strict peers and complete `make verify`. The multi-stage production
+image built successfully; Nginx configuration/health checks passed, and the runtime
+contains static output without Node, node_modules or a server bundle. Three
+Playwright tests using macOS Chrome against actual containerized Nginx passed,
+covering desktop/mobile interactions and static-response behavior. Compose scoped
+names, ports, store path, diagnostics and container-to-host connectivity passed.
+Linux arm64 Playwright Chromium passed the same three actual-Nginx tests. After
+the bundled Headless Shell download completed, the default-channel Make workflow
+also passed all three actual-Nginx production tests and both development tests.
+The scoped test containers/network/volumes are removed with `make clean-worktree`;
+built images and generated temporary projects are retained for reproduction.
+
+This run found a container-only SPA prerender failure: Vite preview listened on
+`::1` while the React Router request connected to `127.0.0.1`. Common Vite config
+now explicitly sets `preview.host` to `127.0.0.1`; a generated-config regression
+assertion protects it. Both Docker and macOS builds pass with the fix.
+This evidence does not cover the optional `Dockerfile.dev.full` image, Linux amd64,
+native Linux hosts, remote CI, SSG or SSR.
+
+Python coverage: 157 core + 11 macOS platform + one Android test; four new shipped
+CSR tests check default/explicit equivalence, ownership, choices and toolchain
+roles. Resource-aware assertions replace tests assuming Make/README live in the
+common directory. Generation/list/required-file goldens change only for frontend;
+other templates preserve their entries. The wheel/sdist verifier generates the
+new CSR output and parses seven frontend configs. It does not yet run Node or
+three-mode browser/container checks from installed artifacts (stage 6).

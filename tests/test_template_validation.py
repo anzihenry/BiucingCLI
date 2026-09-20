@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from biucingcli.catalog import load_templates
+from biucingcli.resources import resolve_resources
 from biucingcli.validation import validate_templates
 
 
@@ -20,9 +21,15 @@ class TemplateValidationTests(CLIHelpers, unittest.TestCase):
         self.assertEqual(len(definitions), 7)
         for definition in definitions:
             with self.subTest(template=definition.name):
-                self.assertTrue((definition.template_dir / "README.md").is_file())
-                self.assertTrue((definition.template_dir / "Makefile").is_file())
-                self.assertTrue((definition.template_dir / ".gitignore").is_file())
+                if definition.variants is not None:
+                    for mode in definition.variants.options:
+                        resources = resolve_resources(definition, {definition.variants.selector: mode})
+                        files = {entry.output_path for entry in resources.entries if entry.kind == "file"}
+                        self.assertTrue({"README.md", "Makefile", ".gitignore"}.issubset(files))
+                else:
+                    self.assertTrue((definition.template_dir / "README.md").is_file())
+                    self.assertTrue((definition.template_dir / "Makefile").is_file())
+                    self.assertTrue((definition.template_dir / ".gitignore").is_file())
         android = next(item for item in definitions if item.name == "android")
         self.assertTrue(
             (android.template_dir / "gradle" / "wrapper" / "gradle-wrapper.jar").is_file()

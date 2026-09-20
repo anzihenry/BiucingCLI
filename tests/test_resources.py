@@ -29,6 +29,7 @@ class ResourceFixture:
         self.common.mkdir(parents=True)
         self.metadata = json.loads((templates_root() / "frontend/template.json").read_text())
         self.metadata.update(name="fixture", contracts=[], required_entries=[])
+        self.metadata["variables"] = [v for v in self.metadata["variables"] if v["name"] != "rendering"]
         self.metadata["variables"].append({
             "name": "rendering", "required": True, "validator": "text",
             "choices": ["csr", "ssg", "ssr"], "default": "csr",
@@ -70,7 +71,7 @@ class ResourceTests(ResourceFixture, unittest.TestCase):
         self.assertEqual(definition.to_dict()["variants"], {
             "selector": "rendering", "default": "csr", "choices": ["csr", "ssg", "ssr"],
         })
-        self.assertIsNone(load_template("frontend").variants)
+        self.assertIsNone(load_template("web-service").variants)
 
     def test_new_models_copy_mutable_inputs(self):
         required = ["a"]

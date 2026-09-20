@@ -1,12 +1,11 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
+import { reactRouter } from "@react-router/dev/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "node:url";
 export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: "./src/test/setup.ts",
-    include: ["src/**/*.test.{ts,tsx}"],
-  },
+  plugins: [tailwindcss(), reactRouter()],
+  resolve: { alias: { "@": fileURLToPath(new URL("./app", import.meta.url)) } },
+  build: { outDir: "build/client" },
+  // React Router uses preview during SPA prerender; avoid localhost IPv4/IPv6 mismatch.
+  preview: { host: "127.0.0.1" },
 });

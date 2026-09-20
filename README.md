@@ -52,8 +52,9 @@ Core checks run on Linux and macOS without native SDKs. See [testing](docs/testi
 for macOS tool integrations and optional Android resource compilation.
 See [kernel modules](docs/kernel-modules.md) for ownership and compatibility
 boundaries, and [template authoring](docs/template-authoring.md) to add templates.
-The [frontend rendering plan](docs/frontend-rendering-plan.md) specifies the planned
-CSR/SSG/SSR variants; these modes are not yet implemented in the shipped template.
+The [frontend rendering plan](docs/frontend-rendering-plan.md) tracks CSR/SSG/SSR
+variants. The shipped frontend now defaults to CSR (explicitly select it with
+`--set rendering=csr`); SSG and SSR remain future stages.
 
 Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
 `pyproject.toml` and `uv.lock` together. For deliberate upgrades use
@@ -80,7 +81,7 @@ See [the JSON contract](docs/json-contract.md) for compatibility and field seman
 
 BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:
 
-- `frontend`: React + TypeScript starter with Docker-first local development, Vitest, and Playwright smoke checks
+- `frontend`: React Router Framework Mode CSR, React 19.3, TypeScript 7, Tailwind 4 and shadcn/ui; shared pnpm lockfile, Vitest and Playwright checks
 - `web-service`: Go + Gin web service starter with Docker development/runtime workflows
 - `microservice`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
 - `worker`: Go background worker starter with scheduled and oneshot execution modes
@@ -132,7 +133,7 @@ This repository contains a small internal template system with practical starter
 
 The current maturity split is:
 
-- `frontend`, `web-service`, and `microservice` are fully Dockerized for development, verification, and runtime packaging.
+- `frontend`, `web-service`, and `microservice` include Docker development, verification, and runtime workflows. The migrated frontend's current verification limits are recorded in the [rendering plan](docs/frontend-rendering-plan.md).
 - `worker` is a backend-adjacent starter for scheduled and oneshot background execution, with generated-project `go test ./...` validation and Docker packaging.
 - `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
 - `harmonyos` is an experimental native starter for ArkTS/ArkUI projects that open in DevEco Studio and expose bootstrap, doctor, lint, build, and signing guidance workflows.

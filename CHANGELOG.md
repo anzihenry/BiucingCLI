@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- migrate frontend to a CSR-only React Router Framework preset with shared React
+  19.3 / TypeScript 7 / Tailwind 4 / shadcn UI resources and a pnpm 11 lockfile;
+  preserve worktree-scoped Docker/Make workflows, add typed-lint negative checks,
+  browser interaction coverage and frontend-only golden updates. SSG/SSR are not
+  advertised yet. Revalidate development/production Docker images on Linux arm64
+  and browser behavior against actual Nginx; fix the IPv4/IPv6 preview mismatch
+  in container SPA prerender and protect the configuration with a regression check.
+
 - integrate optional resource variants with generation plans, effective file/Make/
   placeholder validation, all-mode validation and staged execution; detect source
   drift and add optional schema-1 variant summaries without changing legacy output;

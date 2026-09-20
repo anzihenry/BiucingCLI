@@ -1,0 +1,8 @@
+packages:
+  - .
+
+storeDir: ${PNPM_STORE_DIR:-.pnpm-store}
+strictPeerDependencies: true
+
+onlyBuiltDependencies:
+  - esbuild

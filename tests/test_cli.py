@@ -178,13 +178,13 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
 
         self.assertEqual(code, 2)
         self.assertEqual(stdout, "")
-        self.assertIn("error: output directory does not exist:", stderr)
+        self.assertIn("error: output directory does not exist or is not a directory:", stderr)
         self.assertNotIn("Traceback", stderr)
 
     def test_create_cleans_staging_directory_after_io_failure(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             with patch(
-                "biucingcli.generation.shutil.copytree",
+                "biucingcli.generation.shutil.copy2",
                 side_effect=OSError("synthetic copy failure"),
             ):
                 code, stdout, stderr = self.run_cli_failure(
@@ -449,11 +449,11 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             )
             project_dir = Path(tmpdir) / "scripted-app"
             package_json = (project_dir / "package.json").read_text(encoding="utf-8")
-            index_html = (project_dir / "index.html").read_text(encoding="utf-8")
+            index_html = (project_dir / "app/lib/project.ts").read_text(encoding="utf-8")
 
             self.assertIn("Created frontend project: scripted-app", output)
             self.assertIn('"name": "scripted.frontend"', package_json)
-            self.assertIn("<title>Scripted Frontend</title>", index_html)
+            self.assertIn('title: "Scripted Frontend"', index_html)
 
     def test_create_microservice_prompts_for_proto_package(self):
         with tempfile.TemporaryDirectory() as tmpdir:

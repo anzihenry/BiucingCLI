@@ -126,18 +126,11 @@ class EscapingTests(unittest.TestCase):
                 with self.subTest(value=value, template=template), tempfile.TemporaryDirectory() as tmp:
                     project = self.generate(template, value, tmp)
                     if template == "frontend":
-                        html = (project / "index.html").read_text()
-                        title = re.search(r"<title>(.*?)</title>", html, re.S)[1]
-                        parser = TextCollector()
-                        parser.feed(title)
-                        self.assertEqual("".join(parser.parts), value)
-                        source = (project / "src/pages/HomePage.tsx").read_text()
-                        literals = [re.search(r"<h1>\{(" + JS_STRING + r")\}</h1>", source)[1]]
-                        source = (project / "src/services/projectOverview.ts").read_text()
-                        literals.append(re.search(r"title: (" + JS_STRING + ")", source)[1])
-                        for name in ("browser-smoke", "production-browser-smoke"):
-                            source = (project / f"tests/{name}.spec.ts").read_text()
-                            literals.append(re.search(r"toHaveTitle\((" + JS_STRING + r")\)", source)[1])
+                        source = (project / "app/lib/project.ts").read_text()
+                        literals = [re.search(r"title: (" + JS_STRING + ")", source)[1]]
+                        source = (project / "tests/interactions.ts").read_text()
+                        self.assertIn("toHaveTitle(project.title)", source)
+                        self.assertIn('from "../app/lib/project"', source)
                     else:
                         source = (project / "entry/src/main/ets/core/config/AppConfig.ets").read_text()
                         literals = [re.search(r"displayName: string = ('(?:\\.|[^'\\])*')", source)[1]]

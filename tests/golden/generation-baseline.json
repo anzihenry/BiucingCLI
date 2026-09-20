@@ -6,11 +6,14 @@
       "operation": "create",
       "template": {
         "name": "frontend",
-        "description": "React + TypeScript starter for independent projects",
+        "description": "React Router + TypeScript + Tailwind starter for independent projects",
         "category": "frontend",
         "stack": [
           "React",
-          "TypeScript"
+          "React Router",
+          "TypeScript",
+          "Tailwind CSS",
+          "shadcn/ui"
         ],
         "platforms": [
           "web"
@@ -34,6 +37,11 @@
           "name": "package_name",
           "value": "demo",
           "source": "default_from:project_name"
+        },
+        {
+          "name": "rendering",
+          "value": "csr",
+          "source": "default"
         }
       ],
       "derived_values": {},
@@ -44,12 +52,11 @@
         "make docker-build",
         "make docker-run"
       ],
-      "template_file_count": 41,
+      "template_file_count": 45,
       "template_top_level_entries": [
         ".dockerignore",
         ".env.example",
         ".gitignore",
-        ".npmrc",
         ".pnpm-store",
         ".prettierignore",
         ".prettierrc.json",
@@ -58,41 +65,45 @@
         "Dockerfile.dev.full",
         "Makefile",
         "README.md",
+        "THIRD_PARTY_NOTICES.md",
+        "app",
+        "components.json",
         "compose.dev.yaml",
         "eslint.config.js",
-        "index.html",
         "nginx.conf",
         "package.json",
+        "playwright.build.config.ts",
         "playwright.production.config.ts",
         "playwright.smoke.config.ts",
         "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
         "public",
+        "react-router.config.ts",
         "scripts",
-        "src",
         "tests",
         "tsconfig.json",
-        "vite.config.ts"
-      ]
+        "vite.config.ts",
+        "vitest.config.ts"
+      ],
+      "selected_variant": {
+        "selector": "rendering",
+        "value": "csr"
+      }
     },
     "entries": {
       ".dockerignore": {
         "kind": "file",
-        "sha256": "673dc030096ae4d2a564bd88e22bbeb44e1ccc89fb20baf947aa023491ef5093",
+        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
         "execute_bits": "0o0"
       },
       ".env.example": {
         "kind": "file",
-        "sha256": "5df43efa989ffa4f3b57cf9247cb883b23c8f4a08e5a7971341c2b6ca7824001",
+        "sha256": "e1e6834143088ef38f0f8e3327f73149c812e0f6c9c3c6145186a515bbfd944d",
         "execute_bits": "0o0"
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "0c3bb33ed22cac5e469231563bf9dc542eb72a645e1dac74a3e615f8efbc8a6c",
-        "execute_bits": "0o0"
-      },
-      ".npmrc": {
-        "kind": "file",
-        "sha256": "7cd4fecae7ef541691b098bb473d26742f6eb01a02cef038ad1df4ea7f7070e6",
+        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
         "execute_bits": "0o0"
       },
       ".pnpm-store": {
@@ -103,7 +114,7 @@
       },
       ".prettierignore": {
         "kind": "file",
-        "sha256": "a2409cab6567095750a1a50cbfb5c19cefdb84e10fb48a6cac3f92c4939dfea3",
+        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
         "execute_bits": "0o0"
       },
       ".prettierrc.json": {
@@ -113,67 +124,163 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "17ae9fd3c4ff479c49fd6e41ad2a53aae94bb56017c73157faebadfa929cc590",
+        "sha256": "dd74c6d5b99a7c5fb589d0ef6d3fce6e1e037a22c17e556ddb377c71065f169f",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
         "kind": "file",
-        "sha256": "9c0b9e643cccc462e124597273a534b6cb4497d8713b82c927733549874a2298",
+        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev.full": {
         "kind": "file",
-        "sha256": "476ba03d236ae37c1184efeb93ad7ef7f143c4e405de1e68f2de0791220ad96b",
+        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "1d3fa360c2554006707755e0446b1d00c9a7963bae6004ba7d92ad61a16d9f37",
+        "sha256": "66ad813bcf5447c57fc9f4bf5d8b2e73ca63382b4bc60e65827b0d240234a999",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "8f3ac2529af6cf587f74ec330f1e94b96f32c9370c5e5e185de19f440f297f3a",
+        "sha256": "3fe63b8a905afc3976bc09098f6c779ee2f9fc4a9075ca4b74c6b2500a3730a5",
+        "execute_bits": "0o0"
+      },
+      "THIRD_PARTY_NOTICES.md": {
+        "kind": "file",
+        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
+        "execute_bits": "0o0"
+      },
+      "app": {
+        "kind": "directory"
+      },
+      "app/app.css": {
+        "kind": "file",
+        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
+        "execute_bits": "0o0"
+      },
+      "app/components": {
+        "kind": "directory"
+      },
+      "app/components/ui": {
+        "kind": "directory"
+      },
+      "app/components/ui/button.tsx": {
+        "kind": "file",
+        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+        "execute_bits": "0o0"
+      },
+      "app/components/ui/dialog.tsx": {
+        "kind": "file",
+        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
+        "execute_bits": "0o0"
+      },
+      "app/features": {
+        "kind": "directory"
+      },
+      "app/features/welcome.test.tsx": {
+        "kind": "file",
+        "sha256": "a8ba09cb5b547fd1f47108cd2f628b913ac3a114cbd4f3488cb24931db58833d",
+        "execute_bits": "0o0"
+      },
+      "app/features/welcome.tsx": {
+        "kind": "file",
+        "sha256": "0700d4618d4e7345fbc5106d9ad500a339f5dceb91943aa649d6f479df69002a",
+        "execute_bits": "0o0"
+      },
+      "app/lib": {
+        "kind": "directory"
+      },
+      "app/lib/project.ts": {
+        "kind": "file",
+        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
+        "execute_bits": "0o0"
+      },
+      "app/lib/utils.ts": {
+        "kind": "file",
+        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
+        "execute_bits": "0o0"
+      },
+      "app/root.tsx": {
+        "kind": "file",
+        "sha256": "cebdeac95c0bcc8f4f229762956544ca64b19a6f490ad0ab9569df5f16b00dee",
+        "execute_bits": "0o0"
+      },
+      "app/routes": {
+        "kind": "directory"
+      },
+      "app/routes/about.tsx": {
+        "kind": "file",
+        "sha256": "fc3ea930e60564c2e085807b95331cb285f59d58c47dd472d15b0b92b8e7f975",
+        "execute_bits": "0o0"
+      },
+      "app/routes/home.tsx": {
+        "kind": "file",
+        "sha256": "4470cca55904b474bcbf3b0d07222218a34c824496e4d8af8348e72eb8154b19",
+        "execute_bits": "0o0"
+      },
+      "app/routes.ts": {
+        "kind": "file",
+        "sha256": "5884d6daf61bac403245eafbf20a7b4663d09f267ec09a666c32641a789137a5",
+        "execute_bits": "0o0"
+      },
+      "app/test": {
+        "kind": "directory"
+      },
+      "app/test/setup.ts": {
+        "kind": "file",
+        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
+        "execute_bits": "0o0"
+      },
+      "components.json": {
+        "kind": "file",
+        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "b3b909216458816a60c7e5e3356789ccd3887ad684de6408882e201d783222c6",
+        "sha256": "358ded6701ca1db9d36d0065c0ef39ef85a8917f481e0728347073c2d12acd37",
         "execute_bits": "0o0"
       },
       "eslint.config.js": {
         "kind": "file",
-        "sha256": "3fd5505eaed512d788def7921636a8722b07bca31559821736cd95007b5eff7e",
-        "execute_bits": "0o0"
-      },
-      "index.html": {
-        "kind": "file",
-        "sha256": "2f762edddb27f5b15d7eb83774a7d9c4a5a3a66af8611a7dd0577bea91fce2be",
+        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
         "execute_bits": "0o0"
       },
       "nginx.conf": {
         "kind": "file",
-        "sha256": "5f83763d42cd00d70b2e63e30971df9bd0e11bd61891bcb27b7ba66309383ffc",
+        "sha256": "2290f2267d20649faab65e053a6d1c9c26997c721f53c86bebb8ae24f693f528",
         "execute_bits": "0o0"
       },
       "package.json": {
         "kind": "file",
-        "sha256": "8678286f76f3b7a0c8ed9ef266322cedb6a3884f1a7dc87f30596575c213419e",
+        "sha256": "cf1117c84cc0476a1b1eb8285ee8e711d37b09d494522401025bd1528606988d",
+        "execute_bits": "0o0"
+      },
+      "playwright.build.config.ts": {
+        "kind": "file",
+        "sha256": "e1a1ea2159f29157d9359ae09f3c90c35b8a81cb2472976c899c22ac52ecc82e",
         "execute_bits": "0o0"
       },
       "playwright.production.config.ts": {
         "kind": "file",
-        "sha256": "f28848135c33da71cb1f9bf48b0db14fe795e78fd4ac6f27ccb48862ba62cf47",
+        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
         "execute_bits": "0o0"
       },
       "playwright.smoke.config.ts": {
         "kind": "file",
-        "sha256": "a307f3aaeddbf1b727aec7ee0e364214b4409a7aea955a7d602fe5644958d6ee",
+        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
         "execute_bits": "0o0"
       },
       "pnpm-lock.yaml": {
         "kind": "file",
-        "sha256": "8fcdf677de22a4ff4d163d3b076204f69db0c9f3749b790d08f9e2c8d3b4c2af",
+        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
+        "execute_bits": "0o0"
+      },
+      "pnpm-workspace.yaml": {
+        "kind": "file",
+        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
         "execute_bits": "0o0"
       },
       "public": {
@@ -184,6 +291,16 @@
         "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         "execute_bits": "0o0"
       },
+      "public/favicon.svg": {
+        "kind": "file",
+        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
+        "execute_bits": "0o0"
+      },
+      "react-router.config.ts": {
+        "kind": "file",
+        "sha256": "fa96da2733b8ac71a6486de9e13625c643148a56d1c1e8138c19350c7c6aba80",
+        "execute_bits": "0o0"
+      },
       "scripts": {
         "kind": "directory"
       },
@@ -192,137 +309,47 @@
         "sha256": "053c203240c47922e0900d34d71f2df25bb3aa0f32fd215a96ad937ded6af16d",
         "execute_bits": "0o111"
       },
-      "scripts/doctor": {
+      "scripts/check-toolchain.mjs": {
         "kind": "file",
-        "sha256": "1c7b3b9a6732a9aa946517cfa1a2a558e0f1431dc102d753d2e1c0bee7839adf",
+        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
         "execute_bits": "0o111"
       },
-      "src": {
-        "kind": "directory"
-      },
-      "src/App.test.tsx": {
+      "scripts/doctor": {
         "kind": "file",
-        "sha256": "9f3afeba111677023dbf779916efc20ee6e43e38c743efff48bad9cadb04c2c5",
-        "execute_bits": "0o0"
-      },
-      "src/App.tsx": {
-        "kind": "file",
-        "sha256": "4fe40d778c052cafa08709119b4fdaec2a21324943d3d52d55e7300c8784495c",
-        "execute_bits": "0o0"
-      },
-      "src/components": {
-        "kind": "directory"
-      },
-      "src/components/MetricCard.tsx": {
-        "kind": "file",
-        "sha256": "fa2e0689269a755b57f137dfc239eba619c384507298663a75146862c18e3021",
-        "execute_bits": "0o0"
-      },
-      "src/components/TaskPanel.tsx": {
-        "kind": "file",
-        "sha256": "7aa3f5fe03f8fbca85dbb98eeccb1bfded0c2448ca550fb589f41c1c91cd1c41",
-        "execute_bits": "0o0"
-      },
-      "src/config": {
-        "kind": "directory"
-      },
-      "src/config/env.ts": {
-        "kind": "file",
-        "sha256": "176743f73f0102285388ea52c45fe2a7020ca04ddf096e2437aaed1ddabd2b79",
-        "execute_bits": "0o0"
-      },
-      "src/hooks": {
-        "kind": "directory"
-      },
-      "src/hooks/useProjectOverview.ts": {
-        "kind": "file",
-        "sha256": "32a68894ad8752ed2812516b1b989b81cb92913d69e6b1ccafb76bc0dbda2167",
-        "execute_bits": "0o0"
-      },
-      "src/index.css": {
-        "kind": "file",
-        "sha256": "6784c4b7ecbdbb88fdca0c2e51e7fa6dc25fe4a22f9685c8c5ff1877cfde98c5",
-        "execute_bits": "0o0"
-      },
-      "src/main.tsx": {
-        "kind": "file",
-        "sha256": "61d8bdc968d0006c50538d00ca97decbc65ca101757c055e87fa3e0f1af429b9",
-        "execute_bits": "0o0"
-      },
-      "src/pages": {
-        "kind": "directory"
-      },
-      "src/pages/HomePage.tsx": {
-        "kind": "file",
-        "sha256": "bf24d581bce6ee7d0490ecbea8f33ebd1802d29ed8fded008e38f8aedaeaea10",
-        "execute_bits": "0o0"
-      },
-      "src/router": {
-        "kind": "directory"
-      },
-      "src/router/AppRouter.tsx": {
-        "kind": "file",
-        "sha256": "a60f72f5e7a4185d89b98341af0a43f27e4a85422d4706214887dda762eceb4f",
-        "execute_bits": "0o0"
-      },
-      "src/services": {
-        "kind": "directory"
-      },
-      "src/services/api": {
-        "kind": "directory"
-      },
-      "src/services/api/client.ts": {
-        "kind": "file",
-        "sha256": "74d895edf909f3a12e45f974175d75cc4f86130181710f4635d6b3bac253a97d",
-        "execute_bits": "0o0"
-      },
-      "src/services/projectOverview.ts": {
-        "kind": "file",
-        "sha256": "b4a8777811e3db4f1d5452fc529c492ccfabf2401849ffec20ddf7ef3b8eba20",
-        "execute_bits": "0o0"
-      },
-      "src/test": {
-        "kind": "directory"
-      },
-      "src/test/setup.ts": {
-        "kind": "file",
-        "sha256": "9b328c4843431fa76d8de00008fc159e95f99a840211085ff3b8f25e53d14409",
-        "execute_bits": "0o0"
-      },
-      "src/types": {
-        "kind": "directory"
-      },
-      "src/types/projectOverview.ts": {
-        "kind": "file",
-        "sha256": "1074a3cd99bb4dd6c54d3f3774d77dee12001310327c6cb9c6aa01a9f67c1768",
-        "execute_bits": "0o0"
-      },
-      "src/vite-env.d.ts": {
-        "kind": "file",
-        "sha256": "0209610c59ec3f55fc39c3f3ff52882a1ea8f608985acbf070c7dc3182087d3c",
-        "execute_bits": "0o0"
+        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
+        "execute_bits": "0o111"
       },
       "tests": {
         "kind": "directory"
       },
       "tests/browser-smoke.spec.ts": {
         "kind": "file",
-        "sha256": "25dba5169c806c995c540f240810745213a35f584eaeaa3179d5df044f2f5afd",
+        "sha256": "a6bce1a63977e3df97f768979d4e075a9f8a397cdf37ce426925fa9babe59ed4",
+        "execute_bits": "0o0"
+      },
+      "tests/interactions.ts": {
+        "kind": "file",
+        "sha256": "8e3a3439d8d8d718fae810fb6dc317926ebd08c75c18a0dbef1ccd8ebe244b45",
         "execute_bits": "0o0"
       },
       "tests/production-browser-smoke.spec.ts": {
         "kind": "file",
-        "sha256": "35915540a0f4741af5dc2332fcdb6a22a2615aa42b3d100f04a7803a27d54cb2",
+        "sha256": "07120982d00fc03c703d7820275f702f139fec7f103d2a32ec30904689af7c38",
         "execute_bits": "0o0"
       },
       "tsconfig.json": {
         "kind": "file",
-        "sha256": "9665597ba397119a137d724b8987ad6584f84a987aef5cd3d481ad52eedda218",
+        "sha256": "06a5141611d1d5f01ace49c90c3642249802cdbcc9d2cda25a724f148da8bea3",
         "execute_bits": "0o0"
       },
       "vite.config.ts": {
         "kind": "file",
-        "sha256": "f3121b836660e1abb6f0d249227b8d682dfd7b963a56d2b95d56010d287a839a",
+        "sha256": "ccf5e36e6d17ed27ef0e15b0ff4edff8195492a928a52f6f44d0012c68673849",
+        "execute_bits": "0o0"
+      },
+      "vitest.config.ts": {
+        "kind": "file",
+        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
         "execute_bits": "0o0"
       }
     }

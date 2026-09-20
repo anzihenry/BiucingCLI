@@ -1,2 +1,12 @@
 dist
 node_modules
+.pnpm-store/
+.pnpm-home/
+playwright-report/
+test-results/
+
+build/
+.react-router/
+.env
+.env.*
+!.env.example

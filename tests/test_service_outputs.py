@@ -13,227 +13,46 @@ from cli_support import CLIHelpers
 class ServiceOutputTests(CLIHelpers, unittest.TestCase):
     def test_create_frontend_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            output = self.run_cli(
-                ["create", "frontend", "demo-app", "--output-dir", tmpdir]
-            )
-            project_dir = Path(tmpdir) / "demo-app"
-            package_json = (project_dir / "package.json").read_text(encoding="utf-8")
-            pnpm_lock = (project_dir / "pnpm-lock.yaml").read_text(encoding="utf-8")
-            readme = (project_dir / "README.md").read_text(encoding="utf-8")
-            index_html = (project_dir / "index.html").read_text(encoding="utf-8")
-            eslint_config = (project_dir / "eslint.config.js").read_text(encoding="utf-8")
-            prettier_config = (project_dir / ".prettierrc.json").read_text(encoding="utf-8")
-            env_example = (project_dir / ".env.example").read_text(encoding="utf-8")
-            vite_config = (project_dir / "vite.config.ts").read_text(encoding="utf-8")
-            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
-            dockerfile = (project_dir / "Dockerfile").read_text(encoding="utf-8")
-            dockerfile_dev = (project_dir / "Dockerfile.dev").read_text(encoding="utf-8")
-            dockerfile_dev_full = (
-                project_dir / "Dockerfile.dev.full"
-            ).read_text(encoding="utf-8")
-            npmrc = (project_dir / ".npmrc").read_text(encoding="utf-8")
-            compose_dev = (project_dir / "compose.dev.yaml").read_text(encoding="utf-8")
-            nginx_conf = (project_dir / "nginx.conf").read_text(encoding="utf-8")
-            dockerignore = (project_dir / ".dockerignore").read_text(encoding="utf-8")
-            app_test = (project_dir / "src" / "App.test.tsx").read_text(encoding="utf-8")
-            app_file = (project_dir / "src" / "App.tsx").read_text(encoding="utf-8")
-            env_config = (project_dir / "src" / "config" / "env.ts").read_text(encoding="utf-8")
-            playwright_config = (
-                project_dir / "playwright.smoke.config.ts"
-            ).read_text(encoding="utf-8")
-            playwright_production_config = (
-                project_dir / "playwright.production.config.ts"
-            ).read_text(encoding="utf-8")
-            browser_smoke_test = (
-                project_dir / "tests" / "browser-smoke.spec.ts"
-            ).read_text(encoding="utf-8")
-            production_browser_smoke_test = (
-                project_dir / "tests" / "production-browser-smoke.spec.ts"
-            ).read_text(encoding="utf-8")
-            production_browser_smoke_script = (
-                project_dir / "scripts" / "browser-smoke-production"
-            ).read_text(encoding="utf-8")
-            app_router = (
-                project_dir / "src" / "router" / "AppRouter.tsx"
-            ).read_text(encoding="utf-8")
-            api_client = (
-                project_dir / "src" / "services" / "api" / "client.ts"
-            ).read_text(encoding="utf-8")
-            test_setup = (
-                project_dir / "src" / "test" / "setup.ts"
-            ).read_text(encoding="utf-8")
-            home_page = (project_dir / "src" / "pages" / "HomePage.tsx").read_text(
-                encoding="utf-8"
-            )
-            overview_service = (
-                project_dir / "src" / "services" / "projectOverview.ts"
-            ).read_text(encoding="utf-8")
-            overview_type = (
-                project_dir / "src" / "types" / "projectOverview.ts"
-            ).read_text(encoding="utf-8")
-
-            self.assertTrue(project_dir.exists())
-            self.assertTrue((project_dir / "package.json").exists())
+            output = self.run_cli(["create", "frontend", "demo-app", "--output-dir", tmpdir])
+            root = Path(tmpdir) / "demo-app"
             self.assertIn("Created frontend project: demo-app", output)
-            self.assertIn("make dev", output)
-            self.assertIn("make test", output)
-            self.assertIn("make docker-build", output)
-            self.assertIn("make docker-run", output)
-            self.assertIn("demo-app", package_json)
-            self.assertIn('"packageManager": "pnpm@9.9.0"', package_json)
-            self.assertIn('"node": ">=20.0.0"', package_json)
-            self.assertIn("react-router-dom", package_json)
-            self.assertIn('"lint": "eslint ."', package_json)
-            self.assertIn('"typecheck": "tsc --noEmit"', package_json)
-            self.assertIn('"test": "vitest run"', package_json)
-            self.assertIn('"test:watch": "vitest"', package_json)
-            self.assertIn('"browser:install": "playwright install chromium"', package_json)
-            self.assertIn('"browser:smoke": "playwright test -c playwright.smoke.config.ts"', package_json)
-            self.assertIn(
-                '"browser:smoke:production": "playwright test -c playwright.production.config.ts"',
-                package_json,
-            )
-            self.assertIn('lockfileVersion: "9.0"', pnpm_lock)
-            self.assertIn("playwright@1.55.0", pnpm_lock)
-            self.assertIn("@testing-library/jest-dom@6.9.1", pnpm_lock)
-            self.assertIn('"format": "prettier --write ."', package_json)
-            self.assertIn("Docker Workflow", readme)
-            self.assertIn("Available Commands", readme)
-            self.assertIn("Quality Checks", readme)
-            self.assertIn("Runtime Configuration", readme)
-            self.assertIn("Docker Files", readme)
-            self.assertIn("Package Manager", readme)
-            self.assertIn("make dev", readme)
-            self.assertIn("make browser-smoke", readme)
-            self.assertIn("make browser-smoke-production", readme)
-            self.assertIn("make lockfile-update", readme)
-            self.assertIn("committed `pnpm-lock.yaml`", readme)
-            self.assertIn("The default development image stays relatively light", readme)
-            self.assertIn("make bootstrap-full", readme)
-            self.assertIn("DEV_DOCKERFILE=Dockerfile.dev.full make dev", readme)
-            self.assertIn("<title>Demo App</title>", index_html)
-            self.assertIn("WORKTREE_LABEL ?=$(shell basename", makefile)
-            self.assertIn("WORKTREE_ID ?=$(shell printf", makefile)
-            self.assertIn("COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)", makefile)
-            self.assertIn("IMAGE ?=$(WORKTREE_SLUG)", makefile)
-            self.assertIn("TAG ?=dev", makefile)
-            self.assertIn("DEV_HOST_PORT ?=$(DEV_PORT)", makefile)
-            self.assertIn("PNPM_HOME ?=$(WORKTREE_ROOT)/.pnpm-home/$(WORKTREE_ID)", makefile)
-            self.assertIn("PNPM_STORE_DIR ?=$(WORKTREE_ROOT)/.pnpm-store", makefile)
-            self.assertIn("RUNTIME_CONTAINER ?=$(WORKTREE_SLUG)-production-smoke", makefile)
-            self.assertIn("worktree-info:", makefile)
-            self.assertIn("worktree-doctor:", makefile)
-            self.assertIn("PNPM_STORE_DIR should stay inside this worktree", makefile)
-            self.assertIn("clean-worktree:", makefile)
-            self.assertIn("Port occupancy checks skipped: lsof is not available.", makefile)
-            self.assertIn("Warning: DEV_HOST_PORT $(DEV_HOST_PORT) is already in use.", makefile)
-            self.assertIn("Suggested override: DEV_HOST_PORT=$$(( $(DEV_HOST_PORT) + 10000 )) make dev", makefile)
-            self.assertIn("Suggested override: HOST_PORT=$$(( $(HOST_PORT) + 10000 )) make docker-run", makefile)
-            self.assertIn("Docker is not available; cannot render Compose config.", makefile)
-            self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) config", makefile)
-            self.assertIn("make worktree-compose-config", readme)
-            self.assertIn("prints suggested overrides", readme)
-            self.assertIn("DEV_DOCKERFILE ?=Dockerfile.dev", makefile)
-            self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
-                makefile,
-            )
-            self.assertIn(
-                "DEV_DOCKERFILE=Dockerfile.dev.full $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)",
-                makefile,
-            )
-            self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)",
-                makefile,
-            )
-            self.assertIn(
-                'DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash -lc "pnpm install --frozen-lockfile && pnpm browser:install"',
-                makefile,
-            )
-            self.assertIn(
-                "DEV_DOCKERFILE=$(DEV_DOCKERFILE) $(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) pnpm browser:smoke",
-                makefile,
-            )
-            self.assertIn("BUILDER_IMAGE ?=node:20-alpine", makefile)
-            self.assertIn("RUNTIME_IMAGE ?=nginx:1.27-alpine", makefile)
-            self.assertIn("DEV_BASE_IMAGE ?=node:20-bookworm", makefile)
-            self.assertIn("--build-arg BUILDER_IMAGE=$(BUILDER_IMAGE)", makefile)
-            self.assertIn("browser-smoke-production: docker-build browser-install", makefile)
-            self.assertIn("./scripts/browser-smoke-production", makefile)
-            self.assertIn("lockfile-update:", makefile)
-            self.assertIn("pnpm install --no-frozen-lockfile", makefile)
-            self.assertIn("ARG BUILDER_IMAGE=node:20-alpine", dockerfile)
-            self.assertIn("FROM ${BUILDER_IMAGE} AS builder", dockerfile)
-            self.assertIn("ARG RUNTIME_IMAGE=nginx:1.27-alpine", dockerfile)
-            self.assertIn("FROM ${RUNTIME_IMAGE}", dockerfile)
-            self.assertIn("COPY package.json pnpm-lock.yaml ./", dockerfile)
-            self.assertIn("pnpm install --frozen-lockfile", dockerfile)
-            self.assertIn("HEALTHCHECK", dockerfile)
-            self.assertIn("COPY --from=builder /app/dist /usr/share/nginx/html", dockerfile)
-            self.assertIn("ARG DEV_BASE_IMAGE=node:20-bookworm", dockerfile_dev)
-            self.assertIn("FROM ${DEV_BASE_IMAGE}", dockerfile_dev)
-            self.assertIn("PNPM_STORE_DIR=/pnpm-store", dockerfile_dev)
-            self.assertIn("PLAYWRIGHT_BROWSERS_PATH=/ms-playwright", dockerfile_dev)
-            self.assertIn(
-                'CMD ["bash", "-lc", "if [ ! -d node_modules/.pnpm ]; then pnpm install --frozen-lockfile; fi; pnpm dev --host 0.0.0.0 --port 5173"]',
-                dockerfile_dev,
-            )
-            self.assertIn("ARG DEV_BASE_IMAGE=node:20-bookworm", dockerfile_dev_full)
-            self.assertIn("COPY package.json pnpm-lock.yaml ./", dockerfile_dev_full)
-            self.assertIn("pnpm install --frozen-lockfile", dockerfile_dev_full)
-            self.assertIn("pnpm exec playwright install chromium", dockerfile_dev_full)
-            self.assertIn("frontend-dev", compose_dev)
-            self.assertIn("dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}", compose_dev)
-            self.assertIn("DEV_BASE_IMAGE: ${DEV_BASE_IMAGE:-node:20-bookworm}", compose_dev)
-            self.assertIn(
-                'command: bash -lc "if [ ! -d node_modules/.pnpm ]; then pnpm install --frozen-lockfile; fi; pnpm dev --host 0.0.0.0 --port ${DEV_PORT:-5173} --strictPort"',
-                compose_dev,
-            )
-            self.assertIn('"host.docker.internal:host-gateway"', compose_dev)
-            self.assertIn('"${DEV_HOST_PORT:-5173}:${DEV_PORT:-5173}"', compose_dev)
-            self.assertIn("frontend-node-modules", compose_dev)
-            self.assertIn("frontend-pnpm-store", compose_dev)
-            self.assertIn("frontend-playwright-cache", compose_dev)
-            self.assertIn("store-dir=.pnpm-store", npmrc)
-            self.assertIn("try_files $uri $uri/ /index.html;", nginx_conf)
-            self.assertIn("node_modules/", dockerignore)
-            self.assertIn(".pnpm-store/", dockerignore)
-            self.assertIn("dist/", dockerignore)
-            self.assertIn("react-refresh/only-export-components", eslint_config)
-            self.assertIn('"trailingComma": "all"', prettier_config)
-            self.assertIn("VITE_API_BASE_URL=http://localhost:8080", env_example)
-            self.assertIn('environment: "jsdom"', vite_config)
-            self.assertIn('include: ["src/**/*.test.{ts,tsx}"]', vite_config)
-            self.assertIn("await getProjectOverview()", app_test)
-            self.assertIn('from "vitest"', app_test)
-            self.assertIn("toBeInTheDocument", app_test)
-            self.assertIn("AppRouter", app_file)
-            self.assertIn("apiBaseUrl", env_config)
-            self.assertIn("pnpm exec vite", playwright_config)
-            self.assertIn('testMatch: "browser-smoke.spec.ts"', playwright_config)
-            self.assertIn('baseURL: "http://127.0.0.1:4173"', playwright_config)
-            self.assertIn("PLAYWRIGHT_BASE_URL is required", playwright_production_config)
-            self.assertNotIn("webServer", playwright_production_config)
-            self.assertIn('name: "Demo App"', browser_smoke_test)
-            self.assertIn("browser-smoke-homepage.png", browser_smoke_test)
-            self.assertIn('toContain("nginx")', production_browser_smoke_test)
-            self.assertIn("production-image-homepage.png", production_browser_smoke_test)
-            self.assertIn("State.Health.Status", production_browser_smoke_script)
-            self.assertIn("pnpm browser:smoke:production", production_browser_smoke_script)
-            self.assertIn("docker.internal", production_browser_smoke_script)
-            self.assertTrue(
-                os.access(
-                    project_dir / "scripts" / "browser-smoke-production", os.X_OK
-                )
-            )
-            self.assertIn("createBrowserRouter", app_router)
-            self.assertIn("v7_startTransition", app_router)
-            self.assertIn("VITE_API_BASE_URL is not configured", api_client)
-            self.assertIn("@testing-library/jest-dom/vitest", test_setup)
-            self.assertIn("useProjectOverview", home_page)
-            self.assertIn('title: "Demo App"', overview_service)
-            self.assertIn("getProjectOverviewFallback", overview_service)
-            self.assertIn("export type ProjectOverview", overview_type)
+            for name in ("bootstrap", "dev", "test", "docker-build", "docker-run"):
+                self.assertIn("make " + name, output)
+            for path in ("package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "components.json",
+                         "app/root.tsx", "app/routes.ts", "app/routes/home.tsx", "app/routes/about.tsx",
+                         "app/components/ui/button.tsx", "app/components/ui/dialog.tsx",
+                         "app/features/welcome.test.tsx", "vitest.config.ts", "THIRD_PARTY_NOTICES.md"):
+                self.assertTrue((root / path).is_file(), path)
+            self.assertFalse((root / "src").exists())
+            self.assertFalse((root / "index.html").exists())
+            package = (root / "package.json").read_text()
+            self.assertIn('"packageManager": "pnpm@11.21.0"', package)
+            self.assertIn('"react": "19.3.0"', package)
+            self.assertIn('npm:typescript@7.0.2', package)
+            self.assertNotIn("react-router-dom", package)
+            self.assertIn("ssr: false", (root / "react-router.config.ts").read_text())
+            self.assertIn('title: "Demo App"', (root / "app/lib/project.ts").read_text())
+            makefile = (root / "Makefile").read_text()
+            for contract in ("WORKTREE_ID ?=", "COMPOSE_PROJECT_NAME ?=$(WORKTREE_SLUG)",
+                             "IMAGE ?=$(WORKTREE_SLUG)", "DEV_HOST_PORT ?=$(DEV_PORT)",
+                             "PNPM_HOME ?=$(WORKTREE_ROOT)/.pnpm-home/$(WORKTREE_ID)",
+                             "PNPM_STORE_DIR ?=$(WORKTREE_ROOT)/.pnpm-store", "clean-worktree:",
+                             "worktree-compose-config:", "lockfile-update:",
+                             "verify: doctor format-check lint typecheck test build"):
+                self.assertIn(contract, makefile)
+            for path in ("scripts/doctor", "scripts/browser-smoke-production"):
+                self.assertTrue(os.access(root / path, os.X_OK))
+            docker = (root / "Dockerfile").read_text()
+            self.assertIn("pnpm install --frozen-lockfile", docker)
+            self.assertIn("/app/build/client /usr/share/nginx/html", docker)
+            self.assertIn("HEALTHCHECK", docker)
+            nginx = (root / "nginx.conf").read_text()
+            self.assertIn("try_files $uri $uri/ /index.html;", nginx)
+            self.assertIn("try_files $uri =404;", nginx)
+            compose = (root / "compose.dev.yaml").read_text()
+            for volume in ("frontend-node-modules", "frontend-pnpm-store", "frontend-playwright-cache"):
+                self.assertIn(volume, compose)
+            self.assertIn("pnpm install --frozen-lockfile && pnpm dev", compose)
 
     def test_create_microservice_renders_template(self):
         with tempfile.TemporaryDirectory() as tmpdir:

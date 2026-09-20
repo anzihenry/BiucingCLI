@@ -23,7 +23,7 @@ class GenerationTests(unittest.TestCase):
         (source / "scripts/run").chmod(0o640)
         (source / "binary").write_bytes(b"\xff\x00{{PROJECT_NAME}}")
         (source / "binary").chmod(0o600)
-        return replace(load_template("frontend"), template_dir=source)
+        return replace(load_template("frontend"), template_dir=source, variants=None)
 
     def test_direct_render_preserves_binary_modes_and_single_pass(self):
         with tempfile.TemporaryDirectory() as tmp:

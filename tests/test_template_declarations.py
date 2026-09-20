@@ -31,6 +31,7 @@ class DeclarationTests(unittest.TestCase):
 
     def fixture(self, root):
         data = json.loads((templates_root() / "frontend/template.json").read_text())
+        data.pop("variants", None)
         data.update(name="python-api", category="backend", stack=["Python"], tags=["python"],
                     contracts=[], required_entries=["pyproject.toml"], rule=None,
                     derived_outputs=[], render_outputs=[], next_steps=["cd {{PROJECT_NAME}}", "make test"])
@@ -85,7 +86,7 @@ class DeclarationTests(unittest.TestCase):
             source = Path(tmp) / "source"
             source.mkdir()
             (source / "file.txt").write_text("{{BUNDLE_IDENTIFIER}}")
-            fixture = replace(definition, template_dir=source)
+            fixture = replace(definition, template_dir=source, variants=None)
             self.assertTrue(validate_template_placeholders(fixture))
             with self.assertRaises(InvalidTemplateError):
                 render_template(fixture, {}, Path(tmp) / "result")
@@ -93,7 +94,7 @@ class DeclarationTests(unittest.TestCase):
             self.assertEqual(list(Path(tmp).iterdir()), [source])
 
     def test_bad_names_contexts_and_binding_collisions(self):
-        definition = replace(load_template("frontend"), name="fixture", contracts=[], required_entries=[])
+        definition = replace(load_template("frontend"), name="fixture", contracts=[], required_entries=[], variants=None)
         cases = [
             [TemplateVariable("bad-name")],
             [TemplateVariable("UPPER")],

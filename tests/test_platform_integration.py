@@ -13,6 +13,7 @@ from suite_support import platform_test
 
 from biucingcli.templates import REQUIRED_COMMAND_CONTRACT
 from biucingcli.templates import load_templates
+from biucingcli.resources import resolve_resources
 
 
 from cli_support import CLIHelpers
@@ -26,15 +27,27 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
         for definition in load_templates():
             with self.subTest(template=definition.name):
                 self.assertEqual(set(definition.commands), expected_commands)
-                result = subprocess.run(
-                    ["make", "-s", "help"],
-                    cwd=definition.template_dir,
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                for command in REQUIRED_COMMAND_CONTRACT:
-                    self.assertIn(f"make {command}", result.stdout)
+                makefiles = [definition.template_dir / "Makefile"]
+                if definition.variants is not None:
+                    makefiles = [
+                        next(e.source for e in resolve_resources(
+                            definition, {definition.variants.selector: mode}
+                        ).entries if e.output_path == "Makefile")
+                        for mode in definition.variants.options
+                    ]
+                for makefile in makefiles:
+                    self.assert_make_help(makefile, definition.template_dir)
+
+    def assert_make_help(self, makefile, directory):
+        result = subprocess.run(
+            ["make", "-s", "-f", str(makefile), "help"],
+            cwd=directory,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        for command in REQUIRED_COMMAND_CONTRACT:
+            self.assertIn(f"make {command}", result.stdout)
 
     @platform_test
     def test_create_worker_renders_template_and_generated_tests_pass(self):

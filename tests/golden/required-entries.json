@@ -26,12 +26,22 @@
     ".gitignore",
     "Makefile",
     "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "app/app.css",
+    "app/components/ui/button.tsx",
+    "app/components/ui/dialog.tsx",
+    "app/root.tsx",
+    "components.json",
     "compose.dev.yaml",
     "playwright.production.config.ts",
     "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     "scripts/browser-smoke-production",
+    "scripts/check-toolchain.mjs",
     "scripts/doctor",
-    "tests/production-browser-smoke.spec.ts"
+    "tests/interactions.ts",
+    "tests/production-browser-smoke.spec.ts",
+    "vitest.config.ts"
   ],
   "harmonyos": [
     ".gitignore",

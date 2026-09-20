@@ -11,11 +11,57 @@ Its three-mode acceptance matrix is future work, not coverage claimed by the
 current test suites.
 Stage 1 adds 21 Python-only resource declaration/selection tests in
 `test_resources.py`. Stage 2 adds 17 integration tests in
-`test_variant_generation.py` (153 core, 11 platform, one Android in total). These use
-temporary fixtures, not frontend mode builds; the existing output goldens remain
-unchanged.
+`test_variant_generation.py`. Stage 3 adds four shipped-CSR tests in
+`test_frontend_variants.py` (157 core, 11 platform, one Android in total).
+Fixture tests remain separate from frontend builds. Only frontend entries in
+generation/list/required-file goldens are intentionally migrated; all other
+template baselines remain unchanged.
 
 Install the locked development/build environment with `uv sync --locked`.
+
+## Frontend CSR toolchain (separate from Python core)
+
+Generate a new frontend project, then inside it run:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm peers check
+pnpm verify
+pnpm browser:install
+pnpm browser:smoke
+pnpm browser:smoke:build
+make browser-smoke-production
+```
+
+Use Node 24.19.x and pnpm 11.21.0. `verify` includes format, typed lint, a TS 7
+version assertion, a deliberately invalid typed-lint negative control, component
+tests, route type generation and production build. `browser:smoke:build` uses Vite
+preview for static artifacts; the production Make target tests real Nginx through
+Docker and requires its daemon. Local checks can explicitly select installed
+Chrome using `PLAYWRIGHT_CHANNEL=chrome`; that is not a bundled-Chromium CI result.
+Browser tests share interactions in `tests/interactions.ts`, test desktop/mobile,
+and check navigation, refresh, counter, dialog Escape/focus, overflow and errors.
+Nginx-only assertions additionally cover shell HTML, favicon, missing assets and
+the expected CSR HTTP-200/client-not-found behavior for unknown routes.
+
+The stage-3 local run passed frozen install and quality gates plus both development
+and built-artifact browser checks using installed Chrome.
+Production-build checks also passed with Playwright Chromium selected explicitly
+using `PLAYWRIGHT_CHANNEL=chromium` (two more viewport cases). The separate
+Headless Shell download was cancelled at cleanup; no default-channel result is
+claimed for that macOS run. The Docker follow-up passed the normal development
+image, frozen install, strict peers, `make verify`, production image and Nginx
+health/static-runtime checks on Linux arm64. Three actual-Nginx browser tests
+also passed using macOS Chrome. An IPv4/IPv6 mismatch during SPA prerender was
+fixed with explicit `preview.host: "127.0.0.1"` and a Python regression assertion;
+macOS and Docker production builds both passed afterward. Optional full dev image,
+amd64/native Linux and remote CI are not claimed. Full installed-wheel three-mode
+Node/container CI is stage 6, not part of the Python matrix today.
+
+Docker Linux arm64 browser follow-up passed three actual-Nginx tests using explicit
+Playwright Chromium, then the unmodified Make workflow passed three production and
+two development tests using its default bundled Headless Shell. This is actual
+container browser coverage, separate from macOS Chrome and Vite-preview evidence.
 
 ## Core: Linux and macOS
 

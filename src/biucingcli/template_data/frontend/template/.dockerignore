@@ -6,3 +6,9 @@ playwright-report/
 test-results/
 .git/
 .DS_Store
+
+build/
+.react-router/
+.env
+.env.*
+!.env.example

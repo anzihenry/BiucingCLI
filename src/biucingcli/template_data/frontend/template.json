@@ -1,45 +1,30 @@
 {
   "name": "frontend",
-  "description": "React + TypeScript starter for independent projects",
+  "description": "React Router + TypeScript + Tailwind starter for independent projects",
   "category": "frontend",
-  "stack": [
-    "React",
-    "TypeScript"
-  ],
-  "tags": [
-    "web",
-    "docker",
-    "playwright",
-    "vitest"
-  ],
-  "platforms": [
-    "web"
-  ],
+  "stack": ["React", "React Router", "TypeScript", "Tailwind CSS", "shadcn/ui"],
+  "tags": ["web", "docker", "playwright", "vitest"],
+  "platforms": ["web"],
   "maturity": {
     "level": "validated",
-    "summary": "Docker-first frontend starter with test and browser-smoke workflows."
+    "summary": "CSR starter with shared tooling; SSG/SSR presets are not yet available."
   },
   "validation": {
     "status": "real-build-verified",
     "verification_tier": "real-build",
     "evidence": [
-      "python unittest template rendering coverage",
-      "real docker runtime image builds",
-      "real docker development image builds",
-      "real Playwright browser checks against the production Nginx image"
+      "Python template generation regression tests",
+      "Generated CSR frozen install, strict peers and quality gates on macOS and Docker Linux arm64",
+      "Docker development and static Nginx production image builds",
+      "Actual Nginx desktop/mobile and static-response Playwright checks using macOS Chrome and Docker Linux arm64 Chromium",
+      "Docker Linux arm64 default Headless Shell: three production and two development browser tests passed"
     ]
   },
   "operating_assumptions": [
     "Local development is expected to run through Docker-first workflows.",
     "Browser smoke coverage and runtime packaging are part of the starter contract."
   ],
-  "workflow_labels": [
-    "bootstrap",
-    "dev",
-    "test",
-    "build",
-    "runtime"
-  ],
+  "workflow_labels": ["bootstrap", "dev", "test", "build", "runtime"],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -60,13 +45,8 @@
       "cleanup",
       "diagnostics"
     ],
-    "diagnostics": [
-      "make worktree-info",
-      "make worktree-doctor"
-    ],
-    "cleanup": [
-      "make clean-worktree"
-    ]
+    "diagnostics": ["make worktree-info", "make worktree-doctor"],
+    "cleanup": ["make clean-worktree"]
   },
   "variables": [
     {
@@ -79,16 +59,20 @@
       "required": false,
       "default_from": "project_name",
       "validator": "display-name",
-      "contexts": [
-        "JSON",
-        "XML"
-      ]
+      "contexts": ["JSON", "XML"]
     },
     {
       "name": "package_name",
       "required": false,
       "default_from": "project_name",
       "validator": "npm-package"
+    },
+    {
+      "name": "rendering",
+      "required": true,
+      "validator": "text",
+      "choices": ["csr"],
+      "default": "csr"
     }
   ],
   "next_steps": [
@@ -98,16 +82,46 @@
     "make docker-build",
     "make docker-run"
   ],
-  "contracts": [
-    "docker-compose"
-  ],
+  "contracts": ["docker-compose"],
   "required_entries": [
     "pnpm-lock.yaml",
     "playwright.production.config.ts",
     "scripts/browser-smoke-production",
-    "tests/production-browser-smoke.spec.ts"
+    "tests/production-browser-smoke.spec.ts",
+    "pnpm-workspace.yaml",
+    "components.json",
+    "app/root.tsx",
+    "app/app.css",
+    "app/components/ui/button.tsx",
+    "app/components/ui/dialog.tsx",
+    "vitest.config.ts",
+    "scripts/check-toolchain.mjs",
+    "tests/interactions.ts",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "rule": null,
   "derived_outputs": [],
-  "render_outputs": []
+  "render_outputs": [],
+  "variants": {
+    "selector": "rendering",
+    "options": {
+      "csr": {
+        "source": "variants/csr/template",
+        "required_entries": [
+          "react-router.config.ts",
+          "app/routes.ts",
+          "app/routes/home.tsx",
+          "playwright.build.config.ts",
+          "nginx.conf"
+        ],
+        "forbidden_entries": [
+          "src",
+          "index.html",
+          "app/entry.server.tsx",
+          "server"
+        ],
+        "overrides": []
+      }
+    }
+  }
 }
