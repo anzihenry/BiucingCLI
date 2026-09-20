@@ -1,4 +1,4 @@
-# Kernel modules: stages 1–4
+# Kernel modules: stages 1–5
 
 Stage 1 extracts foundation modules without changing generation algorithms,
 template resources, serialization or CLI contracts.
@@ -130,3 +130,56 @@ See [template authoring](template-authoring.md) for declarations and boundaries.
 new text variable through `--set`, without a new CLI option or registered rule.
 It also tests negative boundaries and compares required entries against the
 pre-migration contract snapshot. Existing generation snapshots remain unchanged.
+
+## Stage 5: typed requests/plans and injected interaction
+
+`models.CreateRequest` contains the template name, positional project name,
+output directory, set values and explicit option values. These two input maps
+are copied and read-only. Explicit values retain priority over set values;
+the positional project name remains authoritative. CLI convenience arguments
+now use one `CLI_VARIABLE_ARGUMENTS` mapping instead of duplicate dictionaries.
+
+`generation.build_generation_plan(request, definition=None, prompt=None)` loads
+or accepts a definition, checks declarations, resolves variables, computes rule
+outputs, validates inputs and gathers the preview inventory. It reads template
+files but creates no directories, staging areas or generated files. Definition
+injection supports fixture catalogs without global patches. `prompt` is an
+optional callable receiving a `TemplateVariable` and returning a string; without
+it, missing required values are aggregated as non-interactive errors.
+
+`GenerationPlan` contains typed metadata, paths, read-only resolved/derived maps,
+variable-source records and preview information. It is an in-process resolved
+plan, not a serialized job, filesystem snapshot or template lock: source files
+and metadata must not be mutated between planning and execution. Target existence
+is intentionally not frozen. `execute_generation_plan(plan)` uses the established
+staging executor, which rechecks target conflicts and current template declarations.
+
+```python
+from pathlib import Path
+from biucingcli.models import CreateRequest
+from biucingcli.generation import build_generation_plan, execute_generation_plan
+
+request = CreateRequest("frontend", "demo", Path("/existing/output"),
+                        set_values={"display_name": "My Demo"})
+plan = build_generation_plan(request)
+# Inspect plan.values / plan.target_dir before choosing to execute.
+execute_generation_plan(plan)
+```
+
+`variables.py` owns resolution and constraints without terminal operations.
+`interaction.py` is a terminal adapter: it prints prompts to stderr and preserves
+EOF/interrupt behavior. The CLI decides whether to supply that adapter based on
+JSON/non-interactive flags and TTY state. Core imports do not load CLI, the terminal
+adapter or the compatibility module.
+
+The historical `templates.resolve_variables*` interactive signatures remain as
+wrappers. `cli.build_create_context` and `GenerationPlan.to_context()` preserve
+the previous dictionary shape for compatibility and the current formatting layer.
+Active CLI preview/create paths both use `build_create_plan`; only creation calls
+the executor. Formatting accepts plans and still observes current target existence.
+Moving formatters out of CLI is deferred to stage 6.
+
+`tests/test_generation_plan.py` verifies direct non-CLI planning/execution, callback
+sources, missing-value aggregation, blank input, cancellation, no-write planning,
+execution-time conflicts/missing parents, detached maps, CLI alias coverage and
+core import boundaries. Existing EOF/PTY/JSON and output baselines remain gates.

@@ -1,8 +1,9 @@
-"""Compatibility exports and variable resolution pending later extraction."""
+"""Compatibility exports, including the historical interactive resolver API."""
 
 from __future__ import annotations
 
-import sys
+from biucingcli import variables
+from biucingcli.interaction import terminal_prompt
 
 from biucingcli.catalog import (
     templates_root as templates_root,
@@ -57,80 +58,13 @@ from biucingcli.generation import (
 )
 
 
-def resolve_variables(
-    definition: TemplateDefinition,
-    provided: dict[str, str | None],
-    interactive: bool = True,
-) -> dict[str, str]:
-    """Resolve final template variables from provided values and defaults."""
+def resolve_variables(definition: TemplateDefinition, provided: dict[str, str | None],
+                      interactive: bool = True) -> dict[str, str]:
     return resolve_variables_detailed(definition, provided, interactive=interactive).values
 
 
-def resolve_variables_detailed(
-    definition: TemplateDefinition,
-    provided: dict[str, str | None],
-    interactive: bool = True,
-) -> VariableResolutionResult:
-    """Resolve final template variables along with source metadata."""
-    resolved: dict[str, str] = {}
-    resolution_sources: dict[str, str] = {}
-    missing_required: list[str] = []
-    for variable in definition.variables:
-        value = provided.get(variable.name)
-        normalized_value = value.strip() if value is not None else ""
-        if normalized_value:
-            resolved[variable.name] = normalized_value
-            resolution_sources[variable.name] = "provided"
-            continue
-
-        if variable.default is not None:
-            resolved[variable.name] = variable.default
-            resolution_sources[variable.name] = "default"
-            continue
-
-        if variable.default_from is not None and variable.default_from in resolved:
-            resolved[variable.name] = resolved[variable.default_from]
-            resolution_sources[variable.name] = f"default_from:{variable.default_from}"
-            continue
-
-        if variable.required:
-            if not interactive:
-                missing_required.append(variable.name)
-                continue
-            prompt = variable.prompt or f"{variable.name}: "
-            print(prompt, end="", file=sys.stderr, flush=True)
-            try:
-                answer = input().strip()
-            except EOFError as exc:
-                print(file=sys.stderr)
-                raise InputEndedError(
-                    f"Input ended while reading {variable.name}; supply it with a flag or --set."
-                ) from exc
-            except KeyboardInterrupt:
-                print(file=sys.stderr)
-                raise
-            if not answer:
-                raise MissingInputError(f"Missing required value for {variable.name}")
-            resolved[variable.name] = answer
-            resolution_sources[variable.name] = "prompted"
-
-    if missing_required:
-        missing_list = ", ".join(missing_required)
-        raise MissingInputError(
-            f"Missing required values in non-interactive mode: {missing_list}"
-        )
-
-    resolved_variables = [
-        ResolvedVariable(
-            name=variable.name,
-            value=resolved[variable.name],
-            source=resolution_sources[variable.name],
-        )
-        for variable in definition.variables
-        if variable.name in resolved and variable.name in resolution_sources
-    ]
-    return VariableResolutionResult(
-        values=resolved,
-        resolved_variables=resolved_variables,
-        missing_required=missing_required,
+def resolve_variables_detailed(definition: TemplateDefinition, provided: dict[str, str | None],
+                               interactive: bool = True) -> VariableResolutionResult:
+    return variables.resolve_variables_detailed(
+        definition, provided, prompt=terminal_prompt if interactive else None,
     )

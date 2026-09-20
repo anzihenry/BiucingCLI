@@ -1,11 +1,14 @@
-"""Pure variable constraints; resolution moves in a later stage."""
+"""Variable constraints and resolution with an optional injected prompt callback."""
 
 from __future__ import annotations
 
 import re
 from urllib.parse import urlparse
 
-from biucingcli.models import TemplateDefinition, TemplateVariable
+from collections.abc import Callable
+
+from biucingcli.errors import MissingInputError
+from biucingcli.models import TemplateDefinition, TemplateVariable, ResolvedVariable, VariableResolutionResult
 
 
 ALLOWED_VARIABLE_VALIDATORS = {
@@ -134,3 +137,68 @@ def validate_resolved_variables(
         if reason:
             errors.append(f"{variable.name}: {reason} (received {value!r})")
     return errors
+
+
+def resolve_variables_detailed(
+    definition: TemplateDefinition,
+    provided: dict[str, str | None],
+    *,
+    prompt: Callable[[TemplateVariable], str] | None = None,
+) -> VariableResolutionResult:
+    """Resolve final template variables along with source metadata."""
+    resolved: dict[str, str] = {}
+    resolution_sources: dict[str, str] = {}
+    missing_required: list[str] = []
+    for variable in definition.variables:
+        value = provided.get(variable.name)
+        normalized_value = value.strip() if value is not None else ""
+        if normalized_value:
+            resolved[variable.name] = normalized_value
+            resolution_sources[variable.name] = "provided"
+            continue
+
+        if variable.default is not None:
+            resolved[variable.name] = variable.default
+            resolution_sources[variable.name] = "default"
+            continue
+
+        if variable.default_from is not None and variable.default_from in resolved:
+            resolved[variable.name] = resolved[variable.default_from]
+            resolution_sources[variable.name] = f"default_from:{variable.default_from}"
+            continue
+
+        if variable.required:
+            if prompt is None:
+                missing_required.append(variable.name)
+                continue
+            answer = prompt(variable).strip()
+            if not answer:
+                raise MissingInputError(f"Missing required value for {variable.name}")
+            resolved[variable.name] = answer
+            resolution_sources[variable.name] = "prompted"
+
+    if missing_required:
+        missing_list = ", ".join(missing_required)
+        raise MissingInputError(
+            f"Missing required values in non-interactive mode: {missing_list}"
+        )
+
+    resolved_variables = [
+        ResolvedVariable(
+            name=variable.name,
+            value=resolved[variable.name],
+            source=resolution_sources[variable.name],
+        )
+        for variable in definition.variables
+        if variable.name in resolved and variable.name in resolution_sources
+    ]
+    return VariableResolutionResult(
+        values=resolved,
+        resolved_variables=resolved_variables,
+        missing_required=missing_required,
+    )
+
+
+def resolve_variables(definition: TemplateDefinition, provided: dict[str, str | None], *,
+                      prompt: Callable[[TemplateVariable], str] | None = None) -> dict[str, str]:
+    return resolve_variables_detailed(definition, provided, prompt=prompt).values

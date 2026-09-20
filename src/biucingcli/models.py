@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from collections.abc import Mapping
+from types import MappingProxyType
 
 
 @dataclass(frozen=True)
@@ -157,4 +159,52 @@ class VariableResolutionResult:
             "values": self.values,
             "resolved_variables": [item.to_dict() for item in self.resolved_variables],
             "missing_required": self.missing_required,
+        }
+
+
+@dataclass(frozen=True)
+class CreateRequest:
+    """CLI-independent inputs; explicit values retain priority over set values."""
+
+    template: str
+    project_name: str
+    output_dir: Path = Path(".")
+    set_values: Mapping[str, str] = field(default_factory=dict)
+    explicit_values: Mapping[str, str | None] = field(default_factory=dict)
+
+    def __post_init__(self):
+        object.__setattr__(self, "set_values", MappingProxyType(dict(self.set_values)))
+        object.__setattr__(self, "explicit_values", MappingProxyType(dict(self.explicit_values)))
+
+
+@dataclass(frozen=True)
+class GenerationPlan:
+    """Resolved generation input, not a snapshot or lock of the filesystem."""
+
+    definition: TemplateDefinition
+    project_name: str
+    target_dir: Path
+    values: Mapping[str, str]
+    resolved_variables: tuple[ResolvedVariable, ...]
+    derived_values: Mapping[str, str]
+    rendered_next_steps: tuple[str, ...]
+    template_file_count: int
+    template_top_level_entries: tuple[str, ...]
+
+    def __post_init__(self):
+        object.__setattr__(self, "values", MappingProxyType(dict(self.values)))
+        object.__setattr__(self, "derived_values", MappingProxyType(dict(self.derived_values)))
+
+    def to_context(self) -> dict[str, object]:
+        """Adapt to the pre-stage-5 formatting context without sharing value maps."""
+        return {
+            "definition": self.definition,
+            "project_name": self.project_name,
+            "target_dir": self.target_dir,
+            "values": dict(self.values),
+            "resolved_variables": [item.to_dict() for item in self.resolved_variables],
+            "derived_values": dict(self.derived_values),
+            "rendered_next_steps": list(self.rendered_next_steps),
+            "template_file_count": self.template_file_count,
+            "template_top_level_entries": list(self.template_top_level_entries),
         }

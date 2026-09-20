@@ -18,14 +18,16 @@ from biucingcli.errors import (
     MissingInputError,
     UnknownTemplateError,
 )
-from biucingcli.generation import render_template
-from biucingcli.rendering import render_text
-from biucingcli.variables import validate_resolved_variables
+from biucingcli.generation import (
+    build_generation_plan, execute_generation_plan, validate_generation_definition,
+    count_template_files as count_template_files,
+    top_level_template_entries as top_level_template_entries,
+    default_display_name as default_display_name,
+    render_template as render_template,
+)
+from biucingcli.models import CreateRequest, GenerationPlan
+from biucingcli.interaction import terminal_prompt
 from biucingcli.validation import validate_templates
-from biucingcli.validation import validate_template_placeholders
-from biucingcli.declarations import declaration_errors
-from biucingcli.templates import resolve_variables_detailed
-from biucingcli.template_rules.registry import derive_template_values
 from biucingcli.template_rules.apple import (
     default_swift_module_name as default_swift_module_name,
     apple_platform_config as apple_platform_config,
@@ -33,11 +35,6 @@ from biucingcli.template_rules.apple import (
 )
 from biucingcli.template_rules.android import default_kotlin_module_name as default_kotlin_module_name
 from biucingcli.template_rules.microservice import microservice_dependency_config as microservice_dependency_config
-
-
-def default_display_name(project_name: str) -> str:
-    """Return a human-friendly display name from a directory name."""
-    return project_name.replace("-", " ").replace("_", " ").title()
 
 
 def parse_set_values(items: list[str]) -> dict[str, str]:
@@ -296,167 +293,71 @@ def format_validation_report_json(errors: list[str]) -> str:
     return json.dumps(payload, indent=2)
 
 
-def count_template_files(template_dir: Path) -> int:
-    """Return the number of files in a template directory."""
-    return sum(1 for path in template_dir.rglob("*") if path.is_file())
+# Single mapping for existing convenience flags; new fields use --set.
+CLI_VARIABLE_ARGUMENTS = {
+    "display_name": "display_name",
+    "package_name": "package_name",
+    "module_name": "module_name",
+    "service_name": "service_name",
+    "http_port": "http_port",
+    "worker_name": "worker_name",
+    "run_mode": "run_mode",
+    "tick_interval_seconds": "tick_interval_seconds",
+    "shutdown_timeout_seconds": "shutdown_timeout_seconds",
+    "grpc_port": "grpc_port",
+    "proto_package": "proto_package",
+    "dependency_store": "dependency_store",
+    "otel_exporter_endpoint": "otel_exporter_endpoint",
+    "apple_platform": "platform",
+    "bundle_identifier": "bundle_identifier",
+    "minimum_os_version": "minimum_os_version",
+    "development_team": "development_team",
+    "organization_name": "organization_name",
+    "swift_module_name": "swift_module_name",
+    "application_id": "application_id",
+    "compile_sdk": "compile_sdk",
+    "min_sdk": "min_sdk",
+    "target_sdk": "target_sdk",
+    "version_code": "version_code",
+    "version_name": "version_name",
+    "java_version": "java_version",
+    "android_namespace": "android_namespace",
+    "kotlin_module_name": "kotlin_module_name",
+    "bundle_name": "bundle_name",
+    "harmony_module_name": "harmony_module_name",
+    "ability_name": "ability_name",
+    "compatible_sdk_version": "compatible_sdk_version",
+    "target_sdk_version": "target_sdk_version",
+    "min_api_version": "min_api_version",
+    "harmony_version_code": "harmony_version_code",
+    "harmony_version_name": "harmony_version_name",
+}
 
 
-def top_level_template_entries(template_dir: Path) -> list[str]:
-    """Return top-level template entries for preview and manifest output."""
-    return sorted(path.name for path in template_dir.iterdir())
+def build_create_plan(args: argparse.Namespace) -> GenerationPlan:
+    definition = load_template(args.template)
+    # Keep metadata errors ahead of --set parsing errors, as before.
+    validate_generation_definition(definition)
+    request = CreateRequest(
+        template=args.template,
+        project_name=args.project_name,
+        output_dir=Path(args.output_dir),
+        set_values=parse_set_values(args.set_values),
+        explicit_values={key: getattr(args, attr) for key, attr in CLI_VARIABLE_ARGUMENTS.items()},
+    )
+    prompt = terminal_prompt if not (args.non_interactive or args.json) and sys.stdin.isatty() else None
+    return build_generation_plan(request, definition=definition, prompt=prompt)
 
 
 def build_create_context(args: argparse.Namespace) -> dict[str, object]:
-    """Resolve a create request into a reusable context."""
-    definition = load_template(args.template)
-    metadata_errors = declaration_errors(definition) + validate_template_placeholders(definition)
-    if metadata_errors:
-        raise InvalidTemplateError("; ".join(metadata_errors))
-    requested_project_name = args.project_name.strip()
-    set_values = parse_set_values(args.set_values)
-    allowed_keys = {variable.name for variable in definition.variables}
-    unknown_keys = sorted(key for key in set_values if key not in allowed_keys)
-    if unknown_keys:
-        unknown_list = ", ".join(unknown_keys)
-        raise ValueError(f"Unknown template variable(s) for {args.template}: {unknown_list}")
-
-    cli_inputs = {
-        "display_name": args.display_name,
-        "package_name": args.package_name,
-        "module_name": args.module_name,
-        "service_name": args.service_name,
-        "http_port": args.http_port,
-        "worker_name": args.worker_name,
-        "run_mode": args.run_mode,
-        "tick_interval_seconds": args.tick_interval_seconds,
-        "shutdown_timeout_seconds": args.shutdown_timeout_seconds,
-        "grpc_port": args.grpc_port,
-        "proto_package": args.proto_package,
-        "dependency_store": args.dependency_store,
-        "otel_exporter_endpoint": args.otel_exporter_endpoint,
-        "apple_platform": args.platform,
-        "bundle_identifier": args.bundle_identifier,
-        "minimum_os_version": args.minimum_os_version,
-        "development_team": args.development_team,
-        "organization_name": args.organization_name,
-        "swift_module_name": args.swift_module_name,
-        "application_id": args.application_id,
-        "compile_sdk": args.compile_sdk,
-        "min_sdk": args.min_sdk,
-        "target_sdk": args.target_sdk,
-        "version_code": args.version_code,
-        "version_name": args.version_name,
-        "java_version": args.java_version,
-        "android_namespace": args.android_namespace,
-        "kotlin_module_name": args.kotlin_module_name,
-        "bundle_name": args.bundle_name,
-        "harmony_module_name": args.harmony_module_name,
-        "ability_name": args.ability_name,
-        "compatible_sdk_version": args.compatible_sdk_version,
-        "target_sdk_version": args.target_sdk_version,
-        "min_api_version": args.min_api_version,
-        "harmony_version_code": args.harmony_version_code,
-        "harmony_version_name": args.harmony_version_name,
-    }
-    unsupported_cli_inputs = sorted(
-        key for key, value in cli_inputs.items() if value is not None and key not in allowed_keys
-    )
-    if unsupported_cli_inputs:
-        unsupported_list = ", ".join(unsupported_cli_inputs)
-        raise ValueError(
-            f"Unsupported option(s) for {args.template}: {unsupported_list}"
-        )
-
-    provided_values: dict[str, str | None] = dict(set_values)
-    provided_values["project_name"] = requested_project_name
-
-    if args.display_name is not None:
-        provided_values["display_name"] = args.display_name
-    elif "display_name" not in provided_values:
-        provided_values["display_name"] = default_display_name(requested_project_name)
-
-    if args.package_name is not None:
-        provided_values["package_name"] = args.package_name
-
-    explicit_values = {
-        "module_name": args.module_name,
-        "service_name": args.service_name,
-        "http_port": args.http_port,
-        "worker_name": args.worker_name,
-        "run_mode": args.run_mode,
-        "tick_interval_seconds": args.tick_interval_seconds,
-        "shutdown_timeout_seconds": args.shutdown_timeout_seconds,
-        "grpc_port": args.grpc_port,
-        "proto_package": args.proto_package,
-        "dependency_store": args.dependency_store,
-        "otel_exporter_endpoint": args.otel_exporter_endpoint,
-        "apple_platform": args.platform,
-        "bundle_identifier": args.bundle_identifier,
-        "minimum_os_version": args.minimum_os_version,
-        "development_team": args.development_team,
-        "organization_name": args.organization_name,
-        "application_id": args.application_id,
-        "compile_sdk": args.compile_sdk,
-        "min_sdk": args.min_sdk,
-        "target_sdk": args.target_sdk,
-        "version_code": args.version_code,
-        "version_name": args.version_name,
-        "java_version": args.java_version,
-        "android_namespace": args.android_namespace,
-        "kotlin_module_name": args.kotlin_module_name,
-        "bundle_name": args.bundle_name,
-        "harmony_module_name": args.harmony_module_name,
-        "ability_name": args.ability_name,
-        "compatible_sdk_version": args.compatible_sdk_version,
-        "target_sdk_version": args.target_sdk_version,
-        "min_api_version": args.min_api_version,
-        "harmony_version_code": args.harmony_version_code,
-        "harmony_version_name": args.harmony_version_name,
-        "swift_module_name": args.swift_module_name,
-    }
-    for key, value in explicit_values.items():
-        if value is not None:
-            provided_values[key] = value
-
-    resolution_result = resolve_variables_detailed(
-        definition,
-        provided_values,
-        interactive=not (args.non_interactive or args.json) and sys.stdin.isatty(),
-    )
-    values = dict(resolution_result.values)
-    rule_result = derive_template_values(definition, values)
-    derived_values = rule_result.derived_values
-    values.update(derived_values)
-    values.update(rule_result.render_only_values)
-
-    input_errors = validate_resolved_variables(definition, values)
-    if input_errors:
-        raise ValueError(
-            f"Invalid input value(s) for {definition.name}: " + "; ".join(input_errors)
-        )
-
-    target_dir = Path(args.output_dir).resolve() / values["project_name"]
-    rendered_next_steps = [render_text(step, values, definition) for step in definition.next_steps]
-    system_derived_values = {
-        key: values[key]
-        for key in sorted(derived_values)
-        if key in values
-    }
-    return {
-        "definition": definition,
-        "project_name": values["project_name"],
-        "target_dir": target_dir,
-        "values": values,
-        "resolved_variables": [item.to_dict() for item in resolution_result.resolved_variables],
-        "derived_values": system_derived_values,
-        "rendered_next_steps": rendered_next_steps,
-        "template_file_count": count_template_files(definition.template_dir),
-        "template_top_level_entries": top_level_template_entries(definition.template_dir),
-    }
+    """Compatibility adapter; active preview/create paths use GenerationPlan."""
+    return build_create_plan(args).to_context()
 
 
-def create_manifest(context: dict[str, object], mode: str) -> dict[str, object]:
+def create_manifest(context: GenerationPlan | dict[str, object], mode: str) -> dict[str, object]:
     """Build a machine-readable preview or generation result."""
+    if isinstance(context, GenerationPlan):
+        context = context.to_context()
     definition = context["definition"]
     assert hasattr(definition, "name")
     return {
@@ -480,8 +381,10 @@ def create_manifest(context: dict[str, object], mode: str) -> dict[str, object]:
     }
 
 
-def format_create_preview(context: dict[str, object], preview_mode: str) -> str:
+def format_create_preview(context: GenerationPlan | dict[str, object], preview_mode: str) -> str:
     """Return a human-readable create preview."""
+    if isinstance(context, GenerationPlan):
+        context = context.to_context()
     definition = context["definition"]
     target_dir = Path(context["target_dir"])
     lines = [
@@ -515,8 +418,10 @@ def format_create_preview(context: dict[str, object], preview_mode: str) -> str:
     return "\n".join(lines)
 
 
-def format_create_success(context: dict[str, object]) -> str:
+def format_create_success(context: GenerationPlan | dict[str, object]) -> str:
     """Return a human-readable create success summary."""
+    if isinstance(context, GenerationPlan):
+        context = context.to_context()
     definition = context["definition"]
     target_dir = Path(context["target_dir"])
     lines = [
@@ -540,7 +445,7 @@ def format_create_success(context: dict[str, object]) -> str:
 
 def preview_project(args: argparse.Namespace, preview_mode: str) -> str:
     """Preview a project generation request."""
-    context = build_create_context(args)
+    context = build_create_plan(args)
     if args.json:
         return json.dumps(create_manifest(context, mode=preview_mode), indent=2)
     return format_create_preview(context, preview_mode)
@@ -548,12 +453,8 @@ def preview_project(args: argparse.Namespace, preview_mode: str) -> str:
 
 def create_project_output(args: argparse.Namespace) -> str:
     """Create a project and return either text or JSON output."""
-    context = build_create_context(args)
-    render_template(
-        context["definition"],
-        context["values"],
-        context["target_dir"],
-    )
+    context = build_create_plan(args)
+    execute_generation_plan(context)
     if args.json:
         return json.dumps(create_manifest(context, mode="create"), indent=2)
     return format_create_success(context)

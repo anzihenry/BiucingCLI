@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- introduce typed creation requests and generation plans shared by preview and
+  execution, and inject input callbacks instead of reading terminals in the core;
+- consolidate CLI variable aliases while retaining legacy resolver/context adapters.
+
 - declare template file contracts, rule outputs and escape contexts in metadata;
 - scope generation placeholders per template and validate extension declarations;
 - verify declaration-only onboarding with a Python backend fixture, preserving
