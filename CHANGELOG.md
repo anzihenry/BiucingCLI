@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- move text/JSON presentation and output versioning out of CLI, retaining formatter
+  adapters and existing output contracts;
+- organize CLI, generated-output, platform and module tests without dropping
+  existing cases, and document template contribution and compatibility boundaries.
+
 - introduce typed creation requests and generation plans shared by preview and
   execution, and inject input callbacks instead of reading terminals in the core;
 - consolidate CLI variable aliases while retaining legacy resolver/context adapters.

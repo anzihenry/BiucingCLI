@@ -57,3 +57,35 @@ Use `--list` with any suite to inspect membership without running it. Unmarked
 tests belong to core; `platform_test` and `android_test` in `tests/suite_support.py`
 opt tests into tool-dependent groups. `--suite all` and standard unittest
 discovery retain full-suite execution (optional tools may be skipped there).
+
+## Test organization after kernel extraction
+
+| Area | Test modules |
+| --- | --- |
+| CLI commands, precedence and interaction | `test_cli.py`, `test_cli_errors.py` |
+| Public output contracts | `test_json_contract.py`, `test_presentation.py` |
+| Models, catalog and resource loading | `test_catalog.py` |
+| Template declarations and structural validation | `test_template_declarations.py`, `test_template_validation.py` |
+| Pure rendering and rule helpers | `test_rendering.py`, `test_rule_helpers.py`, `test_template_rules.py` |
+| Planning and filesystem execution | `test_generation_plan.py`, `test_generation.py` |
+| Generated template contents | `test_native_outputs.py`, `test_service_outputs.py` |
+| External tool integration | `test_platform_integration.py` plus marked escaping tests |
+| Escaping and configuration parsers | `test_escaping.py`, `test_configurations.py` |
+| Stable generated output | `test_refactor_baseline.py`, `generation_baseline.py`, `golden/` |
+
+`cli_support.py` contains shared fixture helpers, no discovered tests. Native
+output assertions belong to core when they only inspect generated files; test
+location alone does not determine the suite. Tool-dependent methods retain their
+explicit markers. Stage 6 retained all 122 existing test method names exactly
+once and added five presentation tests (115 core, 11 platform, one Android).
+
+New unit tests should import the owning module. Keep old import checks in explicit
+compatibility tests. Moving a mock requires targeting the module where the symbol
+is actually used, not preserving hidden cross-module coupling. Do not refresh
+goldens merely to accommodate a refactor; inspect intentional output changes.
+
+Stage 6 activated a direct assertion against `info-web-service.txt`, which had
+previously become stale and was no longer used by the partial CLI assertions.
+Its maturity-summary line was reconciled against the pre-stage-6 committed CLI
+output, not inferred from the new implementation. Generated-project and JSON
+goldens were unchanged.

@@ -1,4 +1,10 @@
-# Kernel modules: stages 1–5
+# Kernel modules: stages 1–6
+
+The current CLI owns parsing, terminal policy, command dispatch and error-to-exit
+mapping. `presentation.py` owns text/JSON results and schema/generator versions;
+`generation.py` owns planning/execution; supporting modules own models, catalog,
+variable resolution, declarations, rendering and built-in template rules. The
+sections below record each extraction stage and its compatibility decisions.
 
 Stage 1 extracts foundation modules without changing generation algorithms,
 template resources, serialization or CLI contracts.
@@ -183,3 +189,43 @@ Moving formatters out of CLI is deferred to stage 6.
 sources, missing-value aggregation, blank input, cancellation, no-write planning,
 execution-time conflicts/missing parents, detached maps, CLI alias coverage and
 core import boundaries. Existing EOF/PTY/JSON and output baselines remain gates.
+
+## Stage 6: presentation boundary and test organization
+
+`presentation.py` formats supplied definitions, validation errors and generation
+plans. It does not import catalog, generation, CLI, validation or the terminal
+adapter; it neither loads templates nor writes output streams nor selects exit
+codes. Create/preview formatting intentionally checks the current target path's
+existence to preserve the established manifest/text semantics.
+
+The CLI loads list/info definitions and delegates formatting. It passes diagnostics
+to `presentation.format_error`, then controls stderr and exit status itself.
+Create JSON serialization also lives in presentation. `JSON_SCHEMA_VERSION` and
+`output_metadata` have a single implementation there; the CLI version flag still
+uses the package runtime version.
+
+### Compatibility retained in this refactor
+
+- `templates.py`: explicit aliases for moved models, errors, catalog, validation,
+  constraints, rendering and filesystem generation; wrappers for the historical
+  `interactive=` resolver signatures.
+- `cli.py`: aliases for version metadata, validation/create formatters, earlier
+  derivation helpers and file-count helpers; list/info formatting wrappers retain
+  their original no-argument/template-name calling conventions and loading seam.
+- `build_create_context` and `GenerationPlan.to_context`: legacy dictionary shape
+  retained for callers and formatters; core planning/execution uses typed objects.
+- Unscoped rendering helpers retain their frozen compatibility map; generation
+  always uses scoped declarations. No legacy entrypoint is removed in stage 6.
+
+These are explicit migration accommodations, not a guarantee that every imported
+module global or old monkeypatch location forms a stable public SDK. New code
+should import owning modules. No third-party plugins, new runtime dependencies,
+template content changes or public JSON schema changes accompany this extraction.
+
+Tests formerly combined in `test_cli.py` are grouped by CLI behavior, native/service
+output, platform integration, rendering, rule helpers and template validation,
+with common fixtures in `cli_support.py`. Existing tests were moved without changing
+their assertions or suite markers; a before/after inventory verified all 122
+method names remained present exactly once. Five direct presentation tests cover
+existing goldens, versioned errors, legacy adapters, stream/no-write behavior and
+independent imports. See [testing](testing.md) for the complete test map.

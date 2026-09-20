@@ -50,6 +50,8 @@ uv run --locked python scripts/verify-distribution
 
 Core checks run on Linux and macOS without native SDKs. See [testing](docs/testing.md)
 for macOS tool integrations and optional Android resource compilation.
+See [kernel modules](docs/kernel-modules.md) for ownership and compatibility
+boundaries, and [template authoring](docs/template-authoring.md) to add templates.
 
 Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
 `pyproject.toml` and `uv.lock` together. For deliberate upgrades use

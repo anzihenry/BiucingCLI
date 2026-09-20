@@ -84,3 +84,28 @@ eighth template. Add platform tests if the new template needs language/SDK proof
 Internal extension metadata is not yet exposed by list/info JSON: this change
 preserves the current public schema. Neither third-party plugin execution nor a
 new CLI option for external template directories is introduced.
+
+## Contribution checklist
+
+1. Add metadata and template resources; declare only the contracts, variables,
+   escape contexts and required entries the template needs. Keep `project_name`
+   constrained by the existing project-name validator.
+2. For a pure declaration template, use `--set` and the generic generation flow;
+   do not add template-name branches to CLI or the generator.
+3. For computed values, add a pure rule module and explicitly register its callable,
+   output sets and allowed overwrites. Add direct rule tests; retain separation
+   between manifest-visible derivations and render-only snippets.
+4. For a new shared contract, add it to `template_rules/contracts.py` with tests.
+   Built-in minimum policy and the required-entry golden should be updated only
+   as a reviewed product change, not to silence missing-file errors.
+5. Add core output/configuration tests and representative generation baselines.
+   Native compiler/shell tests must be marked as platform or Android tests rather
+   than silently adding tool requirements to core. See [test organization](testing.md).
+6. Extend installed-wheel smoke cases and expected template inventory. Verify
+   `uv run --locked biucing validate`, locked core tests and distribution checks;
+   run relevant platform tests and require Linux/macOS CI before release.
+
+Use `catalog`, `models`, `variables`, `generation` and `presentation` for direct
+Python integration. Terminal decisions belong to the CLI adapter; renderers and
+rules must not prompt, print diagnostics or terminate the process. The retained
+legacy imports exist for compatibility, not as the recommended extension surface.
