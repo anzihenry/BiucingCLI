@@ -10,7 +10,10 @@ from biucingcli.catalog import load_templates
 from biucingcli.models import TemplateDefinition
 from biucingcli.variables import ALLOWED_VARIABLE_VALIDATORS, variable_validation_error
 from biucingcli.rendering import PLACEHOLDER_PATTERN, supported_placeholders
-from biucingcli.escaping import FREE_TEXT_KEYS
+from biucingcli.rendering import free_text_names
+from biucingcli.errors import InvalidTemplateError
+from biucingcli.declarations import declaration_errors
+from biucingcli.template_rules.contracts import required_entries as declared_required_entries
 
 
 ALLOWED_VERIFICATION_TIERS = {
@@ -175,13 +178,8 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
             f"{definition.name}: duplicate variable names: {', '.join(duplicate_names)}"
         )
 
-    supported = supported_placeholders()
+    errors.extend(declaration_errors(definition))
     for variable in definition.variables:
-        placeholder = "{{" + variable.name.upper() + "}}"
-        if placeholder not in supported:
-            errors.append(
-                f"{definition.name}: variable '{variable.name}' has no supported placeholder mapping"
-            )
         if variable.default_from and variable.default_from not in variable_names:
             errors.append(
                 f"{definition.name}: variable '{variable.name}' default_from unknown variable '{variable.default_from}'"
@@ -253,60 +251,7 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
         for path in definition.template_dir.rglob("*")
     }
 
-    required_entries = {"README.md", "Makefile", ".gitignore", "scripts/doctor"}
-    if "docker" in definition.tags:
-        required_entries.update({".dockerignore", "compose.dev.yaml"})
-    if definition.category == "backend":
-        required_entries.update({"go.mod", "go.sum", "cmd", "internal", "configs", "scripts"})
-    if definition.category == "native":
-        required_entries.update({".mise.toml", "scripts"})
-    if definition.name == "apple":
-        required_entries.update(
-            {
-                "Tuist.swift",
-                "Workspace.swift",
-                "fastlane/Fastfile",
-                "scripts/verify-release-identity",
-            }
-        )
-    if definition.name == "android":
-        required_entries.update({"gradlew", "gradlew.bat", "scripts"})
-    if definition.name == "microservice":
-        required_entries.update(
-            {
-                "api/buf.gen.yaml",
-                "api/buf.yaml",
-                "api/proto/service/v1/service.proto",
-                "internal/transport/grpc.go",
-                "internal/transport/ping.go",
-                "internal/runtime/server.go",
-                "internal/runtime/server_test.go",
-                "tests/server_test.go",
-            }
-        )
-    if definition.name == "web-service":
-        required_entries.update(
-            {
-                "internal/runtime/server.go",
-                "internal/runtime/server_test.go",
-            }
-        )
-    if definition.name == "worker":
-        required_entries.update(
-            {
-                "internal/runtime/runner.go",
-                "internal/runtime/runner_test.go",
-            }
-        )
-    if definition.name == "frontend":
-        required_entries.update(
-            {
-                "pnpm-lock.yaml",
-                "playwright.production.config.ts",
-                "scripts/browser-smoke-production",
-                "tests/production-browser-smoke.spec.ts",
-            }
-        )
+    required_entries = declared_required_entries(definition)
 
     missing_entries = sorted(entry for entry in required_entries if entry not in relative_entries)
     if missing_entries:
@@ -320,7 +265,10 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
 def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
     """Return placeholder validation errors for a template directory."""
     errors: list[str] = []
-    supported = supported_placeholders()
+    try:
+        supported = supported_placeholders(definition)
+    except InvalidTemplateError as exc:
+        return [str(exc)]
 
     if not definition.template_dir.exists():
         return [f"{definition.name}: template directory is missing"]
@@ -335,7 +283,7 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
             continue
 
         placeholders = sorted(set(PLACEHOLDER_PATTERN.findall(content)))
-        raw_free_text = {"{{" + key.upper() + "}}" for key in FREE_TEXT_KEYS}
+        raw_free_text = {"{{" + key.upper() + "}}" for key in free_text_names(definition)}
         unescaped = sorted(raw_free_text.intersection(placeholders))
         if unescaped and path.suffix != ".md":
             errors.append(
@@ -344,7 +292,7 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
             )
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
-            relative_path = path.relative_to(catalog.templates_root()).as_posix()
+            relative_path = path.relative_to(definition.template_dir.parent).as_posix()
             errors.append(
                 f"{definition.name}: unsupported placeholder(s) in {relative_path}: {', '.join(unsupported)}"
             )

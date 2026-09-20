@@ -11,6 +11,15 @@ from biucingcli.models import (
 )
 
 
+def string_list(data: dict, key: str) -> list[str]:
+    if not isinstance(data, dict):
+        raise TypeError("metadata entry must be an object")
+    value = data.get(key, [])
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise TypeError(f"{key} must be a list of strings")
+    return value
+
+
 def templates_root() -> Path:
     """Return the templates bundled inside the installed package."""
     return Path(__file__).resolve().parent / "template_data"
@@ -26,7 +35,12 @@ def load_template(name: str, *, root: Path | None = None) -> TemplateDefinition:
         with metadata_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
 
+        for variable in data["variables"]:
+            string_list(variable, "contexts")
         variables = [TemplateVariable(**variable) for variable in data["variables"]]
+        rule = data.get("rule")
+        if rule is not None and not isinstance(rule, str):
+            raise TypeError("rule must be a string or null")
         maturity = TemplateMaturity(**data["maturity"])
         validation = TemplateValidation(**data["validation"])
         worktree = TemplateWorktree(**data.get("worktree", {}))
@@ -46,6 +60,11 @@ def load_template(name: str, *, root: Path | None = None) -> TemplateDefinition:
             variables=variables,
             next_steps=data["next_steps"],
             template_dir=metadata_path.parent / "template",
+            contracts=string_list(data, "contracts"),
+            required_entries=string_list(data, "required_entries"),
+            rule=rule,
+            derived_outputs=string_list(data, "derived_outputs"),
+            render_outputs=string_list(data, "render_outputs"),
         )
     except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError) as exc:
         raise InvalidTemplateError(

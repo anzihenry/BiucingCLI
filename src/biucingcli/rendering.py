@@ -1,83 +1,76 @@
-"""Pure single-pass text rendering; no filesystem operations."""
+"""Template-scoped single-pass rendering; legacy unscoped helpers remain compatible."""
 
 from __future__ import annotations
 
 import re
 
-from biucingcli.escaping import CONTEXT_ESCAPERS, FREE_TEXT_KEYS
+from biucingcli import _legacy_rendering
+from biucingcli.escaping import CONTEXT_ESCAPERS
+from biucingcli.errors import InvalidTemplateError
+from biucingcli.models import TemplateDefinition
 
 
 PLACEHOLDER_PATTERN = re.compile(r"\{\{[A-Z0-9_]+\}\}")
-def supported_placeholders() -> set[str]:
-    """Return every placeholder the renderer knows how to replace."""
-    return set(placeholder_map({}).keys())
+NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]*")
 
 
-def placeholder_map(values: dict[str, str]) -> dict[str, str]:
-    """Map internal variable names to template placeholders."""
-    placeholders = {
-        "{{PROJECT_NAME}}": values.get("project_name", ""),
-        "{{DISPLAY_NAME}}": values.get("display_name", ""),
-        "{{PACKAGE_NAME}}": values.get("package_name", ""),
-        "{{MODULE_NAME}}": values.get("module_name", ""),
-        "{{SERVICE_NAME}}": values.get("service_name", ""),
-        "{{WORKER_NAME}}": values.get("worker_name", ""),
-        "{{RUN_MODE}}": values.get("run_mode", ""),
-        "{{TICK_INTERVAL_SECONDS}}": values.get("tick_interval_seconds", ""),
-        "{{SHUTDOWN_TIMEOUT_SECONDS}}": values.get("shutdown_timeout_seconds", ""),
-        "{{SERVICE_TYPE_NAME}}": values.get("service_type_name", ""),
-        "{{HTTP_PORT}}": values.get("http_port", ""),
-        "{{GRPC_PORT}}": values.get("grpc_port", ""),
-        "{{PROTO_PACKAGE}}": values.get("proto_package", ""),
-        "{{DEPENDENCY_STORE}}": values.get("dependency_store", ""),
-        "{{DEPENDENCY_STORE_IMAGE}}": values.get("dependency_store_image", ""),
-        "{{DEPENDENCY_STORE_PORT}}": values.get("dependency_store_port", ""),
-        "{{DEPENDENCY_STORE_DSN}}": values.get("dependency_store_dsn", ""),
-        "{{DEPENDENCY_STORE_CONTAINER_DSN}}": values.get("dependency_store_container_dsn", ""),
-        "{{DEPENDENCY_STORE_ENV_BLOCK}}": values.get("dependency_store_env_block", ""),
-        "{{OTEL_EXPORTER_ENDPOINT}}": values.get("otel_exporter_endpoint", ""),
-        "{{APPLICATION_ID}}": values.get("application_id", ""),
-        "{{ANDROID_NAMESPACE}}": values.get("android_namespace", ""),
-        "{{COMPILE_SDK}}": values.get("compile_sdk", ""),
-        "{{MIN_SDK}}": values.get("min_sdk", ""),
-        "{{TARGET_SDK}}": values.get("target_sdk", ""),
-        "{{VERSION_CODE}}": values.get("version_code", ""),
-        "{{VERSION_NAME}}": values.get("version_name", ""),
-        "{{JAVA_VERSION}}": values.get("java_version", ""),
-        "{{KOTLIN_MODULE_NAME}}": values.get("kotlin_module_name", ""),
-        "{{BUNDLE_NAME}}": values.get("bundle_name", ""),
-        "{{HARMONY_MODULE_NAME}}": values.get("harmony_module_name", ""),
-        "{{ABILITY_NAME}}": values.get("ability_name", ""),
-        "{{COMPATIBLE_SDK_VERSION}}": values.get("compatible_sdk_version", ""),
-        "{{TARGET_SDK_VERSION}}": values.get("target_sdk_version", ""),
-        "{{MIN_API_VERSION}}": values.get("min_api_version", ""),
-        "{{HARMONY_VERSION_CODE}}": values.get("harmony_version_code", ""),
-        "{{HARMONY_VERSION_NAME}}": values.get("harmony_version_name", ""),
-        "{{APPLE_PLATFORM}}": values.get("apple_platform", ""),
-        "{{APPLE_PLATFORM_NAME}}": values.get("apple_platform_name", ""),
-        "{{FASTLANE_PLATFORM}}": values.get("fastlane_platform", ""),
-        "{{APP_STORE_PLATFORM}}": values.get("app_store_platform", ""),
-        "{{BUNDLE_IDENTIFIER}}": values.get("bundle_identifier", ""),
-        "{{MINIMUM_OS_VERSION}}": values.get("minimum_os_version", ""),
-        "{{DEVELOPMENT_TEAM}}": values.get("development_team", ""),
-        "{{ORGANIZATION_NAME}}": values.get("organization_name", ""),
-        "{{SWIFT_MODULE_NAME}}": values.get("swift_module_name", ""),
-        "{{TUIST_DESTINATIONS}}": values.get("tuist_destinations", ""),
-        "{{TUIST_DEPLOYMENT_TARGETS}}": values.get("tuist_deployment_targets", ""),
-        "{{XCODEBUILD_DESTINATION}}": values.get("xcodebuild_destination", ""),
-        "{{SWIFTPM_SUPPORTED_PLATFORM}}": values.get("swiftpm_supported_platform", ""),
-        "{{APPLE_SCENE_BODY}}": values.get("apple_scene_body", ""),
-        "{{APPLE_HOME_BODY}}": values.get("apple_home_body", ""),
-        "{{APPLE_PLATFORM_OUTPUT_NOTE}}": values.get("apple_platform_output_note", ""),
+def free_text_names(definition: TemplateDefinition) -> set[str]:
+    # Infer safety from constraints, never from a hard-coded list of field names.
+    return {v.name for v in definition.variables
+            if v.validator in {"text", "display-name", "url"}
+            or (v.validator == "choice" and (not v.choices or any(
+                re.fullmatch(r"[A-Za-z0-9_.-]+", choice) is None for choice in v.choices)))}
+
+
+def placeholder_bindings(definition: TemplateDefinition) -> dict[str, tuple[str, str | None]]:
+    bindings = {}
+
+    def add(name, context=None):
+        token = "{{" + name.upper() + ("_" + context if context else "") + "}}"
+        if token in bindings:
+            raise InvalidTemplateError(f"{definition.name}: duplicate placeholder binding {token}")
+        bindings[token] = (name, context)
+
+    inputs = {v.name for v in definition.variables}
+    for variable in definition.variables:
+        if not isinstance(variable.name, str) or not NAME_PATTERN.fullmatch(variable.name):
+            raise InvalidTemplateError(f"{definition.name}: invalid variable name {variable.name!r}")
+        add(variable.name)
+        for context in variable.contexts:
+            if context not in CONTEXT_ESCAPERS:
+                raise InvalidTemplateError(f"{definition.name}: unknown escape context {context!r}")
+            add(variable.name, context)
+    outputs = definition.derived_outputs + definition.render_outputs
+    if len(outputs) != len(set(outputs)):
+        raise InvalidTemplateError(f"{definition.name}: duplicate derived/render output")
+    for name in outputs:
+        if not NAME_PATTERN.fullmatch(name):
+            raise InvalidTemplateError(f"{definition.name}: invalid output name {name!r}")
+        # Legitimate input overwrites are checked against the registered rule.
+        if name not in inputs:
+            add(name)
+    return bindings
+
+
+def supported_placeholders(definition: TemplateDefinition | None = None) -> set[str]:
+    if definition is None:
+        return _legacy_rendering.supported_placeholders()
+    return set(placeholder_bindings(definition))
+
+
+def placeholder_map(values: dict[str, str], definition: TemplateDefinition | None = None) -> dict[str, str]:
+    if definition is None:
+        return _legacy_rendering.placeholder_map(values)
+    return {
+        token: CONTEXT_ESCAPERS[context](values.get(name, "")) if context else values.get(name, "")
+        for token, (name, context) in placeholder_bindings(definition).items()
     }
-    for key in FREE_TEXT_KEYS:
-        for context, escape in CONTEXT_ESCAPERS.items():
-            placeholders["{{" + key.upper() + "_" + context + "}}"] = escape(values.get(key, ""))
-    return placeholders
 
 
-def render_text(text: str, values: dict[str, str]) -> str:
-    """Replace placeholders in a text snippet."""
-    placeholders = placeholder_map(values)
-    # Replace only tokens from the template, never tokens inside inserted data.
+def render_text(text: str, values: dict[str, str], definition: TemplateDefinition | None = None) -> str:
+    placeholders = placeholder_map(values, definition)
+    if definition is not None:
+        unknown = sorted(set(PLACEHOLDER_PATTERN.findall(text)) - placeholders.keys())
+        if unknown:
+            raise InvalidTemplateError(f"{definition.name}: unsupported placeholder(s): {', '.join(unknown)}")
     return PLACEHOLDER_PATTERN.sub(lambda match: placeholders.get(match[0], match[0]), text)

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- declare template file contracts, rule outputs and escape contexts in metadata;
+- scope generation placeholders per template and validate extension declarations;
+- verify declaration-only onboarding with a Python backend fixture, preserving
+  existing output and required-file baselines.
+
 - extract Apple, Android and microservice derivations into pure built-in rules
   selected by a static registry, preserving generated output and JSON metadata.
 

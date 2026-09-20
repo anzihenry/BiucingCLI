@@ -19,6 +19,7 @@ class TemplateVariable:
     choices: list[str] = field(default_factory=list)
     minimum: int | None = None
     maximum: int | None = None
+    contexts: list[str] = field(default_factory=list)
 
     def numeric_bounds(self) -> tuple[int | None, int | None]:
         """Return effective numeric limits, including validator defaults."""
@@ -117,6 +118,11 @@ class TemplateDefinition:
     variables: list[TemplateVariable]
     next_steps: list[str]
     template_dir: Path
+    contracts: list[str] = field(default_factory=list)
+    required_entries: list[str] = field(default_factory=list)
+    rule: str | None = None
+    derived_outputs: list[str] = field(default_factory=list)
+    render_outputs: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable representation."""

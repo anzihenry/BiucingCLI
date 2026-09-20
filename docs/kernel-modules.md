@@ -1,4 +1,4 @@
-# Kernel modules: stages 1–3
+# Kernel modules: stages 1–4
 
 Stage 1 extracts foundation modules without changing generation algorithms,
 template resources, serialization or CLI contracts.
@@ -99,3 +99,34 @@ placeholder table remain unchanged for stage 4.
 default names, snippet separation/escaping, invalid selections, registry fallback
 and missing assignments, input/result isolation, helper aliases and independent
 imports. Existing 11-case generation snapshots remain the end-to-end contract.
+
+## Stage 4: template-scoped declarations
+
+The historical stage 3 string-based rule helper remains compatible, but generation
+now passes the complete `TemplateDefinition` and selects its declared `rule`.
+The registry owns exact derived/render-only output sets and allowed input
+overwrites; metadata must agree, and actual returned keys are checked too.
+
+`declarations.py` validates extension metadata, names, contracts, paths, rule
+outputs, escape contexts and placeholder binding collisions. `template_rules/contracts.py`
+owns reusable file contracts. Base requirements always apply; built-in minimum
+contract/rule assignments cannot be disabled by deleting declarations. Category
+and tags no longer implicitly select technology-specific required files.
+
+Core rendering always receives a definition and builds its bindings solely from
+that template's inputs, declared contexts and rule outputs. Unknown placeholders
+fail; arbitrary extra values cannot create new bindings. Source placeholder checks
+run before prompting/preview and before filesystem staging. Inserted user text is
+still processed once, never re-expanded. New free text is identified by validator
+semantics rather than existing variable names.
+
+`_legacy_rendering.py` freezes the previous global map exclusively for callers of
+unscoped rendering helpers. It is not the template extension mechanism. Existing
+JSON `to_dict` surfaces deliberately omit internal extension fields, preserving
+schema version 1 and existing golden outputs.
+
+See [template authoring](template-authoring.md) for declarations and boundaries.
+`tests/test_template_declarations.py` demonstrates a new Python backend using a
+new text variable through `--set`, without a new CLI option or registered rule.
+It also tests negative boundaries and compares required entries against the
+pre-migration contract snapshot. Existing generation snapshots remain unchanged.

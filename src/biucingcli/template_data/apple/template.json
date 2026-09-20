@@ -2,9 +2,24 @@
   "name": "apple",
   "description": "Swift + Tuist Apple app starter for mid-sized teams",
   "category": "native",
-  "stack": ["Swift", "Tuist", "SwiftPM", "fastlane"],
-  "tags": ["apple", "swiftui", "tuist", "fastlane"],
-  "platforms": ["ios", "macos", "watchos", "tvos"],
+  "stack": [
+    "Swift",
+    "Tuist",
+    "SwiftPM",
+    "fastlane"
+  ],
+  "tags": [
+    "apple",
+    "swiftui",
+    "tuist",
+    "fastlane"
+  ],
+  "platforms": [
+    "ios",
+    "macos",
+    "watchos",
+    "tvos"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Multi-platform Apple starter with doctor, generate, lint, test, beta, and release workflows."
@@ -21,7 +36,16 @@
     "The starter assumes a native Apple workstation with Xcode-oriented tooling and simulator-first validation.",
     "Generated projects should keep bootstrap, doctor, generate, lint, test, beta, and release workflows explicit."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "generate", "lint", "test", "build", "release", "open"],
+  "workflow_labels": [
+    "bootstrap",
+    "doctor",
+    "generate",
+    "lint",
+    "test",
+    "build",
+    "release",
+    "open"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -60,14 +84,22 @@
       "name": "display_name",
       "required": false,
       "default_from": "project_name",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "SWIFT"
+      ]
     },
     {
       "name": "apple_platform",
       "required": false,
       "default": "ios",
       "validator": "choice",
-      "choices": ["ios", "macos", "watchos", "tvos"]
+      "choices": [
+        "ios",
+        "macos",
+        "watchos",
+        "tvos"
+      ]
     },
     {
       "name": "bundle_identifier",
@@ -79,7 +111,10 @@
       "name": "organization_name",
       "required": false,
       "default": "Example Team",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "SWIFT"
+      ]
     },
     {
       "name": "development_team",
@@ -106,5 +141,32 @@
     "make lint",
     "make test",
     "open {{PROJECT_NAME}}.xcworkspace"
+  ],
+  "contracts": [
+    "native-tools"
+  ],
+  "required_entries": [
+    "Tuist.swift",
+    "Workspace.swift",
+    "fastlane/Fastfile",
+    "scripts/verify-release-identity"
+  ],
+  "rule": "apple",
+  "derived_outputs": [
+    "apple_platform",
+    "apple_platform_name",
+    "fastlane_platform",
+    "app_store_platform",
+    "minimum_os_version",
+    "tuist_destinations",
+    "tuist_deployment_targets",
+    "xcodebuild_destination",
+    "swiftpm_supported_platform",
+    "swift_module_name"
+  ],
+  "render_outputs": [
+    "apple_scene_body",
+    "apple_home_body",
+    "apple_platform_output_note"
   ]
 }

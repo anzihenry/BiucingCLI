@@ -2,9 +2,20 @@
   "name": "web-service",
   "description": "Go + Gin web service starter",
   "category": "backend",
-  "stack": ["Go", "Gin"],
-  "tags": ["api", "docker", "go", "service"],
-  "platforms": ["linux", "container"],
+  "stack": [
+    "Go",
+    "Gin"
+  ],
+  "tags": [
+    "api",
+    "docker",
+    "go",
+    "service"
+  ],
+  "platforms": [
+    "linux",
+    "container"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Dockerized web service starter with bounded HTTP timeouts, graceful shutdown, runtime health checks, lint, and tests."
@@ -24,7 +35,13 @@
     "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
     "Generated projects are expected to keep config, build, and verification workflows repo-local."
   ],
-  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "workflow_labels": [
+    "bootstrap",
+    "dev",
+    "verify",
+    "build",
+    "runtime"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -84,5 +101,16 @@
     "make verify",
     "make docker-build",
     "make docker-run"
-  ]
+  ],
+  "contracts": [
+    "docker-compose",
+    "go-backend"
+  ],
+  "required_entries": [
+    "internal/runtime/server.go",
+    "internal/runtime/server_test.go"
+  ],
+  "rule": null,
+  "derived_outputs": [],
+  "render_outputs": []
 }

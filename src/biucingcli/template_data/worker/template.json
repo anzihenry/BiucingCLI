@@ -2,9 +2,20 @@
   "name": "worker",
   "description": "Go background worker starter with scheduled and oneshot execution modes",
   "category": "backend",
-  "stack": ["Go", "Docker"],
-  "tags": ["worker", "docker", "go", "async"],
-  "platforms": ["linux", "container"],
+  "stack": [
+    "Go",
+    "Docker"
+  ],
+  "tags": [
+    "worker",
+    "docker",
+    "go",
+    "async"
+  ],
+  "platforms": [
+    "linux",
+    "container"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Dockerized worker starter with explicit retry semantics, bounded shutdown, and deterministic generated-project tests."
@@ -22,7 +33,13 @@
     "The starter is optimized for background execution rather than a public HTTP API surface.",
     "Generated projects are expected to keep config, verification, and container packaging repo-local."
   ],
-  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "workflow_labels": [
+    "bootstrap",
+    "dev",
+    "verify",
+    "build",
+    "runtime"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -73,7 +90,10 @@
       "required": false,
       "default": "scheduled",
       "validator": "choice",
-      "choices": ["scheduled", "oneshot"]
+      "choices": [
+        "scheduled",
+        "oneshot"
+      ]
     },
     {
       "name": "tick_interval_seconds",
@@ -96,5 +116,16 @@
     "make verify",
     "make docker-build",
     "make docker-run"
-  ]
+  ],
+  "contracts": [
+    "docker-compose",
+    "go-backend"
+  ],
+  "required_entries": [
+    "internal/runtime/runner.go",
+    "internal/runtime/runner_test.go"
+  ],
+  "rule": null,
+  "derived_outputs": [],
+  "render_outputs": []
 }

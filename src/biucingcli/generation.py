@@ -8,7 +8,9 @@ import stat
 import tempfile
 from pathlib import Path
 
-from biucingcli.errors import BiucingError, GenerationConflictError, GenerationError
+from biucingcli.errors import BiucingError, GenerationConflictError, GenerationError, InvalidTemplateError
+from biucingcli.declarations import declaration_errors
+from biucingcli.validation import validate_template_placeholders
 from biucingcli.models import TemplateDefinition
 from biucingcli.rendering import render_text
 
@@ -25,6 +27,10 @@ def render_template(
         raise GenerationError(f"output directory does not exist: {target_dir.parent}")
     if not target_dir.parent.is_dir():
         raise GenerationError(f"output path is not a directory: {target_dir.parent}")
+
+    errors = declaration_errors(definition) + validate_template_placeholders(definition)
+    if errors:
+        raise InvalidTemplateError("; ".join(errors))
 
     staging_root: Path | None = None
     try:
@@ -43,7 +49,7 @@ def render_template(
             except UnicodeDecodeError:
                 continue
 
-            path.write_text(render_text(content, values), encoding="utf-8")
+            path.write_text(render_text(content, values, definition), encoding="utf-8")
             if path.name == "gradlew" or "scripts" in path.parts:
                 current_mode = path.stat().st_mode
                 path.chmod(current_mode | stat.S_IXUSR)

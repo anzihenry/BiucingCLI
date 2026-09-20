@@ -2,9 +2,22 @@
   "name": "android",
   "description": "Kotlin Android app starter for mid-sized teams",
   "category": "native",
-  "stack": ["Kotlin", "Android", "Gradle", "Jetpack Compose", "fastlane"],
-  "tags": ["android", "kotlin", "compose", "fastlane"],
-  "platforms": ["android"],
+  "stack": [
+    "Kotlin",
+    "Android",
+    "Gradle",
+    "Jetpack Compose",
+    "fastlane"
+  ],
+  "tags": [
+    "android",
+    "kotlin",
+    "compose",
+    "fastlane"
+  ],
+  "platforms": [
+    "android"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Android starter with doctor, format, build, test, and UI smoke workflows."
@@ -21,7 +34,15 @@
     "The starter assumes a native Android workstation flow with Gradle, emulator, and release-signing guidance.",
     "Generated projects should expose bootstrap, doctor, format, build, test, and UI smoke workflows."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "format", "build", "test", "ui-test", "open"],
+  "workflow_labels": [
+    "bootstrap",
+    "doctor",
+    "format",
+    "build",
+    "test",
+    "ui-test",
+    "open"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -60,7 +81,11 @@
       "name": "display_name",
       "required": false,
       "default_from": "project_name",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "ANDROID",
+        "KOTLIN"
+      ]
     },
     {
       "name": "package_name",
@@ -142,5 +167,18 @@
     "make test",
     "make test-ui",
     "open -a \"Android Studio\" ."
-  ]
+  ],
+  "contracts": [
+    "native-tools"
+  ],
+  "required_entries": [
+    "gradlew",
+    "gradlew.bat",
+    "scripts"
+  ],
+  "rule": "android",
+  "derived_outputs": [
+    "kotlin_module_name"
+  ],
+  "render_outputs": []
 }

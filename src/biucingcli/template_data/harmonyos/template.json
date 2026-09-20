@@ -2,9 +2,24 @@
   "name": "harmonyos",
   "description": "ArkTS HarmonyOS app starter for DevEco Studio projects",
   "category": "native",
-  "stack": ["ArkTS", "ArkUI", "HarmonyOS", "DevEco Studio", "hvigor", "ohpm"],
-  "tags": ["harmonyos", "arkts", "arkui", "deveco", "native"],
-  "platforms": ["harmonyos"],
+  "stack": [
+    "ArkTS",
+    "ArkUI",
+    "HarmonyOS",
+    "DevEco Studio",
+    "hvigor",
+    "ohpm"
+  ],
+  "tags": [
+    "harmonyos",
+    "arkts",
+    "arkui",
+    "deveco",
+    "native"
+  ],
+  "platforms": [
+    "harmonyos"
+  ],
   "maturity": {
     "level": "experimental",
     "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, Hypium test wiring, build verification, artifact checks, and local release-signing preflight."
@@ -22,7 +37,16 @@
     "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
     "Generated projects are structured for an ArkTS Stage model app with one entry module."
   ],
-  "workflow_labels": ["bootstrap", "doctor", "lint", "test", "build", "verify", "release", "open"],
+  "workflow_labels": [
+    "bootstrap",
+    "doctor",
+    "lint",
+    "test",
+    "build",
+    "verify",
+    "release",
+    "open"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -61,7 +85,11 @@
       "name": "display_name",
       "required": false,
       "default_from": "project_name",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "JSON",
+        "JS_SINGLE"
+      ]
     },
     {
       "name": "bundle_name",
@@ -117,7 +145,10 @@
       "name": "organization_name",
       "required": false,
       "default": "Example Team",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "JSON"
+      ]
     }
   ],
   "next_steps": [
@@ -130,5 +161,12 @@
     "make verify",
     "make release-preflight",
     "open -a \"DevEco Studio\" ."
-  ]
+  ],
+  "contracts": [
+    "native-tools"
+  ],
+  "required_entries": [],
+  "rule": null,
+  "derived_outputs": [],
+  "render_outputs": []
 }

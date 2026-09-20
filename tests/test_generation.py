@@ -59,7 +59,7 @@ class GenerationTests(unittest.TestCase):
                 definition = self.fixture(root)
                 target = root / "output"
 
-                def occupy(text="", values=None):
+                def occupy(text="", values=None, definition=None):
                     target.mkdir(exist_ok=True)
                     (target / "sentinel").write_bytes(b"user data")
                     return text

@@ -2,9 +2,19 @@
   "name": "frontend",
   "description": "React + TypeScript starter for independent projects",
   "category": "frontend",
-  "stack": ["React", "TypeScript"],
-  "tags": ["web", "docker", "playwright", "vitest"],
-  "platforms": ["web"],
+  "stack": [
+    "React",
+    "TypeScript"
+  ],
+  "tags": [
+    "web",
+    "docker",
+    "playwright",
+    "vitest"
+  ],
+  "platforms": [
+    "web"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Docker-first frontend starter with test and browser-smoke workflows."
@@ -23,7 +33,13 @@
     "Local development is expected to run through Docker-first workflows.",
     "Browser smoke coverage and runtime packaging are part of the starter contract."
   ],
-  "workflow_labels": ["bootstrap", "dev", "test", "build", "runtime"],
+  "workflow_labels": [
+    "bootstrap",
+    "dev",
+    "test",
+    "build",
+    "runtime"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -62,7 +78,11 @@
       "name": "display_name",
       "required": false,
       "default_from": "project_name",
-      "validator": "display-name"
+      "validator": "display-name",
+      "contexts": [
+        "JSON",
+        "XML"
+      ]
     },
     {
       "name": "package_name",
@@ -77,5 +97,17 @@
     "make test",
     "make docker-build",
     "make docker-run"
-  ]
+  ],
+  "contracts": [
+    "docker-compose"
+  ],
+  "required_entries": [
+    "pnpm-lock.yaml",
+    "playwright.production.config.ts",
+    "scripts/browser-smoke-production",
+    "tests/production-browser-smoke.spec.ts"
+  ],
+  "rule": null,
+  "derived_outputs": [],
+  "render_outputs": []
 }

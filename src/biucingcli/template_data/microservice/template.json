@@ -2,9 +2,25 @@
   "name": "microservice",
   "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
   "category": "backend",
-  "stack": ["Go", "Gin", "Protobuf", "Buf", "Docker Compose", "OpenTelemetry"],
-  "tags": ["grpc", "otel", "protobuf", "docker", "service"],
-  "platforms": ["linux", "container"],
+  "stack": [
+    "Go",
+    "Gin",
+    "Protobuf",
+    "Buf",
+    "Docker Compose",
+    "OpenTelemetry"
+  ],
+  "tags": [
+    "grpc",
+    "otel",
+    "protobuf",
+    "docker",
+    "service"
+  ],
+  "platforms": [
+    "linux",
+    "container"
+  ],
   "maturity": {
     "level": "validated",
     "summary": "Containerized microservice starter with coordinated HTTP/gRPC shutdown, bounded timeouts, health checks, protobuf, and observability."
@@ -24,7 +40,13 @@
     "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
     "Generated projects are expected to validate protobuf, service runtime, and container packaging together."
   ],
-  "workflow_labels": ["bootstrap", "dev", "verify", "build", "runtime"],
+  "workflow_labels": [
+    "bootstrap",
+    "dev",
+    "verify",
+    "build",
+    "runtime"
+  ],
   "commands": {
     "bootstrap": "make bootstrap",
     "doctor": "make doctor",
@@ -95,13 +117,20 @@
       "required": false,
       "default": "postgres",
       "validator": "choice",
-      "choices": ["postgres", "redis"]
+      "choices": [
+        "postgres",
+        "redis"
+      ]
     },
     {
       "name": "otel_exporter_endpoint",
       "required": false,
       "default": "http://localhost:4318",
-      "validator": "url"
+      "validator": "url",
+      "contexts": [
+        "JSON",
+        "DOCKER"
+      ]
     }
   ],
   "next_steps": [
@@ -110,5 +139,30 @@
     "make verify",
     "make up",
     "make docker-build"
-  ]
+  ],
+  "contracts": [
+    "docker-compose",
+    "go-backend"
+  ],
+  "required_entries": [
+    "api/buf.gen.yaml",
+    "api/buf.yaml",
+    "api/proto/service/v1/service.proto",
+    "internal/transport/grpc.go",
+    "internal/transport/ping.go",
+    "internal/runtime/server.go",
+    "internal/runtime/server_test.go",
+    "tests/server_test.go"
+  ],
+  "rule": "microservice",
+  "derived_outputs": [
+    "dependency_store",
+    "dependency_store_image",
+    "dependency_store_port",
+    "dependency_store_dsn",
+    "dependency_store_container_dsn",
+    "dependency_store_env_block",
+    "service_type_name"
+  ],
+  "render_outputs": []
 }

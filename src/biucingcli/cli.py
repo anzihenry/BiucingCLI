@@ -22,6 +22,8 @@ from biucingcli.generation import render_template
 from biucingcli.rendering import render_text
 from biucingcli.variables import validate_resolved_variables
 from biucingcli.validation import validate_templates
+from biucingcli.validation import validate_template_placeholders
+from biucingcli.declarations import declaration_errors
 from biucingcli.templates import resolve_variables_detailed
 from biucingcli.template_rules.registry import derive_template_values
 from biucingcli.template_rules.apple import (
@@ -307,6 +309,9 @@ def top_level_template_entries(template_dir: Path) -> list[str]:
 def build_create_context(args: argparse.Namespace) -> dict[str, object]:
     """Resolve a create request into a reusable context."""
     definition = load_template(args.template)
+    metadata_errors = declaration_errors(definition) + validate_template_placeholders(definition)
+    if metadata_errors:
+        raise InvalidTemplateError("; ".join(metadata_errors))
     requested_project_name = args.project_name.strip()
     set_values = parse_set_values(args.set_values)
     allowed_keys = {variable.name for variable in definition.variables}
@@ -419,7 +424,7 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         interactive=not (args.non_interactive or args.json) and sys.stdin.isatty(),
     )
     values = dict(resolution_result.values)
-    rule_result = derive_template_values(args.template, values)
+    rule_result = derive_template_values(definition, values)
     derived_values = rule_result.derived_values
     values.update(derived_values)
     values.update(rule_result.render_only_values)
@@ -431,7 +436,7 @@ def build_create_context(args: argparse.Namespace) -> dict[str, object]:
         )
 
     target_dir = Path(args.output_dir).resolve() / values["project_name"]
-    rendered_next_steps = [render_text(step, values) for step in definition.next_steps]
+    rendered_next_steps = [render_text(step, values, definition) for step in definition.next_steps]
     system_derived_values = {
         key: values[key]
         for key in sorted(derived_values)
