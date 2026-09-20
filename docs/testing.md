@@ -5,6 +5,11 @@ For kernel extraction contracts and generated-output snapshots, see
 Current foundation boundaries and fixture-root APIs are documented in
 [kernel modules](kernel-modules.md).
 
+The planned frontend rendering extension has a separate
+[stage 0 specification and baseline record](frontend-rendering-plan.md).
+Its three-mode acceptance matrix is future work, not coverage claimed by the
+current test suites.
+
 Install the locked development/build environment with `uv sync --locked`.
 
 ## Core: Linux and macOS

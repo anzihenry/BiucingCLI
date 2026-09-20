@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- document the stage-0 frontend CSR/SSG/SSR design, resource composition contract,
+  compatibility decisions and phased acceptance gates; no runtime changes yet.
+
 - move text/JSON presentation and output versioning out of CLI, retaining formatter
   adapters and existing output contracts;
 - organize CLI, generated-output, platform and module tests without dropping

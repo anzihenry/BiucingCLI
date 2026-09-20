@@ -1,5 +1,9 @@
 # Adding a built-in template
 
+This document describes implemented behavior. For the proposed optional resource
+variant extension (not yet supported), see the
+[frontend rendering plan](frontend-rendering-plan.md).
+
 Place `template.json` and a `template/` resource tree under
 `src/biucingcli/template_data/<name>/`. Keep the metadata name equal to the directory.
 Existing descriptive metadata (stack, maturity, validation, worktree, commands,
