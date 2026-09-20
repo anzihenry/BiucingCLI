@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- add immutable resource-variant models, strict optional metadata loading and a
+  standalone deterministic resource resolver with 21 fixture-based core tests;
+  generation/preview integration and shipped frontend modes remain future work.
+
 - document the stage-0 frontend CSR/SSG/SSR design, resource composition contract,
   compatibility decisions and phased acceptance gates; no runtime changes yet.
 

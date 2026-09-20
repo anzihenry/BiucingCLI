@@ -9,6 +9,10 @@ The planned frontend rendering extension has a separate
 [stage 0 specification and baseline record](frontend-rendering-plan.md).
 Its three-mode acceptance matrix is future work, not coverage claimed by the
 current test suites.
+Stage 1 adds 21 Python-only resource declaration/selection tests in
+`test_resources.py` (136 core, 11 platform, one Android in total). These use
+temporary fixtures, not frontend mode builds; the existing output goldens remain
+unchanged.
 
 Install the locked development/build environment with `uv sync --locked`.
 

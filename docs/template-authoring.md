@@ -1,7 +1,8 @@
 # Adding a built-in template
 
-This document describes implemented behavior. For the proposed optional resource
-variant extension (not yet supported), see the
+This document describes shipped generation behavior. For the optional resource
+variant extension (models and standalone resolution only; not yet connected to
+generation), see the
 [frontend rendering plan](frontend-rendering-plan.md).
 
 Place `template.json` and a `template/` resource tree under

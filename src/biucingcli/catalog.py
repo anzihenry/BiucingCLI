@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from biucingcli.errors import InvalidTemplateError, UnknownTemplateError
+from biucingcli.variant_declarations import parse_variants, variant_declaration_errors
 from biucingcli.models import (
     TemplateDefinition, TemplateVariable, TemplateMaturity, TemplateValidation, TemplateWorktree,
 )
@@ -44,7 +45,7 @@ def load_template(name: str, *, root: Path | None = None) -> TemplateDefinition:
         maturity = TemplateMaturity(**data["maturity"])
         validation = TemplateValidation(**data["validation"])
         worktree = TemplateWorktree(**data.get("worktree", {}))
-        return TemplateDefinition(
+        definition = TemplateDefinition(
             name=data["name"],
             description=data["description"],
             stack=data["stack"],
@@ -65,7 +66,12 @@ def load_template(name: str, *, root: Path | None = None) -> TemplateDefinition:
             rule=rule,
             derived_outputs=string_list(data, "derived_outputs"),
             render_outputs=string_list(data, "render_outputs"),
+            variants=parse_variants(data["variants"]) if "variants" in data else None,
         )
+        errors = variant_declaration_errors(definition)
+        if errors:
+            raise InvalidTemplateError("; ".join(errors))
+        return definition
     except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError) as exc:
         raise InvalidTemplateError(
             f"invalid metadata for template '{name}': {exc}"

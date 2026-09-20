@@ -102,6 +102,61 @@ class TemplateWorktree:
 
 
 @dataclass(frozen=True)
+class TemplateVariant:
+    """One resource layer; paths are relative to template metadata/output."""
+
+    source: str
+    required_entries: tuple[str, ...] = ()
+    forbidden_entries: tuple[str, ...] = ()
+    overrides: tuple[str, ...] = ()
+    next_steps: tuple[str, ...] | None = None
+
+    def __post_init__(self):
+        for name in ("required_entries", "forbidden_entries", "overrides"):
+            object.__setattr__(self, name, tuple(getattr(self, name)))
+        if self.next_steps is not None:
+            object.__setattr__(self, "next_steps", tuple(self.next_steps))
+
+
+@dataclass(frozen=True)
+class TemplateVariants:
+    """A single input selector and its immutable option mapping."""
+
+    selector: str
+    options: Mapping[str, TemplateVariant]
+
+    def __post_init__(self):
+        object.__setattr__(self, "options", MappingProxyType(dict(self.options)))
+
+
+@dataclass(frozen=True)
+class ResourceEntry:
+    """A source entry, not a copied/rendered file or filesystem snapshot."""
+
+    source: Path
+    output_path: str
+    layer: str
+    kind: str
+    mode: int
+
+
+@dataclass(frozen=True)
+class ResolvedResources:
+    """Deterministic resource selection; execution is a separate concern."""
+
+    selector: str | None
+    selected_variant: str | None
+    entries: tuple[ResourceEntry, ...]
+    required_entries: tuple[str, ...]
+    forbidden_entries: tuple[str, ...]
+    next_steps: tuple[str, ...]
+
+    def __post_init__(self):
+        for name in ("entries", "required_entries", "forbidden_entries", "next_steps"):
+            object.__setattr__(self, name, tuple(getattr(self, name)))
+
+
+@dataclass(frozen=True)
 class TemplateDefinition:
     """Template metadata and file locations."""
 
@@ -125,6 +180,7 @@ class TemplateDefinition:
     rule: str | None = None
     derived_outputs: list[str] = field(default_factory=list)
     render_outputs: list[str] = field(default_factory=list)
+    variants: TemplateVariants | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-serializable representation."""

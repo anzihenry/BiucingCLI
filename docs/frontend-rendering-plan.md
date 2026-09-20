@@ -1,6 +1,7 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 0 specification; runtime support is not implemented**.
+Status: **stage 1 models/loading and standalone resource resolver implemented;
+generation integration and shipped rendering modes are not implemented**.
 Recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
 the current frontend does not accept `--set rendering=...`.
@@ -332,3 +333,50 @@ three-mode production certification. The distribution command did not use
 `--check-make`; existing Make integrations ran in the platform suite. Stage 0
 changes only documentation: no runtime changes, new template variables, public
 JSON fields, package version changes or golden refreshes.
+
+## Stage 1 implementation boundary
+
+`models.py` now defines `TemplateVariant`, `TemplateVariants`, `ResourceEntry`
+and `ResolvedResources`. New collection fields defensively copy inputs to tuples
+or a read-only mapping. `TemplateDefinition.variants` defaults to None and is
+deliberately absent from `to_dict()` in this phase.
+
+`variant_declarations.py` parses the optional strict schema and checks selector,
+paths, source overlap and required/forbidden contradictions without filesystem
+I/O. Catalog invokes it only for variant declarations; old metadata parsing and
+the shipped template set remain unchanged. Root existence/content is inspected
+only for the selected mode by the standalone resolver.
+
+```python
+from biucingcli.catalog import load_template
+from biucingcli.resources import resolve_resources
+from biucingcli.variables import resolve_variables_detailed
+
+# fixture_root contains an experimental template, not a new CLI plugin source.
+definition = load_template("fixture", root=fixture_root)
+resolved = resolve_variables_detailed(
+    definition, {"project_name": "demo", "rendering": "ssg"}
+)
+resources = resolve_resources(definition, resolved.values)
+```
+
+The resolver expects resolved inputs; missing/unknown selections raise ValueError.
+It performs no prompting, derivation, text replacement, copying or target writes.
+Its deterministic entries record source/output path, common/option layer, kind
+and permission bits. Equal directories merge with common permissions winning;
+whole-file overrides require exact explicit declarations, with stale overrides
+rejected. Variant-enabled trees reject symlinks, special files, unsafe paths and
+case/Unicode collisions. Output constraints and unrendered next steps are returned
+for stage 2 to consume; actual required/forbidden file enforcement, Make checks
+and placeholder validation are not performed by this resolver.
+
+For legacy inventory only, symlinks are represented as symlink entries and are not
+traversed. This inventory is not a replacement implementation of copytree: legacy
+generation continues to use its existing path unchanged. Do not connect a legacy
+inventory to an executor that assumes all entries are files/directories.
+
+`tests/test_resources.py` provides 21 core tests, using temporary metadata/resource
+fixtures and no new shipped template. Stages 2 onward must still integrate the
+resolver with GenerationPlan, execute/preview, full validate and presentation.
+Source fingerprints/rechecks also remain stage 2 work. A fixture successfully
+loading is **not** evidence that the current CLI can generate variant resources.
