@@ -10,7 +10,8 @@ The planned frontend rendering extension has a separate
 Its three-mode acceptance matrix is future work, not coverage claimed by the
 current test suites.
 Stage 1 adds 21 Python-only resource declaration/selection tests in
-`test_resources.py` (136 core, 11 platform, one Android in total). These use
+`test_resources.py`. Stage 2 adds 17 integration tests in
+`test_variant_generation.py` (153 core, 11 platform, one Android in total). These use
 temporary fixtures, not frontend mode builds; the existing output goldens remain
 unchanged.
 
@@ -77,6 +78,7 @@ discovery retain full-suite execution (optional tools may be skipped there).
 | Template declarations and structural validation | `test_template_declarations.py`, `test_template_validation.py` |
 | Pure rendering and rule helpers | `test_rendering.py`, `test_rule_helpers.py`, `test_template_rules.py` |
 | Planning and filesystem execution | `test_generation_plan.py`, `test_generation.py` |
+| Resource variants and effective generation | `test_resources.py`, `test_variant_generation.py` |
 | Generated template contents | `test_native_outputs.py`, `test_service_outputs.py` |
 | External tool integration | `test_platform_integration.py` plus marked escaping tests |
 | Escaping and configuration parsers | `test_escaping.py`, `test_configurations.py` |

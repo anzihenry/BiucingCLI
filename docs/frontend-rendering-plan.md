@@ -1,7 +1,7 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 1 models/loading and standalone resource resolver implemented;
-generation integration and shipped rendering modes are not implemented**.
+Status: **stage 2 plan/validation/execution integration implemented with fixtures;
+shipped frontend rendering modes are not implemented**.
 Recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
 the current frontend does not accept `--set rendering=...`.
@@ -104,7 +104,7 @@ artifacts, not node_modules; SSR retains required production dependencies. Some
 SSR-related packages in a CSR development install are an accepted tradeoff.
 Installation scripts and native package support need verification on CI targets.
 
-## Metadata contract (internal, proposed)
+## Metadata contract (internal)
 
 `variants` is optional. Omission means the existing single-directory template;
 explicit null, wrong types, empty options and unknown keys inside this new object
@@ -232,7 +232,8 @@ replacement. No claim of atomic no-replace publication is added.
 
 ## CLI and JSON contract
 
-Planned commands:
+Commands for the future frontend resources (the variant mechanism is currently
+covered by fixture templates; frontend itself has no rendering selector yet):
 
 ```bash
 biucing info frontend
@@ -334,7 +335,7 @@ three-mode production certification. The distribution command did not use
 changes only documentation: no runtime changes, new template variables, public
 JSON fields, package version changes or golden refreshes.
 
-## Stage 1 implementation boundary
+## Stage 1 implementation boundary (historical)
 
 `models.py` now defines `TemplateVariant`, `TemplateVariants`, `ResourceEntry`
 and `ResolvedResources`. New collection fields defensively copy inputs to tuples
@@ -380,3 +381,47 @@ fixtures and no new shipped template. Stages 2 onward must still integrate the
 resolver with GenerationPlan, execute/preview, full validate and presentation.
 Source fingerprints/rechecks also remain stage 2 work. A fixture successfully
 loading is **not** evidence that the current CLI can generate variant resources.
+
+## Stage 2 implementation boundary
+
+Variant-enabled definitions now select resources during `build_generation_plan`.
+The plan retains `ResolvedResources` and a fingerprint. Counts, top-level entries,
+effective next steps and `selected_variant` come from the same selection used by
+execution. The legacy direct `render_template` entry point also supports variants
+through the same preparation/publication helpers; it does not silently copy only
+the common layer. Legacy definitions keep the original copytree execution path.
+
+Variant generation validates metadata before prompting, then checks the selected
+effective resource set after resolving inputs. Required/forbidden paths, Make
+targets, free-text contexts and next-step placeholders are checked. Shadowed
+common files and unselected mode content do not participate in these checks.
+`validate` checks every declared option without prompting for required inputs;
+errors from resource resolution/content checks are collected with mode context.
+Malformed declarations remain catalog/domain errors under the existing envelope.
+
+The fingerprint captures definition state, on-disk metadata, and inventory,
+permission bits and content of both selected source layers, including shadowed
+common files and directory roots. It is checked after preparation, before staging
+and before publication. Execution compares current selection with the saved one;
+changes raise GenerationError rather than silently rebuilding a different plan.
+This is not a persisted snapshot or a concurrent filesystem lock.
+
+Variant publication copies only listed entries, renders text once, preserves
+binary bytes and file modes, and applies directory modes after writing children.
+Cleanup restores owner traversal/write permissions inside unpublished staging
+directories when needed. Existing and late target conflicts (including dangling
+target symlinks), OSError and cancellation preserve the user target and clean
+staging. Final publication still does not promise atomic no-replace semantics
+against arbitrary concurrent target creation.
+
+Public schema-1 JSON adds optional `variants` for list/info and `selected_variant`
+for create/plan/dry-run. Legacy outputs omit both. See
+[JSON contract](json-contract.md#resource-variants). No source path or fingerprint
+is exposed. Info text lists selector/choices/default; existing resolved-variable
+lines also identify the selected mode in preview/create text.
+
+`test_variant_generation.py` adds 17 core tests covering these integrations and
+failure paths. All official template resources and existing goldens remain
+unchanged. Stage 3 begins the intentional frontend resource migration; installed
+three-mode frontend/container/browser coverage remains stages 3–6, not a claim
+made by the current seven-template distribution verifier.

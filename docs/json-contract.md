@@ -66,3 +66,31 @@ Named rules include syntax and length checks; numeric bounds alone are not the
 entire rule. This metadata is not a JSON Schema or a portable regex specification.
 The CLI remains authoritative for input validation. Resolved values in create
 results retain `name/value/source`; obtain declarations through list/info.
+
+## Resource variants
+
+Templates declaring resource variants have an additional `variants` object in
+list/info template details:
+
+```json
+{"selector": "rendering", "default": "csr", "choices": ["csr", "ssg", "ssr"]}
+```
+
+Create, plan and dry-run results for these templates include a top-level
+`selected_variant` object, for example:
+
+```json
+{"selector": "rendering", "value": "ssg"}
+```
+
+The default comes from the selector variable declaration; the selected value also
+appears in `resolved_variables` with its usual source. Counts, top-level entries
+and next steps describe the effective common-plus-selected resource set. Source
+paths, override policies and consistency fingerprints are internal and omitted.
+These additive fields retain schema version 1 and are absent from legacy
+templates. Validation retains its existing success/error envelopes; variant
+resource diagnostics include `template[option]` context in error strings.
+
+These examples illustrate the implemented mechanism, not new shipped frontend
+modes. The current frontend still has no rendering selector; the integration is
+tested through fixture templates pending the resource migration.

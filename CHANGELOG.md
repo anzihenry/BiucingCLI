@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- integrate optional resource variants with generation plans, effective file/Make/
+  placeholder validation, all-mode validation and staged execution; detect source
+  drift and add optional schema-1 variant summaries without changing legacy output;
+- add 17 fixture-based integration tests for variants, JSON contracts, source
+  changes, conflicts and cleanup; shipped frontend resources remain unchanged.
+
 - add immutable resource-variant models, strict optional metadata loading and a
   standalone deterministic resource resolver with 21 fixture-based core tests;
   generation/preview integration and shipped frontend modes remain future work.

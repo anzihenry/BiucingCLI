@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import PurePosixPath
 
 from biucingcli import catalog
 from biucingcli.catalog import load_templates
-from biucingcli.models import TemplateDefinition
+from biucingcli.models import TemplateDefinition, ResolvedResources
+from biucingcli.resources import resolve_resources
+from biucingcli.variant_declarations import at_or_below, collision_key
 from biucingcli.variables import ALLOWED_VARIABLE_VALIDATORS, variable_validation_error
 from biucingcli.rendering import PLACEHOLDER_PATTERN, supported_placeholders
 from biucingcli.rendering import free_text_names
@@ -207,9 +210,16 @@ def validate_template_definition(definition: TemplateDefinition) -> list[str]:
     return errors
 
 
-def validate_template_command_contract(definition: TemplateDefinition) -> list[str]:
+def validate_template_command_contract(
+    definition: TemplateDefinition, resources: ResolvedResources | None = None,
+) -> list[str]:
     """Validate metadata commands against concrete phony Make targets."""
     makefile_path = definition.template_dir / "Makefile"
+    if resources is not None:
+        entry = next((e for e in resources.entries if e.output_path == "Makefile" and e.kind == "file"), None)
+        if entry is None:
+            return [f"{definition.name}: Makefile is missing for command contract validation"]
+        makefile_path = entry.source
     if not makefile_path.is_file():
         return [f"{definition.name}: Makefile is missing for command contract validation"]
 
@@ -262,7 +272,9 @@ def validate_template_required_files(definition: TemplateDefinition) -> list[str
     return errors
 
 
-def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
+def validate_template_placeholders(
+    definition: TemplateDefinition, resources: ResolvedResources | None = None,
+) -> list[str]:
     """Return placeholder validation errors for a template directory."""
     errors: list[str] = []
     try:
@@ -270,10 +282,16 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
     except InvalidTemplateError as exc:
         return [str(exc)]
 
-    if not definition.template_dir.exists():
+    if resources is None and not definition.template_dir.exists():
         return [f"{definition.name}: template directory is missing"]
 
-    for path in definition.template_dir.rglob("*"):
+    sources = (
+        [(entry.source, entry.output_path) for entry in resources.entries if entry.kind == "file"]
+        if resources is not None else
+        [(path, path.relative_to(definition.template_dir).as_posix())
+         for path in definition.template_dir.rglob("*")]
+    )
+    for path, output_path in sources:
         if not path.is_file():
             continue
 
@@ -285,19 +303,21 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
         placeholders = sorted(set(PLACEHOLDER_PATTERN.findall(content)))
         raw_free_text = {"{{" + key.upper() + "}}" for key in free_text_names(definition)}
         unescaped = sorted(raw_free_text.intersection(placeholders))
-        if unescaped and path.suffix != ".md":
+        if unescaped and PurePosixPath(output_path).suffix != ".md":
             errors.append(
                 f"{definition.name}: free-text placeholder(s) require an explicit context "
-                f"in {path.relative_to(definition.template_dir)}: {', '.join(unescaped)}"
+                f"in {output_path}: {', '.join(unescaped)}"
             )
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
             relative_path = path.relative_to(definition.template_dir.parent).as_posix()
+            if resources is not None:
+                relative_path = f"{output_path} (source {relative_path})"
             errors.append(
                 f"{definition.name}: unsupported placeholder(s) in {relative_path}: {', '.join(unsupported)}"
             )
 
-    for step in definition.next_steps:
+    for step in (resources.next_steps if resources is not None else definition.next_steps):
         placeholders = sorted(set(PLACEHOLDER_PATTERN.findall(step)))
         unsupported = [placeholder for placeholder in placeholders if placeholder not in supported]
         if unsupported:
@@ -305,6 +325,26 @@ def validate_template_placeholders(definition: TemplateDefinition) -> list[str]:
                 f"{definition.name}: unsupported placeholder(s) in next_steps: {', '.join(unsupported)}"
             )
 
+    return errors
+
+
+def validate_resolved_resources(definition: TemplateDefinition, resources: ResolvedResources) -> list[str]:
+    """Validate the effective output; never scan unselected or shadowed files."""
+    context = f"{definition.name}[{resources.selected_variant}]"
+    paths = {entry.output_path for entry in resources.entries}
+    errors = []
+    for missing in sorted(set(resources.required_entries) - paths):
+        errors.append(f"{context}: missing required entry: {missing}")
+    for path in sorted(paths):
+        for forbidden in resources.forbidden_entries:
+            if at_or_below(collision_key(path), collision_key(forbidden)):
+                errors.append(f"{context}: forbidden entry: {path} (rule {forbidden})")
+    try:
+        checks = (validate_template_placeholders(definition, resources)
+                  + validate_template_command_contract(definition, resources))
+        errors.extend(message.replace(f"{definition.name}:", f"{context}:", 1) for message in checks)
+    except (OSError, UnicodeError) as exc:
+        errors.append(f"{context}: cannot validate resource content: {exc}")
     return errors
 
 
@@ -316,6 +356,14 @@ def validate_templates() -> list[str]:
 
     for definition in definitions:
         errors.extend(validate_template_definition(definition))
+        if definition.variants is not None:
+            for name in sorted(definition.variants.options):
+                try:
+                    resources = resolve_resources(definition, {definition.variants.selector: name})
+                    errors.extend(validate_resolved_resources(definition, resources))
+                except InvalidTemplateError as exc:
+                    errors.append(str(exc))
+            continue
         errors.extend(validate_template_placeholders(definition))
         errors.extend(validate_template_required_files(definition))
         errors.extend(validate_template_command_contract(definition))

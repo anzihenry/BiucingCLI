@@ -1,6 +1,7 @@
 """Read-only resource selection; independent of CLI, rendering and generation."""
 
 import stat
+import hashlib
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -51,7 +52,7 @@ def resolve_resources(definition: TemplateDefinition, values: Mapping[str, str])
 
     No defaults/prompts/derivations are applied here. Legacy symlinks are retained
     as inventory entries, not followed; legacy generation remains on its existing
-    copytree path. Fingerprinting and plan execution belong to stage 2.
+    copytree path. Fingerprinting is explicit and separate from enumeration.
     """
     errors = variant_declaration_errors(definition)
     if errors:
@@ -108,3 +109,44 @@ def resolve_resources(definition: TemplateDefinition, values: Mapping[str, str])
         forbidden_entries=option.forbidden_entries if option else (),
         next_steps=(option.next_steps if option and option.next_steps is not None else tuple(definition.next_steps)),
     )
+
+
+def resource_fingerprint(definition: TemplateDefinition, resources: ResolvedResources) -> str:
+    """Detect selected source/metadata drift, including shadowed common files.
+
+    This is a consistency check, not a lock or persistent filesystem snapshot.
+    Never follows resource symlinks; captures directory and file permission bits.
+    """
+    digest = hashlib.sha256()
+
+    def record(value):
+        encoded = repr(value).encode("utf-8")
+        digest.update(len(encoded).to_bytes(8, "big"))
+        digest.update(encoded)
+
+    record(definition)
+    record(resources)
+    metadata_dir = definition.template_dir.parent
+    metadata = metadata_dir / "template.json"
+    context = f"{definition.name}[{resources.selected_variant}]"
+    try:
+        # Injected definitions need not have a metadata file. Track its absence too.
+        if metadata.exists() or metadata.is_symlink():
+            metadata_mode = metadata.lstat().st_mode
+            record((stat.S_IFMT(metadata_mode), stat.S_IMODE(metadata_mode),
+                    str(metadata.readlink()) if metadata.is_symlink() else None))
+            record(metadata.read_bytes())
+        else:
+            record(None)
+        option = definition.variants.options[resources.selected_variant]
+        for layer, root in (("common", definition.template_dir),
+                            (resources.selected_variant, metadata_dir / option.source)):
+            _check_root(root, metadata_dir, context)
+            record((layer, stat.S_IMODE(root.stat().st_mode)))
+            for entry in _entries(root, layer, context, strict=True):
+                record(entry)
+                if entry.kind == "file":
+                    record(hashlib.sha256(entry.source.read_bytes()).hexdigest())
+    except OSError as exc:
+        raise InvalidTemplateError(f"{context}: cannot fingerprint resources: {exc}") from exc
+    return digest.hexdigest()

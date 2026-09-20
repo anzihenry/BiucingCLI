@@ -198,7 +198,15 @@ class TemplateDefinition:
             "workflow_labels": self.workflow_labels,
             "variables": [variable.to_dict() for variable in self.variables],
             "next_steps": self.next_steps,
+            **({"variants": self.variant_summary()} if self.variants else {}),
         }
+
+    def variant_summary(self) -> dict[str, object]:
+        if self.variants is None:
+            return {}
+        variable = next(v for v in self.variables if v.name == self.variants.selector)
+        return {"selector": self.variants.selector, "default": variable.default,
+                "choices": list(variable.choices)}
 
 
 @dataclass(frozen=True)
@@ -246,6 +254,8 @@ class GenerationPlan:
     rendered_next_steps: tuple[str, ...]
     template_file_count: int
     template_top_level_entries: tuple[str, ...]
+    resources: ResolvedResources | None = None
+    resource_fingerprint: str | None = None
 
     def __post_init__(self):
         object.__setattr__(self, "values", MappingProxyType(dict(self.values)))
@@ -263,4 +273,7 @@ class GenerationPlan:
             "rendered_next_steps": list(self.rendered_next_steps),
             "template_file_count": self.template_file_count,
             "template_top_level_entries": list(self.template_top_level_entries),
+            **({"selected_variant": {"selector": self.resources.selector,
+                                      "value": self.resources.selected_variant}}
+               if self.resources is not None else {}),
         }

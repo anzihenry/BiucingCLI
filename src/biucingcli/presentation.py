@@ -60,6 +60,9 @@ def format_template_info(definition: TemplateDefinition) -> str:
     ]
     for assumption in definition.operating_assumptions:
         lines.append(f"- {assumption}")
+    if definition.variants is not None:
+        summary = definition.variant_summary()
+        lines.append(f"Variants ({summary['selector']}): {', '.join(summary['choices'])}; default={summary['default']}")
     lines.append("Worktree diagnostics:")
     for diagnostic in definition.worktree.diagnostics:
         lines.append(f"- {diagnostic}")
@@ -131,6 +134,7 @@ def create_manifest(context: GenerationPlan | dict[str, object], mode: str) -> d
         "next_steps": context["rendered_next_steps"],
         "template_file_count": context["template_file_count"],
         "template_top_level_entries": context["template_top_level_entries"],
+        **({"selected_variant": context["selected_variant"]} if "selected_variant" in context else {}),
     }
 
 

@@ -1,8 +1,8 @@
 # Adding a built-in template
 
 This document describes shipped generation behavior. For the optional resource
-variant extension (models and standalone resolution only; not yet connected to
-generation), see the
+variant extension (integrated with planning, validation and generation; shipped
+frontend presets are still pending), see the
 [frontend rendering plan](frontend-rendering-plan.md).
 
 Place `template.json` and a `template/` resource tree under
@@ -86,8 +86,9 @@ explicit). A fixture demonstrating complete loading, validation, preview and
 generation is in `tests/test_template_declarations.py`; it is not a shipped
 eighth template. Add platform tests if the new template needs language/SDK proof.
 
-Internal extension metadata is not yet exposed by list/info JSON: this change
-preserves the current public schema. Neither third-party plugin execution nor a
+Internal file contracts/rule declarations are not exposed by list/info JSON.
+Variant templates expose only their selector/default/choices summary; see the
+[JSON contract](json-contract.md#resource-variants). Neither third-party plugin execution nor a
 new CLI option for external template directories is introduced.
 
 ## Contribution checklist

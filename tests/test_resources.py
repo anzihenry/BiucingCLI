@@ -19,7 +19,7 @@ from biucingcli.resources import resolve_resources
 from biucingcli.variables import resolve_variables_detailed
 
 
-class ResourceTests(unittest.TestCase):
+class ResourceFixture:
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -61,11 +61,15 @@ class ResourceTests(unittest.TestCase):
     def resolve(self, mode="csr"):
         return resolve_resources(self.load(), {"rendering": mode})
 
-    def test_load_models_without_exposing_internal_json(self):
+
+class ResourceTests(ResourceFixture, unittest.TestCase):
+    def test_load_models_without_exposing_internal_paths(self):
         definition = self.load()
         self.assertEqual(definition.variants.selector, "rendering")
         self.assertEqual(definition.variants.options["csr"].source, "variants/csr/template")
-        self.assertNotIn("variants", definition.to_dict())
+        self.assertEqual(definition.to_dict()["variants"], {
+            "selector": "rendering", "default": "csr", "choices": ["csr", "ssg", "ssr"],
+        })
         self.assertIsNone(load_template("frontend").variants)
 
     def test_new_models_copy_mutable_inputs(self):

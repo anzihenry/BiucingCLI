@@ -7,10 +7,11 @@ from biucingcli.rendering import placeholder_bindings
 from biucingcli.template_rules.contracts import CONTRACTS, BUILTIN_CONTRACTS
 from biucingcli.template_rules.registry import rule_declaration_errors
 from biucingcli.variables import ALLOWED_VARIABLE_VALIDATORS
+from biucingcli.variant_declarations import variant_declaration_errors
 
 
 def declaration_errors(definition) -> list[str]:
-    errors = rule_declaration_errors(definition)
+    errors = rule_declaration_errors(definition) + variant_declaration_errors(definition)
     for variable in definition.variables:
         if variable.validator not in ALLOWED_VARIABLE_VALIDATORS:
             errors.append(f"{definition.name}: variable '{variable.name}' uses unsupported validator '{variable.validator}'")
