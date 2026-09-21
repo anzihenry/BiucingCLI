@@ -14,6 +14,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_all_templates_and_variants_parse(self):
         variants = [
             ("frontend", []),
+            ("frontend", ["--set", "rendering=ssg"]),
             ("web-service", ["--module-name", "example.com/demo"]),
             ("worker", ["--module-name", "example.com/demo"]),
             ("android", ["--package-name", "com.example.demo"]),

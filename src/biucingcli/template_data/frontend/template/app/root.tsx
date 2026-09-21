@@ -11,13 +11,16 @@ import type { Route } from "./+types/root";
 import { project } from "./lib/project";
 import "./app.css";
 
+export function meta() {
+  return [{ title: project.title }];
+}
+
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{project.title}</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <Meta />
         <Links />

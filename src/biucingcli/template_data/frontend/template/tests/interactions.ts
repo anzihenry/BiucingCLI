@@ -1,12 +1,12 @@
 import { expect, test } from "playwright/test";
 import { project } from "../app/lib/project";
 
-export function registerInteractionTests() {
+export function registerInteractionTests(mode = "CSR") {
   for (const viewport of [
     { width: 1280, height: 800 },
     { width: 390, height: 844 },
   ]) {
-    test(`CSR interactions at ${viewport.width}px`, async ({
+    test(`${mode} interactions at ${viewport.width}px`, async ({
       page,
     }, testInfo) => {
       await page.setViewportSize(viewport);

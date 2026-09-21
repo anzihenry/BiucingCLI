@@ -1,4 +1,4 @@
-"""Shipped CSR preset contracts; Node/browser gates run separately."""
+"""Shipped CSR/SSG preset contracts; Node/browser gates run separately."""
 
 from dataclasses import replace
 import json
@@ -15,13 +15,13 @@ from generation_baseline import inventory
 
 
 class FrontendVariantTests(unittest.TestCase):
-    def test_only_csr_is_advertised_and_validated(self):
+    def test_shipped_modes_are_advertised_and_validated(self):
         definition = load_template("frontend")
         self.assertEqual(definition.variant_summary(), {
-            "selector": "rendering", "default": "csr", "choices": ["csr"],
+            "selector": "rendering", "default": "csr", "choices": ["csr", "ssg"],
         })
         self.assertEqual(validate_templates(), [])
-        for mode in ("ssg", "ssr", "auto"):
+        for mode in ("ssr", "auto"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
                 with self.assertRaises(ValueError):
                     build_generation_plan(CreateRequest("frontend", "demo", Path(tmp), {"rendering": mode}))
@@ -67,9 +67,51 @@ class FrontendVariantTests(unittest.TestCase):
         self.assertIn("strictPeerDependencies: true", files["pnpm-workspace.yaml"].read_text())
         # SPA prerender must not depend on container localhost address-family order.
         self.assertIn('preview: { host: "127.0.0.1" }', files["vite.config.ts"].read_text())
+        for dependency in ("@base-ui/react/button", "@base-ui/react/dialog", "lucide-react"):
+            self.assertIn(f'"{dependency}"', files["vite.config.ts"].read_text())
         dockerfile = files["Dockerfile"].read_text()
         runtime = dockerfile.split("FROM ${RUNTIME_IMAGE}")[1]
         self.assertIn("/app/build/client /usr/share/nginx/html", runtime)
         self.assertNotIn("node_modules", runtime)
         self.assertNotIn("build/server", runtime)
         self.assertIn("Copyright (c) 2023 shadcn", files["THIRD_PARTY_NOTICES.md"].read_text())
+
+    def test_ssg_shares_toolchain_without_csr_route_or_deployment_leaks(self):
+        definition = load_template("frontend")
+        csr = {e.output_path: e for e in resolve_resources(definition, {"rendering": "csr"}).entries}
+        ssg = {e.output_path: e for e in resolve_resources(definition, {"rendering": "ssg"}).entries}
+        for name in ("package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "app/root.tsx",
+                     "app/components/ui/button.tsx", "tests/interactions.ts", "vite.config.ts"):
+            self.assertEqual(ssg[name].source, csr[name].source, name)
+            self.assertEqual(ssg[name].layer, "common", name)
+        for name in ("nginx.conf", "react-router.config.ts", "app/routes/home.tsx", "README.md"):
+            self.assertNotEqual(ssg[name].source, csr[name].source, name)
+        self.assertIn("app/routes/article.tsx", ssg)
+        self.assertNotIn("app/routes/article.tsx", csr)
+        self.assertIn("public/404.html", ssg)
+        self.assertNotIn("public/404.html", csr)
+        config = ssg["react-router.config.ts"].source.read_text()
+        self.assertIn("ssr: false", config)
+        self.assertIn("contentPaths()", config)
+        self.assertIn("requireSiteOrigin(process.env.SITE_URL)", config)
+        nginx = ssg["nginx.conf"].source.read_text()
+        self.assertIn("try_files $uri $uri/index.html =404", nginx)
+        self.assertNotIn("try_files $uri $uri/ /index.html", nginx)
+        docker = ssg["Dockerfile"].source.read_text()
+        self.assertIn("ARG SITE_URL", docker)
+        runtime = docker.split("FROM ${RUNTIME_IMAGE}")[1]
+        self.assertNotIn("node_modules", runtime)
+        self.assertNotIn("build/server", runtime)
+
+    def test_ssg_generation_is_deterministic_and_preserves_special_input(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            values = {"rendering": "ssg", "display_name": 'R&D "引号" <研发> \\ $HOME {{PROJECT_NAME}}'}
+            plan = build_generation_plan(CreateRequest("frontend", "demo", Path(tmp), values))
+            execute_generation_plan(plan)
+            target = Path(tmp) / "second"
+            execute_generation_plan(replace(plan, target_dir=target))
+            self.assertEqual(inventory(plan.target_dir), inventory(target))
+            text = (target / "app/lib/project.ts").read_text()
+            self.assertIn("{{PROJECT_NAME}}", text)
+            self.assertNotIn("variants", {p.name for p in target.iterdir()})
+            self.assertTrue((target / "scripts/browser-smoke-production").stat().st_mode & 0o111)

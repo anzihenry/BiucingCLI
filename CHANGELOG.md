@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- add the frontend SSG preset with explicitly enumerated content routes, build-time
+  HTML/navigation data, validated SITE_URL, per-page metadata, sitemap/robots and
+  static Nginx real-404 deployment; share dependencies/components with CSR and
+  separate preview routing so deep-link refresh does not fall back to the homepage.
+
 - migrate frontend to a CSR-only React Router Framework preset with shared React
   19.3 / TypeScript 7 / Tailwind 4 / shadcn UI resources and a pnpm 11 lockfile;
   preserve worktree-scoped Docker/Make workflows, add typed-lint negative checks,

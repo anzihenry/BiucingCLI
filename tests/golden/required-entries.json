@@ -41,6 +41,7 @@
     "scripts/doctor",
     "tests/interactions.ts",
     "tests/production-browser-smoke.spec.ts",
+    "vite.preview.config.ts",
     "vitest.config.ts"
   ],
   "harmonyos": [

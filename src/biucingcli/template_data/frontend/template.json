@@ -7,7 +7,7 @@
   "platforms": ["web"],
   "maturity": {
     "level": "validated",
-    "summary": "CSR starter with shared tooling; SSG/SSR presets are not yet available."
+    "summary": "CSR and SSG presets with shared tooling; SSR is not yet available."
   },
   "validation": {
     "status": "real-build-verified",
@@ -17,7 +17,10 @@
       "Generated CSR frozen install, strict peers and quality gates on macOS and Docker Linux arm64",
       "Docker development and static Nginx production image builds",
       "Actual Nginx desktop/mobile and static-response Playwright checks using macOS Chrome and Docker Linux arm64 Chromium",
-      "Docker Linux arm64 default Headless Shell: three production and two development browser tests passed"
+      "CSR Docker Linux arm64 default Headless Shell: three production and two development browser tests passed",
+      "SSG macOS and Docker Linux arm64 frozen install, strict quality gates and static production image build",
+      "SSG actual Nginx: seven Linux arm64 default Headless Shell tests including delayed hydration, metadata, fixed data and real 404",
+      "SSG Linux arm64 cold and repeated development launches: four browser tests each; macOS Chrome development and static preview passed"
     ]
   },
   "operating_assumptions": [
@@ -71,7 +74,7 @@
       "name": "rendering",
       "required": true,
       "validator": "text",
-      "choices": ["csr"],
+      "choices": ["csr", "ssg"],
       "default": "csr"
     }
   ],
@@ -97,7 +100,8 @@
     "vitest.config.ts",
     "scripts/check-toolchain.mjs",
     "tests/interactions.ts",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "vite.preview.config.ts"
   ],
   "rule": null,
   "derived_outputs": [],
@@ -120,6 +124,34 @@
           "app/entry.server.tsx",
           "server"
         ],
+        "overrides": []
+      },
+      "ssg": {
+        "source": "variants/ssg/template",
+        "next_steps": [
+          "make bootstrap",
+          "make dev",
+          "make test",
+          "export SITE_URL=https://example.com",
+          "make docker-build",
+          "make docker-run"
+        ],
+        "required_entries": [
+          "react-router.config.ts",
+          "app/routes.ts",
+          "app/routes/home.tsx",
+          "app/routes/article.tsx",
+          "app/content.ts",
+          "app/lib/site.ts",
+          "app/lib/content.server.ts",
+          "app/routes/sitemap.ts",
+          "app/routes/robots.ts",
+          "public/404.html",
+          "tests/ssg.ts",
+          "playwright.build.config.ts",
+          "nginx.conf"
+        ],
+        "forbidden_entries": ["src", "index.html", "app/entry.server.tsx", "server"],
         "overrides": []
       }
     }

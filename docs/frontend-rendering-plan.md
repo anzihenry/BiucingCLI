@@ -1,10 +1,10 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 3 shared toolchain and CSR complete; macOS quality/build/browser
-checks and Docker Linux arm64 development/production builds and browser checks pass**.
+Status: **stage 4 SSG complete; macOS and Docker Linux arm64 quality, build and
+browser checks pass. Stage 3 CSR remains supported.**
 Recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
-the current frontend accepts only `--set rendering=csr` (also the default).
+the current frontend accepts `--set rendering=csr|ssg` (default: `csr`).
 
 ## Scope and decisions
 
@@ -232,8 +232,8 @@ replacement. No claim of atomic no-replace publication is added.
 
 ## CLI and JSON contract
 
-Target commands after all modes ship (today only `csr` is accepted; `ssg` and
-`ssr` fail as invalid choices without creating files):
+Target commands after all modes ship (today `csr` and `ssg` are accepted;
+`ssr` fails as an invalid choice without creating files):
 
 ```bash
 biucing info frontend
@@ -503,3 +503,69 @@ common directory. Generation/list/required-file goldens change only for frontend
 other templates preserve their entries. The wheel/sdist verifier generates the
 new CSR output and parses seven frontend configs. It does not yet run Node or
 three-mode browser/container checks from installed artifacts (stage 6).
+
+## Stage 4 implementation and verification (2026-09-21)
+
+`rendering=ssg` is now available alongside default CSR; SSR remains rejected.
+The SSG resource layer owns complete routes, public content, server-only loaders,
+site-origin validation, page metadata, prerender configuration, static deployment,
+preview routing and acceptance tests. It requires no generator-core branches,
+per-mode variable schema, dependency changes or JSON merges. Node/React/TS and
+pnpm lockfile versions remain those verified in stage 3.
+
+The content list explicitly enumerates `/`, `/about` and two `/articles/:slug`
+pages. The same path list drives prerendering, sitemap and local preview. Slugs
+must be unique lowercase URL segments. HTML and `.data` navigation payloads are
+built together; a serialized `builtAt` demonstrates a fixed build snapshot.
+New content requires a rebuild, not a runtime server or an arbitrary-route fallback.
+
+SSG production builds require `SITE_URL`, supplied through the environment or
+Docker builder argument. It is a syntactically validated HTTPS DNS origin, not a
+DNS reachability check. Credentials, paths, query/fragment, non-default ports,
+loopback/local names and malformed hostnames are rejected. Development can omit
+the origin, in which case no canonical URL is emitted. Metadata and sitemap never
+derive their origin from the request host. All loader output is public; this
+preset adds no private data source, CMS, API or authentication.
+
+Nginx serves only static client artifacts, including deep-link HTML, navigation
+data, sitemap and robots. Unknown routes, unknown slugs, missing data and assets
+return HTTP 404 with a noindex error page. The framework's SPA fallback is removed
+after build. Runtime inspection confirms no Node executable, node_modules or server
+bundle. Publish the whole static directory as one release on other hosts and
+configure equivalent routing rather than an index.html catch-all.
+
+Three shared/frontend integration fixes were required:
+
+- Root title now uses the route metadata API so SSG child metadata does not create
+  duplicate titles; default CSR retains its title.
+- Mode-owned `vite.preview.config.ts` keeps CSR SPA fallback but maps enumerated
+  SSG paths to their own HTML. Generic Vite preview had returned the home document
+  on an extensionless deep-link refresh. It is still not production Nginx.
+- Explicit prebundling of shipped UI imports avoids a cold-start missing Rolldown
+  cache chunk. JS-only counter/dialog triggers stay disabled until hydration via
+  a shared `useSyncExternalStore` hook, avoiding lost clicks on prerendered HTML.
+  Content and native links remain available without JS. Tests wait for hydration
+  before specifically asserting client-side data navigation, and use a window
+  marker instead of mutating React-owned HTML attributes.
+
+Verified against generated special-text projects on macOS and Docker Desktop
+29.8.0 / Linux arm64: frozen install, peers, format, typed lint/negative control,
+TS 7, route types, four SSG unit/component cases and production build. macOS Chrome
+passed four development and four static-preview tests. Actual Nginx passed six
+initial Chrome tests, then all seven final Linux default Headless Shell tests,
+including delayed JS, original HTML without JS, single title/canonical, sitemap,
+stable query-independent data, client navigation, deep refresh and real 404s.
+Linux development passed four tests on both a cold cache and a repeated launch.
+CSR passed its complete macOS quality gate, two unit tests and two development
+plus two static-preview browser cases after the shared changes.
+
+Negative build probes confirmed missing SITE_URL, HTTP localhost, credentials and
+subpaths fail with actionable errors. Core/platform/Android coverage is now
+159 + 11 + 1 = 171 tests. A separate `frontend-ssg` exact-output golden and two
+Python SSG contracts protect generation; other templates' baseline entries are
+unchanged. Wheel/sdist checks include SSG resources and generate SSG from the
+installed wheel outside the checkout, parsing seven configuration files. Running
+Node/browser jobs from installed artifacts and full three-mode CI remain stage 6.
+No native Linux host, amd64, optional full-dev image, SSR or remote CI result is
+claimed. Test containers/network/volumes are cleaned; temporary source projects
+and built images are retained for reproduction. No commit/push/release is implicit.

@@ -60,6 +60,9 @@ def assert_archives_contain_templates(wheel: Path, source_dist: Path) -> None:
     required_suffixes = {
         "src/biucingcli/template_data/frontend/template.json",
         "src/biucingcli/template_data/frontend/template/.gitignore",
+        "src/biucingcli/template_data/frontend/variants/ssg/template/.env.example",
+        "src/biucingcli/template_data/frontend/variants/ssg/template/react-router.config.ts",
+        "src/biucingcli/template_data/frontend/variants/ssg/template/public/404.html",
         "src/biucingcli/template_data/android/template/gradle/wrapper/gradle-wrapper.jar",
     }
     for suffix in required_suffixes:
@@ -168,6 +171,14 @@ def main() -> None:
                 cwd=run_dir,
             )
             assert_generated_project(projects_dir / project_name, check_make=args.check_make)
+
+        run(str(biucing), "create", "frontend", "audit-frontend-ssg", "--set", "rendering=ssg",
+            "--output-dir", str(projects_dir), "--non-interactive", cwd=run_dir)
+        ssg_project = projects_dir / "audit-frontend-ssg"
+        assert_generated_project(ssg_project, check_make=args.check_make)
+        for name in ("react-router.config.ts", "app/routes/article.tsx", "public/404.html", ".env.example"):
+            if not (ssg_project / name).is_file():
+                raise AssertionError(f"installed SSG output is missing {name}")
 
         android_wrapper = (
             projects_dir

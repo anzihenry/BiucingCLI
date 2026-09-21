@@ -12,16 +12,22 @@ current test suites.
 Stage 1 adds 21 Python-only resource declaration/selection tests in
 `test_resources.py`. Stage 2 adds 17 integration tests in
 `test_variant_generation.py`. Stage 3 adds four shipped-CSR tests in
-`test_frontend_variants.py` (157 core, 11 platform, one Android in total).
+`test_frontend_variants.py`. Stage 4 adds two SSG contract tests and a separate
+`frontend-ssg` golden case (159 core, 11 platform, one Android in total).
 Fixture tests remain separate from frontend builds. Only frontend entries in
 generation/list/required-file goldens are intentionally migrated; all other
 template baselines remain unchanged.
 
 Install the locked development/build environment with `uv sync --locked`.
 
-## Frontend CSR toolchain (separate from Python core)
+## Frontend CSR/SSG toolchain (separate from Python core)
 
 Generate a new frontend project, then inside it run:
+
+For SSG (`--set rendering=ssg`), export `SITE_URL=https://your-public-domain.example`
+before `verify`, `build` or production browser checks. Development alone may omit
+it; no canonical origin is then emitted. The origin is validated at build time,
+not added as a generator variable or silently defaulted to localhost.
 
 ```bash
 pnpm install --frozen-lockfile
@@ -62,6 +68,26 @@ Docker Linux arm64 browser follow-up passed three actual-Nginx tests using expli
 Playwright Chromium, then the unmodified Make workflow passed three production and
 two development tests using its default bundled Headless Shell. This is actual
 container browser coverage, separate from macOS Chrome and Vite-preview evidence.
+
+## Stage 4 SSG acceptance
+
+The SSG preset shares the lockfile and quality gate with CSR. The generated
+`app/lib/site.test.ts` covers origin validation and content lookup; the shared
+component test additionally checks disabled actions in server HTML. Four SSG
+unit/component cases pass. The default Linux Headless Shell production workflow
+passes seven cases: desktop/mobile interactions and data navigation, delayed JS
+hydration, raw HTML/metadata/sitemap/fixed data, and real static 404s. Four Linux
+development cases pass from both a cold cache and a repeated launch. macOS Chrome
+passes four development and four static-preview cases; default CSR's two
+development/two preview cases and complete quality gate also pass.
+
+Build-time SITE_URL negative checks reject missing or invalid origins. Preview is
+mode-owned: SSG maps known paths to pre-rendered documents, CSR keeps SPA fallback.
+Use the production Make target for Nginx status/header behavior; Vite preview is
+not evidence of deployment correctness. Python checks now include an SSG golden,
+all-mode config parsing, wheel/sdist SSG resources and installed-wheel generation.
+Node/browser execution from the installed wheel, amd64 and remote CI are not yet
+covered. See the stage 4 record in the rendering plan for scope and cold-start fixes.
 
 ## Core: Linux and macOS
 

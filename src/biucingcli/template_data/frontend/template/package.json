@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "pnpm typecheck && react-router build",
-    "preview": "vite preview",
+    "preview": "vite preview --config vite.preview.config.ts",
     "typecheck": "react-router typegen && node ./node_modules/@typescript/native/bin/tsc --noEmit",
     "lint": "react-router typegen && eslint . --max-warnings=0 && node scripts/check-toolchain.mjs",
     "test": "vitest run",
