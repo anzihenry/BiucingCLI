@@ -123,7 +123,16 @@ coverage to 161 core + 11 platform + one Android = 173 tests. Installed wheel/sd
 verification includes SSR resources and independently generated SSR configs.
 The installed-wheel runner and six-job Node/browser CI matrix are implemented in
 stage 6; actual hosted CI execution still needs a push. Eleven artifact/runner/CI
-regressions bring current totals to 172 core + 11 platform + one Android = 184.
+regressions brought totals to 172 core + 11 platform + one Android = 184.
+The subsequent cache-contamination guard brings current totals to 173 core +
+11 platform + one Android = 185. It checks shared and mode-specific frontend
+resource layers for local dependency/build artifacts, including empty directories
+that Git does not track. Do not run package-manager commands inside template
+source directories; generate a project outside the checkout for frontend checks.
+The three frontend goldens had mistakenly included local `.pnpm-store/v3` empty
+directories; only those directory records were removed. The corrected 173-test
+core suite also passes in a fresh Git archive with the repair patch applied,
+without copying ignored/untracked workspace files.
 
 See the stage 5 record in the rendering plan for actual platform results and
 limits. Keep these generated-project checks separate from Python-only core CI.

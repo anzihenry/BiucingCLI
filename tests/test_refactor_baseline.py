@@ -12,6 +12,16 @@ from generation_baseline import CASES, collect_case, inventory
 
 
 class RefactorBaselineTests(unittest.TestCase):
+    def test_frontend_resource_layers_have_no_local_build_artifacts(self):
+        # Include empty and ignored directories: Git and wheel file inventories
+        # cannot reveal these, but the resource resolver copies directories too.
+        root = Path(__file__).resolve().parents[1] / "src/biucingcli/template_data/frontend"
+        forbidden = {".pnpm-store", "node_modules", ".react-router", "build",
+                     "dist", "coverage", "test-results", "playwright-report"}
+        polluted = sorted(path.relative_to(root).as_posix() for path in root.rglob("*")
+                          if path.name in forbidden)
+        self.assertEqual(polluted, [], f"Remove local artifacts from template layers: {polluted}")
+
     def test_generated_projects_match_baseline(self):
         expected = json.loads((Path(__file__).parent / "golden/generation-baseline.json").read_text())
         self.assertEqual(set(expected), set(CASES))

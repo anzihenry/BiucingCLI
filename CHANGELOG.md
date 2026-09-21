@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix frontend generation baselines contaminated by local empty pnpm cache
+  directories; guard shared and mode-specific resource layers against build artifacts.
+
 - add installed-wheel CSR/SSG/SSR acceptance with native frontend quality/browser
   checks, real production-container checks, scoped cleanup and retained diagnostics;
   share a six-job Linux/macOS frontend matrix between CI and release gates.
