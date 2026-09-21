@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""Verify generated frontend projects from an installed wheel, not an editable checkout."""
+
+from frontend_verification import main
+
+
+if __name__ == "__main__":
+    main()

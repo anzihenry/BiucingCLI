@@ -7,8 +7,9 @@ Current foundation boundaries and fixture-root APIs are documented in
 
 The planned frontend rendering extension has a separate
 [stage 0 specification and baseline record](frontend-rendering-plan.md).
-Generated-project acceptance is recorded per stage; the complete installed-wheel
-three-mode CI matrix remains stage 6, not coverage claimed by Python core.
+Generated-project acceptance is recorded per stage. Stage 6 adds a separate
+[installed-wheel three-mode runner and CI matrix](frontend-artifact-acceptance.md),
+not coverage claimed by Python core. Hosted workflow results require a CI run.
 Stage 1 adds 21 Python-only resource declaration/selection tests in
 `test_resources.py`. Stage 2 adds 17 integration tests in
 `test_variant_generation.py`. Stage 3 adds four shipped-CSR tests in
@@ -89,6 +90,11 @@ all-mode config parsing, wheel/sdist SSG resources and installed-wheel generatio
 Node/browser execution from the installed wheel, amd64 and remote CI are not yet
 covered. See the stage 4 record in the rendering plan for scope and cold-start fixes.
 
+The stage-specific statements above record their original evidence. Stage 6 adds
+installed-wheel execution without modifying generated outputs; see the current
+[artifact acceptance guide](frontend-artifact-acceptance.md) and stage 6 record
+for the macOS/Linux results and the still-pending hosted CI gate.
+
 ## Stage 5 SSR acceptance
 
 Generate with `--set rendering=ssr`; the dependency lockfile and quality commands
@@ -115,7 +121,9 @@ request-specific HTML responses, status codes and special-input hydration.
 The new Python SSR ownership/determinism cases and exact-output golden bring
 coverage to 161 core + 11 platform + one Android = 173 tests. Installed wheel/sdist
 verification includes SSR resources and independently generated SSR configs.
-The complete installed-wheel Node/browser CI matrix remains stage 6.
+The installed-wheel runner and six-job Node/browser CI matrix are implemented in
+stage 6; actual hosted CI execution still needs a push. Eleven artifact/runner/CI
+regressions bring current totals to 172 core + 11 platform + one Android = 184.
 
 See the stage 5 record in the rendering plan for actual platform results and
 limits. Keep these generated-project checks separate from Python-only core CI.

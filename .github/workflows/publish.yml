@@ -93,8 +93,15 @@ jobs:
       - run: uv run --locked python scripts/run-tests --suite platform
       - run: uv run --locked python scripts/verify-distribution --check-make
 
+  frontend:
+    needs: verify
+    uses: ./.github/workflows/frontend.yml
+    with:
+      artifact-name: python-distributions
+      ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
+
   publish:
-    needs: [verify, platform]
+    needs: [verify, platform, frontend]
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.target || 'pypi' }}

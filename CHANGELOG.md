@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- add installed-wheel CSR/SSG/SSR acceptance with native frontend quality/browser
+  checks, real production-container checks, scoped cleanup and retained diagnostics;
+  share a six-job Linux/macOS frontend matrix between CI and release gates.
+- verify every template resource in wheel/sdist and in a wheel rebuilt from sdist,
+  including hidden files, binaries and executable flags; add artifact/runner/CI
+  regressions without changing generated projects or existing golden outputs.
+
 - add the frontend SSR preset with request-isolated loaders, private server
   configuration, uncached HTML/data responses, bounded rendering and a non-root
   Node production image; cover input/error handling, client artifact boundaries,

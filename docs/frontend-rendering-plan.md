@@ -1,7 +1,7 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 5 SSR complete; macOS and Docker Linux arm64 quality, build and
-browser checks pass. CSR and SSG remain supported.**
+Status: **stage 6 implementation and local installed-artifact acceptance complete.
+Hosted CI/release-gate execution remains pending a push; no remote success claimed.**
 Initially recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
 the current frontend accepts `--set rendering=csr|ssg|ssr` (default: `csr`).
@@ -647,3 +647,72 @@ Reproduction project: `/private/tmp/biucing-stage5.S6sQOR/ssr-check`; image
 dependency/browser caches are cleaned after verification; source projects,
 downloaded host browser cache and built images are retained. Cache removal is
 recoverable by reinstalling dependencies/browsers, not a deletion of project data.
+
+## Stage 6 implementation and local verification (2026-09-21)
+
+Implemented after stage 5 commit `d53e749`. Generated templates, the generator
+kernel, dependency locks, public JSON output and all existing goldens are unchanged.
+The additional coverage lives in verification scripts, regression tests, CI and
+documentation. See [frontend artifact acceptance](frontend-artifact-acceptance.md)
+for commands, prerequisites, report retention, cleanup and platform limits.
+
+`verify-distribution` now inventories all 325 template resource files, comparing
+content hashes and all executable bits across the checkout, wheel and sdist. It
+also rebuilds a wheel from the extracted sdist using the locked build environment
+and checks the same inventory. Safe extraction rejects traversal, links and
+special files, uses a fresh destination and never restores archive ownership or
+setuid bits. Linux Python 3.11.2 exposed the absence of the later tarfile `filter`
+API, so the implementation uses validated regular-file extraction compatible with
+the project's minimum Python version. Both platforms' core regressions pass.
+
+`verify-frontend` installs one explicit wheel into a fresh venv, verifies its
+import location, clears source-path and external-browser-server overrides, and
+generates each mode outside the checkout. It runs frozen native pnpm installation,
+peer constraints, format/lint/negative control/TS7/unit/build checks, development
+and built-browser checks. Optional deployment checks build actual images, inspect
+their contents, require readiness and clean exit, and remove only owned UUID-scoped
+containers/images even after browser failure. Logs, phase-specific screenshots
+and a SHA-linked JSON report remain available for diagnosis. Eleven new Python-
+only tests cover inventories, negative cases, safe extraction, workspace/env
+isolation, failure/timeout reporting, cleanup and CI/release wiring.
+
+The reusable frontend workflow contains exactly six jobs: Linux/macOS × three
+modes, with one Python version. It consumes a separately built/verified wheel;
+Linux jobs additionally test actual production images. Publishing consumes the
+same artifact later given to `uv publish`, checks out the release tag for scripts,
+and now waits for frontend acceptance in addition to existing verification and
+platform jobs. Browser reports upload on failure as well as success. `actionlint`
+1.7.7 and the workflow contract test passed. No Trusted Publisher change is needed.
+
+Local installed-wheel evidence (Node 24.19.0 / pnpm 11.21.0, unchanged lockfile):
+
+| Check | macOS arm64 | Docker Linux arm64 |
+| --- | --- | --- |
+| All three modes installed from wheel, frozen native deps and complete quality gates | Passed | Passed |
+| Unit/component cases across CSR/SSG/SSR | 2 / 4 / 31 | 2 / 4 / 31 |
+| Development browser cases | 2 / 4 / 4, installed Chrome | 2 / 4 / 4, default Headless Shell |
+| Built-artifact browser/Node cases | 2 / 4 / 7, installed Chrome | 2 / 4 / 7, default Headless Shell |
+| Actual production-image browser cases | 3 / 7 / 5, Chrome against Linux images | Linux images checked through the macOS invocation |
+
+Both invocations tested wheel SHA-256
+`24f8c776c0a83ab68307bfbd99334a6e7a9100e851084836eccdcb462223cd15`.
+The macOS report has 54 successful stages; the Linux report has 27. Linux used
+the exact previously downloaded Linux Headless Shell cache, with normal installer
+checks and fresh Linux native dependencies, not copied macOS node_modules. Actual
+production image checks cover static-only CSR/SSG and non-root SSR, private-input
+sentinels, HTML/data/status behavior, health, clean shutdown and scoped cleanup.
+Reports remain under `/private/tmp/biucing-stage6.4fM2Da/macos/reports` and
+`/private/tmp/biucing-stage6.4fM2Da/linux/run/reports`. Test containers and temporary
+runner images are cleaned; artifacts, generated projects, reports and task-local
+dependency caches are retained for reproduction.
+
+Final Python coverage is 172 core + 11 platform + one Android = 184 passing tests;
+172 core cases also pass on Linux Python 3.11.2. Ruff, distribution verification,
+Make-entry checks and diff whitespace checks pass. No output baseline was refreshed.
+Maturity remains `validated`; no production-certification upgrade is implied.
+
+Remaining external gate: the newly configured GitHub Actions matrix has not run
+remotely because this task does not authorize a commit/push/workflow dispatch.
+Hosted Linux amd64/macOS runners, apt browser-dependency setup on a fresh hosted
+image, and the combined native-Linux browser-to-production-image CI job must be
+confirmed by that run. No PyPI publication, release or version bump was performed.

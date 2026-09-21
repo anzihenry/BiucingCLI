@@ -1,0 +1,64 @@
+name: Frontend artifact acceptance
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        required: true
+        type: string
+      ref:
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        mode: [csr, ssg, ssr]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.16"
+          python-version: "3.11"
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.19.0"
+      - name: Install pinned package manager
+        run: npm install --global pnpm@11.21.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ runner.temp }}/frontend-dist
+      - run: uv sync --locked
+      - name: Test installed wheel on native platform and Linux production containers
+        shell: bash
+        env:
+          RENDERING_MODE: ${{ matrix.mode }}
+        run: |
+          flags=()
+          if [ "$RUNNER_OS" = Linux ]; then
+            flags+=(--docker --install-browser-deps)
+          fi
+          uv run --locked python scripts/verify-frontend \
+            --dist-dir "$RUNNER_TEMP/frontend-dist" \
+            --work-dir "$RUNNER_TEMP/frontend-acceptance" \
+            --mode "$RENDERING_MODE" "${flags[@]}"
+      - name: Retain logs, summary and browser diagnostics (no node_modules or private env)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-${{ matrix.os }}-${{ matrix.mode }}
+          path: ${{ runner.temp }}/frontend-acceptance/reports/
+          if-no-files-found: warn
+          retention-days: 7

@@ -58,6 +58,8 @@ variants. The shipped frontend now defaults to CSR (explicitly select it with
 SSG production builds require an explicit public HTTPS `SITE_URL` for canonical
 URLs and sitemap. `--set rendering=ssr` generates request-time HTML with a
 self-hosted Node runtime, private server configuration and graceful shutdown.
+See [frontend artifact acceptance](docs/frontend-artifact-acceptance.md) to run
+all three modes from an installed wheel and understand the separate CI/release gates.
 
 Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
 `pyproject.toml` and `uv.lock` together. For deliberate upgrades use

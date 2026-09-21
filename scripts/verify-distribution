@@ -15,6 +15,9 @@ import zipfile
 from pathlib import Path
 
 from config_validation import validate_configurations
+from distribution_resources import (
+    assert_resources_equal, extract_sdist, sdist_resources, source_resources, wheel_resources,
+)
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -127,6 +130,19 @@ def main() -> None:
         wheel, source_dist = wheels[0], source_dists[0]
         run(sys.executable, "-m", "twine", "check", "--strict", str(wheel), str(source_dist))
         assert_archives_contain_templates(wheel, source_dist)
+        expected = source_resources(REPOSITORY_ROOT / "src/biucingcli/template_data")
+        assert_resources_equal(expected, wheel_resources(wheel), "wheel resources")
+        assert_resources_equal(expected, sdist_resources(source_dist), "sdist resources")
+        source_root = extract_sdist(source_dist, audit_root / "source")
+        rebuilt_dir = audit_root / "rebuilt"
+        run("uv", "build", "--wheel", "--no-sources", "--no-build-isolation",
+            "--python", sys.executable, "--out-dir", str(rebuilt_dir),
+            cwd=source_root, env=environment)
+        rebuilt_wheels = list(rebuilt_dir.glob("*.whl"))
+        if len(rebuilt_wheels) != 1:
+            raise AssertionError("expected exactly one wheel rebuilt from sdist")
+        assert_resources_equal(expected, wheel_resources(rebuilt_wheels[0]), "sdist-rebuilt wheel resources")
+        print(f"Exact bytes/executable flags verified for {len(expected)} resources in wheel, sdist and rebuilt wheel")
 
         virtual_environment = audit_root / "venv"
         run("uv", "venv", "--python", sys.executable, str(virtual_environment))
