@@ -63,6 +63,9 @@ def assert_archives_contain_templates(wheel: Path, source_dist: Path) -> None:
         "src/biucingcli/template_data/frontend/variants/ssg/template/.env.example",
         "src/biucingcli/template_data/frontend/variants/ssg/template/react-router.config.ts",
         "src/biucingcli/template_data/frontend/variants/ssg/template/public/404.html",
+        "src/biucingcli/template_data/frontend/variants/ssr/template/.env.example",
+        "src/biucingcli/template_data/frontend/variants/ssr/template/server/index.ts",
+        "src/biucingcli/template_data/frontend/variants/ssr/template/app/entry.server.tsx",
         "src/biucingcli/template_data/android/template/gradle/wrapper/gradle-wrapper.jar",
     }
     for suffix in required_suffixes:
@@ -179,6 +182,16 @@ def main() -> None:
         for name in ("react-router.config.ts", "app/routes/article.tsx", "public/404.html", ".env.example"):
             if not (ssg_project / name).is_file():
                 raise AssertionError(f"installed SSG output is missing {name}")
+
+        run(str(biucing), "create", "frontend", "audit-frontend-ssr", "--set", "rendering=ssr",
+            "--output-dir", str(projects_dir), "--non-interactive", cwd=run_dir)
+        ssr_project = projects_dir / "audit-frontend-ssr"
+        assert_generated_project(ssr_project, check_make=args.check_make)
+        for name in ("server/index.ts", "server/runtime.ts", "app/entry.server.tsx", ".env.example"):
+            if not (ssr_project / name).is_file():
+                raise AssertionError(f"installed SSR output is missing {name}")
+        if (ssr_project / "nginx.conf").exists():
+            raise AssertionError("installed SSR output contains static runtime config")
 
         android_wrapper = (
             projects_dir

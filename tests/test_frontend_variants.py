@@ -1,4 +1,4 @@
-"""Shipped CSR/SSG preset contracts; Node/browser gates run separately."""
+"""Shipped CSR/SSG/SSR preset contracts; Node/browser gates run separately."""
 
 from dataclasses import replace
 import json
@@ -18,10 +18,10 @@ class FrontendVariantTests(unittest.TestCase):
     def test_shipped_modes_are_advertised_and_validated(self):
         definition = load_template("frontend")
         self.assertEqual(definition.variant_summary(), {
-            "selector": "rendering", "default": "csr", "choices": ["csr", "ssg"],
+            "selector": "rendering", "default": "csr", "choices": ["csr", "ssg", "ssr"],
         })
         self.assertEqual(validate_templates(), [])
-        for mode in ("ssr", "auto"):
+        for mode in ("SSR", "auto"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
                 with self.assertRaises(ValueError):
                     build_generation_plan(CreateRequest("frontend", "demo", Path(tmp), {"rendering": mode}))
@@ -115,3 +115,32 @@ class FrontendVariantTests(unittest.TestCase):
             self.assertIn("{{PROJECT_NAME}}", text)
             self.assertNotIn("variants", {p.name for p in target.iterdir()})
             self.assertTrue((target / "scripts/browser-smoke-production").stat().st_mode & 0o111)
+
+    def test_ssr_shares_toolchain_and_owns_node_runtime(self):
+        definition = load_template("frontend")
+        csr = {e.output_path: e for e in resolve_resources(definition, {"rendering": "csr"}).entries}
+        ssr = {e.output_path: e for e in resolve_resources(definition, {"rendering": "ssr"}).entries}
+        for name in ("package.json", "pnpm-lock.yaml", "tsconfig.json", "app/root.tsx", "tests/interactions.ts"):
+            self.assertEqual(csr[name].source, ssr[name].source, name)
+        for name in ("app/entry.server.tsx", "app/lib/request.server.ts", "server/index.ts", "server/runtime.ts"):
+            self.assertIn(name, ssr)
+            self.assertNotIn(name, csr)
+            self.assertNotEqual(ssr[name].layer, "common")
+        self.assertNotIn("nginx.conf", ssr)
+        self.assertNotIn("public/404.html", ssr)
+        self.assertIn("ssr: true", ssr["react-router.config.ts"].source.read_text())
+        docker = ssr["Dockerfile"].source.read_text()
+        self.assertIn("pnpm install --prod --frozen-lockfile", docker)
+        self.assertIn("USER node", docker)
+        self.assertIn('CMD ["node", "server/index.ts"]', docker)
+
+    def test_ssr_generation_preserves_special_input_and_executable_scripts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            values = {"rendering": "ssr", "display_name": 'R&D "引号" <研发> \\ $HOME {{PROJECT_NAME}}'}
+            plan = build_generation_plan(CreateRequest("frontend", "demo", Path(tmp), values))
+            execute_generation_plan(plan)
+            target = Path(tmp) / "second"
+            execute_generation_plan(replace(plan, target_dir=target))
+            self.assertEqual(inventory(plan.target_dir), inventory(target))
+            self.assertTrue((target / "scripts/browser-smoke-production").stat().st_mode & 0o111)
+            self.assertIn("{{PROJECT_NAME}}", (target / "app/lib/project.ts").read_text())

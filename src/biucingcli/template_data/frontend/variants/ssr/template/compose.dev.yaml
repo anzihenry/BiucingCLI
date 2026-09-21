@@ -1,0 +1,29 @@
+services:
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: ${DEV_DOCKERFILE:-Dockerfile.dev}
+      args:
+        DEV_BASE_IMAGE: ${DEV_BASE_IMAGE:-node:24.19.0-bookworm}
+    working_dir: /workspace
+    command: bash -lc "pnpm install --frozen-lockfile && pnpm dev --host 0.0.0.0 --port ${DEV_PORT:-5173} --strictPort"
+    environment:
+      SSR_PRIVATE_TOKEN: ${SSR_PRIVATE_TOKEN:-}
+      CHOKIDAR_USEPOLLING: "true"
+      PNPM_STORE_DIR: /pnpm-store
+      npm_config_store_dir: /pnpm-store
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    ports:
+      - "${DEV_HOST_PORT:-5173}:${DEV_PORT:-5173}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/workspace
+      - frontend-node-modules:/workspace/node_modules
+      - frontend-pnpm-store:/pnpm-store
+      - frontend-playwright-cache:/ms-playwright
+
+volumes:
+  frontend-node-modules:
+  frontend-pnpm-store:
+  frontend-playwright-cache:

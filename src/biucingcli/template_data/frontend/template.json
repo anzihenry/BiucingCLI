@@ -7,7 +7,7 @@
   "platforms": ["web"],
   "maturity": {
     "level": "validated",
-    "summary": "CSR and SSG presets with shared tooling; SSR is not yet available."
+    "summary": "CSR, SSG and self-hosted Node SSR presets with shared tooling."
   },
   "validation": {
     "status": "real-build-verified",
@@ -20,7 +20,11 @@
       "CSR Docker Linux arm64 default Headless Shell: three production and two development browser tests passed",
       "SSG macOS and Docker Linux arm64 frozen install, strict quality gates and static production image build",
       "SSG actual Nginx: seven Linux arm64 default Headless Shell tests including delayed hydration, metadata, fixed data and real 404",
-      "SSG Linux arm64 cold and repeated development launches: four browser tests each; macOS Chrome development and static preview passed"
+      "SSG Linux arm64 cold and repeated development launches: four browser tests each; macOS Chrome development and static preview passed",
+      "SSR macOS frozen install, strict quality gates, 31 unit/component cases and production build",
+      "SSR macOS Chrome: seven Node production checks and four development checks, including request isolation, private data boundaries and sanitized failures",
+      "SSR Docker Linux arm64: strict quality gates, 31 unit cases and non-root production-only image inspection",
+      "SSR Linux default Headless Shell: seven Node checks, four cold/four repeated development checks and five actual production-image checks including SIGTERM exit"
     ]
   },
   "operating_assumptions": [
@@ -74,7 +78,7 @@
       "name": "rendering",
       "required": true,
       "validator": "text",
-      "choices": ["csr", "ssg"],
+      "choices": ["csr", "ssg", "ssr"],
       "default": "csr"
     }
   ],
@@ -123,6 +127,29 @@
           "index.html",
           "app/entry.server.tsx",
           "server"
+        ],
+        "overrides": []
+      },
+      "ssr": {
+        "source": "variants/ssr/template",
+        "required_entries": [
+          "react-router.config.ts",
+          "app/routes.ts",
+          "app/routes/home.tsx",
+          "app/entry.server.tsx",
+          "app/lib/request.server.ts",
+          "server/index.ts",
+          "server/runtime.ts",
+          "tests/ssr.ts",
+          "tests/node-runtime.spec.ts",
+          "playwright.build.config.ts"
+        ],
+        "forbidden_entries": [
+          "src",
+          "index.html",
+          "nginx.conf",
+          "app/content.ts",
+          "public/404.html"
         ],
         "overrides": []
       },

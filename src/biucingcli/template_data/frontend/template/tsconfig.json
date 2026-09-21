@@ -1,5 +1,11 @@
 {
-  "include": ["app/**/*", "tests/**/*", ".react-router/types/**/*", "*.ts"],
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "server/**/*",
+    ".react-router/types/**/*",
+    "*.ts"
+  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["node", "vite/client"],
@@ -10,6 +16,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "@/*": ["./app/*"]

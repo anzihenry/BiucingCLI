@@ -56,7 +56,8 @@ The [frontend rendering plan](docs/frontend-rendering-plan.md) tracks CSR/SSG/SS
 variants. The shipped frontend now defaults to CSR (explicitly select it with
 `--set rendering=csr`); `--set rendering=ssg` generates a static content site.
 SSG production builds require an explicit public HTTPS `SITE_URL` for canonical
-URLs and sitemap; SSR remains a future stage.
+URLs and sitemap. `--set rendering=ssr` generates request-time HTML with a
+self-hosted Node runtime, private server configuration and graceful shutdown.
 
 Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
 `pyproject.toml` and `uv.lock` together. For deliberate upgrades use
@@ -83,7 +84,7 @@ See [the JSON contract](docs/json-contract.md) for compatibility and field seman
 
 BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:
 
-- `frontend`: React Router Framework Mode CSR/SSG, React 19.3, TypeScript 7, Tailwind 4 and shadcn/ui; shared pnpm lockfile, Vitest and Playwright checks
+- `frontend`: React Router Framework Mode CSR/SSG/SSR, React 19.3, TypeScript 7, Tailwind 4 and shadcn/ui; shared pnpm lockfile, Vitest and Playwright checks
 - `web-service`: Go + Gin web service starter with Docker development/runtime workflows
 - `microservice`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
 - `worker`: Go background worker starter with scheduled and oneshot execution modes

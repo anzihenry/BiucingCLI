@@ -345,7 +345,7 @@
       },
       "tsconfig.json": {
         "kind": "file",
-        "sha256": "06a5141611d1d5f01ace49c90c3642249802cdbcc9d2cda25a724f148da8bea3",
+        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
         "execute_bits": "0o0"
       },
       "vite.config.ts": {
@@ -4157,7 +4157,7 @@
       },
       "tsconfig.json": {
         "kind": "file",
-        "sha256": "06a5141611d1d5f01ace49c90c3642249802cdbcc9d2cda25a724f148da8bea3",
+        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
         "execute_bits": "0o0"
       },
       "vite.config.ts": {
@@ -4168,6 +4168,415 @@
       "vite.preview.config.ts": {
         "kind": "file",
         "sha256": "86dd2304996701fd3fa760919ea70013e132be5218f7e335bbd3907cbb7a843f",
+        "execute_bits": "0o0"
+      },
+      "vitest.config.ts": {
+        "kind": "file",
+        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "frontend-ssr": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "frontend",
+        "description": "React Router + TypeScript + Tailwind starter for independent projects",
+        "category": "frontend",
+        "stack": [
+          "React",
+          "React Router",
+          "TypeScript",
+          "Tailwind CSS",
+          "shadcn/ui"
+        ],
+        "platforms": [
+          "web"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "package_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "rendering",
+          "value": "ssr",
+          "source": "provided"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make test",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 55,
+      "template_top_level_entries": [
+        ".dockerignore",
+        ".env.example",
+        ".gitignore",
+        ".pnpm-store",
+        ".prettierignore",
+        ".prettierrc.json",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Dockerfile.dev.full",
+        "Makefile",
+        "README.md",
+        "THIRD_PARTY_NOTICES.md",
+        "app",
+        "components.json",
+        "compose.dev.yaml",
+        "eslint.config.js",
+        "package.json",
+        "playwright.build.config.ts",
+        "playwright.production.config.ts",
+        "playwright.smoke.config.ts",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "public",
+        "react-router.config.ts",
+        "scripts",
+        "server",
+        "tests",
+        "tsconfig.json",
+        "vite.config.ts",
+        "vite.preview.config.ts",
+        "vitest.config.ts"
+      ],
+      "selected_variant": {
+        "selector": "rendering",
+        "value": "ssr"
+      }
+    },
+    "entries": {
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
+        "execute_bits": "0o0"
+      },
+      ".env.example": {
+        "kind": "file",
+        "sha256": "9773b77ea193cccc4ec7ef19aeaf1f91505207b3924197aeabf29241dc21f6ab",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
+        "execute_bits": "0o0"
+      },
+      ".pnpm-store": {
+        "kind": "directory"
+      },
+      ".pnpm-store/v3": {
+        "kind": "directory"
+      },
+      ".prettierignore": {
+        "kind": "file",
+        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
+        "execute_bits": "0o0"
+      },
+      ".prettierrc.json": {
+        "kind": "file",
+        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "6aaf484fd5847d8657d95c9d003ecffabd13ef5efc87d9e8762d6d59114c7c8b",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev.full": {
+        "kind": "file",
+        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "246ccc693252702c3c83e0289f2bd2c3b8fd851b3652f340d4d1699bc452548b",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "a380192bb5af8470076ac7112ba37d6f3229610abd8c884333b099da0797e1f6",
+        "execute_bits": "0o0"
+      },
+      "THIRD_PARTY_NOTICES.md": {
+        "kind": "file",
+        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
+        "execute_bits": "0o0"
+      },
+      "app": {
+        "kind": "directory"
+      },
+      "app/app.css": {
+        "kind": "file",
+        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
+        "execute_bits": "0o0"
+      },
+      "app/components": {
+        "kind": "directory"
+      },
+      "app/components/ui": {
+        "kind": "directory"
+      },
+      "app/components/ui/button.tsx": {
+        "kind": "file",
+        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+        "execute_bits": "0o0"
+      },
+      "app/components/ui/dialog.tsx": {
+        "kind": "file",
+        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
+        "execute_bits": "0o0"
+      },
+      "app/entry.server.test.tsx": {
+        "kind": "file",
+        "sha256": "785817f1f2605bca4a921de32339f64cc62a3283d611b8f90eb6b6ebcec09c42",
+        "execute_bits": "0o0"
+      },
+      "app/entry.server.tsx": {
+        "kind": "file",
+        "sha256": "22046708f401f6c43504d5c805a9544298e4715c4bf3a74747dba124b1a4bbcb",
+        "execute_bits": "0o0"
+      },
+      "app/features": {
+        "kind": "directory"
+      },
+      "app/features/welcome.test.tsx": {
+        "kind": "file",
+        "sha256": "f475964ad7305325c595fdcb703b53890958200c7af7465d4b2f69b17f6f92fe",
+        "execute_bits": "0o0"
+      },
+      "app/features/welcome.tsx": {
+        "kind": "file",
+        "sha256": "31cf39abd1777b190c496db1b9671f70223d047e9d50d0ad2df8dc060f493b85",
+        "execute_bits": "0o0"
+      },
+      "app/lib": {
+        "kind": "directory"
+      },
+      "app/lib/project.ts": {
+        "kind": "file",
+        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
+        "execute_bits": "0o0"
+      },
+      "app/lib/request.server.test.ts": {
+        "kind": "file",
+        "sha256": "68801c8dea34907a12ec23b59fa616c0c3d77eade10078e17b30427681bcf197",
+        "execute_bits": "0o0"
+      },
+      "app/lib/request.server.ts": {
+        "kind": "file",
+        "sha256": "f77ad115e7d0f78eb1ad72dafa29017392b3a3a18417c0008bd0b28c2bf0afbe",
+        "execute_bits": "0o0"
+      },
+      "app/lib/runtime.test.ts": {
+        "kind": "file",
+        "sha256": "d5baf505d3a1d83188257d12aaa0b4698ce0ed9d3368ca7be0ddfa3b6839b204",
+        "execute_bits": "0o0"
+      },
+      "app/lib/use-hydrated.ts": {
+        "kind": "file",
+        "sha256": "441bcc28914f7a261ad7ed55ba9d953b2eddfc883422a66bcfff8ecb5cb9cd19",
+        "execute_bits": "0o0"
+      },
+      "app/lib/utils.ts": {
+        "kind": "file",
+        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
+        "execute_bits": "0o0"
+      },
+      "app/root.tsx": {
+        "kind": "file",
+        "sha256": "ae2cbe1da4296b67335a3cb2488f40e28d9f06e29a8fd1da362092aac6598b7a",
+        "execute_bits": "0o0"
+      },
+      "app/routes": {
+        "kind": "directory"
+      },
+      "app/routes/about.tsx": {
+        "kind": "file",
+        "sha256": "a79d5f99e88d1f7176093264e8a104b7e44f4b264165d35b5a4b71f05daadf17",
+        "execute_bits": "0o0"
+      },
+      "app/routes/home.tsx": {
+        "kind": "file",
+        "sha256": "c2a171aaa84d25f2879651130578d85d143a5503a523e766b1b1dd9429cfe9f5",
+        "execute_bits": "0o0"
+      },
+      "app/routes.ts": {
+        "kind": "file",
+        "sha256": "5884d6daf61bac403245eafbf20a7b4663d09f267ec09a666c32641a789137a5",
+        "execute_bits": "0o0"
+      },
+      "app/test": {
+        "kind": "directory"
+      },
+      "app/test/setup.ts": {
+        "kind": "file",
+        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
+        "execute_bits": "0o0"
+      },
+      "components.json": {
+        "kind": "file",
+        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "fbc3d64a142a0b377de1289e53c60ca18aa895abc6ecce872e8c93d60be40bf3",
+        "execute_bits": "0o0"
+      },
+      "eslint.config.js": {
+        "kind": "file",
+        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
+        "execute_bits": "0o0"
+      },
+      "package.json": {
+        "kind": "file",
+        "sha256": "1b19fe832e751ced17f0cea8ab9cc4157795c106ee184e75208b27e6c00ba228",
+        "execute_bits": "0o0"
+      },
+      "playwright.build.config.ts": {
+        "kind": "file",
+        "sha256": "2e89462dd6a6f39d012e84488ead88acb36f7bdaee8b097173a758529b2a7ade",
+        "execute_bits": "0o0"
+      },
+      "playwright.production.config.ts": {
+        "kind": "file",
+        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
+        "execute_bits": "0o0"
+      },
+      "playwright.smoke.config.ts": {
+        "kind": "file",
+        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
+        "execute_bits": "0o0"
+      },
+      "pnpm-lock.yaml": {
+        "kind": "file",
+        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
+        "execute_bits": "0o0"
+      },
+      "pnpm-workspace.yaml": {
+        "kind": "file",
+        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
+        "execute_bits": "0o0"
+      },
+      "public": {
+        "kind": "directory"
+      },
+      "public/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "public/favicon.svg": {
+        "kind": "file",
+        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
+        "execute_bits": "0o0"
+      },
+      "react-router.config.ts": {
+        "kind": "file",
+        "sha256": "36e26035d3120a27f4af35a7ba4ac2813375110aa7c77fe56cfd425be36e79c8",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/browser-smoke-production": {
+        "kind": "file",
+        "sha256": "970b5da797a6b9462862b4ad7aecd28b5066bafee85c5e0ba78a1c4e362eb3c5",
+        "execute_bits": "0o111"
+      },
+      "scripts/check-toolchain.mjs": {
+        "kind": "file",
+        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
+        "execute_bits": "0o111"
+      },
+      "server": {
+        "kind": "directory"
+      },
+      "server/index.ts": {
+        "kind": "file",
+        "sha256": "c135cc4cf5d22ca665ba15e2e71b1cf56c2dd8ee04ecbe65bb0579ab17c989e4",
+        "execute_bits": "0o0"
+      },
+      "server/runtime.ts": {
+        "kind": "file",
+        "sha256": "7689ab9e09bed55825e8a26bac42d6aa77a4b544bf27dbc93ffc95f5c6bb712a",
+        "execute_bits": "0o0"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "f2cce7548331c31439694c917445b5ead75f17a8d11dc0512cec097c87e2dfec",
+        "execute_bits": "0o0"
+      },
+      "tests/interactions.ts": {
+        "kind": "file",
+        "sha256": "78f37033b7444c80b10e560dfb385c9b2e4861a59150bfd6baa27c289aff19e6",
+        "execute_bits": "0o0"
+      },
+      "tests/node-runtime.spec.ts": {
+        "kind": "file",
+        "sha256": "657743408c57b987ed2c8dcfcfb01954858d4e9dde3e93a058d26cb124cabe54",
+        "execute_bits": "0o0"
+      },
+      "tests/production-browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "547dbb1d60a63213928326a329c4d700a545b65a75d4757f07e67d7149e0a69b",
+        "execute_bits": "0o0"
+      },
+      "tests/ssr.ts": {
+        "kind": "file",
+        "sha256": "341048fcc5a7fe003b9702fbd682cbad49e129a4121541d1d094fa8461a7889d",
+        "execute_bits": "0o0"
+      },
+      "tsconfig.json": {
+        "kind": "file",
+        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
+        "execute_bits": "0o0"
+      },
+      "vite.config.ts": {
+        "kind": "file",
+        "sha256": "23002d574e50139151b60ba243c9013c43409884b9c0b3a3eba03d50e2470508",
+        "execute_bits": "0o0"
+      },
+      "vite.preview.config.ts": {
+        "kind": "file",
+        "sha256": "6ceeae25ce40d49636094fe602edc50587396cab12eb1c2f43bb8780f51b154d",
         "execute_bits": "0o0"
       },
       "vitest.config.ts": {

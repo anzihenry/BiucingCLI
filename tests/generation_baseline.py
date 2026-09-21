@@ -13,6 +13,7 @@ from biucingcli.cli import main
 CASES = {
     "frontend": ["frontend"],
     "frontend-ssg": ["frontend", "--set", "rendering=ssg"],
+    "frontend-ssr": ["frontend", "--set", "rendering=ssr"],
     "web-service": ["web-service", "--module-name", "example.com/demo"],
     "worker": ["worker", "--module-name", "example.com/demo"],
     "android": ["android", "--package-name", "com.example.demo"],

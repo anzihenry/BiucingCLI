@@ -1,10 +1,10 @@
 # Frontend rendering variants: design and implementation plan
 
-Status: **stage 4 SSG complete; macOS and Docker Linux arm64 quality, build and
-browser checks pass. Stage 3 CSR remains supported.**
-Recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
+Status: **stage 5 SSR complete; macOS and Docker Linux arm64 quality, build and
+browser checks pass. CSR and SSG remain supported.**
+Initially recorded on 2026-09-20, against commit `070841f`. This plan is separate from the
 completed kernel extraction stages 0–6. Examples below describe future behavior;
-the current frontend accepts `--set rendering=csr|ssg` (default: `csr`).
+the current frontend accepts `--set rendering=csr|ssg|ssr` (default: `csr`).
 
 ## Scope and decisions
 
@@ -569,3 +569,81 @@ Node/browser jobs from installed artifacts and full three-mode CI remain stage 6
 No native Linux host, amd64, optional full-dev image, SSR or remote CI result is
 claimed. Test containers/network/volumes are cleaned; temporary source projects
 and built images are retained for reproduction. No commit/push/release is implicit.
+
+## Stage 5 implementation and verification (2026-09-21)
+
+Implemented against stage 4 commit `9b94f52`. The new `ssr` resource layer owns
+routes, the server-only request snapshot helper, explicit React server entry,
+Node HTTP runtime, preview adapter, deployment files and runtime/browser tests.
+No generator-core branch, dependency change, lockfile change or resource override
+was needed. The only shared resource change includes `server/**/*` in TypeScript
+checking and permits explicit `.ts` import extensions for Node 24's native type
+stripping. CSR and SSG retain their previous source/deployment files.
+
+Home loader data is request-local: a bounded public `visitor` query, random UUID
+and timestamp. Duplicate, oversized and control-character input returns 400.
+Private settings remain in `.server.ts`; the loader returns an explicit public
+object, not the environment. Private configuration failures return sanitized 500
+HTML and data, with generic application logs. Unknown routes return real 404.
+HTML and navigation data are `private, no-store`; fingerprinted client assets
+are immutable, and other public files revalidate. No shared request-data cache,
+backend, authentication, database, CMS, cloud target or RSC was added.
+
+The Node adapter uses the locked official `@react-router/node` request listener
+for Fetch/HTTP lifecycle bridging. The small outer server handles public files,
+HEAD/methods, path decoding/traversal and symlink boundaries, process health,
+socket input timeouts and bounded shutdown. It ignores forwarded origin headers
+by default; deployments still need TLS and allowed-host/proxy policy. Rendering
+waits for all content to preserve error status, has a six-second abort deadline,
+and cancels on disconnect. Suspense streaming optimization is not claimed.
+SIGTERM/SIGINT stop acceptance, drain for ten seconds, then force close; successful
+drain exits 0, forced drain exits 1. `/healthz` does not certify upstream services.
+
+Docker uses frozen builder and production-only dependency stages, then runs Node
+as the non-root `node` user. Runtime inspection confirms compiled server/client
+output and runtime sources, without app sources, private env files, Vite, TS
+compiler or React Router dev dependency. `CONTAINER_PORT` is passed as runtime
+`PORT` as well as mapped; actual port 3100 was tested. Worktree-scoped Make,
+Compose, cache, image and cleanup commands are preserved. `pnpm preview` uses
+the real SSR handler through Vite; built-browser checks launch Node directly.
+
+Verified on macOS and Docker Desktop 29.8.0/Linux arm64: frozen install, peer
+constraints, strict formatting/lint plus negative control, TS 7 route/runtime
+checking, 31 unit/component cases and production build. Tests cover request
+isolation, server config boundaries, input errors, HEAD, render failure/deadline/
+cancellation, public file safety and graceful/forced drain. macOS Chrome passed
+seven direct Node acceptance cases, four development cases and five preview
+cases. Five more cases passed against the actual Linux production image,
+including special-text hydration, twelve concurrent request snapshots, HTML/data
+cache headers, missing routes/assets and health. That image was healthy and
+exited 0 on SIGTERM. Linux default Headless Shell also passed seven direct Node
+checks, four development checks from a cold cache and four on a repeated launch,
+and five actual production-image checks, including clean SIGTERM exit. Client
+navigation refreshes loader snapshots without replacing the document. Browser
+downloads were slow in Docker; the exact locked Linux arm64 Headless Shell and
+FFmpeg archives were fetched with Playwright through the host network and copied
+to this worktree's cache volume, then actually executed on Linux. The initial
+production browser run skipped only the separately prepared browser-install
+prerequisite, not build, runtime health, browser assertions or shutdown checks.
+`pnpm browser:install --only-shell` subsequently passed inside Linux with normal
+host-requirement validation. The redundant full Chromium download was cancelled;
+completion of the full-browser installation command is not claimed for this run.
+
+CSR and SSG both pass the full macOS quality gate after the shared TS config
+change, with two CSR and four SSG static-preview browser cases. Python passes
+161 core + 11 platform + one Android test (173 total), plus Ruff. Two new SSR
+generation contracts and the `frontend-ssr` exact-output golden protect ownership,
+determinism, special text and executable scripts. All non-frontend baseline
+entries are unchanged. Wheel/sdist checks include SSR private-named resources and
+generate all three modes outside the checkout, with seven parsed SSR configs and
+Make checks. Installed-wheel Node/browser CI remains stage 6.
+
+No native Linux host, Linux amd64, optional full-dev image, remote CI, load test,
+external backend or other browser-engine coverage is claimed. No commit, push or
+release is implicit in this implementation task.
+
+Reproduction project: `/private/tmp/biucing-stage5.S6sQOR/ssr-check`; image
+`ssr-check-aa2ddd01:dev`. Temporary test containers, Compose network and named
+dependency/browser caches are cleaned after verification; source projects,
+downloaded host browser cache and built images are retained. Cache removal is
+recoverable by reinstalling dependencies/browsers, not a deletion of project data.

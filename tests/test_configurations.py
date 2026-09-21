@@ -15,6 +15,7 @@ class ConfigurationTests(unittest.TestCase):
         variants = [
             ("frontend", []),
             ("frontend", ["--set", "rendering=ssg"]),
+            ("frontend", ["--set", "rendering=ssr"]),
             ("web-service", ["--module-name", "example.com/demo"]),
             ("worker", ["--module-name", "example.com/demo"]),
             ("android", ["--package-name", "com.example.demo"]),

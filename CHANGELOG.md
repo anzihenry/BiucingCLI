@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- add the frontend SSR preset with request-isolated loaders, private server
+  configuration, uncached HTML/data responses, bounded rendering and a non-root
+  Node production image; cover input/error handling, client artifact boundaries,
+  HTTP/static file safety and graceful/forced shutdown. Preserve one shared
+  frontend dependency lockfile and add SSR generation/distribution regressions.
+
 - add the frontend SSG preset with explicitly enumerated content routes, build-time
   HTML/navigation data, validated SITE_URL, per-page metadata, sitemap/robots and
   static Nginx real-404 deployment; share dependencies/components with CSR and

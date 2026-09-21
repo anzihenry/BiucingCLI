@@ -7,8 +7,8 @@ Current foundation boundaries and fixture-root APIs are documented in
 
 The planned frontend rendering extension has a separate
 [stage 0 specification and baseline record](frontend-rendering-plan.md).
-Its three-mode acceptance matrix is future work, not coverage claimed by the
-current test suites.
+Generated-project acceptance is recorded per stage; the complete installed-wheel
+three-mode CI matrix remains stage 6, not coverage claimed by Python core.
 Stage 1 adds 21 Python-only resource declaration/selection tests in
 `test_resources.py`. Stage 2 adds 17 integration tests in
 `test_variant_generation.py`. Stage 3 adds four shipped-CSR tests in
@@ -20,7 +20,7 @@ template baselines remain unchanged.
 
 Install the locked development/build environment with `uv sync --locked`.
 
-## Frontend CSR/SSG toolchain (separate from Python core)
+## Frontend CSR/SSG/SSR toolchain (separate from Python core)
 
 Generate a new frontend project, then inside it run:
 
@@ -88,6 +88,37 @@ not evidence of deployment correctness. Python checks now include an SSG golden,
 all-mode config parsing, wheel/sdist SSG resources and installed-wheel generation.
 Node/browser execution from the installed wheel, amd64 and remote CI are not yet
 covered. See the stage 4 record in the rendering plan for scope and cold-start fixes.
+
+## Stage 5 SSR acceptance
+
+Generate with `--set rendering=ssr`; the dependency lockfile and quality commands
+are shared with CSR/SSG. `pnpm browser:smoke:build` starts the production Node
+entry directly and runs seven checks, including an isolated misconfigured-server
+probe for sanitized HTML/data 500s and a client-bundle private-module scan.
+`pnpm preview` also renders requests but uses Vite's host; it is not the production
+process. `make browser-smoke-production` targets the actual non-root image,
+injects a harmless private sentinel, checks health and runs five browser/HTTP
+checks before asserting a clean SIGTERM exit. Do not use real secrets as fixtures.
+The macOS Chrome and Docker Linux arm64 default Headless Shell runs passed;
+Linux development passed on both a cold cache and a repeated launch. The latter
+used exact-version Linux browser artifacts pre-fetched through the host network
+because container downloads were slow; no browser assertions were skipped.
+Linux `pnpm browser:install --only-shell` also passed with normal dependency
+validation. The redundant full Chromium download was cancelled after Headless
+Shell acceptance; that full download is not a claimed successful check.
+
+The 31 generated unit/component cases cover request snapshots, invalid input,
+private configuration errors, SSR HEAD/status/deadline/cancellation, static path
+and symlink boundaries, cache headers and graceful versus forced connection drain.
+The four development checks cover desktop/mobile interactions, twelve concurrent
+request-specific HTML responses, status codes and special-input hydration.
+The new Python SSR ownership/determinism cases and exact-output golden bring
+coverage to 161 core + 11 platform + one Android = 173 tests. Installed wheel/sdist
+verification includes SSR resources and independently generated SSR configs.
+The complete installed-wheel Node/browser CI matrix remains stage 6.
+
+See the stage 5 record in the rendering plan for actual platform results and
+limits. Keep these generated-project checks separate from Python-only core CI.
 
 ## Core: Linux and macOS
 

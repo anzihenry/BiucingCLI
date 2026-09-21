@@ -412,7 +412,7 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "CSR and SSG presets with shared tooling; SSR is not yet available."
+        "summary": "CSR, SSG and self-hosted Node SSR presets with shared tooling."
       },
       "validation": {
         "status": "real-build-verified",
@@ -425,7 +425,11 @@
           "CSR Docker Linux arm64 default Headless Shell: three production and two development browser tests passed",
           "SSG macOS and Docker Linux arm64 frozen install, strict quality gates and static production image build",
           "SSG actual Nginx: seven Linux arm64 default Headless Shell tests including delayed hydration, metadata, fixed data and real 404",
-          "SSG Linux arm64 cold and repeated development launches: four browser tests each; macOS Chrome development and static preview passed"
+          "SSG Linux arm64 cold and repeated development launches: four browser tests each; macOS Chrome development and static preview passed",
+          "SSR macOS frozen install, strict quality gates, 31 unit/component cases and production build",
+          "SSR macOS Chrome: seven Node production checks and four development checks, including request isolation, private data boundaries and sanitized failures",
+          "SSR Docker Linux arm64: strict quality gates, 31 unit cases and non-root production-only image inspection",
+          "SSR Linux default Headless Shell: seven Node checks, four cold/four repeated development checks and five actual production-image checks including SIGTERM exit"
         ]
       },
       "worktree": {
@@ -500,7 +504,8 @@
           "validator": "text",
           "choices": [
             "csr",
-            "ssg"
+            "ssg",
+            "ssr"
           ],
           "minimum": null,
           "maximum": null
@@ -518,7 +523,8 @@
         "default": "csr",
         "choices": [
           "csr",
-          "ssg"
+          "ssg",
+          "ssr"
         ]
       }
     },
