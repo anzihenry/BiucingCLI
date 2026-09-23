@@ -1,0 +1,445 @@
+#!/usr/bin/env python3
+"""Explicit static SDK publication, exact locking, resolution and local overrides."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import plistlib
+import re
+import shutil
+import subprocess
+import struct
+import sys
+import tempfile
+import urllib.request
+import zipfile
+
+ROOT = Path(__file__).resolve().parent.parent
+REGISTRY = Path(os.environ.get('COMPONENT_REGISTRY', ROOT / '.artifacts')).resolve()
+DECLARATION = ROOT / 'Dependencies/components.json'
+LOCK = ROOT / 'Dependencies/components.lock.json'
+OVERRIDES = ROOT / 'Dependencies/overrides.local.json'
+RESOLVED = ROOT / '.build/components'
+SAFEDI_VERSION = '2.0.0'
+SAFEDI_SHA = '4f73f4868aec87d4929248ee8f98d2e14d0bd9a9b8963e6728dff756b483a5af'
+MODULES = {'FoundationKit': ['ProductContracts', 'DesignSystem'],
+           'SharedCore': ['CoreNative', 'SharedCore'], 'HomeFeature': ['HomeFeature']}
+DEPENDENCIES = {'FoundationKit': [], 'SharedCore': [], 'HomeFeature': ['FoundationKit']}
+# Explicit supported ABI matrix. Device and simulator binaries are distinct.
+SLICES = {'macosx': ('macos', ['arm64', 'x86_64'], ''),
+          'iphoneos': ('ios', ['arm64'], ''),
+          'iphonesimulator': ('ios', ['arm64', 'x86_64'], '-simulator'),
+          'watchos': ('watchos', ['arm64_32', 'arm64'], ''),
+          'watchsimulator': ('watchos', ['arm64', 'x86_64'], '-simulator'),
+          'appletvos': ('tvos', ['arm64'], ''),
+          'appletvsimulator': ('tvos', ['arm64', 'x86_64'], '-simulator')}
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def write(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + '.tmp')
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
+    temporary.replace(path)
+
+
+def run(*args, **kwargs):
+    subprocess.run([str(arg) for arg in args], check=True, cwd=ROOT, **kwargs)
+
+
+def output(*args):
+    return subprocess.check_output(args, text=True, cwd=ROOT).strip()
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def inventory(folder):
+    files = {}
+    for path in sorted(folder.rglob('*')):
+        if path.is_symlink():
+            raise ValueError(f'Symlinks are not permitted in artifacts: {path}')
+        if path.is_file() and path.relative_to(folder).as_posix() != 'manifest.json':
+            files[path.relative_to(folder).as_posix()] = sha(path)
+    return files
+
+
+def is_static_archive(path):
+    data = path.read_bytes()
+    if data[:8] == b'!<arch>\n':
+        return True
+    if len(data) < 8:
+        return False
+    magic, count = struct.unpack('>II', data[:8])
+    if magic not in (0xcafebabe, 0xcafebabf) or not 1 <= count <= 64:
+        return False
+    width = 20 if magic == 0xcafebabe else 32
+    if len(data) < 8 + count * width:
+        return False
+    for index in range(count):
+        entry = data[8 + index * width:8 + (index + 1) * width]
+        if width == 20:
+            _, _, offset, size, _ = struct.unpack('>IIIII', entry)
+        else:
+            _, _, offset, size, _, _ = struct.unpack('>IIQQII', entry)
+        if size < 8 or offset + size > len(data) or data[offset:offset + 8] != b'!<arch>\n':
+            return False
+    return True
+
+
+def validate(folder, name, version=None):
+    manifest = read(folder / 'manifest.json')
+    if manifest['schema'] != 1 or manifest['name'] != name or manifest['linkage'] != 'static':
+        raise ValueError(f'Invalid SDK manifest: {folder}')
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?', manifest['version']):
+        raise ValueError('Invalid artifact version')
+    if version is not None and manifest['version'] != version:
+        raise ValueError(f'Wrong version: {folder}')
+    if set(manifest['dependencies']) != set(DEPENDENCIES[name]):
+        raise ValueError(f'Wrong SDK dependency boundary: {name}')
+    if manifest['modules'] != MODULES[name] or manifest['files'] != inventory(folder):
+        raise ValueError(f'SDK content/checksum mismatch: {folder}')
+    if manifest.get('abi') != 1 or manifest.get('minimumOS') != '{{MINIMUM_OS_VERSION}}':
+        raise ValueError(f'Unsupported ABI/minimum OS baseline: {folder}')
+    if manifest['slices'] != {k: v[1] for k, v in SLICES.items()}:
+        raise ValueError(f'Incomplete platform matrix: {folder}')
+    for module in MODULES[name]:
+        xc = folder / f'{module}.xcframework'
+        info = plistlib.loads((xc / 'Info.plist').read_bytes())
+        if len(info['AvailableLibraries']) != len(SLICES):
+            raise ValueError(f'Missing XCFramework slices: {xc}')
+        expected_slices = {(item[0], 'simulator' if item[2] else None): set(item[1])
+                           for item in SLICES.values()}
+        actual_slices = {(item['SupportedPlatform'], item.get('SupportedPlatformVariant')):
+                         set(item['SupportedArchitectures']) for item in info['AvailableLibraries']}
+        if actual_slices != expected_slices:
+            raise ValueError(f'Wrong XCFramework platform/architecture matrix: {xc}')
+        for library in info['AvailableLibraries']:
+            binary = xc / library['LibraryIdentifier'] / library['LibraryPath'] / module
+            if not binary.resolve().is_relative_to(xc.resolve()) or not is_static_archive(binary):
+                raise ValueError(f'Expected static archive: {binary}')
+    if name == 'HomeFeature' and not (folder / 'Resources/HomeFeature.bundle/Info.plist').is_file():
+        raise ValueError('Missing feature resource bundle')
+    return manifest
+
+
+def safedi():
+    cache = ROOT / '.cache/safedi' / SAFEDI_VERSION
+    tool = cache / f'SafeDITool.artifactbundle/SafeDITool-macos-{platform.machine()}/bin/SafeDITool'
+    if not tool.exists():
+        cache.mkdir(parents=True, exist_ok=True)
+        archive = cache / 'tool.zip'
+        urllib.request.urlretrieve(
+            f'https://github.com/dfed/SafeDI/releases/download/{SAFEDI_VERSION}/SafeDITool.artifactbundle.zip', archive)
+        if sha(archive) != SAFEDI_SHA:
+            raise ValueError('SafeDI download checksum mismatch')
+        with zipfile.ZipFile(archive) as bundle:
+            for member in bundle.infolist():
+                target = (cache / member.filename).resolve()
+                if not target.is_relative_to(cache.resolve()):
+                    raise ValueError('Invalid SafeDI archive path')
+            bundle.extractall(cache)
+        tool.chmod(0o755)
+        write(cache / 'tool-lock.json', {'sha256': sha(tool)})
+    if sha(tool) != read(cache / 'tool-lock.json')['sha256']:
+        raise ValueError('Cached SafeDI tool changed; remove .cache/safedi and retry')
+    return tool
+
+
+def generate_di(include, destination):
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='safedi-') as temporary:
+        generated = Path(temporary) / 'DependencyTree.swift'
+        run(safedi(), 'generate', '--include', include, '--combined-output', generated)
+        content = generated.read_text()
+        if 'incorrectly configured' in content or '#error' in content:
+            raise ValueError(f'Invalid SafeDI graph: {include}')
+        if not destination.exists() or destination.read_text() != content:
+            with tempfile.NamedTemporaryFile(mode='w', dir=destination.parent, suffix='.tmp', delete=False) as file:
+                file.write(content)
+                staged = Path(file.name)
+            try:
+                staged.replace(destination)
+            finally:
+                staged.unlink(missing_ok=True)
+
+
+def di():
+    generate_di(ROOT / 'Composition/DI', ROOT / 'Composition/Generated/DependencyTree.swift')
+
+
+def check_di():
+    di()
+    generate_di(ROOT / 'Components/DI', ROOT / 'Components/Sources/HomeFeature/DependencyTree.swift')
+    with tempfile.TemporaryDirectory() as temporary:
+        path = Path(temporary)
+        for name, source in {
+            'missing': '@Instantiable(isRoot: true) public struct Root { @Instantiated let missing: Missing; public init(missing: Missing) {} }',
+            'cycle': '@Instantiable(isRoot: true) public struct Root { @Instantiated let child: Child; public init(child: Child) {} }\n'
+                     '@Instantiable public struct Child { @Instantiated let root: Root; public init(root: Root) {} }'
+        }.items():
+            (path / 'Graph.swift').write_text(source)
+            result = subprocess.run([str(safedi()), 'generate', '--include', str(path),
+                                     '--combined-output', str(path / 'out.swift')], capture_output=True, text=True)
+            failed = result.returncode != 0 or (path / 'out.swift').exists() and '#error' in (path / 'out.swift').read_text()
+            diagnostic = result.stdout + result.stderr
+            expected = 'type `Missing`' if name == 'missing' else 'Dependency cycle detected'
+            if not failed or expected not in diagnostic:
+                raise ValueError(f'SafeDI did not reject the {name} graph for the expected reason: {diagnostic}')
+            (path / 'out.swift').unlink(missing_ok=True)
+    print('SafeDI valid graph, missing dependency and cycle checks passed.')
+
+
+def build(version, component=None):
+    selected = [component] if component else list(MODULES)
+    declared = read(DECLARATION)["components"]
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?', version):
+        raise ValueError('Use a semantic version, optionally with a prerelease suffix')
+    if any((REGISTRY / name / version).exists() for name in selected):
+        raise ValueError('Immutable version already exists; use a new version')
+    check_di()
+    toolchain = output('xcrun', 'swiftc', '--version')
+    compiler = re.search(r'Swift version (\d+)\.(\d+)', toolchain)
+    if not compiler or tuple(map(int, compiler.groups())) < (6, 4):
+        raise ValueError('Swift 6.4 or newer toolchain is required')
+    REGISTRY.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.publishing-', dir=REGISTRY) as temporary:
+        stage = Path(temporary)
+        frameworks = {module: [] for name in selected for module in MODULES[name]}
+        for sdk, (os_name, architectures, suffix) in SLICES.items():
+            sdk_path = output('xcrun', '--sdk', sdk, '--show-sdk-path')
+            destination = stage / 'slices' / sdk
+            destination.mkdir(parents=True)
+            if component:
+                for dependency in DEPENDENCIES[component]:
+                    folder = REGISTRY / dependency / declared[dependency]
+                    validate(folder, dependency, declared[dependency])
+                    for module in MODULES[dependency]:
+                        xc = folder / f'{module}.xcframework'
+                        libraries = plistlib.loads((xc / 'Info.plist').read_bytes())['AvailableLibraries']
+                        variant = 'simulator' if suffix else None
+                        library = next(item for item in libraries
+                                       if item['SupportedPlatform'] == os_name
+                                       and item.get('SupportedPlatformVariant') == variant)
+                        shutil.copytree(xc / library['LibraryIdentifier'] / library['LibraryPath'],
+                                        destination / f'{module}.framework')
+            for module in frameworks:
+                framework = destination / f'{module}.framework'
+                framework.mkdir()
+                binaries = []
+                for arch in architectures:
+                    target = f'{arch}-apple-{os_name}{{MINIMUM_OS_VERSION}}{suffix}'
+                    work = destination / f'{module}-{arch}'
+                    work.mkdir()
+                    binary = work / module
+                    if module == 'CoreNative':
+                        source = ROOT / 'Shared/Core/Sources/CoreNative'
+                        headers = framework / 'Headers'
+                        headers.mkdir(exist_ok=True)
+                        shutil.copy2(source / 'include/CoreNative.h', headers)
+                        modules = framework / 'Modules'
+                        modules.mkdir(exist_ok=True)
+                        (modules / 'module.modulemap').write_text(
+                            'framework module CoreNative { umbrella header "CoreNative.h" export * link "c++" }\n')
+                        objects = []
+                        for file in sorted(source.glob('*.cpp')):
+                            obj = work / (file.stem + '.o')
+                            run('xcrun', 'clang++', '-std=c++20', '-target', target, '-isysroot', sdk_path,
+                                '-g', '-O2', '-fvisibility=hidden', '-I', source / 'include', '-c', file, '-o', obj)
+                            objects.append(obj)
+                        run('xcrun', 'libtool', '-static', '-o', binary, *objects)
+                    else:
+                        source = ROOT / ('Shared/Core/Sources/SharedCore' if module == 'SharedCore'
+                                         else f'Components/Sources/{module}')
+                        modules = framework / f'Modules/{module}.swiftmodule'
+                        modules.mkdir(parents=True, exist_ok=True)
+                        triple = f'{arch}-apple-{os_name}{suffix}'
+                        run('xcrun', 'swiftc', '-swift-version', '6', '-parse-as-library', '-emit-library', '-static',
+                            '-g', '-O', '-enable-library-evolution', '-module-name', module, '-target', target,
+                            '-sdk', sdk_path, '-F', destination, '-emit-module',
+                            '-emit-module-path', modules / f'{triple}.swiftmodule',
+                            '-emit-module-interface-path', modules / f'{triple}.swiftinterface',
+                            *sorted(source.glob('*.swift')), '-o', binary)
+                    binaries.append(binary)
+                run('xcrun', 'lipo', '-create', *binaries, '-output', framework / module)
+                (framework / 'Info.plist').write_bytes(plistlib.dumps({
+                    'CFBundleIdentifier': f'components.{module}', 'CFBundleName': module,
+                    'CFBundleExecutable': module, 'CFBundlePackageType': 'FMWK',
+                    'CFBundleShortVersionString': version.split('-')[0], 'CFBundleVersion': '1',
+                    'MinimumOSVersion': '{{MINIMUM_OS_VERSION}}'}))
+                frameworks[module].append(framework)
+        source_files = {}
+        bases = [f'Components/Sources/{module}' for name in selected if name != 'SharedCore'
+                 for module in MODULES[name]]
+        if 'SharedCore' in selected:
+            bases.append('Shared/Core/Sources')
+        if 'HomeFeature' in selected:
+            bases += ['Components/DI', 'Components/Resources']
+        for base in bases:
+            for file in sorted((ROOT / base).rglob('*')):
+                if file.is_file():
+                    source_files[file.relative_to(ROOT).as_posix()] = sha(file)
+        source_digest = hashlib.sha256(json.dumps(source_files, sort_keys=True).encode()).hexdigest()
+        try:
+            revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True, cwd=ROOT,
+                                               stderr=subprocess.DEVNULL).strip()
+        except subprocess.CalledProcessError:
+            revision = None
+        for name in selected:
+            modules = MODULES[name]
+            folder = stage / name
+            folder.mkdir()
+            for module in modules:
+                arguments = [item for framework in frameworks[module] for item in ('-framework', framework)]
+                run('xcodebuild', '-create-xcframework', *arguments, '-output', folder / f'{module}.xcframework')
+            if name == 'HomeFeature':
+                shutil.copytree(ROOT / 'Components/Resources', folder / 'Resources')
+            manifest = {'schema': 1, 'name': name, 'version': version, 'linkage': 'static',
+                        'modules': modules, 'dependencies': {dep: declared[dep] if component else version for dep in DEPENDENCIES[name]},
+                        'toolchain': toolchain, 'xcode': output('xcodebuild', '-version'),
+                        'minimumOS': '{{MINIMUM_OS_VERSION}}', 'abi': 1,
+                        'slices': {key: value[1] for key, value in SLICES.items()},
+                        'sourceRevision': revision, 'sourceDigest': source_digest, 'sources': source_files,
+                        'symbols': 'DWARF embedded in static archive object files; final app generates dSYM',
+                        'safeDI': SAFEDI_VERSION, 'files': inventory(folder)}
+            write(folder / 'manifest.json', manifest)
+            validate(folder, name, version)
+        # Publish only after every SDK and platform passes. Never replace a version.
+        for name in selected:
+            parent = REGISTRY / name
+            parent.mkdir(exist_ok=True)
+            (stage / name).rename(parent / version)
+    print(f'Published immutable SDK set {version} in {REGISTRY}')
+
+
+def lock():
+    entries = {}
+    for name, version in read(DECLARATION)['components'].items():
+        if name not in MODULES:
+            raise ValueError(f'Unknown component: {name}')
+        folder = REGISTRY / name / version
+        manifest = validate(folder, name, version)
+        entries[name] = {'version': version, 'manifestSHA256': sha(folder / 'manifest.json'),
+                         'dependencies': manifest['dependencies']}
+    if set(entries) != set(MODULES):
+        raise ValueError('Declaration must include the complete SDK closure')
+    for item in entries.values():
+        for dependency, version in item['dependencies'].items():
+            if entries[dependency]['version'] != version:
+                raise ValueError(f'Incompatible transitive dependency: {dependency}')
+    write(LOCK, {'schema': 1, 'components': entries})
+
+
+def resolve(release=False):
+    overrides = read(OVERRIDES) if OVERRIDES.exists() else {}
+    if overrides and (release or os.environ.get('CI', '').lower() not in ('', '0', 'false')):
+        raise ValueError('CI/release forbids local component overrides; clear them first')
+    entries = read(LOCK)['components']
+    if {name: entry['version'] for name, entry in entries.items()} != read(DECLARATION)['components']:
+        raise ValueError('Declaration/lock mismatch; explicitly update the lock')
+    if set(entries) != set(MODULES) or not set(overrides).issubset(entries):
+        raise ValueError('Invalid dependency closure/override')
+    manifests = {}
+    folders = {}
+    for name, entry in entries.items():
+        folder = Path(overrides[name]) if name in overrides else REGISTRY / name / entry['version']
+        manifest = validate(folder, name, None if name in overrides else entry['version'])
+        if name not in overrides and sha(folder / 'manifest.json') != entry['manifestSHA256']:
+            raise ValueError(f'Locked manifest changed: {name}')
+        manifests[name], folders[name] = manifest, folder
+    for name, manifest in manifests.items():
+        for dep, version in manifest['dependencies'].items():
+            if dep not in manifests or manifests[dep]['version'] != version:
+                raise ValueError(f'{name} requires {dep}@{version}; override the compatible SDK set explicitly')
+    RESOLVED.parent.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=RESOLVED.parent, prefix='components-') as temporary:
+        stage = Path(temporary)
+        for name, folder in folders.items():
+            shutil.copytree(folder, stage / name)
+        write(stage / 'resolution.json', {'overrides': overrides, 'manifests': manifests})
+        if RESOLVED.exists():
+            shutil.rmtree(RESOLVED)
+        stage.rename(RESOLVED)
+    for name, manifest in manifests.items():
+        print(f'{name}@{manifest["version"]}' + (' [LOCAL OVERRIDE]' if name in overrides else ' [LOCKED]'))
+
+
+def verify_resolved():
+    resolution = read(RESOLVED / 'resolution.json')
+    overrides = read(OVERRIDES) if OVERRIDES.exists() else {}
+    if resolution['overrides'] != overrides:
+        raise ValueError('Overrides changed; run make generate')
+    if overrides and (os.environ.get('CONFIGURATION') == 'Release' or
+                      os.environ.get('CI', '').lower() not in ('', '0', 'false')):
+        raise ValueError('CI/Release refuses local overrides')
+    entries = read(LOCK)['components']
+    if {name: entry['version'] for name, entry in entries.items()} != read(DECLARATION)['components']:
+        raise ValueError('Declaration/lock mismatch')
+    if set(entries) != set(MODULES):
+        raise ValueError('Invalid dependency closure')
+    for name, entry in entries.items():
+        folder = RESOLVED / name
+        validate(folder, name, None if name in overrides else entry['version'])
+        if name not in overrides and sha(folder / 'manifest.json') != entry['manifestSHA256']:
+            raise ValueError(f'Resolved SDK differs from lock: {name}')
+    print('Resolved SDK checksums and release policy verified.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    build_parser = commands.add_parser('build')
+    build_parser.add_argument('--version', required=True)
+    build_parser.add_argument('--component', choices=list(MODULES))
+    commands.add_parser('lock')
+    resolve_parser = commands.add_parser('resolve')
+    resolve_parser.add_argument('--release', action='store_true')
+    commands.add_parser('verify-resolved')
+    commands.add_parser('di')
+    commands.add_parser('check-di')
+    override_parser = commands.add_parser('override')
+    override_parser.add_argument('action', choices=['set', 'clear', 'info'])
+    override_parser.add_argument('name', nargs='?', choices=list(MODULES))
+    override_parser.add_argument('path', nargs='?')
+    args = parser.parse_args()
+    if args.command == 'build':
+        build(args.version, args.component)
+    elif args.command == 'lock':
+        lock()
+    elif args.command == 'resolve':
+        resolve(args.release)
+    elif args.command == 'verify-resolved':
+        verify_resolved()
+    elif args.command == 'di':
+        di()
+    elif args.command == 'check-di':
+        check_di()
+    else:
+        values = read(OVERRIDES) if OVERRIDES.exists() else {}
+        if args.action == 'set':
+            if not args.name or not args.path:
+                parser.error('override set requires NAME PATH')
+            folder = Path(args.path).resolve()
+            validate(folder, args.name)
+            values[args.name] = str(folder)
+            write(OVERRIDES, values)
+        elif args.action == 'clear':
+            if args.name:
+                values.pop(args.name, None)
+            else:
+                values = {}
+            write(OVERRIDES, values)
+        print(json.dumps(values, indent=2))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as error:
+        sys.exit(f'Component operation failed: {error}')

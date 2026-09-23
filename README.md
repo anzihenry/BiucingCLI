@@ -4,6 +4,10 @@ BiucingCLI is a scaffold generator for independent developers who want practical
 
 The project is being restarted from a clean slate with a narrower goal: generate useful project skeletons, not an all-purpose agent workflow.
 
+Apple 模版默认生成 iOS、macOS、watchOS、tvOS 四个薄壳，使用静态组件 SDK、
+精确依赖锁、SafeDI 2.0.0 和 C++20 共享核心。`--platform` 保留为默认操作平台选择。
+详见 [架构与实现记录](docs/apple-shell-component-architecture.md)。
+
 ## Version
 
 The current repository release target is `0.9.1`.
@@ -90,7 +94,7 @@ BiucingCLI focuses on a small set of templates that match the maintainer's real 
 - `web-service`: Go + Gin web service starter with Docker development/runtime workflows
 - `microservice`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
 - `worker`: Go background worker starter with scheduled and oneshot execution modes
-- `apple`: SwiftUI + Tuist + SwiftPM Apple app starter for `ios`, `macos`, `watchos`, and `tvos`
+- `apple`: Swift 6.4 + SwiftUI + Tuist + SafeDI starter generating four thin Apple shells, versioned static XCFramework components, exact locks and a portable C++20 core; Android/HarmonyOS adapters remain future integrations
 - `android`: Kotlin + Gradle + Jetpack Compose Android app starter with fastlane and a committed Gradle wrapper
 - `harmonyos`: ArkTS + ArkUI HarmonyOS app starter for DevEco Studio projects
 
@@ -215,6 +219,7 @@ Local HarmonyOS validation status:
 - [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
 - [Microservice Team Environment Standard](docs/microservice-team-environment-standard.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
+- [Apple 四平台壳工程与组件架构（已确认目标）](docs/apple-shell-component-architecture.md)
 - [Android Team Environment Standard](docs/android-team-environment-standard.md)
 - [HarmonyOS Team Environment Standard](docs/harmonyos-team-environment-standard.md)
 - [Android Template Design](docs/android-template-design.md)

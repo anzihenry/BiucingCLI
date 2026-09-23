@@ -30,6 +30,18 @@ fail() {
 echo "Apple environment doctor"
 echo "platform: ${platform_name}"
 
+if command -v cmake >/dev/null 2>&1 && cmake --version >/dev/null 2>&1; then
+  pass "cmake is available for shared C++ core tests (requires 3.20 or newer)"
+else
+  fail "cmake is not available. Run 'brew bundle' before using make core-test."
+fi
+
+if xcrun --find clang++ >/dev/null 2>&1; then
+  pass "Apple C++ compiler is available"
+else
+  fail "Apple C++ compiler is unavailable. Select a working Xcode installation."
+fi
+
 developer_dir=""
 if developer_dir="$(xcode-select -p 2>/dev/null)"; then
   pass "xcode-select points to ${developer_dir}"
@@ -71,9 +83,15 @@ fi
 
 if command -v swift >/dev/null 2>&1; then
   swift_version_output="$(swift --version 2>&1 || true)"
-  if [[ "$swift_version_output" == *"swift-driver version"* || "$swift_version_output" == *"Apple Swift version"* ]]; then
-    pass "swift is available"
-    echo "$swift_version_output" | head -n 1
+  if [[ "$swift_version_output" =~ Swift\ version\ ([0-9]+)\.([0-9]+) ]]; then
+    swift_major="${BASH_REMATCH[1]}"
+    swift_minor="${BASH_REMATCH[2]}"
+    if (( swift_major > 6 || (swift_major == 6 && swift_minor >= 4) )); then
+      pass "swift is available (Swift ${swift_major}.${swift_minor}; requires 6.4 or newer)"
+      echo "$swift_version_output" | head -n 1
+    else
+      fail "Swift 6.4 or newer is required; found ${swift_major}.${swift_minor}. Select Xcode 27 or a newer compatible toolchain and check PATH/DEVELOPER_DIR."
+    fi
   else
     fail "swift is installed but not usable. Output: ${swift_version_output}"
   fi
@@ -149,6 +167,22 @@ else
   else
     fail "xcrun is not available, so simulator readiness could not be checked for ${platform_name}."
   fi
+fi
+
+# Publishing the default SDK set needs all four platforms, regardless of the
+# default run platform selected by --platform.
+for sdk in macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator; do
+  if xcrun --sdk "$sdk" --show-sdk-path >/dev/null 2>&1; then
+    pass "SDK available: $sdk"
+  else
+    fail "Missing SDK: $sdk. Install the corresponding Xcode platform support."
+  fi
+done
+
+if command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; sys.exit(sys.version_info < (3, 9))'; then
+  pass "Python 3.9+ is available for SDK artifact tooling"
+else
+  fail "Python 3.9+ is required for SDK artifact tooling"
 fi
 
 if (( failures > 0 )); then

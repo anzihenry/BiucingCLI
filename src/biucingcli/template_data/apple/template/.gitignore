@@ -26,3 +26,9 @@ xcuserdata
 *.provisionprofile
 /fastlane/*.json
 /app-store-connect-api-key.json
+
+# Local immutable registry and generated binary resolution
+.artifacts/
+Dependencies/overrides.local.json
+Composition/Generated/
+Components/Sources/HomeFeature/DependencyTree.swift

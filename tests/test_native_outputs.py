@@ -666,307 +666,56 @@ class NativeOutputTests(CLIHelpers, unittest.TestCase):
             self.assertTrue(os.access(project_dir / "scripts" / "verify-supply-chain", os.X_OK))
             self.assertTrue(os.access(project_dir / "scripts" / "verify-release-artifact", os.X_OK))
 
-    def test_create_apple_renders_template(self):
+    def test_create_apple_renders_four_binary_shells(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            output = self.run_cli(
-                [
-                    "create",
-                    "apple",
-                    "pulse-mac",
-                    "--output-dir",
-                    tmpdir,
-                    "--platform",
-                    "macos",
-                    "--bundle-identifier",
-                    "com.example.pulsemac",
-                    "--organization-name",
-                    "Example Labs",
-                    "--development-team",
-                    "ABCDE12345",
-                ]
-            )
-            project_dir = Path(tmpdir) / "pulse-mac"
-            readme = (project_dir / "README.md").read_text(encoding="utf-8")
-            makefile = (project_dir / "Makefile").read_text(encoding="utf-8")
-            tuist_config = (project_dir / "Tuist.swift").read_text(encoding="utf-8")
-            swiftlint_config = (project_dir / ".swiftlint.yml").read_text(
-                encoding="utf-8"
-            )
-            swiftformat_config = (project_dir / ".swiftformat").read_text(
-                encoding="utf-8"
-            )
-            project_swift = (project_dir / "App" / "Project.swift").read_text(
-                encoding="utf-8"
-            )
-            home_view = (
-                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeView.swift"
-            ).read_text(encoding="utf-8")
-            home_view_model = (
-                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeViewModel.swift"
-            ).read_text(encoding="utf-8")
-            bootstrap = (project_dir / "scripts" / "bootstrap").read_text(encoding="utf-8")
-            doctor = (project_dir / "scripts" / "doctor").read_text(encoding="utf-8")
-            design_system = (
-                project_dir
-                / "Packages"
-                / "DesignSystem"
-                / "Package.swift"
-            ).read_text(encoding="utf-8")
-            app_services_package = (
-                project_dir
-                / "Packages"
-                / "AppServices"
-                / "Package.swift"
-            ).read_text(encoding="utf-8")
-            app_services_source = (
-                project_dir
-                / "Packages"
-                / "AppServices"
-                / "Sources"
-                / "AppServices"
-                / "StarterMetadata.swift"
-            ).read_text(encoding="utf-8")
-            design_system_theme = (
-                project_dir
-                / "Packages"
-                / "DesignSystem"
-                / "Sources"
-                / "DesignSystem"
-                / "Theme.swift"
-            ).read_text(encoding="utf-8")
-            gitignore = (project_dir / ".gitignore").read_text(encoding="utf-8")
-            appfile = (project_dir / "fastlane" / "Appfile").read_text(encoding="utf-8")
-            fastfile = (project_dir / "fastlane" / "Fastfile").read_text(encoding="utf-8")
-            matchfile = (project_dir / "fastlane" / "Matchfile").read_text(encoding="utf-8")
-            fastlane_env_example = (
-                project_dir / "fastlane" / ".env.example"
-            ).read_text(encoding="utf-8")
-            release_delivery = (
-                project_dir / "docs" / "release-delivery.md"
-            ).read_text(encoding="utf-8")
-            app_tests = (
-                project_dir / "App" / "Targets" / "AppTests" / "Sources" / "AppTests.swift"
-            ).read_text(encoding="utf-8")
-            test_destination = (
-                project_dir / "scripts" / "test-destination"
-            ).read_text(encoding="utf-8")
-            release_identity_script = (
-                project_dir / "scripts" / "verify-release-identity"
-            ).read_text(encoding="utf-8")
-
-            self.assertTrue(project_dir.exists())
-            self.assertIn("Created apple project: pulse-mac", output)
-            self.assertIn("make bootstrap", output)
-            self.assertIn("make doctor", output)
-            self.assertIn("make lint", output)
-            self.assertIn("Tuist", readme)
-            self.assertIn("Target platform: `macOS`", readme)
-            self.assertIn("make doctor", readme)
-            self.assertIn("make lint", readme)
-            self.assertIn("make format", readme)
-            self.assertIn("make release", readme)
-            self.assertIn("simulator/runtime visibility", readme)
-            self.assertIn("warning-only signal for macOS starters", readme)
-            self.assertIn("split-view workspace", readme)
-            self.assertIn("small view-model test", readme)
-            self.assertIn("mocked service dependency", readme)
-            self.assertIn("`Packages/AppServices` holds starter metadata", readme)
-            self.assertIn("keep UI-focused primitives in `DesignSystem`", readme)
-            self.assertIn("`development_team` is written into `App/Project.swift`", readme)
-            self.assertIn("`bundle_identifier` is used for the main app target", readme)
-            self.assertIn("`{{BUNDLE_IDENTIFIER}}.tests`".replace("{{BUNDLE_IDENTIFIER}}", "com.example.pulsemac"), readme)
-            self.assertIn("fastlane match", readme)
-            self.assertIn("APP_STORE_CONNECT_API_KEY_PATH", readme)
-            self.assertIn("MATCH_GIT_URL", readme)
-            self.assertIn("make release-doctor", readme)
-            self.assertIn("signed App Store archive", readme)
-            self.assertIn("uploads the signed ipa/pkg to TestFlight", readme)
-            self.assertIn("uploads the signed ipa/pkg to App Store Connect", readme)
-            self.assertIn("APP_STORE_SUBMIT_FOR_REVIEW=true", readme)
-            self.assertIn("generate:", makefile)
-            self.assertIn("tuist generate --no-open", makefile)
-            self.assertIn("platform=macOS", makefile)
-            self.assertIn("release-doctor:", makefile)
-            self.assertIn("release-generate:", makefile)
-            self.assertIn("release-identity-check:", makefile)
-            self.assertIn(
-                "$(MAKE) --no-print-directory DEBUG_BUNDLE_SUFFIX= generate", makefile
-            )
-            self.assertIn("archive:", makefile)
-            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane archive", makefile)
-            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane beta", makefile)
-            self.assertIn("DEBUG_BUNDLE_SUFFIX= fastlane release", makefile)
-            self.assertIn("WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel", makefile)
-            self.assertIn("WORKTREE_LABEL ?= $(shell basename", makefile)
-            self.assertIn("WORKTREE_ID ?= $(shell printf '%s' \"$(WORKTREE_ROOT)\" | shasum | cut -c1-8)", makefile)
-            self.assertIn("WORKTREE_ID", makefile)
-            self.assertIn("DERIVED_DATA_PATH", makefile)
-            self.assertIn("TEST_DESTINATION ?= $(shell ./scripts/test-destination macos", makefile)
-            self.assertIn("-destination '$(TEST_DESTINATION)'", makefile)
-            self.assertIn("TUIST_HOME", makefile)
-            self.assertIn("XDG_CACHE_HOME=$(TUIST_XDG_CACHE_HOME)", makefile)
-            self.assertIn("DEBUG_BUNDLE_SUFFIX", makefile)
-            self.assertIn(
-                "Release bundle identifier: $(RELEASE_BUNDLE_IDENTIFIER)", makefile
-            )
-            self.assertIn("worktree-info:", makefile)
-            self.assertIn("worktree-doctor:", makefile)
-            self.assertIn("clean-worktree:", makefile)
-            self.assertIn("swiftlint lint --cache-path $(SWIFTLINT_CACHE)", makefile)
-            self.assertIn("swiftformat . --cache $(SWIFTFORMAT_CACHE)", makefile)
-            self.assertIn("-derivedDataPath $(DERIVED_DATA_PATH)", makefile)
-            self.assertIn("Worktree Workflow", readme)
-            self.assertIn("debug bundle identifier", readme)
-            self.assertIn("included:", swiftlint_config)
-            self.assertIn("modifier_order", swiftlint_config)
-            self.assertIn("--swiftversion 6", swiftformat_config)
-            self.assertIn("--disable trailingCommas", swiftformat_config)
-            self.assertIn("--maxwidth 120", swiftformat_config)
-            self.assertIn("let config = Config(", tuist_config)
-            self.assertNotIn("fullHandle:", tuist_config)
-            self.assertIn(
-                'let debugBundleSuffix = Environment.debugBundleSuffix.getString(default: "")',
-                project_swift,
-            )
-            self.assertIn('bundleId: "com.example.pulsemac\\(debugBundleSuffix)"', project_swift)
-            self.assertIn('.local(path: "../Packages/AppServices")', project_swift)
-            self.assertIn("destinations: .macOS", project_swift)
-            self.assertIn('deploymentTargets: .macOS("26.0")', project_swift)
-            self.assertIn('.package(product: "AppServices")', project_swift)
-            self.assertIn('WindowGroup("Pulse Mac")', (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
-            self.assertIn(".defaultSize(width: 1100, height: 720)", (project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift").read_text(encoding="utf-8"))
-            self.assertIn("private let viewModel = HomeViewModel(", home_view)
-            self.assertIn("NavigationSplitView", home_view)
-            self.assertIn('Section("Workspace")', home_view)
-            self.assertIn('GroupBox("Project Summary")', home_view)
-            self.assertIn('GroupBox("Release Checklist")', home_view)
-            self.assertIn("struct HomeViewModel", home_view_model)
-            self.assertIn("import AppServices", home_view_model)
-            self.assertIn("typealias HomeFact = StarterFact", home_view_model)
-            self.assertIn("StarterFactBuilder.overviewFacts(", home_view_model)
-            self.assertIn("func releaseChecklist() -> [String]", home_view_model)
-            self.assertIn("brew bundle", bootstrap)
-            self.assertIn("Apple environment doctor", doctor)
-            self.assertIn('platform_name="macOS"', doctor)
-            self.assertIn('tuist_home="${TUIST_HOME:-${repo_root}/.cache/tuist/${worktree_id}/home}"', doctor)
-            self.assertIn("xcode-select points to", doctor)
-            self.assertIn("xcodebuild is available", doctor)
-            self.assertIn("tuist is available", doctor)
-            self.assertIn("swiftlint is available", doctor)
-            self.assertIn("swiftformat is available", doctor)
-            self.assertIn("fastlane is not available", doctor)
-            self.assertIn("simulator services are not ready", doctor)
-            self.assertIn("Doctor completed with", doctor)
-            self.assertIn('printf \'%s\\n\' "platform=macOS"', test_destination)
-            self.assertIn("No available", test_destination)
-            self.assertTrue(os.access(project_dir / "scripts" / "test-destination", os.X_OK))
-            self.assertIn('.macOS("26.0")', design_system)
-            self.assertIn('name: "AppServices"', app_services_package)
-            self.assertIn("public struct StarterFact: Equatable", app_services_source)
-            self.assertIn("public protocol ReleaseChecklistProviding", app_services_source)
-            self.assertIn("public enum StarterFactBuilder", app_services_source)
-            self.assertIn("enum BiucingTheme", design_system_theme)
-            self.assertIn("sectionTitleFont", design_system_theme)
-            self.assertIn("import AppServices", app_tests)
-            self.assertIn("!.env.example", gitignore)
-            self.assertIn("/credentials/", gitignore)
-            self.assertIn("/signing/", gitignore)
-            self.assertIn("*.mobileprovision", gitignore)
-            self.assertIn("/fastlane/*.json", gitignore)
-            self.assertIn('app_identifier("com.example.pulsemac")', appfile)
-            self.assertIn('apple_id(ENV.fetch("FASTLANE_USER", "developer@example.com"))', appfile)
-            self.assertIn('team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "ABCDE12345"))', appfile)
-            self.assertIn("default_platform(:mac)", fastfile)
-            self.assertIn('APP_STORE_PLATFORM = "osx"', fastfile)
-            self.assertIn("lane :release_doctor", fastfile)
-            self.assertIn("lane :archive", fastfile)
-            self.assertIn("sync_app_store_signing", fastfile)
-            self.assertIn("build_signed_app", fastfile)
-            self.assertIn('sh("make release-generate")', fastfile)
+            self.run_cli([
+                "create", "apple", "pulse-mac", "--output-dir", tmpdir,
+                "--platform", "macos", "--bundle-identifier", "com.example.pulse",
+                "--organization-name", "Example Labs", "--development-team", "ABCDE12345",
+            ])
+            root = Path(tmpdir) / "pulse-mac"
+            for platform in ("ios", "macos", "watchos", "tvos"):
+                project = (root / f"Apps/{platform}/Project.swift").read_text()
+                self.assertIn(f'let appName = "PulseMac_{platform}"', project)
+                self.assertIn(f'com.example.pulse.{platform}', project)
+                self.assertIn('"SWIFT_VERSION": "6.0"', project)
+                self.assertIn('.xcframework(path:', project)
+                self.assertNotIn('.package(', project)
+                self.assertNotIn('Components/Sources', project)
+                self.assertIn('Composition/Generated', project)
+                self.assertIn('HomeFeature/Resources', project)
+                self.assertTrue((root / f"Apps/{platform}/Tests/AppTests.swift").exists())
+            watch = (root / 'Apps/watchos/Project.swift').read_text()
+            self.assertIn('"WKWatchOnly": true', watch)
+            makefile = (root / 'Makefile').read_text()
+            self.assertIn('PLATFORM ?= macos', makefile)
+            self.assertIn('generate: components-resolve', makefile)
+            self.assertIn('./scripts/components resolve --release', makefile)
+            self.assertIn('DEBUG_BUNDLE_SUFFIX= generate', makefile)
+            self.assertIn('DERIVED_DATA_PATH', makefile)
+            self.assertIn('core-swift-test', makefile)
+            self.assertIn('build-all:', makefile)
+            self.assertIn('test-all:', makefile)
+            fastfile = (root / 'fastlane/Fastfile').read_text()
             self.assertIn('sh("make release-identity-check")', fastfile)
-            self.assertIn(
-                'sh("./scripts/verify-release-identity", "archive", ARCHIVE_PATH)',
-                fastfile,
-            )
-            self.assertIn("upload_to_testflight", fastfile)
-            self.assertIn("upload_to_app_store", fastfile)
-            self.assertIn("api_key_path: app_store_api_key_path", fastfile)
-            self.assertIn("submit_for_review: env_true?", fastfile)
-            self.assertIn('sh("make lint")', fastfile)
-            self.assertIn('sh("make test")', fastfile)
-            self.assertIn('git_url(ENV.fetch("MATCH_GIT_URL"', matchfile)
-            self.assertIn('app_identifier(["com.example.pulsemac"])', matchfile)
-            self.assertIn('team_id(ENV.fetch("DEVELOPMENT_TEAM_ID", "ABCDE12345"))', matchfile)
-            self.assertIn(
-                "APP_STORE_CONNECT_API_KEY_PATH=credentials/app-store-connect-api-key.json",
-                fastlane_env_example,
-            )
-            self.assertIn("MATCH_ALLOW_WRITE=false", fastlane_env_example)
-            self.assertIn("make release-doctor", release_delivery)
-            self.assertIn("MATCH_ALLOW_WRITE=true fastlane match appstore", release_delivery)
-            self.assertIn("uploads the signed ipa/pkg to TestFlight", release_delivery)
-            self.assertIn("does not submit it for review", release_delivery)
-            self.assertIn("@testable import PulseMac", app_tests)
-            self.assertIn("func testHomeViewModelBuildsOverviewFacts()", app_tests)
-            self.assertIn("func testHomeViewModelUsesMockChecklistProvider()", app_tests)
-            self.assertIn("StarterFact(label: \"Bundle ID\"", app_tests)
-            self.assertIn("private struct MockReleaseChecklistProvider", app_tests)
-            self.assertIn(
-                'EXPECTED_BUNDLE_IDENTIFIER = "com.example.pulsemac"',
-                release_identity_script,
-            )
-            self.assertIn('when "workspace"', release_identity_script)
-            self.assertIn('when "archive"', release_identity_script)
-            self.assertTrue(
-                os.access(project_dir / "scripts" / "verify-release-identity", os.X_OK)
-            )
+            self.assertIn('sh("./scripts/verify-release-identity", "archive", ARCHIVE_PATH)', fastfile)
+            self.assertIn('submit_for_review: env_true?', fastfile)
+            gitignore = (root / '.gitignore').read_text()
+            self.assertIn('Dependencies/overrides.local.json', gitignore)
+            self.assertIn('/credentials/', gitignore)
+            for script in ('components', 'doctor', 'bootstrap', 'verify-release-identity'):
+                self.assertTrue(os.access(root / 'scripts' / script, os.X_OK))
 
-    def test_create_apple_ios_renders_platform_specific_output(self):
+    def test_create_apple_platform_selects_default_not_generated_platforms(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            output = self.run_cli(
-                [
-                    "create",
-                    "apple",
-                    "pulse-ios",
-                    "--output-dir",
-                    tmpdir,
-                    "--platform",
-                    "ios",
-                    "--bundle-identifier",
-                    "com.example.pulseios",
-                    "--organization-name",
-                    "Example Labs",
-                    "--development-team",
-                    "ABCDE12345",
-                ]
-            )
-            project_dir = Path(tmpdir) / "pulse-ios"
-            readme = (project_dir / "README.md").read_text(encoding="utf-8")
-            project_swift = (project_dir / "App" / "Project.swift").read_text(
-                encoding="utf-8"
-            )
-            app_entry = (
-                project_dir / "App" / "Targets" / "App" / "Sources" / "AppEntry.swift"
-            ).read_text(encoding="utf-8")
-            home_view = (
-                project_dir / "App" / "Targets" / "App" / "Sources" / "HomeView.swift"
-            ).read_text(encoding="utf-8")
-
-            self.assertIn("Created apple project: pulse-ios", output)
-            self.assertIn("make doctor", output)
-            self.assertIn("Target platform: `iOS`", readme)
-            self.assertIn("stacked overview screen", readme)
-            self.assertIn("make release", readme)
-            self.assertIn("registered in the Apple Developer portal", readme)
-            self.assertIn("destinations: .iOS", project_swift)
-            self.assertIn('deploymentTargets: .iOS("26.0")', project_swift)
-            self.assertIn("WindowGroup {", app_entry)
-            self.assertNotIn(".defaultSize(", app_entry)
-            self.assertIn("NavigationStack", home_view)
-            self.assertIn('Section("Project Summary")', home_view)
-            self.assertIn(".listStyle(.insetGrouped)", home_view)
-            self.assertIn('navigationTitle("Starter Overview")', home_view)
-            self.assertNotIn("NavigationSplitView", home_view)
+            self.run_cli([
+                "create", "apple", "pulse-ios", "--output-dir", tmpdir,
+                "--platform", "ios", "--bundle-identifier", "com.example.pulseios",
+            ])
+            root = Path(tmpdir) / 'pulse-ios'
+            self.assertIn('PLATFORM ?= ios', (root / 'Makefile').read_text())
+            self.assertEqual({path.name for path in (root / 'Apps').iterdir()},
+                             {'ios', 'macos', 'watchos', 'tvos'})
 
 
 if __name__ == "__main__":

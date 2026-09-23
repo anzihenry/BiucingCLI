@@ -1,12 +1,15 @@
-default_platform(:{{FASTLANE_PLATFORM}})
+APPLE_PLATFORM = ENV.fetch("PLATFORM", "{{APPLE_PLATFORM}}")
+abort "Invalid PLATFORM" unless %w[ios macos watchos tvos].include?(APPLE_PLATFORM)
+LANE_PLATFORM = APPLE_PLATFORM == "macos" ? :mac : :ios
+default_platform(LANE_PLATFORM)
 
-APP_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}"
-APP_STORE_PLATFORM = "{{APP_STORE_PLATFORM}}"
+APP_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}.#{APPLE_PLATFORM}"
+APP_STORE_PLATFORM = { "macos" => "osx", "tvos" => "appletvos" }.fetch(APPLE_PLATFORM, "ios")
 TEAM_ID = ENV.fetch("DEVELOPMENT_TEAM_ID", "{{DEVELOPMENT_TEAM}}")
 PROJECT_ROOT = File.expand_path("..", __dir__)
 WORKSPACE = "{{PROJECT_NAME}}.xcworkspace"
-SCHEME = "{{SWIFT_MODULE_NAME}}"
-ARCHIVE_PATH = "build/release/{{SWIFT_MODULE_NAME}}.xcarchive"
+SCHEME = "{{SWIFT_MODULE_NAME}}_#{APPLE_PLATFORM}"
+ARCHIVE_PATH = "build/release/#{SCHEME}.xcarchive"
 OUTPUT_DIRECTORY = "build/release"
 
 def env_true?(name, default: false)
@@ -51,6 +54,7 @@ end
 def sync_app_store_signing
   match(
     type: ENV.fetch("MATCH_TYPE", "appstore"),
+    platform: APPLE_PLATFORM == "watchos" ? "ios" : APPLE_PLATFORM,
     app_identifier: APP_IDENTIFIER,
     team_id: TEAM_ID,
     git_url: signing_git_url,
@@ -75,7 +79,7 @@ def build_signed_app
   )
 end
 
-platform :{{FASTLANE_PLATFORM}} do
+platform LANE_PLATFORM do
   desc "Validate release credentials and signing configuration"
   lane :release_doctor do
     app_store_api_key_path

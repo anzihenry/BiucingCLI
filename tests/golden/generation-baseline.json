@@ -1780,13 +1780,16 @@
       "operation": "create",
       "template": {
         "name": "apple",
-        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "description": "Four Apple shells with versioned static component SDKs and a portable C++20 core",
         "category": "native",
         "stack": [
-          "Swift",
+          "Swift 6.4",
+          "C++20",
+          "CMake",
           "Tuist",
           "SwiftPM",
-          "fastlane"
+          "fastlane",
+          "SafeDI 2.0.0"
         ],
         "platforms": [
           "ios",
@@ -1855,17 +1858,20 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 31,
+      "template_file_count": 60,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
         ".swiftformat",
         ".swiftlint.yml",
-        "App",
+        "Apps",
         "Brewfile",
+        "Components",
+        "Composition",
+        "Dependencies",
         "Makefile",
-        "Packages",
         "README.md",
+        "Shared",
         "Tuist.swift",
         "Workspace.swift",
         "docs",
@@ -1876,158 +1882,358 @@
     "entries": {
       ".gitignore": {
         "kind": "file",
-        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "sha256": "a6f56e431c5bf4d1cdc3643a512fedc35cafc66b4b4e77b2e96cd64090332a81",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "sha256": "8bb6adbb58bf9c785877e8c0ea260e58f28f7d88be55bbd5509a1be24cf5df53",
         "execute_bits": "0o0"
       },
       ".swiftformat": {
         "kind": "file",
-        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "sha256": "e50633ebfc70178c5078d3f32cb025c66317f0e0a531de2a0185222173f40b5a",
         "execute_bits": "0o0"
       },
       ".swiftlint.yml": {
         "kind": "file",
-        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "sha256": "9cfd182713cb44c5a886671db943912d157546dec72b40c7ffc1c95fae034740",
         "execute_bits": "0o0"
       },
-      "App": {
+      "Apps": {
         "kind": "directory"
       },
-      "App/Config": {
+      "Apps/ios": {
         "kind": "directory"
       },
-      "App/Config/ProjectDescriptionHelpers": {
-        "kind": "directory"
-      },
-      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+      "Apps/ios/Project.swift": {
         "kind": "file",
-        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "sha256": "1e783be065f2b00c3756c330412bf501d61266f16624d8bf5ce8a649f9aabede",
         "execute_bits": "0o0"
       },
-      "App/Config/XCConfig": {
+      "Apps/ios/Sources": {
         "kind": "directory"
       },
-      "App/Config/XCConfig/Base.xcconfig": {
+      "Apps/ios/Sources/AppEntry.swift": {
         "kind": "file",
-        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
         "execute_bits": "0o0"
       },
-      "App/Project.swift": {
+      "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "4588854158b3699fdba22d19f33edb17021a026101195e04f7d8beccb0715233",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
         "execute_bits": "0o0"
       },
-      "App/Targets": {
+      "Apps/ios/Tests": {
         "kind": "directory"
       },
-      "App/Targets/App": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources/.gitkeep": {
+      "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources": {
+      "Apps/macos": {
         "kind": "directory"
       },
-      "App/Targets/App/Sources/AppEntry.swift": {
+      "Apps/macos/Project.swift": {
         "kind": "file",
-        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "sha256": "3321dfe8a5e292ad16dcbc30ea883360354585196bf743ad11507505f04e42ad",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources/HomeView.swift": {
-        "kind": "file",
-        "sha256": "1771e931b75c01f7555804c17ef4d5fbbc3cebb2c45dd6aa5230d27d34807bda",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/App/Sources/HomeViewModel.swift": {
-        "kind": "file",
-        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/AppTests": {
+      "Apps/macos/Sources": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources": {
+      "Apps/macos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "ae2b10f00d2b2899977db7752bc6ce5aa6aceb77a677c20aa73fb0488eaf210d",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Tests": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources/AppTests.swift": {
+      "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Project.swift": {
+        "kind": "file",
+        "sha256": "c03e7530b22021d027d6cf18b689a4f43a63c2377cd3eefb700246e61724bfb0",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Project.swift": {
+        "kind": "file",
+        "sha256": "7962ab551f6719abe88d5b9cacd66d4615138c2ac7d6babcc41637a37a2d49e7",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
         "execute_bits": "0o0"
       },
       "Brewfile": {
         "kind": "file",
-        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "sha256": "0a6a96f8cb212e9829cdee51fad7c171fb94c5cd1fe74a42060d096991016b11",
+        "execute_bits": "0o0"
+      },
+      "Components": {
+        "kind": "directory"
+      },
+      "Components/DI": {
+        "kind": "directory"
+      },
+      "Components/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "aea8566d5c8b27f06f0ab6e8e3da2350c31ac5706d2bcf436b5ec52c0697d129",
+        "execute_bits": "0o0"
+      },
+      "Components/Package.swift": {
+        "kind": "file",
+        "sha256": "98547a0d10247a9363f61e1959a808ce5b8439e2d906e5813caf9c53ff2e3d6b",
+        "execute_bits": "0o0"
+      },
+      "Components/README.md": {
+        "kind": "file",
+        "sha256": "7b188018baa756ed2a3d4e75764746dd93d37559f57ee5f1b99488112ad7910c",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/Info.plist": {
+        "kind": "file",
+        "sha256": "f2ef0e04e0982674bbea70f44de5f81ddc362e88ba3d5d24f9f20b1bc8f66681",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj/Localizable.strings": {
+        "kind": "file",
+        "sha256": "341a3bf94994d147cd46e3239fff7aa97bb058b696a4a9da29b47de30aa2c89f",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem/FeatureStyle.swift": {
+        "kind": "file",
+        "sha256": "560a6ce6b60d2a5e720646bd0b55b171727cabb0d058921620d7ad5ad2747bad",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/HomeFeature": {
+        "kind": "directory"
+      },
+      "Components/Sources/HomeFeature/HomeFeature.swift": {
+        "kind": "file",
+        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/ProductContracts": {
+        "kind": "directory"
+      },
+      "Components/Sources/ProductContracts/AnalysisService.swift": {
+        "kind": "file",
+        "sha256": "18748c0999316baeb8912b1dc72b0173b5569c720e3dde03dfd6f0c25d5e49da",
+        "execute_bits": "0o0"
+      },
+      "Components/Tests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests/HomeFeatureTests.swift": {
+        "kind": "file",
+        "sha256": "2ee8994cc2510a146a20f6975c61a5b5eed9e5fe421ba07a7ddb56fb916a5f1d",
+        "execute_bits": "0o0"
+      },
+      "Composition": {
+        "kind": "directory"
+      },
+      "Composition/DI": {
+        "kind": "directory"
+      },
+      "Composition/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "74c3cdc0b90bced4b7ffc68bf2c059036b3a443bacfa41521daf25674a9948bd",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources": {
+        "kind": "directory"
+      },
+      "Composition/Sources/AppComposition.swift": {
+        "kind": "file",
+        "sha256": "8d55595216d73eb0f59aabd8047e4ab754ca35dd550278682ba17faac13bf175",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/FactoryBindings.swift": {
+        "kind": "file",
+        "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Dependencies": {
+        "kind": "directory"
+      },
+      "Dependencies/README.md": {
+        "kind": "file",
+        "sha256": "ae5c84c901cf479e9fe5e9a6e024e1c2ff5e3de6a39eed32d69d8c4e651f0ea2",
+        "execute_bits": "0o0"
+      },
+      "Dependencies/components.json": {
+        "kind": "file",
+        "sha256": "442c796111ac287d7154bbae92cfd7eb4f3b8e38ed716a04b959888efd08ebd3",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "febda1a33acb182b2ec3e5296d3416be8e4f75d29d7301973b2b98f45a7ebbe2",
-        "execute_bits": "0o0"
-      },
-      "Packages": {
-        "kind": "directory"
-      },
-      "Packages/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Package.swift": {
-        "kind": "file",
-        "sha256": "689daecb1559395b548143ff637d8abbc6209828de11a1aa3c53578dd0897558",
-        "execute_bits": "0o0"
-      },
-      "Packages/AppServices/Sources": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
-        "kind": "file",
-        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Package.swift": {
-        "kind": "file",
-        "sha256": "48d5cecfe1caca6794ea569982d1a036ff8c1a4df44ca11e4874faf941538d95",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem/Sources": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
-        "kind": "file",
-        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "sha256": "152f27378bd60aeb3ee01c3b2707e920c906c14445cb2cfd034f0f82823c385e",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "43895124a569171da6d7c7c8166b0b5d7909bd6287c8836db4e076a86b3ea4fb",
+        "sha256": "1650ccc3fb00e6c4ed49be79d6f2966b06e770e47f58750d1a9aa3c204321183",
+        "execute_bits": "0o0"
+      },
+      "Shared": {
+        "kind": "directory"
+      },
+      "Shared/Core": {
+        "kind": "directory"
+      },
+      "Shared/Core/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "41150906b3ecfcf353ec0685249d9758ce36132512da94a5729087009a9b60a4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Package.swift": {
+        "kind": "file",
+        "sha256": "22f50152484461c5fd030452ff2854a9ff0da9c71e9b5970050991c989b21d03",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/README.md": {
+        "kind": "file",
+        "sha256": "e0950cc7c5010812e89315d95b2359bb3311d38356eb19edcbc9223fd3eacccc",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/bridge.cpp": {
+        "kind": "file",
+        "sha256": "43e8833d37dd3e3a5e716ab1a010552abe3c071cbc6006b6e72ee9ec3806bfb0",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.cpp": {
+        "kind": "file",
+        "sha256": "ad86cab86a6a0d7c78d9f3680117325559e580f5c576f489f1f02ad8bead07b4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.hpp": {
+        "kind": "file",
+        "sha256": "3b5782549b6590db62513f22a43b7e843daa3004abcfddda820f82da8580d731",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/include": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/include/CoreNative.h": {
+        "kind": "file",
+        "sha256": "1ce8453a0c5c897a965edffc07e82bf0c0b6120c47b127ac53ab4a4b21354dc2",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/SharedCore": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/SharedCore/SharedCore.swift": {
+        "kind": "file",
+        "sha256": "419d79cfa696bb61bf706fc5aa664e667fc65a49acdbd12e924a231fded6cffa",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native/core_test.c": {
+        "kind": "file",
+        "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests/SharedCoreTests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/SharedCoreTests/SharedCoreTests.swift": {
+        "kind": "file",
+        "sha256": "0270e5637ae2d353097a78a0486b2b77b39f8cac97c731b236280325eb163928",
         "execute_bits": "0o0"
       },
       "Tuist.swift": {
         "kind": "file",
-        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "sha256": "e10a229a77af635a9d38fa19ad63b386d350345aef8e0ab8b61801cfdcbebdfd",
         "execute_bits": "0o0"
       },
       "Workspace.swift": {
         "kind": "file",
-        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "sha256": "2a4b505817cea55dc6c652d5d78d45326eac591b1a45437c52b29f23efc6f88c",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -2035,7 +2241,7 @@
       },
       "docs/release-delivery.md": {
         "kind": "file",
-        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -2048,17 +2254,17 @@
       },
       "fastlane/Appfile": {
         "kind": "file",
-        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "sha256": "cc30f64d3cde37247c45388d9a50c39ecf42244950c07019d8b1131dcf0edb87",
         "execute_bits": "0o0"
       },
       "fastlane/Fastfile": {
         "kind": "file",
-        "sha256": "157e882c0044b04d110cd592c86d41c9e234fc1695c30e1fbb5e5948aa263d13",
+        "sha256": "5566ee82405dcfbc0b270cb6712c7153f6042d69bca8fcc2fcc5ccbc0069a467",
         "execute_bits": "0o0"
       },
       "fastlane/Matchfile": {
         "kind": "file",
-        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "sha256": "fd2a141ade8e4a6146da413059766ae05672c5a2536ecccc08c1b499ae8c6da3",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -2066,12 +2272,17 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "sha256": "4bf10fdfdc393fcd5539fdf756bbc31d6de7d6e0202aea4f96ea4fa2a0cdcfee",
+        "execute_bits": "0o111"
+      },
+      "scripts/components": {
+        "kind": "file",
+        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "b728ed8a9aa828fe30af20be5ac7cda5845f1959efb6a83cdc773355c56bbe96",
+        "sha256": "fc0be8fb49348b1b4a5b942168671c6c8b2f7c157cf1f7e454901239f8016eba",
         "execute_bits": "0o111"
       },
       "scripts/setup-xcode": {
@@ -2086,7 +2297,7 @@
       },
       "scripts/verify-release-identity": {
         "kind": "file",
-        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "sha256": "e2167c74b5d9da199c9c474326f87e2314f4db7f6bf175be71a7704b0fab02ba",
         "execute_bits": "0o111"
       }
     }
@@ -2098,13 +2309,16 @@
       "operation": "create",
       "template": {
         "name": "apple",
-        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "description": "Four Apple shells with versioned static component SDKs and a portable C++20 core",
         "category": "native",
         "stack": [
-          "Swift",
+          "Swift 6.4",
+          "C++20",
+          "CMake",
           "Tuist",
           "SwiftPM",
-          "fastlane"
+          "fastlane",
+          "SafeDI 2.0.0"
         ],
         "platforms": [
           "ios",
@@ -2173,17 +2387,20 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 31,
+      "template_file_count": 60,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
         ".swiftformat",
         ".swiftlint.yml",
-        "App",
+        "Apps",
         "Brewfile",
+        "Components",
+        "Composition",
+        "Dependencies",
         "Makefile",
-        "Packages",
         "README.md",
+        "Shared",
         "Tuist.swift",
         "Workspace.swift",
         "docs",
@@ -2194,158 +2411,358 @@
     "entries": {
       ".gitignore": {
         "kind": "file",
-        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "sha256": "a6f56e431c5bf4d1cdc3643a512fedc35cafc66b4b4e77b2e96cd64090332a81",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "sha256": "8bb6adbb58bf9c785877e8c0ea260e58f28f7d88be55bbd5509a1be24cf5df53",
         "execute_bits": "0o0"
       },
       ".swiftformat": {
         "kind": "file",
-        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "sha256": "e50633ebfc70178c5078d3f32cb025c66317f0e0a531de2a0185222173f40b5a",
         "execute_bits": "0o0"
       },
       ".swiftlint.yml": {
         "kind": "file",
-        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "sha256": "9cfd182713cb44c5a886671db943912d157546dec72b40c7ffc1c95fae034740",
         "execute_bits": "0o0"
       },
-      "App": {
+      "Apps": {
         "kind": "directory"
       },
-      "App/Config": {
+      "Apps/ios": {
         "kind": "directory"
       },
-      "App/Config/ProjectDescriptionHelpers": {
-        "kind": "directory"
-      },
-      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+      "Apps/ios/Project.swift": {
         "kind": "file",
-        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "sha256": "1e783be065f2b00c3756c330412bf501d61266f16624d8bf5ce8a649f9aabede",
         "execute_bits": "0o0"
       },
-      "App/Config/XCConfig": {
+      "Apps/ios/Sources": {
         "kind": "directory"
       },
-      "App/Config/XCConfig/Base.xcconfig": {
+      "Apps/ios/Sources/AppEntry.swift": {
         "kind": "file",
-        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
         "execute_bits": "0o0"
       },
-      "App/Project.swift": {
+      "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "e1bd47af3a08d4a523008b11d8213844cc7d35f7fbf1bc01ca8f7fbd668f0baf",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
         "execute_bits": "0o0"
       },
-      "App/Targets": {
+      "Apps/ios/Tests": {
         "kind": "directory"
       },
-      "App/Targets/App": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources/.gitkeep": {
+      "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources": {
+      "Apps/macos": {
         "kind": "directory"
       },
-      "App/Targets/App/Sources/AppEntry.swift": {
+      "Apps/macos/Project.swift": {
         "kind": "file",
-        "sha256": "ccfb8a93559aac9a37882ecb3c42996baec0845c7f54f8dd94c69de3743fb0dc",
+        "sha256": "3321dfe8a5e292ad16dcbc30ea883360354585196bf743ad11507505f04e42ad",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources/HomeView.swift": {
-        "kind": "file",
-        "sha256": "4b77ebdb61c54924aa49dff8c93329f5c4d4eb7140221aafa728aadf06c96994",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/App/Sources/HomeViewModel.swift": {
-        "kind": "file",
-        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/AppTests": {
+      "Apps/macos/Sources": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources": {
+      "Apps/macos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "ae2b10f00d2b2899977db7752bc6ce5aa6aceb77a677c20aa73fb0488eaf210d",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Tests": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources/AppTests.swift": {
+      "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Project.swift": {
+        "kind": "file",
+        "sha256": "c03e7530b22021d027d6cf18b689a4f43a63c2377cd3eefb700246e61724bfb0",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Project.swift": {
+        "kind": "file",
+        "sha256": "7962ab551f6719abe88d5b9cacd66d4615138c2ac7d6babcc41637a37a2d49e7",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
         "execute_bits": "0o0"
       },
       "Brewfile": {
         "kind": "file",
-        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "sha256": "0a6a96f8cb212e9829cdee51fad7c171fb94c5cd1fe74a42060d096991016b11",
+        "execute_bits": "0o0"
+      },
+      "Components": {
+        "kind": "directory"
+      },
+      "Components/DI": {
+        "kind": "directory"
+      },
+      "Components/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "aea8566d5c8b27f06f0ab6e8e3da2350c31ac5706d2bcf436b5ec52c0697d129",
+        "execute_bits": "0o0"
+      },
+      "Components/Package.swift": {
+        "kind": "file",
+        "sha256": "98547a0d10247a9363f61e1959a808ce5b8439e2d906e5813caf9c53ff2e3d6b",
+        "execute_bits": "0o0"
+      },
+      "Components/README.md": {
+        "kind": "file",
+        "sha256": "7b188018baa756ed2a3d4e75764746dd93d37559f57ee5f1b99488112ad7910c",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/Info.plist": {
+        "kind": "file",
+        "sha256": "f2ef0e04e0982674bbea70f44de5f81ddc362e88ba3d5d24f9f20b1bc8f66681",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj/Localizable.strings": {
+        "kind": "file",
+        "sha256": "341a3bf94994d147cd46e3239fff7aa97bb058b696a4a9da29b47de30aa2c89f",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem/FeatureStyle.swift": {
+        "kind": "file",
+        "sha256": "560a6ce6b60d2a5e720646bd0b55b171727cabb0d058921620d7ad5ad2747bad",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/HomeFeature": {
+        "kind": "directory"
+      },
+      "Components/Sources/HomeFeature/HomeFeature.swift": {
+        "kind": "file",
+        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/ProductContracts": {
+        "kind": "directory"
+      },
+      "Components/Sources/ProductContracts/AnalysisService.swift": {
+        "kind": "file",
+        "sha256": "18748c0999316baeb8912b1dc72b0173b5569c720e3dde03dfd6f0c25d5e49da",
+        "execute_bits": "0o0"
+      },
+      "Components/Tests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests/HomeFeatureTests.swift": {
+        "kind": "file",
+        "sha256": "2ee8994cc2510a146a20f6975c61a5b5eed9e5fe421ba07a7ddb56fb916a5f1d",
+        "execute_bits": "0o0"
+      },
+      "Composition": {
+        "kind": "directory"
+      },
+      "Composition/DI": {
+        "kind": "directory"
+      },
+      "Composition/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "74c3cdc0b90bced4b7ffc68bf2c059036b3a443bacfa41521daf25674a9948bd",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources": {
+        "kind": "directory"
+      },
+      "Composition/Sources/AppComposition.swift": {
+        "kind": "file",
+        "sha256": "8d55595216d73eb0f59aabd8047e4ab754ca35dd550278682ba17faac13bf175",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/FactoryBindings.swift": {
+        "kind": "file",
+        "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Dependencies": {
+        "kind": "directory"
+      },
+      "Dependencies/README.md": {
+        "kind": "file",
+        "sha256": "ae5c84c901cf479e9fe5e9a6e024e1c2ff5e3de6a39eed32d69d8c4e651f0ea2",
+        "execute_bits": "0o0"
+      },
+      "Dependencies/components.json": {
+        "kind": "file",
+        "sha256": "442c796111ac287d7154bbae92cfd7eb4f3b8e38ed716a04b959888efd08ebd3",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "51ed169cfcf5df12e049c93ae77d619001288a7f0b32b89702eca6b04b897a6b",
-        "execute_bits": "0o0"
-      },
-      "Packages": {
-        "kind": "directory"
-      },
-      "Packages/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Package.swift": {
-        "kind": "file",
-        "sha256": "d9b3768c3cb11f10f5b0f991a4259233d33e9a2270d2d5498fc6d38691d4f5b7",
-        "execute_bits": "0o0"
-      },
-      "Packages/AppServices/Sources": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
-        "kind": "file",
-        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Package.swift": {
-        "kind": "file",
-        "sha256": "c697e440fcedb4e0e7a5e24cda1040bc6bcde660f8945d23894d43a6e9b6104c",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem/Sources": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
-        "kind": "file",
-        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "sha256": "705e448082ae5f1a6c95991cbb6d03d1ae8bf3deda276839eb0c26ed76809ff8",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "8267e4a398ba1a37b47ed6824cccf9bd7e4d73927164a44f8e92c5f7fa3da4b4",
+        "sha256": "d958b9a371270019cd97f9e1d55ebf0cf412934a9f9b64d65c4e77864fc470ca",
+        "execute_bits": "0o0"
+      },
+      "Shared": {
+        "kind": "directory"
+      },
+      "Shared/Core": {
+        "kind": "directory"
+      },
+      "Shared/Core/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "41150906b3ecfcf353ec0685249d9758ce36132512da94a5729087009a9b60a4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Package.swift": {
+        "kind": "file",
+        "sha256": "22f50152484461c5fd030452ff2854a9ff0da9c71e9b5970050991c989b21d03",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/README.md": {
+        "kind": "file",
+        "sha256": "e0950cc7c5010812e89315d95b2359bb3311d38356eb19edcbc9223fd3eacccc",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/bridge.cpp": {
+        "kind": "file",
+        "sha256": "43e8833d37dd3e3a5e716ab1a010552abe3c071cbc6006b6e72ee9ec3806bfb0",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.cpp": {
+        "kind": "file",
+        "sha256": "ad86cab86a6a0d7c78d9f3680117325559e580f5c576f489f1f02ad8bead07b4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.hpp": {
+        "kind": "file",
+        "sha256": "3b5782549b6590db62513f22a43b7e843daa3004abcfddda820f82da8580d731",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/include": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/include/CoreNative.h": {
+        "kind": "file",
+        "sha256": "1ce8453a0c5c897a965edffc07e82bf0c0b6120c47b127ac53ab4a4b21354dc2",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/SharedCore": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/SharedCore/SharedCore.swift": {
+        "kind": "file",
+        "sha256": "419d79cfa696bb61bf706fc5aa664e667fc65a49acdbd12e924a231fded6cffa",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native/core_test.c": {
+        "kind": "file",
+        "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests/SharedCoreTests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/SharedCoreTests/SharedCoreTests.swift": {
+        "kind": "file",
+        "sha256": "0270e5637ae2d353097a78a0486b2b77b39f8cac97c731b236280325eb163928",
         "execute_bits": "0o0"
       },
       "Tuist.swift": {
         "kind": "file",
-        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "sha256": "e10a229a77af635a9d38fa19ad63b386d350345aef8e0ab8b61801cfdcbebdfd",
         "execute_bits": "0o0"
       },
       "Workspace.swift": {
         "kind": "file",
-        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "sha256": "2a4b505817cea55dc6c652d5d78d45326eac591b1a45437c52b29f23efc6f88c",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -2353,7 +2770,7 @@
       },
       "docs/release-delivery.md": {
         "kind": "file",
-        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -2366,17 +2783,17 @@
       },
       "fastlane/Appfile": {
         "kind": "file",
-        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "sha256": "be8fc2dd7f914cdb3f78c880279483444dea318889bf844f3fbd1e83f8751049",
         "execute_bits": "0o0"
       },
       "fastlane/Fastfile": {
         "kind": "file",
-        "sha256": "56df6659a93e0a0b7a99d6552f488c9e89c42ed81cece9cce94fa52815ec7076",
+        "sha256": "e3319c18fe94513173b0249960e7642d861e67e4f40615207adaf0796c255e70",
         "execute_bits": "0o0"
       },
       "fastlane/Matchfile": {
         "kind": "file",
-        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "sha256": "f18aa999f64e35364e1357276bb55c8d267de7dcd4b7eb7930d915b80faa04d8",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -2384,12 +2801,17 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "sha256": "4bf10fdfdc393fcd5539fdf756bbc31d6de7d6e0202aea4f96ea4fa2a0cdcfee",
+        "execute_bits": "0o111"
+      },
+      "scripts/components": {
+        "kind": "file",
+        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "44eff142a2a02ab17461b3c3c538ab549e9979588e6e325e350cea44f2cc8d8d",
+        "sha256": "df406c2ec6d55e8b16c4fdaead8e01e201b6394577a2b393367976a4a764a7c1",
         "execute_bits": "0o111"
       },
       "scripts/setup-xcode": {
@@ -2404,7 +2826,7 @@
       },
       "scripts/verify-release-identity": {
         "kind": "file",
-        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "sha256": "9a4358839e42f9376e39cff1375dbf48e9397c95109fc8944d3992d92118dada",
         "execute_bits": "0o111"
       }
     }
@@ -2416,13 +2838,16 @@
       "operation": "create",
       "template": {
         "name": "apple",
-        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "description": "Four Apple shells with versioned static component SDKs and a portable C++20 core",
         "category": "native",
         "stack": [
-          "Swift",
+          "Swift 6.4",
+          "C++20",
+          "CMake",
           "Tuist",
           "SwiftPM",
-          "fastlane"
+          "fastlane",
+          "SafeDI 2.0.0"
         ],
         "platforms": [
           "ios",
@@ -2491,17 +2916,20 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 31,
+      "template_file_count": 60,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
         ".swiftformat",
         ".swiftlint.yml",
-        "App",
+        "Apps",
         "Brewfile",
+        "Components",
+        "Composition",
+        "Dependencies",
         "Makefile",
-        "Packages",
         "README.md",
+        "Shared",
         "Tuist.swift",
         "Workspace.swift",
         "docs",
@@ -2512,158 +2940,358 @@
     "entries": {
       ".gitignore": {
         "kind": "file",
-        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "sha256": "a6f56e431c5bf4d1cdc3643a512fedc35cafc66b4b4e77b2e96cd64090332a81",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "sha256": "8bb6adbb58bf9c785877e8c0ea260e58f28f7d88be55bbd5509a1be24cf5df53",
         "execute_bits": "0o0"
       },
       ".swiftformat": {
         "kind": "file",
-        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "sha256": "e50633ebfc70178c5078d3f32cb025c66317f0e0a531de2a0185222173f40b5a",
         "execute_bits": "0o0"
       },
       ".swiftlint.yml": {
         "kind": "file",
-        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "sha256": "9cfd182713cb44c5a886671db943912d157546dec72b40c7ffc1c95fae034740",
         "execute_bits": "0o0"
       },
-      "App": {
+      "Apps": {
         "kind": "directory"
       },
-      "App/Config": {
+      "Apps/ios": {
         "kind": "directory"
       },
-      "App/Config/ProjectDescriptionHelpers": {
-        "kind": "directory"
-      },
-      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+      "Apps/ios/Project.swift": {
         "kind": "file",
-        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "sha256": "1e783be065f2b00c3756c330412bf501d61266f16624d8bf5ce8a649f9aabede",
         "execute_bits": "0o0"
       },
-      "App/Config/XCConfig": {
+      "Apps/ios/Sources": {
         "kind": "directory"
       },
-      "App/Config/XCConfig/Base.xcconfig": {
+      "Apps/ios/Sources/AppEntry.swift": {
         "kind": "file",
-        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
         "execute_bits": "0o0"
       },
-      "App/Project.swift": {
+      "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "f41e498e1d6087691607d69e1ed85a83e58e389c2aeb626a32fc9e6ff0f0aa10",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
         "execute_bits": "0o0"
       },
-      "App/Targets": {
+      "Apps/ios/Tests": {
         "kind": "directory"
       },
-      "App/Targets/App": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources/.gitkeep": {
+      "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources": {
+      "Apps/macos": {
         "kind": "directory"
       },
-      "App/Targets/App/Sources/AppEntry.swift": {
+      "Apps/macos/Project.swift": {
         "kind": "file",
-        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "sha256": "3321dfe8a5e292ad16dcbc30ea883360354585196bf743ad11507505f04e42ad",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources/HomeView.swift": {
-        "kind": "file",
-        "sha256": "6f29c59325b48437b701e9b7856d0df3d9d8aaf2f48b97b5a7a07fae8d964580",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/App/Sources/HomeViewModel.swift": {
-        "kind": "file",
-        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/AppTests": {
+      "Apps/macos/Sources": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources": {
+      "Apps/macos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "ae2b10f00d2b2899977db7752bc6ce5aa6aceb77a677c20aa73fb0488eaf210d",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Tests": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources/AppTests.swift": {
+      "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Project.swift": {
+        "kind": "file",
+        "sha256": "c03e7530b22021d027d6cf18b689a4f43a63c2377cd3eefb700246e61724bfb0",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Project.swift": {
+        "kind": "file",
+        "sha256": "7962ab551f6719abe88d5b9cacd66d4615138c2ac7d6babcc41637a37a2d49e7",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
         "execute_bits": "0o0"
       },
       "Brewfile": {
         "kind": "file",
-        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "sha256": "0a6a96f8cb212e9829cdee51fad7c171fb94c5cd1fe74a42060d096991016b11",
+        "execute_bits": "0o0"
+      },
+      "Components": {
+        "kind": "directory"
+      },
+      "Components/DI": {
+        "kind": "directory"
+      },
+      "Components/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "aea8566d5c8b27f06f0ab6e8e3da2350c31ac5706d2bcf436b5ec52c0697d129",
+        "execute_bits": "0o0"
+      },
+      "Components/Package.swift": {
+        "kind": "file",
+        "sha256": "98547a0d10247a9363f61e1959a808ce5b8439e2d906e5813caf9c53ff2e3d6b",
+        "execute_bits": "0o0"
+      },
+      "Components/README.md": {
+        "kind": "file",
+        "sha256": "7b188018baa756ed2a3d4e75764746dd93d37559f57ee5f1b99488112ad7910c",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/Info.plist": {
+        "kind": "file",
+        "sha256": "f2ef0e04e0982674bbea70f44de5f81ddc362e88ba3d5d24f9f20b1bc8f66681",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj/Localizable.strings": {
+        "kind": "file",
+        "sha256": "341a3bf94994d147cd46e3239fff7aa97bb058b696a4a9da29b47de30aa2c89f",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem/FeatureStyle.swift": {
+        "kind": "file",
+        "sha256": "560a6ce6b60d2a5e720646bd0b55b171727cabb0d058921620d7ad5ad2747bad",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/HomeFeature": {
+        "kind": "directory"
+      },
+      "Components/Sources/HomeFeature/HomeFeature.swift": {
+        "kind": "file",
+        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/ProductContracts": {
+        "kind": "directory"
+      },
+      "Components/Sources/ProductContracts/AnalysisService.swift": {
+        "kind": "file",
+        "sha256": "18748c0999316baeb8912b1dc72b0173b5569c720e3dde03dfd6f0c25d5e49da",
+        "execute_bits": "0o0"
+      },
+      "Components/Tests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests/HomeFeatureTests.swift": {
+        "kind": "file",
+        "sha256": "2ee8994cc2510a146a20f6975c61a5b5eed9e5fe421ba07a7ddb56fb916a5f1d",
+        "execute_bits": "0o0"
+      },
+      "Composition": {
+        "kind": "directory"
+      },
+      "Composition/DI": {
+        "kind": "directory"
+      },
+      "Composition/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "74c3cdc0b90bced4b7ffc68bf2c059036b3a443bacfa41521daf25674a9948bd",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources": {
+        "kind": "directory"
+      },
+      "Composition/Sources/AppComposition.swift": {
+        "kind": "file",
+        "sha256": "8d55595216d73eb0f59aabd8047e4ab754ca35dd550278682ba17faac13bf175",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/FactoryBindings.swift": {
+        "kind": "file",
+        "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Dependencies": {
+        "kind": "directory"
+      },
+      "Dependencies/README.md": {
+        "kind": "file",
+        "sha256": "ae5c84c901cf479e9fe5e9a6e024e1c2ff5e3de6a39eed32d69d8c4e651f0ea2",
+        "execute_bits": "0o0"
+      },
+      "Dependencies/components.json": {
+        "kind": "file",
+        "sha256": "442c796111ac287d7154bbae92cfd7eb4f3b8e38ed716a04b959888efd08ebd3",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "aab8d1d70b1af83fb33f87ea03061b180f7911bd1946ec0555fbd4401ee37181",
-        "execute_bits": "0o0"
-      },
-      "Packages": {
-        "kind": "directory"
-      },
-      "Packages/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Package.swift": {
-        "kind": "file",
-        "sha256": "128a66cb648769f33929f5de6787a5610eb41353e567ad1a5914c562cab3cb4e",
-        "execute_bits": "0o0"
-      },
-      "Packages/AppServices/Sources": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
-        "kind": "file",
-        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Package.swift": {
-        "kind": "file",
-        "sha256": "4a87c8bcf53916aee10a8c32380f3d840b0367400920a4fdd0061a3ac1408f39",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem/Sources": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
-        "kind": "file",
-        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "sha256": "8a11927efd00cd16faa3f669fd0f3faf0353373c6c93bd467eb92c6fedae5535",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "a3e3224bf24f18b63ecd46d677f54136c73eae73e69786536ad46a2a9d3ecb7e",
+        "sha256": "3389e3f9fc1250102bc11fdc5baa0724a09a956e541cd83da55bc6f33c94801f",
+        "execute_bits": "0o0"
+      },
+      "Shared": {
+        "kind": "directory"
+      },
+      "Shared/Core": {
+        "kind": "directory"
+      },
+      "Shared/Core/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "41150906b3ecfcf353ec0685249d9758ce36132512da94a5729087009a9b60a4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Package.swift": {
+        "kind": "file",
+        "sha256": "22f50152484461c5fd030452ff2854a9ff0da9c71e9b5970050991c989b21d03",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/README.md": {
+        "kind": "file",
+        "sha256": "e0950cc7c5010812e89315d95b2359bb3311d38356eb19edcbc9223fd3eacccc",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/bridge.cpp": {
+        "kind": "file",
+        "sha256": "43e8833d37dd3e3a5e716ab1a010552abe3c071cbc6006b6e72ee9ec3806bfb0",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.cpp": {
+        "kind": "file",
+        "sha256": "ad86cab86a6a0d7c78d9f3680117325559e580f5c576f489f1f02ad8bead07b4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.hpp": {
+        "kind": "file",
+        "sha256": "3b5782549b6590db62513f22a43b7e843daa3004abcfddda820f82da8580d731",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/include": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/include/CoreNative.h": {
+        "kind": "file",
+        "sha256": "1ce8453a0c5c897a965edffc07e82bf0c0b6120c47b127ac53ab4a4b21354dc2",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/SharedCore": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/SharedCore/SharedCore.swift": {
+        "kind": "file",
+        "sha256": "419d79cfa696bb61bf706fc5aa664e667fc65a49acdbd12e924a231fded6cffa",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native/core_test.c": {
+        "kind": "file",
+        "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests/SharedCoreTests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/SharedCoreTests/SharedCoreTests.swift": {
+        "kind": "file",
+        "sha256": "0270e5637ae2d353097a78a0486b2b77b39f8cac97c731b236280325eb163928",
         "execute_bits": "0o0"
       },
       "Tuist.swift": {
         "kind": "file",
-        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "sha256": "e10a229a77af635a9d38fa19ad63b386d350345aef8e0ab8b61801cfdcbebdfd",
         "execute_bits": "0o0"
       },
       "Workspace.swift": {
         "kind": "file",
-        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "sha256": "2a4b505817cea55dc6c652d5d78d45326eac591b1a45437c52b29f23efc6f88c",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -2671,7 +3299,7 @@
       },
       "docs/release-delivery.md": {
         "kind": "file",
-        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -2684,17 +3312,17 @@
       },
       "fastlane/Appfile": {
         "kind": "file",
-        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "sha256": "2f9e5c36d70ec3260173a83988557a9c2ee7ea21a8e8e94d7f8be14ed51df08f",
         "execute_bits": "0o0"
       },
       "fastlane/Fastfile": {
         "kind": "file",
-        "sha256": "157e882c0044b04d110cd592c86d41c9e234fc1695c30e1fbb5e5948aa263d13",
+        "sha256": "bd6667d06299d72ae99d84225cc77a1338e697cce56cba4b7a06847c82240f1c",
         "execute_bits": "0o0"
       },
       "fastlane/Matchfile": {
         "kind": "file",
-        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "sha256": "d505081e821d7ef506e22da46c39e1194cffc631e911b1276058cab034f65eaa",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -2702,12 +3330,17 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "sha256": "4bf10fdfdc393fcd5539fdf756bbc31d6de7d6e0202aea4f96ea4fa2a0cdcfee",
+        "execute_bits": "0o111"
+      },
+      "scripts/components": {
+        "kind": "file",
+        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "7c55366bcef44e1d7b8fa41a6bacc693b4b413e2810ab4ee711a08aa8936af35",
+        "sha256": "0bb6f1dfc2d5a144e40771002696b5e3c1acfe6c0f18548719e7b9920100c123",
         "execute_bits": "0o111"
       },
       "scripts/setup-xcode": {
@@ -2722,7 +3355,7 @@
       },
       "scripts/verify-release-identity": {
         "kind": "file",
-        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "sha256": "14a80e9c6e8b30038faf1ce42ae40b1f16d18459e03c0448a5d74ae27166058a",
         "execute_bits": "0o111"
       }
     }
@@ -2734,13 +3367,16 @@
       "operation": "create",
       "template": {
         "name": "apple",
-        "description": "Swift + Tuist Apple app starter for mid-sized teams",
+        "description": "Four Apple shells with versioned static component SDKs and a portable C++20 core",
         "category": "native",
         "stack": [
-          "Swift",
+          "Swift 6.4",
+          "C++20",
+          "CMake",
           "Tuist",
           "SwiftPM",
-          "fastlane"
+          "fastlane",
+          "SafeDI 2.0.0"
         ],
         "platforms": [
           "ios",
@@ -2809,17 +3445,20 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 31,
+      "template_file_count": 60,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
         ".swiftformat",
         ".swiftlint.yml",
-        "App",
+        "Apps",
         "Brewfile",
+        "Components",
+        "Composition",
+        "Dependencies",
         "Makefile",
-        "Packages",
         "README.md",
+        "Shared",
         "Tuist.swift",
         "Workspace.swift",
         "docs",
@@ -2830,158 +3469,358 @@
     "entries": {
       ".gitignore": {
         "kind": "file",
-        "sha256": "fc2e0ed8c3ae21653b89886cee1241914825880428f89d9ec555419a9eb89f12",
+        "sha256": "a6f56e431c5bf4d1cdc3643a512fedc35cafc66b4b4e77b2e96cd64090332a81",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "7a3040a073be043f5c426a83203d25e33b6096ebea7c4aaf83a22733332bfd33",
+        "sha256": "8bb6adbb58bf9c785877e8c0ea260e58f28f7d88be55bbd5509a1be24cf5df53",
         "execute_bits": "0o0"
       },
       ".swiftformat": {
         "kind": "file",
-        "sha256": "184864397a47faa5d0a8cbedcf68a2a29f75bdf27bf9f7a01e46b7ba986d5317",
+        "sha256": "e50633ebfc70178c5078d3f32cb025c66317f0e0a531de2a0185222173f40b5a",
         "execute_bits": "0o0"
       },
       ".swiftlint.yml": {
         "kind": "file",
-        "sha256": "596dd7b414476ab8b22adb881b223d3abc5eb731164ff09caea6b8c0707c3602",
+        "sha256": "9cfd182713cb44c5a886671db943912d157546dec72b40c7ffc1c95fae034740",
         "execute_bits": "0o0"
       },
-      "App": {
+      "Apps": {
         "kind": "directory"
       },
-      "App/Config": {
+      "Apps/ios": {
         "kind": "directory"
       },
-      "App/Config/ProjectDescriptionHelpers": {
-        "kind": "directory"
-      },
-      "App/Config/ProjectDescriptionHelpers/Module.swift": {
+      "Apps/ios/Project.swift": {
         "kind": "file",
-        "sha256": "836e86ecdab82e34243cacb87b69a725667017411acb4ecbfcf0c9195381ea78",
+        "sha256": "1e783be065f2b00c3756c330412bf501d61266f16624d8bf5ce8a649f9aabede",
         "execute_bits": "0o0"
       },
-      "App/Config/XCConfig": {
+      "Apps/ios/Sources": {
         "kind": "directory"
       },
-      "App/Config/XCConfig/Base.xcconfig": {
+      "Apps/ios/Sources/AppEntry.swift": {
         "kind": "file",
-        "sha256": "e1df0f64f20fb08fa3ceb76f6c6bb311db33eb5bccb71478b517b3efa5e838fd",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
         "execute_bits": "0o0"
       },
-      "App/Project.swift": {
+      "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "80c41238ec8d89d06bcbd3d09fbb8592778ab9ec2cbb40d432db53d2bcd323f2",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
         "execute_bits": "0o0"
       },
-      "App/Targets": {
+      "Apps/ios/Tests": {
         "kind": "directory"
       },
-      "App/Targets/App": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources": {
-        "kind": "directory"
-      },
-      "App/Targets/App/Resources/.gitkeep": {
+      "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources": {
+      "Apps/macos": {
         "kind": "directory"
       },
-      "App/Targets/App/Sources/AppEntry.swift": {
+      "Apps/macos/Project.swift": {
         "kind": "file",
-        "sha256": "4e50f7c748af2dd7cc4a4eb325842b80bf1b81cfc013751b76aa1cbe9eeaf15f",
+        "sha256": "3321dfe8a5e292ad16dcbc30ea883360354585196bf743ad11507505f04e42ad",
         "execute_bits": "0o0"
       },
-      "App/Targets/App/Sources/HomeView.swift": {
-        "kind": "file",
-        "sha256": "ff82910c139b6d8a6afa3a35eec8fd019375e3b86b014b948fc0d0cc9fd496c5",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/App/Sources/HomeViewModel.swift": {
-        "kind": "file",
-        "sha256": "af95022692911f41dd9cd8b22827205ced63de4d4a8bfc720937755f9ef229cf",
-        "execute_bits": "0o0"
-      },
-      "App/Targets/AppTests": {
+      "Apps/macos/Sources": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources": {
+      "Apps/macos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "ae2b10f00d2b2899977db7752bc6ce5aa6aceb77a677c20aa73fb0488eaf210d",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/macos/Tests": {
         "kind": "directory"
       },
-      "App/Targets/AppTests/Sources/AppTests.swift": {
+      "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "da857d2ba0d7fc8d55911ba4d91b27c2d6913f9aff6c60077ebe6fcfb01cce51",
+        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Project.swift": {
+        "kind": "file",
+        "sha256": "c03e7530b22021d027d6cf18b689a4f43a63c2377cd3eefb700246e61724bfb0",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/tvos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/tvos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Project.swift": {
+        "kind": "file",
+        "sha256": "7962ab551f6719abe88d5b9cacd66d4615138c2ac7d6babcc41637a37a2d49e7",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Sources/AppEntry.swift": {
+        "kind": "file",
+        "sha256": "15ac5cbcc19b196ff24cd87bd5bb5f02de1df4cf459bb90d7253b865111939ef",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Sources/ShellRoot.swift": {
+        "kind": "file",
+        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "execute_bits": "0o0"
+      },
+      "Apps/watchos/Tests": {
+        "kind": "directory"
+      },
+      "Apps/watchos/Tests/AppTests.swift": {
+        "kind": "file",
+        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
         "execute_bits": "0o0"
       },
       "Brewfile": {
         "kind": "file",
-        "sha256": "ee570b370af496a70cce95fd2167e92ce65e8ee1368562a9b13749d8aa773ea0",
+        "sha256": "0a6a96f8cb212e9829cdee51fad7c171fb94c5cd1fe74a42060d096991016b11",
+        "execute_bits": "0o0"
+      },
+      "Components": {
+        "kind": "directory"
+      },
+      "Components/DI": {
+        "kind": "directory"
+      },
+      "Components/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "aea8566d5c8b27f06f0ab6e8e3da2350c31ac5706d2bcf436b5ec52c0697d129",
+        "execute_bits": "0o0"
+      },
+      "Components/Package.swift": {
+        "kind": "file",
+        "sha256": "98547a0d10247a9363f61e1959a808ce5b8439e2d906e5813caf9c53ff2e3d6b",
+        "execute_bits": "0o0"
+      },
+      "Components/README.md": {
+        "kind": "file",
+        "sha256": "7b188018baa756ed2a3d4e75764746dd93d37559f57ee5f1b99488112ad7910c",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/Info.plist": {
+        "kind": "file",
+        "sha256": "f2ef0e04e0982674bbea70f44de5f81ddc362e88ba3d5d24f9f20b1bc8f66681",
+        "execute_bits": "0o0"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj": {
+        "kind": "directory"
+      },
+      "Components/Resources/HomeFeature.bundle/en.lproj/Localizable.strings": {
+        "kind": "file",
+        "sha256": "341a3bf94994d147cd46e3239fff7aa97bb058b696a4a9da29b47de30aa2c89f",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem": {
+        "kind": "directory"
+      },
+      "Components/Sources/DesignSystem/FeatureStyle.swift": {
+        "kind": "file",
+        "sha256": "560a6ce6b60d2a5e720646bd0b55b171727cabb0d058921620d7ad5ad2747bad",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/HomeFeature": {
+        "kind": "directory"
+      },
+      "Components/Sources/HomeFeature/HomeFeature.swift": {
+        "kind": "file",
+        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "execute_bits": "0o0"
+      },
+      "Components/Sources/ProductContracts": {
+        "kind": "directory"
+      },
+      "Components/Sources/ProductContracts/AnalysisService.swift": {
+        "kind": "file",
+        "sha256": "18748c0999316baeb8912b1dc72b0173b5569c720e3dde03dfd6f0c25d5e49da",
+        "execute_bits": "0o0"
+      },
+      "Components/Tests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests": {
+        "kind": "directory"
+      },
+      "Components/Tests/HomeFeatureTests/HomeFeatureTests.swift": {
+        "kind": "file",
+        "sha256": "2ee8994cc2510a146a20f6975c61a5b5eed9e5fe421ba07a7ddb56fb916a5f1d",
+        "execute_bits": "0o0"
+      },
+      "Composition": {
+        "kind": "directory"
+      },
+      "Composition/DI": {
+        "kind": "directory"
+      },
+      "Composition/DI/Graph.swift": {
+        "kind": "file",
+        "sha256": "74c3cdc0b90bced4b7ffc68bf2c059036b3a443bacfa41521daf25674a9948bd",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources": {
+        "kind": "directory"
+      },
+      "Composition/Sources/AppComposition.swift": {
+        "kind": "file",
+        "sha256": "8d55595216d73eb0f59aabd8047e4ab754ca35dd550278682ba17faac13bf175",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/FactoryBindings.swift": {
+        "kind": "file",
+        "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Dependencies": {
+        "kind": "directory"
+      },
+      "Dependencies/README.md": {
+        "kind": "file",
+        "sha256": "ae5c84c901cf479e9fe5e9a6e024e1c2ff5e3de6a39eed32d69d8c4e651f0ea2",
+        "execute_bits": "0o0"
+      },
+      "Dependencies/components.json": {
+        "kind": "file",
+        "sha256": "442c796111ac287d7154bbae92cfd7eb4f3b8e38ed716a04b959888efd08ebd3",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "7674c218e56dc97a00a3ee8a71064c9ec0d490bbe1bfcc747c7bc4d41c001b5f",
-        "execute_bits": "0o0"
-      },
-      "Packages": {
-        "kind": "directory"
-      },
-      "Packages/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Package.swift": {
-        "kind": "file",
-        "sha256": "43ee5f363e32bb63020336cecf46f07cf1945c3fc7a7745d05c6fe5bc05c39c9",
-        "execute_bits": "0o0"
-      },
-      "Packages/AppServices/Sources": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices": {
-        "kind": "directory"
-      },
-      "Packages/AppServices/Sources/AppServices/StarterMetadata.swift": {
-        "kind": "file",
-        "sha256": "b2709eeb65d66f3816a1622182ecc7fc41c72658e3ed12446c8d8155908415ed",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Package.swift": {
-        "kind": "file",
-        "sha256": "2f491a44764df86d65cf33b911e9b612f61d07196bebd4adcee33069f156b465",
-        "execute_bits": "0o0"
-      },
-      "Packages/DesignSystem/Sources": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem": {
-        "kind": "directory"
-      },
-      "Packages/DesignSystem/Sources/DesignSystem/Theme.swift": {
-        "kind": "file",
-        "sha256": "f8ccdfe3e7c1e29ef34bb291fdede966db27b0a7330cbee2660a61fbdeff3be5",
+        "sha256": "c56e03666011b5fc7dbc9725249473c86ea23ac916bc80febfddc7a445d277e6",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "8c409a21e139f0159802d67509b8cf1b8c0a7e3d853a667ff01b8f54f9fc59c1",
+        "sha256": "4ea48ccfa1c677a74b741c798127bcb2b84d21a6512ab99a15b92677205a3a57",
+        "execute_bits": "0o0"
+      },
+      "Shared": {
+        "kind": "directory"
+      },
+      "Shared/Core": {
+        "kind": "directory"
+      },
+      "Shared/Core/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "41150906b3ecfcf353ec0685249d9758ce36132512da94a5729087009a9b60a4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Package.swift": {
+        "kind": "file",
+        "sha256": "22f50152484461c5fd030452ff2854a9ff0da9c71e9b5970050991c989b21d03",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/README.md": {
+        "kind": "file",
+        "sha256": "e0950cc7c5010812e89315d95b2359bb3311d38356eb19edcbc9223fd3eacccc",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/bridge.cpp": {
+        "kind": "file",
+        "sha256": "43e8833d37dd3e3a5e716ab1a010552abe3c071cbc6006b6e72ee9ec3806bfb0",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.cpp": {
+        "kind": "file",
+        "sha256": "ad86cab86a6a0d7c78d9f3680117325559e580f5c576f489f1f02ad8bead07b4",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/core.hpp": {
+        "kind": "file",
+        "sha256": "3b5782549b6590db62513f22a43b7e843daa3004abcfddda820f82da8580d731",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/CoreNative/include": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/CoreNative/include/CoreNative.h": {
+        "kind": "file",
+        "sha256": "1ce8453a0c5c897a965edffc07e82bf0c0b6120c47b127ac53ab4a4b21354dc2",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Sources/SharedCore": {
+        "kind": "directory"
+      },
+      "Shared/Core/Sources/SharedCore/SharedCore.swift": {
+        "kind": "file",
+        "sha256": "419d79cfa696bb61bf706fc5aa664e667fc65a49acdbd12e924a231fded6cffa",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/Native/core_test.c": {
+        "kind": "file",
+        "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "Shared/Core/Tests/SharedCoreTests": {
+        "kind": "directory"
+      },
+      "Shared/Core/Tests/SharedCoreTests/SharedCoreTests.swift": {
+        "kind": "file",
+        "sha256": "0270e5637ae2d353097a78a0486b2b77b39f8cac97c731b236280325eb163928",
         "execute_bits": "0o0"
       },
       "Tuist.swift": {
         "kind": "file",
-        "sha256": "be0506b59bc337393ce3af760772b03e547528c5d03af70dc94e8d7768b4be8e",
+        "sha256": "e10a229a77af635a9d38fa19ad63b386d350345aef8e0ab8b61801cfdcbebdfd",
         "execute_bits": "0o0"
       },
       "Workspace.swift": {
         "kind": "file",
-        "sha256": "5066968047de06d6ef750e6a0a5ae7c4f7f27b6696f2c8f041aa4bedd777e09a",
+        "sha256": "2a4b505817cea55dc6c652d5d78d45326eac591b1a45437c52b29f23efc6f88c",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -2989,7 +3828,7 @@
       },
       "docs/release-delivery.md": {
         "kind": "file",
-        "sha256": "9522a587978129166d5d794edfb282ab2a18a470709af74fae313c58d14272df",
+        "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -3002,17 +3841,17 @@
       },
       "fastlane/Appfile": {
         "kind": "file",
-        "sha256": "25c923dea572bff0d6fc6f010b50e26ad5b4c8ca2434153837ac27fe500b3213",
+        "sha256": "26091841cc8ef23f94f30bb0ce161093a209561e38a6a92a11b696d75c65b620",
         "execute_bits": "0o0"
       },
       "fastlane/Fastfile": {
         "kind": "file",
-        "sha256": "382bcc287a4aaaa7a642bee55855ea53f8a5cb0ad7dca049297284fe4c7f317a",
+        "sha256": "eee1c4cb92352b22e2eb95772fa600106f528612cdb6995f31a8fa7690e2fa83",
         "execute_bits": "0o0"
       },
       "fastlane/Matchfile": {
         "kind": "file",
-        "sha256": "d79ca83a7f42dd1189f91e1a5c0334552a7d8ef976252c85597a0ff768a5ed33",
+        "sha256": "20b4aee214875166b686b9e2de8361a65c356d1ef175e57f212a058d65979842",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -3020,12 +3859,17 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "53ae9b224bacd1fa855dc5383787263c6ffddc8b613293b2256142a0034d8bd9",
+        "sha256": "4bf10fdfdc393fcd5539fdf756bbc31d6de7d6e0202aea4f96ea4fa2a0cdcfee",
+        "execute_bits": "0o111"
+      },
+      "scripts/components": {
+        "kind": "file",
+        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "56859d9f17298bbab8b2c4728d7961b02236f9e778f07583f0b060fff4adb10a",
+        "sha256": "6d9d60eae13ef8524206fd0c0cc996f3fd3fa008e7d7dd5602bba4bb72a7f2e5",
         "execute_bits": "0o111"
       },
       "scripts/setup-xcode": {
@@ -3040,7 +3884,7 @@
       },
       "scripts/verify-release-identity": {
         "kind": "file",
-        "sha256": "4f77bfc6f85310dde20caa1620c02aacf2d3a6a6408b383f0ddf78ad7f06d702",
+        "sha256": "a05ffaaa89498703657f94a0cdfdff7e1383acf469d83cab182feb40e463e869",
         "execute_bits": "0o111"
       }
     }

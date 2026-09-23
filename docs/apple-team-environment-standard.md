@@ -28,6 +28,9 @@ This standard intentionally centers on the Apple-native toolchain and uses `Tuis
 ### Core Apple Toolchain
 
 - `Xcode`: the full IDE and Apple SDK distribution.
+- `Swift 6.4+`: minimum compiler/SwiftPM toolchain for generated packages; Xcode 27
+  is the verified baseline. Xcode `SWIFT_VERSION=6.0` selects Swift 6 language mode.
+- `C++20`: shared portable core; SwiftPM/CMake for source development, static XCFramework for app integration.
 - `xcodebuild`: CLI build and test entrypoint.
 - `xcrun`: access to Apple command-line tools such as `simctl`.
 - `Simulator`: local app and UI test execution.
@@ -124,112 +127,41 @@ Responsible for:
 ## Standard Repository Layout
 
 ```text
-.
-├── App/
-│   ├── Project.swift
-│   ├── Config/
-│   │   ├── ProjectDescriptionHelpers/
-│   │   └── XCConfig/
-│   ├── Targets/
-│   │   ├── App/
-│   │   ├── AppTests/
-│   │   ├── AppUITests/
-│   │   └── DemoApp/
-│   └── Features/
-│       ├── Home/
-│       ├── Profile/
-│       └── Settings/
-├── Packages/
-│   ├── DesignSystem/
-│   ├── Networking/
-│   └── Analytics/
-├── fastlane/
-│   ├── Fastfile
-│   └── Appfile
-├── scripts/
-│   ├── bootstrap
-│   ├── doctor
-│   ├── setup-xcode
-│   └── ci/
-├── .mise.toml
-├── Brewfile
-├── Makefile
-├── Package.swift
-├── Tuist.swift
-├── Workspace.swift
-└── README.md
+Apps/{ios,macos,watchos,tvos}/   Tuist manifests, thin app shells and tests
+Composition/                   Platform implementations, public factories, SafeDI graph
+Dependencies/                  Exact declarations, committed binary lock
+Components/                    One source-development package with multiple targets
+Shared/Core/                   C++20, C ABI, Apple facade, CMake/SwiftPM tests
+fastlane/                      Per-platform archive and delivery
+scripts/components             Build, publish, resolve, override and verify SDKs
+Tuist.swift / Workspace.swift  Shared project configuration
 ```
 
-## Directory Rules
+All four shells are generated together. `--platform` selects the default command
+platform; `make build PLATFORM=macos` changes it for a command. Each app has its own
+platform-suffixed bundle identifier and lifecycle.
 
-### `App/`
+## Directory and Dependency Rules
 
-Contains all `Tuist` manifests and Xcode-facing structure.
+- `Apps/` owns lifecycle, root navigation and platform application configuration.
+- `Composition/` binds public component factories to platform implementations.
+- `Components/` is for independent component source development and testing.
+  Shells do not reference its source package: they consume static XCFrameworks.
+- `Shared/Core/` owns portable domain rules/state and the C ABI. Native platform
+  dependencies must remain in adapters outside it.
+- `Dependencies/components.json` declares exact SDK versions;
+  `components.lock.json` locks the full dependency closure and artifact manifests.
+- `.artifacts/` is the default local immutable registry. Teams may supply an
+  explicitly configured registry using `COMPONENT_REGISTRY`.
+- `Dependencies/overrides.local.json` is ignored local state. CI/Release rejects
+  overrides; ordinary builds fail if a locked binary is missing or modified.
+- Generated `.xcodeproj`, `.xcworkspace`, DI constructors and resolved binaries
+  are outputs, not sources of truth.
 
-- `Project.swift`: target definitions.
-- `Config/ProjectDescriptionHelpers/`: reusable manifest helpers.
-- `Config/XCConfig/`: shared build settings, split by environment when needed.
-- `Targets/`: app binary, tests, UI tests, demo or internal builds.
-- `Features/`: app-facing feature modules when they are not extracted into Swift packages.
-
-Rule:
-
-- if something exists only to shape the Xcode graph, it belongs under `App/`.
-
-### Root `Tuist.swift` and `Workspace.swift`
-
-Contain repository-wide Tuist configuration and workspace composition.
-
-Rule:
-
-- keep one root `Tuist.swift` for shared Tuist behavior across the repository;
-- use root `Workspace.swift` when the repo needs explicit workspace composition.
-
-### `Packages/`
-
-Contains reusable internal Swift packages.
-
-Use for:
-
-- pure business logic;
-- shared domain models;
-- design system components;
-- networking, analytics, persistence, utilities.
-
-Rule:
-
-- if a module can compile and test independently from the app shell, prefer putting it in `Packages/`.
-
-### `fastlane/`
-
-Contains delivery automation only.
-
-Rule:
-
-- build orchestration for local dev belongs in `Makefile` and `scripts/`;
-- release/distribution orchestration belongs in `fastlane/`.
-
-### `scripts/`
-
-Contains bootstrap, environment checks, and CI wrappers.
-
-Rule:
-
-- scripts may call `brew`, `mise`, `tuist`, `xcodebuild`, and `fastlane`;
-- scripts should not duplicate business logic already defined in `Fastfile` or `Makefile`.
-
-## Source of Truth
-
-The team should treat these files as the canonical sources of truth:
-
-- `Brewfile`: workstation tools.
-- `.mise.toml`: runtime and CLI versions.
-- `Package.swift` and `Package.resolved`: package graph and resolved versions.
-- `App/**/*.swift`: Tuist project definition.
-- `Makefile`: supported developer commands.
-- `fastlane/Fastfile`: supported delivery lanes.
-
-The team should not treat generated `.xcodeproj` or `.xcworkspace` files as source of truth.
+SafeDI 2.0.0 CLI validates component-internal and shell-public construction graphs.
+Graph descriptions stay outside compiled SDK APIs; generated constructors are
+compiled against real types. No global service locator or source scan across the
+binary boundary is used. See [the architecture decisions](apple-shell-component-architecture.md).
 
 ## Required Root Files
 
@@ -350,7 +282,7 @@ Rules:
 
 Default rule:
 
-- add new dependencies through `SwiftPM`.
+- manage component development dependencies through `SwiftPM`; product shells use the exact binary SDK lock.
 
 Exceptions:
 
@@ -377,7 +309,7 @@ Do not put everything in one app target.
 Recommended evolution path:
 
 1. start with a small number of feature modules;
-2. extract cross-feature logic into `Packages/`;
+2. maintain source components in `Components/` and publish their stable SDK boundaries;
 3. add stricter boundaries only when module count and build times justify it.
 
 ## CI Standard
@@ -423,7 +355,7 @@ Avoid:
 3. Standardize `make bootstrap`, `make generate`, and `make test`.
 4. Migrate dependencies toward `SwiftPM`.
 5. Add `fastlane` for beta and release lanes.
-6. Split modules into `App/` and `Packages/` as the codebase grows.
+6. Split modules into `Apps/` and `Components/` as the codebase grows.
 
 ## Non-Goals
 
@@ -440,6 +372,6 @@ For a mid-sized Apple team starting now, the default environment standard should
 - `Homebrew` for workstation packages;
 - `mise` for runtime and CLI pinning;
 - `Tuist` for project generation and project conventions;
-- `SwiftPM` as the default dependency manager;
+- `SwiftPM` for component development and exact binary SDK manifests for shell integration;
 - `Makefile` as the human-facing command surface;
 - `fastlane` for signing, beta, and release automation.

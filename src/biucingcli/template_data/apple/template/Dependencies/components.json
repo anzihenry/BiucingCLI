@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "components": {
+    "FoundationKit": "0.1.0",
+    "SharedCore": "0.1.0",
+    "HomeFeature": "0.1.0"
+  }
+}

@@ -1,6 +1,6 @@
 Available templates:
 - android: Kotlin Android app starter for mid-sized teams
-- apple: Swift + Tuist Apple app starter for mid-sized teams
+- apple: Four Apple shells with versioned static component SDKs and a portable C++20 core
 - frontend: React Router + TypeScript + Tailwind starter for independent projects
 - harmonyos: ArkTS HarmonyOS app starter for DevEco Studio projects
 - microservice: Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry

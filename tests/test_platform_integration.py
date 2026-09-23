@@ -192,6 +192,8 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
                 ]
             )
             project_dir = Path(tmpdir) / "release-identity-app"
+            # This test isolates release identity from SDK publication (covered separately).
+            (project_dir / "scripts/components").write_text("#!/bin/sh\nexit 0\n")
             fake_bin = Path(tmpdir) / "fake-bin"
             fake_bin.mkdir()
             tuist_log = Path(tmpdir) / "tuist.log"
@@ -294,9 +296,9 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
             result = run_workspace(
                 [
                     {
-                        "target": "IdentityCheckApp",
+                        "target": "IdentityCheckApp_macos",
                         "buildSettings": {
-                            "PRODUCT_BUNDLE_IDENTIFIER": "com.example.identitycheck"
+                            "PRODUCT_BUNDLE_IDENTIFIER": "com.example.identitycheck.macos"
                         },
                     }
                 ]
@@ -307,29 +309,29 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
             result = run_workspace(
                 [
                     {
-                        "target": "IdentityCheckApp",
+                        "target": "IdentityCheckApp_macos",
                         "buildSettings": {
                             "PRODUCT_BUNDLE_IDENTIFIER": (
-                                "com.example.identitycheck.alpha"
+                                "com.example.identitycheck.macos.alpha"
                             )
                         },
                     }
                 ]
             )
             self.assertEqual(result.returncode, 1)
-            self.assertIn("Expected: com.example.identitycheck", result.stderr)
-            self.assertIn("Actual: com.example.identitycheck.alpha", result.stderr)
+            self.assertIn("Expected: com.example.identitycheck.macos", result.stderr)
+            self.assertIn("Actual: com.example.identitycheck.macos.alpha", result.stderr)
 
             result = run_workspace(
-                [{"target": "IdentityCheckApp", "buildSettings": {}}]
+                [{"target": "IdentityCheckApp_macos", "buildSettings": {}}]
             )
             self.assertEqual(result.returncode, 1)
             self.assertIn("Actual: <missing>", result.stderr)
 
             result = run_workspace(
                 [
-                    {"target": "IdentityCheckApp", "buildSettings": {}},
-                    {"target": "IdentityCheckApp", "buildSettings": {}},
+                    {"target": "IdentityCheckApp_macos", "buildSettings": {}},
+                    {"target": "IdentityCheckApp_macos", "buildSettings": {}},
                 ]
             )
             self.assertEqual(result.returncode, 1)
@@ -346,7 +348,7 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
                 with archive_plist.open("wb") as handle:
                     plistlib.dump({"ApplicationProperties": properties}, handle)
 
-            write_archive("com.example.identitycheck")
+            write_archive("com.example.identitycheck.macos")
             result = subprocess.run(
                 [str(script), "archive", str(archive_dir)],
                 cwd=project_dir,
@@ -357,7 +359,7 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
             self.assertEqual(result.returncode, 0, msg=result.stderr)
             self.assertIn("archive identity verified", result.stdout)
 
-            write_archive("com.example.identitycheck.alpha")
+            write_archive("com.example.identitycheck.macos.alpha")
             result = subprocess.run(
                 [str(script), "archive", str(archive_dir)],
                 cwd=project_dir,
@@ -366,7 +368,7 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
                 check=False,
             )
             self.assertEqual(result.returncode, 1)
-            self.assertIn("Actual: com.example.identitycheck.alpha", result.stderr)
+            self.assertIn("Actual: com.example.identitycheck.macos.alpha", result.stderr)
 
             write_archive()
             result = subprocess.run(

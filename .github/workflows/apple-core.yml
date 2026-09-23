@@ -1,0 +1,33 @@
+name: Apple shared C++ core
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Generate starter from current sources
+        run: |
+          python -c "from pathlib import Path; Path('generated').mkdir(exist_ok=True)"
+          python -m biucingcli.cli create apple cpp-demo --platform macos --bundle-identifier com.example.cppdemo --output-dir generated --non-interactive
+      - name: Configure portable core
+        run: cmake -S generated/cpp-demo/Shared/Core -B core-build -DCMAKE_BUILD_TYPE=Release -DBIUCING_CORE_BUILD_TESTS=ON
+      - name: Build portable core
+        run: cmake --build core-build --config Release
+      - name: Test C boundary against C++ implementation
+        run: ctest --test-dir core-build -C Release --output-on-failure

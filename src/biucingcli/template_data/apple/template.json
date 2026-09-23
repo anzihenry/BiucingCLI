@@ -1,15 +1,19 @@
 {
   "name": "apple",
-  "description": "Swift + Tuist Apple app starter for mid-sized teams",
+  "description": "Four Apple shells with versioned static component SDKs and a portable C++20 core",
   "category": "native",
   "stack": [
-    "Swift",
+    "Swift 6.4",
+    "C++20",
+    "CMake",
     "Tuist",
     "SwiftPM",
-    "fastlane"
+    "fastlane",
+    "SafeDI 2.0.0"
   ],
   "tags": [
     "apple",
+    "cpp",
     "swiftui",
     "tuist",
     "fastlane"
@@ -22,7 +26,7 @@
   ],
   "maturity": {
     "level": "validated",
-    "summary": "Multi-platform Apple starter with doctor, generate, lint, test, beta, and release workflows."
+    "summary": "Four Apple shells, static XCFramework SDKs, compile-time DI, and portable C++20 core."
   },
   "validation": {
     "status": "generated-project-verified",
@@ -148,8 +152,18 @@
   "required_entries": [
     "Tuist.swift",
     "Workspace.swift",
+    "Shared/Core/Package.swift",
+    "Shared/Core/CMakeLists.txt",
+    "Shared/Core/Sources/CoreNative/include/CoreNative.h",
     "fastlane/Fastfile",
-    "scripts/verify-release-identity"
+    "scripts/verify-release-identity",
+    "Apps/ios/Project.swift",
+    "Apps/macos/Project.swift",
+    "Apps/watchos/Project.swift",
+    "Apps/tvos/Project.swift",
+    "Components/Package.swift",
+    "Dependencies/components.json",
+    "scripts/components"
   ],
   "rule": "apple",
   "derived_outputs": [

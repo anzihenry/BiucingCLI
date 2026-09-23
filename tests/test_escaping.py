@@ -146,11 +146,11 @@ class EscapingTests(unittest.TestCase):
         for value in SAMPLES:
             with tempfile.TemporaryDirectory() as tmp:
                 project = self.generate("apple", value, tmp)
-                source = (project / "App/Project.swift").read_text()
+                source = (project / "Apps/macos/Project.swift").read_text()
                 self.assertIn('organizationName: "' + swift_string(value) + '"', source)
-                app_sources = project / "App/Targets/App/Sources"
+                app_sources = project / "Apps/macos/Sources"
                 source = "\n".join(file.read_text() for file in app_sources.rglob("*.swift"))
-                literals.append(re.search(r"WindowGroup\((" + JS_STRING + r")\)", source)[1])
+                literals.append(re.search(r"navigationTitle\((" + JS_STRING + r")\)", source)[1])
         code = ('import Foundation\nlet values = [' + ','.join(literals) + ']\n'
                 'let data = try! JSONSerialization.data(withJSONObject: values)\n'
                 'print(String(data: data, encoding: .utf8)!)')

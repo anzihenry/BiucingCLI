@@ -4,7 +4,7 @@ The generated starter includes fastlane lanes for release credential checks, sig
 
 ## One-Time Setup
 
-1. Register `{{BUNDLE_IDENTIFIER}}` in Apple Developer and App Store Connect.
+1. Register the platform identifiers `{{BUNDLE_IDENTIFIER}}.ios`, `.macos`, `.watchos`, and `.tvos` as needed in Apple Developer and App Store Connect. Each shell has independent signing configuration.
 2. Create an App Store Connect API key with access to manage builds for the app.
 3. Save the fastlane API key JSON as `credentials/app-store-connect-api-key.json` locally and keep it untracked.
 4. Create a private certificate repository for `fastlane match`.
@@ -18,6 +18,10 @@ MATCH_ALLOW_WRITE=true fastlane match appstore
 After the first sync, keep `MATCH_ALLOW_WRITE=false` on developer and CI machines so release jobs consume known signing material instead of mutating it.
 
 ## Commands
+
+Select a shell with `PLATFORM=ios|macos|watchos|tvos`, e.g. `make archive PLATFORM=macos`.
+Release rejects local SDK overrides and consumes the committed binary lock.
+The checked-in pipeline is not evidence of a successful signing or store upload.
 
 ```bash
 make release-doctor
@@ -39,7 +43,7 @@ By default, `make release` uploads the binary but does not submit it for review.
 
 ## Release Identity Boundary
 
-`DEBUG_BUNDLE_SUFFIX` belongs only to local Debug/worktree workflows. Archive, beta, and release lanes always clear it, even when a caller exports a non-empty value. The delivery pipeline compares both the generated Release build settings and `Info.plist` inside the final xcarchive with `{{BUNDLE_IDENTIFIER}}`; any missing or different value stops the lane before upload.
+`DEBUG_BUNDLE_SUFFIX` belongs only to local Debug/worktree workflows. Archive, beta, and release lanes always clear it, even when a caller exports a non-empty value. The delivery pipeline compares both the generated Release build settings and `Info.plist` inside the final xcarchive with `{{BUNDLE_IDENTIFIER}}.<platform>`; any missing or different value stops the lane before upload.
 
 ## Local Secrets
 

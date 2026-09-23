@@ -1,0 +1,54 @@
+name: Apple binary component integration
+
+# Register a macOS runner with Xcode/Swift 6.4+, all platform SDKs/simulators,
+# Tuist 4.209.0, CMake and SwiftLint before enabling this job as a merge gate.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  four-shells:
+    runs-on: [self-hosted, macOS, apple-swift64]
+    env:
+      PYTHONPATH: src
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Generate from current template
+        run: |
+          mkdir -p generated
+          python3 -m biucingcli.cli create apple sdk-demo --platform macos --bundle-identifier com.example.sdkdemo --output-dir generated --non-interactive
+      - name: Build and lock immutable SDKs
+        working-directory: generated/sdk-demo
+        run: make components-bootstrap generate
+      - name: Verify native core, DI, components and all four shells
+        working-directory: generated/sdk-demo
+        run: make verify XCODEBUILD='xcodebuild -derivedDataPath DerivedData/ci CODE_SIGNING_ALLOWED=NO'
+      - name: Verify consumers without component sources
+        working-directory: generated/sdk-demo
+        run: |
+          component_sources="$(mktemp -d)"
+          restore_sources() {
+            for name in Components Shared; do
+              if [ -d "$component_sources/$name" ]; then mv "$component_sources/$name" "$name"; fi
+            done
+            rmdir "$component_sources"
+          }
+          trap restore_sources EXIT
+          mv Components "$component_sources/Components"
+          mv Shared "$component_sources/Shared"
+          make build-all XCODEBUILD='xcodebuild -derivedDataPath DerivedData/ci CODE_SIGNING_ALLOWED=NO'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apple-sdk-verification
+          include-hidden-files: true
+          path: |
+            generated/sdk-demo/Dependencies/components.lock.json
+            generated/sdk-demo/.artifacts/**/manifest.json
+            generated/sdk-demo/DerivedData/ci/Logs/Test/*.xcresult

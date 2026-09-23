@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- generate iOS, macOS, watchOS and tvOS shells in one Apple product repository;
+  keep `--platform` as the default build/run selection. Shells consume versioned
+  static XCFramework SDKs with exact manifest locks and explicit local overrides.
+- integrate pinned SafeDI 2.0.0 CLI generation at component and shell boundaries,
+  check missing/cyclic dependencies, and keep public SDK APIs independent of DI.
+- add cancellable C++ sessions with fixed-width errors, serial Swift scheduling,
+  async idempotent close, resource delivery and artifact integrity tests.
+
+- fix the watchOS starter's simulator installation by declaring its standalone
+  Watch app identity (`WKApplication` and `WKWatchOnly`) in the generated Info.plist.
+
+- require Swift 6.4+ for all Apple starter packages and validate the compiler
+  minimum in doctor, while retaining Swift 6 language mode and the C++20 core.
+
+- add a portable C++20 core to the Apple starter, with one source tree consumed
+  by SwiftPM and CMake, a C ABI and throwing Swift facade, binary shell integration,
+  worktree-scoped test commands, and macOS/Linux/Windows core CI. Android JNI and
+  HarmonyOS Node-API integration are documented extension points, not shipped adapters.
+
 - fix frontend generation baselines contaminated by local empty pnpm cache
   directories; guard shared and mode-specific resource layers against build artifacts.
 

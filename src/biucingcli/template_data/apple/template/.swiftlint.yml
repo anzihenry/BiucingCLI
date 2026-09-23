@@ -1,8 +1,13 @@
 included:
-  - App
-  - Packages
+  - Apps
+  - Composition/Sources
+  - Components/Sources
+  - Shared/Core/Sources/SharedCore
+  - Shared/Core/Tests
 
 excluded:
+  - Composition/Generated
+  - Components/Sources/HomeFeature/DependencyTree.swift
   - .build
   - DerivedData
 

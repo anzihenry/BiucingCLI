@@ -4,9 +4,11 @@
 require "json"
 require "open3"
 
-EXPECTED_BUNDLE_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}"
+PLATFORM = ENV.fetch("PLATFORM", "{{APPLE_PLATFORM}}")
+abort "Invalid PLATFORM" unless %w[ios macos watchos tvos].include?(PLATFORM)
+EXPECTED_BUNDLE_IDENTIFIER = "{{BUNDLE_IDENTIFIER}}.#{PLATFORM}"
 WORKSPACE = "{{PROJECT_NAME}}.xcworkspace"
-SCHEME = "{{SWIFT_MODULE_NAME}}"
+SCHEME = "{{SWIFT_MODULE_NAME}}_#{PLATFORM}"
 
 def fail_identity(message, actual: nil)
   warn "Apple release identity check failed: #{message}"
