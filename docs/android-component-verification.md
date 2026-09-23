@@ -7,7 +7,7 @@ Dagger 2.52 使用 Java annotation processor；NDK 28.2.13676358、CMake 3.22.1
 构建 arm64-v8a 和 x86_64 原生库，核心语言标准为 C++20。
 模拟器为 Android API 35；本次没有 Android 真机运行记录。
 
-## 已执行的本地验收
+## 2026-09-23 手机壳基线验收
 
 | 验证 | 结果 |
 | --- | --- |
@@ -60,3 +60,23 @@ make test-ui
 - 外部 Maven 托管、认证和符号服务由团队配置；默认实现是本地不可变目录仓库。
 - CI 工作流已提供但本次未在远端运行；主机 JNI 测试不能替代设备 ABI 验收。
 - 真实数据库/文件迁移、同步、后台任务与长任务进度仍按具体产品扩展。
+
+## 2026-09-24 Wear OS / TV 补齐
+
+本次沿用上述工具链，产品扩为 app、wear、tv；SDK 扩为十个 AAR，SharedCore
+增加 armeabi-v7a。新增设备验证使用官方 API 34 ARM64 系统镜像。
+
+- 十个 SDK 的 Release 构建与共享 Home 状态单元测试通过。
+- 三个应用的 Debug、R8 Release、Android Lint 全部通过（Lint 无错误，保留版本目录建议等警告）。
+- Wear OS 圆屏：2 项仪器测试通过，包括旋钮 MotionEvent 驱动列表滚动、真实 JNI
+  计算 42、页面导航与 Activity 重建后的状态保留。
+- Android TV：1 项仪器测试通过，包括方向键/确认键、焦点恢复、真实 JNI 计算与 Activity 重建。
+- Dagger：homestate SDK 和三个壳的缺失绑定/循环依赖，共 8 个反例全部正确拒绝，正常图恢复编译通过。
+- 移走 components、core、feature、shared 后，clean 重建三个应用的 Debug/R8 Release 成功，手机 JVM 测试通过。
+- 生成器 core 回归 189 项、平台回归 11 项与 AAPT2 特殊文本资源编译通过；wheel、sdist 和七类模板的安装生成验证通过。
+
+日志与工程位于 `/private/tmp/biucing-android-devices/`。设备间会话彼此独立；未实现
+手机与手表的伴侣同步。本次 ARMv7 已编译并验证 ELF/符号交付，没有对应设备运行证据。
+新增手表、电视的压缩 Release 已编译，运行证据为 Debug 仪器测试；真机、正式签名与
+商店发布仍未验收。CI 已扩为 phone / Wear / TV 矩阵，本次没有远端 CI 结果；TV 使用
+API 36 x86_64 镜像，因为较旧的 TV x86 镜像不在本模板 ABI 范围内。

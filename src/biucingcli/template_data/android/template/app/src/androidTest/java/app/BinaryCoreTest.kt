@@ -1,6 +1,7 @@
 package {{PACKAGE_NAME}}
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import {{PACKAGE_NAME}}.composition.ShellAssembly
 import {{PACKAGE_NAME}}.core.sharedcore.CoreSession
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

@@ -14,8 +14,10 @@ cases = {
 }
 # Check SDK internal compilation and the consumer's public-factory composition separately.
 for folder, args in [
-    ('feature/home/src/main/java', ['-p', 'components', ':feature:home:compileReleaseJavaWithJavac']),
+    ('core/homestate/src/main/java', ['-p', 'components', ':core:homestate:compileReleaseJavaWithJavac']),
     ('app/src/main/java', [':app:compileDebugJavaWithJavac']),
+    ('wear/src/main/java', [':wear:compileDebugJavaWithJavac']),
+    ('tv/src/main/java', [':tv:compileDebugJavaWithJavac']),
 ]:
     source = root / folder / 'DiFailure.java'
     if source.exists():

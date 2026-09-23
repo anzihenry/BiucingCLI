@@ -960,7 +960,7 @@
         "make test-ui",
         "open -a \"Android Studio\" ."
       ],
-      "template_file_count": 87,
+      "template_file_count": 117,
       "template_top_level_entries": [
         ".editorconfig",
         ".gitignore",
@@ -971,6 +971,7 @@
         "app",
         "build.gradle.kts",
         "components",
+        "composition",
         "core",
         "dependencies",
         "docs",
@@ -982,7 +983,9 @@
         "gradlew.bat",
         "scripts",
         "settings.gradle.kts",
-        "shared"
+        "shared",
+        "tv",
+        "wear"
       ]
     },
     "entries": {
@@ -993,7 +996,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "80e2ee2b90d8a2598c25d656a5814795a5df24507af865232605353ff88b51f0",
+        "sha256": "7311d3b50337bc5bf81a4e3af7692792879fb180e2c3fee4e418cf2ddc551bdc",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -1008,12 +1011,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "dfa9d3307d1859a6b7350409f9aba1f0155552b4fdd889da3fbb03debc9b3549",
+        "sha256": "06e68099ef810c6028e2cff3de9fac29d61612d3e33aa2ad8879eff5d30c4f6b",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "f3ecba0bcfe9d06148079bd02f722c72a8bf5100c2b1cd330d49e2af9ff08b19",
+        "sha256": "11a2e382cdeb02fa7529ecdc87d3be6b46d04bc3e813e0668453f89695002047",
         "execute_bits": "0o0"
       },
       "app": {
@@ -1021,12 +1024,12 @@
       },
       "app/build.gradle.kts": {
         "kind": "file",
-        "sha256": "2aa409e584977a627f82b132e5b4b163a50f1d8dd2f9e8c697ccb56c0ffe7719",
+        "sha256": "7b938d3de697fbb3038d73df0a584976d42370ba79c5ecccc5e1f8a0fe195418",
         "execute_bits": "0o0"
       },
       "app/gradle.lockfile": {
         "kind": "file",
-        "sha256": "31060bd10f329c1ecb78004b6c11537cf58649daa208215d50e78a1cd2233d35",
+        "sha256": "b3e69e9ec03fd359a9b02386e6d86c029a3d322b52f161cc4f0a2c1ab5537a81",
         "execute_bits": "0o0"
       },
       "app/proguard-rules.pro": {
@@ -1048,7 +1051,7 @@
       },
       "app/src/androidTest/java/app/BinaryCoreTest.kt": {
         "kind": "file",
-        "sha256": "6d2f6e29db19620c6b7a46e4ae90b2ff4aea91f576aa761563947b820cdfadf1",
+        "sha256": "dad231905f84a71970342f6d689ccb416018f4340aa3932fbfb3d2a50eb63276",
         "execute_bits": "0o0"
       },
       "app/src/androidTest/java/app/HomeRouteUiTest.kt": {
@@ -1072,17 +1075,7 @@
       },
       "app/src/main/java/app/MainActivity.kt": {
         "kind": "file",
-        "sha256": "d86351c062b4b1d3fefa7d15aae4f42d4a00905f3f9bb4dcd57917937cc6c4e1",
-        "execute_bits": "0o0"
-      },
-      "app/src/main/java/app/NativeAnalysisService.kt": {
-        "kind": "file",
-        "sha256": "d3719ba634c783e8dce3706c03cf3ebb29d2d9b718c84039f4370e72aaaf6940",
-        "execute_bits": "0o0"
-      },
-      "app/src/main/java/app/ShellAssembly.java": {
-        "kind": "file",
-        "sha256": "35e9d8dd425894b30b138bda29b1e3abedfa1003827fd8fbe972732c3f542453",
+        "sha256": "6e5de8c31ba8205ac7fa34aea6c5270552fe90d39d01000224a6b142083017ce",
         "execute_bits": "0o0"
       },
       "app/src/main/res": {
@@ -1133,7 +1126,7 @@
       },
       "components/gradle/verification-metadata.xml": {
         "kind": "file",
-        "sha256": "64c653589982b278f637dfec7b38d950abcdd4bf17284638bd8cd49a3b562234",
+        "sha256": "df9878dfb8bf9ac5e51097d464bb6b278f2d3dc233485081d435b17e5af9d82b",
         "execute_bits": "0o0"
       },
       "components/gradle.properties": {
@@ -1143,7 +1136,37 @@
       },
       "components/settings.gradle.kts": {
         "kind": "file",
-        "sha256": "6d13dd5299e7840e79d69d6f8d0ffd828485758412faba023d79f00ee2673e07",
+        "sha256": "30f95f41c4cc6f9560390cbdad9b05059331aceed316c18f7082c3954fc37a4c",
+        "execute_bits": "0o0"
+      },
+      "composition": {
+        "kind": "directory"
+      },
+      "composition/src": {
+        "kind": "directory"
+      },
+      "composition/src/main": {
+        "kind": "directory"
+      },
+      "composition/src/main/java": {
+        "kind": "directory"
+      },
+      "composition/src/main/java/composition": {
+        "kind": "directory"
+      },
+      "composition/src/main/java/composition/NativeAnalysisService.kt": {
+        "kind": "file",
+        "sha256": "c0381461a84d370be87566d9a1ee8ae88dedb54ef67ff83e2a75a1b9fe615b61",
+        "execute_bits": "0o0"
+      },
+      "composition/src/main/java/composition/SessionOwner.kt": {
+        "kind": "file",
+        "sha256": "0a1bd8c0c87d8277cd8430e221ec4809f63fe589586b12ac2396f2480ca7f2f5",
+        "execute_bits": "0o0"
+      },
+      "composition/src/main/java/composition/ShellAssembly.java": {
+        "kind": "file",
+        "sha256": "d14c12b7d594d14bc061357ee8219864162454230074474da03ea5c7bab75e5f",
         "execute_bits": "0o0"
       },
       "core": {
@@ -1187,6 +1210,55 @@
       "core/designsystem/src/main/java/designsystem/Theme.kt": {
         "kind": "file",
         "sha256": "e4d70bfc38b642cf8286c0e1d9023f2a3b9a2c95a80ad3a2748deb8685ec2cda",
+        "execute_bits": "0o0"
+      },
+      "core/homestate": {
+        "kind": "directory"
+      },
+      "core/homestate/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "e58c83e20d20bb7c753d53fb4cb52e983abb076282db6de67d198d662ed84686",
+        "execute_bits": "0o0"
+      },
+      "core/homestate/gradle.lockfile": {
+        "kind": "file",
+        "sha256": "a6b9a58f3ed68f32d21a32697a7b16731753c19c35acc4112f9e4ccdc6cd3a2b",
+        "execute_bits": "0o0"
+      },
+      "core/homestate/src": {
+        "kind": "directory"
+      },
+      "core/homestate/src/main": {
+        "kind": "directory"
+      },
+      "core/homestate/src/main/java": {
+        "kind": "directory"
+      },
+      "core/homestate/src/main/java/home": {
+        "kind": "directory"
+      },
+      "core/homestate/src/main/java/home/HomeAssembly.java": {
+        "kind": "file",
+        "sha256": "acbcf69762f82a3c9412482bb207cd43f8b6618ef7d5171184ffd174002de82e",
+        "execute_bits": "0o0"
+      },
+      "core/homestate/src/main/java/home/HomeModel.kt": {
+        "kind": "file",
+        "sha256": "88f037f6c2d6383164c5e5af5b30159b6d8c3e25c6ded0891a4cde4629b13480",
+        "execute_bits": "0o0"
+      },
+      "core/homestate/src/test": {
+        "kind": "directory"
+      },
+      "core/homestate/src/test/java": {
+        "kind": "directory"
+      },
+      "core/homestate/src/test/java/home": {
+        "kind": "directory"
+      },
+      "core/homestate/src/test/java/home/HomeModelTest.kt": {
+        "kind": "file",
+        "sha256": "ddbd5eae1615775138bab6565f825ce6181e277431445716656e4c917fdc4412",
         "execute_bits": "0o0"
       },
       "core/model": {
@@ -1273,7 +1345,7 @@
       },
       "core/sharedcore/build.gradle.kts": {
         "kind": "file",
-        "sha256": "bdeb73cfc0b195020d7599c03e722f90e3f72a166907d24d756435ff4b8610ee",
+        "sha256": "de5976cfda42da97d4b13c7d6260fa9f2f184b04a2ef2a1a801ab1070a4ec930",
         "execute_bits": "0o0"
       },
       "core/sharedcore/consumer-rules.pro": {
@@ -1365,7 +1437,7 @@
       },
       "dependencies/components.json": {
         "kind": "file",
-        "sha256": "3102998ad5e313feb93119df8e9f900d3c180d5b20646b51cda15347a4396d1d",
+        "sha256": "0e2872ce2c5c6fdafe9a8d224bb836ec5f7c8e93eb46b62375a14e1a8d76ccbc",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -1391,12 +1463,12 @@
       },
       "fastlane/Appfile": {
         "kind": "file",
-        "sha256": "a23d10834df460f7ab4e8a053d3a51d074ee1350606062ccb39345cd44698dc0",
+        "sha256": "a7b420532d01f88af743a6e12ba21b45f769189f6b0f18c506e05c4829a8c0d6",
         "execute_bits": "0o0"
       },
       "fastlane/Fastfile": {
         "kind": "file",
-        "sha256": "8da62711523dcb745b094b7959030426d9e12b3b6a3bf3bb57b361c768a87f16",
+        "sha256": "0faf9eaeac237ff6bfc548b9ed49e0e3e79e229edc6426a04cc4db98a2bc3e40",
         "execute_bits": "0o0"
       },
       "feature": {
@@ -1407,12 +1479,12 @@
       },
       "feature/home/build.gradle.kts": {
         "kind": "file",
-        "sha256": "d3d5d181a235deb405002f4ea36eafa26bc295c73d0b89f7d5fc2bc73dc13138",
+        "sha256": "98e6fb248de6135c6b5caa1728e00dede587d45d63157f9c419919d415c1367f",
         "execute_bits": "0o0"
       },
       "feature/home/gradle.lockfile": {
         "kind": "file",
-        "sha256": "30c9b6b255e76d41b25250f51b39eaa19b91101edcbb693faa0f9d0b6c53751e",
+        "sha256": "ab2530e924afd4199e793797eacb993543a0fd36cc06f0f3c4831b845580f46c",
         "execute_bits": "0o0"
       },
       "feature/home/src": {
@@ -1426,16 +1498,6 @@
       },
       "feature/home/src/main/java/home": {
         "kind": "directory"
-      },
-      "feature/home/src/main/java/home/HomeAssembly.java": {
-        "kind": "file",
-        "sha256": "acbcf69762f82a3c9412482bb207cd43f8b6618ef7d5171184ffd174002de82e",
-        "execute_bits": "0o0"
-      },
-      "feature/home/src/main/java/home/HomeModel.kt": {
-        "kind": "file",
-        "sha256": "88f037f6c2d6383164c5e5af5b30159b6d8c3e25c6ded0891a4cde4629b13480",
-        "execute_bits": "0o0"
       },
       "feature/home/src/main/java/home/HomeRoute.kt": {
         "kind": "file",
@@ -1451,20 +1513,6 @@
       "feature/home/src/main/res/values/strings.xml": {
         "kind": "file",
         "sha256": "d250b21a44faa4b7b5e7dcb653aa2e24eba1cc6b68037f187e37c67f041a83d0",
-        "execute_bits": "0o0"
-      },
-      "feature/home/src/test": {
-        "kind": "directory"
-      },
-      "feature/home/src/test/java": {
-        "kind": "directory"
-      },
-      "feature/home/src/test/java/home": {
-        "kind": "directory"
-      },
-      "feature/home/src/test/java/home/HomeModelTest.kt": {
-        "kind": "file",
-        "sha256": "ddbd5eae1615775138bab6565f825ce6181e277431445716656e4c917fdc4412",
         "execute_bits": "0o0"
       },
       "feature/settings": {
@@ -1497,17 +1545,99 @@
         "sha256": "1440b06d82ee4fec3889bda9ad789ed45aa91fe9ef71c6d57e070719bd7079e1",
         "execute_bits": "0o0"
       },
+      "feature/tvhome": {
+        "kind": "directory"
+      },
+      "feature/tvhome/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "3856a2bdc2fc43d8899d0dd954bf3b0dc876e12096e00c304596ee111a83c53a",
+        "execute_bits": "0o0"
+      },
+      "feature/tvhome/gradle.lockfile": {
+        "kind": "file",
+        "sha256": "1f07048f30562daf0b514c28bb799c88c2194d198b417f8f3e638b44f5576a65",
+        "execute_bits": "0o0"
+      },
+      "feature/tvhome/src": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main/java": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main/java/tvhome": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main/java/tvhome/TvHomeRoute.kt": {
+        "kind": "file",
+        "sha256": "31473229d4ed12667060c815ba9ab3ce67f851ea04203edb3030ef3fd0e4d341",
+        "execute_bits": "0o0"
+      },
+      "feature/tvhome/src/main/res": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main/res/values": {
+        "kind": "directory"
+      },
+      "feature/tvhome/src/main/res/values/strings.xml": {
+        "kind": "file",
+        "sha256": "199e3924672fe585d5da82b840e53facf1f4762fac1d908129ba1f2731db9729",
+        "execute_bits": "0o0"
+      },
+      "feature/wearhome": {
+        "kind": "directory"
+      },
+      "feature/wearhome/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "8f884a6c4d4f1101e9688a77a3f9696f4fb6d98ece147ec677b3171664240eb3",
+        "execute_bits": "0o0"
+      },
+      "feature/wearhome/gradle.lockfile": {
+        "kind": "file",
+        "sha256": "d7adfe3346270f272e9c6cc310a47041dc79b0ba976518b0a51f7aa0f1ca5aaf",
+        "execute_bits": "0o0"
+      },
+      "feature/wearhome/src": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main/java": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main/java/wearhome": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main/java/wearhome/WearHomeRoute.kt": {
+        "kind": "file",
+        "sha256": "a59e3f13d9706d6d842c4bc917d3167f926304c55d5075bfa5626574c235baab",
+        "execute_bits": "0o0"
+      },
+      "feature/wearhome/src/main/res": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main/res/values": {
+        "kind": "directory"
+      },
+      "feature/wearhome/src/main/res/values/strings.xml": {
+        "kind": "file",
+        "sha256": "199e3924672fe585d5da82b840e53facf1f4762fac1d908129ba1f2731db9729",
+        "execute_bits": "0o0"
+      },
       "gradle": {
         "kind": "directory"
       },
       "gradle/libs.versions.toml": {
         "kind": "file",
-        "sha256": "0bb08b2ce60c64b54b9af31b4bb9d96904474596a0f8e1b7ac80496413d2ca0e",
+        "sha256": "fdbd07c80f435ea44ea0d9393d574502dde248a3fd5cbbef7e66b5aa44636ca8",
         "execute_bits": "0o0"
       },
       "gradle/verification-metadata.xml": {
         "kind": "file",
-        "sha256": "64c653589982b278f637dfec7b38d950abcdd4bf17284638bd8cd49a3b562234",
+        "sha256": "df9878dfb8bf9ac5e51097d464bb6b278f2d3dc233485081d435b17e5af9d82b",
         "execute_bits": "0o0"
       },
       "gradle/wrapper": {
@@ -1548,7 +1678,7 @@
       },
       "scripts/artifact-info": {
         "kind": "file",
-        "sha256": "c8518819adc20eefc9222de4ad021228de7dddfd6899bc7385e897a6364cbba4",
+        "sha256": "e913d2303e9d0660b136b9e438a4800a769ac308124695821c14e38602c40844",
         "execute_bits": "0o111"
       },
       "scripts/bootstrap": {
@@ -1558,7 +1688,7 @@
       },
       "scripts/components": {
         "kind": "file",
-        "sha256": "0206c6ad2c238b250dd7417a08a7be3405e3570dd1adab905f3fd92ae37defc6",
+        "sha256": "900001cce2549d4c9eb84a122f0948efa2b7effd784c6766104cc17c280886c8",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
@@ -1583,7 +1713,7 @@
       },
       "scripts/verify-di": {
         "kind": "file",
-        "sha256": "47144bcd6592a0496761c0458d7aeed1af45e1f37fccdcde6d87c0ebd6aaed81",
+        "sha256": "a7f67bc0b358f9fb4ee0e31508cfced5eceb72c96b04fe4ae0421cf21b45365a",
         "execute_bits": "0o100"
       },
       "scripts/verify-gradle-supply-chain": {
@@ -1593,12 +1723,12 @@
       },
       "scripts/verify-release-artifact": {
         "kind": "file",
-        "sha256": "da82cb651734407f6bb9b0a466d1624afd8d3ea98093a4fe56057faeecf2f912",
+        "sha256": "0adabfc7d8db70a4190438bda639be058d0b6cb368edf8661587386294f00bbd",
         "execute_bits": "0o111"
       },
       "settings.gradle.kts": {
         "kind": "file",
-        "sha256": "f57154b4cc273cd1bf15ca83c1f073806c2a64c5c9435e869c74c92858477827",
+        "sha256": "6e6e95f97e9ddefd4a43445a6f0b053fe219c6973dbf4b413fdbee56dceb9ec2",
         "execute_bits": "0o0"
       },
       "shared": {
@@ -1650,6 +1780,167 @@
       "shared/core/Tests/Native/core_test.c": {
         "kind": "file",
         "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "tv": {
+        "kind": "directory"
+      },
+      "tv/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "8e3851378ecfade1a9248a919c9485319aa738488cce59362b2bc89383f881df",
+        "execute_bits": "0o0"
+      },
+      "tv/gradle.lockfile": {
+        "kind": "file",
+        "sha256": "d9b7a0f1a708a8320b3c87255126b3aaa9f3e5b8a9e1a8b98e9c57361791cd15",
+        "execute_bits": "0o0"
+      },
+      "tv/proguard-rules.pro": {
+        "kind": "file",
+        "sha256": "226ffcefd2f90cd794d0b611d197979259024c01e6bad064bcead9bc6fc63c7e",
+        "execute_bits": "0o0"
+      },
+      "tv/src": {
+        "kind": "directory"
+      },
+      "tv/src/androidTest": {
+        "kind": "directory"
+      },
+      "tv/src/androidTest/java": {
+        "kind": "directory"
+      },
+      "tv/src/androidTest/java/tv": {
+        "kind": "directory"
+      },
+      "tv/src/androidTest/java/tv/TvShellTest.kt": {
+        "kind": "file",
+        "sha256": "354ccd5c79b89b951c555a08b7445a3cd9ef38d6e4ceeb270bcebfa5ba0e9ef9",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main": {
+        "kind": "directory"
+      },
+      "tv/src/main/AndroidManifest.xml": {
+        "kind": "file",
+        "sha256": "69a99e06773e52a63e57f5ef9f92f8338d174c6eee2c7e86f9164aa1680ad650",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main/java": {
+        "kind": "directory"
+      },
+      "tv/src/main/java/tv": {
+        "kind": "directory"
+      },
+      "tv/src/main/java/tv/MainActivity.kt": {
+        "kind": "file",
+        "sha256": "672c1f203032d20b51e99632e99209caab929818bc656c2d0d60be0609619e9b",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main/res": {
+        "kind": "directory"
+      },
+      "tv/src/main/res/drawable": {
+        "kind": "directory"
+      },
+      "tv/src/main/res/drawable/app_banner.xml": {
+        "kind": "file",
+        "sha256": "84e1426e8497e941bef5bf88b6d2405fda4cc1402603858030aae0e73f18d403",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main/res/drawable/app_icon.xml": {
+        "kind": "file",
+        "sha256": "501a787d6f655b5f4f8a27cb6c5f6aaadf9487b6f2009a3108b0ba61d8624bd3",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main/res/values": {
+        "kind": "directory"
+      },
+      "tv/src/main/res/values/strings.xml": {
+        "kind": "file",
+        "sha256": "d8c37f0ad23cd76f688ada92df6db3cf0f5aea241f699ed3d5a294eb075577d0",
+        "execute_bits": "0o0"
+      },
+      "tv/src/main/res/values/themes.xml": {
+        "kind": "file",
+        "sha256": "a8560486bb4c906afb2a65146c2754b1969d52323b9b243d8fe96c1c212dd9db",
+        "execute_bits": "0o0"
+      },
+      "wear": {
+        "kind": "directory"
+      },
+      "wear/build.gradle.kts": {
+        "kind": "file",
+        "sha256": "d41fc5d88165c64a721c2be354ba7dfd731388c3399e4a464a3ba4ab1e37fd85",
+        "execute_bits": "0o0"
+      },
+      "wear/gradle.lockfile": {
+        "kind": "file",
+        "sha256": "34e0098fa09451cdaff58785a2b77dd4f386623c4f88fbb26e7ce34acb8e173a",
+        "execute_bits": "0o0"
+      },
+      "wear/proguard-rules.pro": {
+        "kind": "file",
+        "sha256": "226ffcefd2f90cd794d0b611d197979259024c01e6bad064bcead9bc6fc63c7e",
+        "execute_bits": "0o0"
+      },
+      "wear/src": {
+        "kind": "directory"
+      },
+      "wear/src/androidTest": {
+        "kind": "directory"
+      },
+      "wear/src/androidTest/java": {
+        "kind": "directory"
+      },
+      "wear/src/androidTest/java/wear": {
+        "kind": "directory"
+      },
+      "wear/src/androidTest/java/wear/WearShellTest.kt": {
+        "kind": "file",
+        "sha256": "4ebe32790471c969799e4ac1e2a88583f8e07e6c5d6b7ff99b916915b9905c36",
+        "execute_bits": "0o0"
+      },
+      "wear/src/main": {
+        "kind": "directory"
+      },
+      "wear/src/main/AndroidManifest.xml": {
+        "kind": "file",
+        "sha256": "d4b049a1ac56e4523aa52a8e14854aa833a3bcd60c8220ed2badbca37273d4ef",
+        "execute_bits": "0o0"
+      },
+      "wear/src/main/java": {
+        "kind": "directory"
+      },
+      "wear/src/main/java/wear": {
+        "kind": "directory"
+      },
+      "wear/src/main/java/wear/MainActivity.kt": {
+        "kind": "file",
+        "sha256": "836956fc9854a805c57eb6eec134812346a76964e36d4ee2f34c82cac1b5a9f1",
+        "execute_bits": "0o0"
+      },
+      "wear/src/main/res": {
+        "kind": "directory"
+      },
+      "wear/src/main/res/drawable": {
+        "kind": "directory"
+      },
+      "wear/src/main/res/drawable/app_icon.xml": {
+        "kind": "file",
+        "sha256": "501a787d6f655b5f4f8a27cb6c5f6aaadf9487b6f2009a3108b0ba61d8624bd3",
+        "execute_bits": "0o0"
+      },
+      "wear/src/main/res/values": {
+        "kind": "directory"
+      },
+      "wear/src/main/res/values/strings.xml": {
+        "kind": "file",
+        "sha256": "d8c37f0ad23cd76f688ada92df6db3cf0f5aea241f699ed3d5a294eb075577d0",
+        "execute_bits": "0o0"
+      },
+      "wear/src/main/res/values/themes.xml": {
+        "kind": "file",
+        "sha256": "a8560486bb4c906afb2a65146c2754b1969d52323b9b243d8fe96c1c212dd9db",
         "execute_bits": "0o0"
       }
     }

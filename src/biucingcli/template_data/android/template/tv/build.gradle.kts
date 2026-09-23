@@ -1,0 +1,198 @@
+import groovy.json.JsonSlurper
+import java.security.KeyStore
+import java.util.Properties
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+val componentLock = JsonSlurper().parse(rootProject.file("dependencies/components.lock.json")) as Map<*, *>
+val componentVersions = (componentLock["components"] as Map<*, *>).map { (name, entry) ->
+    name.toString() to (entry as Map<*, *>)["version"].toString()
+}.toMap()
+
+fun loadLocalProperties(rootDir: java.io.File): Properties {
+    val properties = Properties()
+    val localPropertiesFile = rootDir.resolve("local.properties")
+
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use(properties::load)
+    }
+
+    return properties
+}
+
+fun Project.releaseProperty(
+    localProperties: Properties,
+    gradleKey: String,
+    envKey: String,
+): String? {
+    return providers.gradleProperty(gradleKey).orNull
+        ?: System.getenv(envKey)
+        ?: localProperties.getProperty(gradleKey)
+}
+
+val localProperties = loadLocalProperties(rootDir)
+val releaseStoreFile = project.releaseProperty(
+    localProperties,
+    "biucing.release.storeFile",
+    "BIUCING_RELEASE_STORE_FILE",
+)
+val releaseStorePassword = project.releaseProperty(
+    localProperties,
+    "biucing.release.storePassword",
+    "BIUCING_RELEASE_STORE_PASSWORD",
+)
+val releaseKeyAlias = project.releaseProperty(
+    localProperties,
+    "biucing.release.keyAlias",
+    "BIUCING_RELEASE_KEY_ALIAS",
+)
+val releaseKeyPassword = project.releaseProperty(
+    localProperties,
+    "biucing.release.keyPassword",
+    "BIUCING_RELEASE_KEY_PASSWORD",
+)
+val hasCompleteReleaseSigning =
+    listOf(
+        releaseStoreFile,
+        releaseStorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword,
+    ).all { !it.isNullOrBlank() }
+val debugApplicationIdSuffix =
+    providers.gradleProperty("biucing.worktree.applicationIdSuffix")
+        .orElse(providers.environmentVariable("BIUCING_ANDROID_APPLICATION_ID_SUFFIX"))
+        .orElse(".debug")
+        .get()
+
+android {
+    namespace = "{{ANDROID_NAMESPACE}}.tv"
+    compileSdk = {{COMPILE_SDK}}
+    sourceSets["main"].java.srcDir("../composition/src/main/java")
+
+    defaultConfig {
+        applicationId = "{{APPLICATION_ID}}.tv"
+        minSdk = maxOf(23, {{MIN_SDK}})
+        ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64") }
+        targetSdk = {{TARGET_SDK}}
+        versionCode = {{VERSION_CODE}}
+        versionName = "{{VERSION_NAME}}"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (hasCompleteReleaseSigning) {
+                storeFile = rootProject.file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix = debugApplicationIdSuffix
+            versionNameSuffix = "-debug"
+        }
+
+        release {
+            isMinifyEnabled = true
+            if (hasCompleteReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.toVersion("{{JAVA_VERSION}}")
+        targetCompatibility = JavaVersion.toVersion("{{JAVA_VERSION}}")
+    }
+
+    kotlinOptions {
+        jvmTarget = "{{JAVA_VERSION}}"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+}
+
+tasks.register("verifyReleaseSigning") {
+    group = "verification"
+    description = "Verifies that the configured release keystore contains the configured private key."
+
+    doLast {
+        require(hasCompleteReleaseSigning) {
+            "Configure all biucing.release.* values or BIUCING_RELEASE_* environment variables."
+        }
+
+        val storeFile = rootProject.file(requireNotNull(releaseStoreFile))
+        require(storeFile.isFile) { "Release keystore does not exist: ${storeFile.path}" }
+
+        val storePassword = requireNotNull(releaseStorePassword)
+        val keyAlias = requireNotNull(releaseKeyAlias)
+        val keyPassword = requireNotNull(releaseKeyPassword)
+        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+
+        storeFile.inputStream().use { keyStore.load(it, storePassword.toCharArray()) }
+        require(keyStore.containsAlias(keyAlias)) {
+            "Release keystore does not contain alias: $keyAlias"
+        }
+        require(keyStore.isKeyEntry(keyAlias)) {
+            "Release signing alias is not a private-key entry: $keyAlias"
+        }
+        requireNotNull(keyStore.getKey(keyAlias, keyPassword.toCharArray())) {
+            "Release signing key could not be opened for alias: $keyAlias"
+        }
+    }
+}
+
+dependencies {
+    implementation("{{PACKAGE_NAME}}.components:model:" + componentVersions.getValue("model"))
+    implementation("{{PACKAGE_NAME}}.components:network:" + componentVersions.getValue("network"))
+    implementation("{{PACKAGE_NAME}}.components:homestate:" + componentVersions.getValue("homestate"))
+
+    implementation("{{PACKAGE_NAME}}.components:tvhome:" + componentVersions.getValue("tvhome"))
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.dagger)
+    annotationProcessor(libs.dagger.compiler)
+    implementation("{{PACKAGE_NAME}}.components:sharedcore:" + componentVersions.getValue("sharedcore"))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
+    testImplementation(libs.junit4)
+    testImplementation("{{PACKAGE_NAME}}.components:testing:" + componentVersions.getValue("testing"))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// A release task reached indirectly must also reject local binary overrides.
+val verifyReleaseComponents by tasks.registering(Exec::class) {
+    workingDir(rootProject.projectDir)
+    commandLine("python3", "scripts/components", "verify", "--release")
+}
+tasks.configureEach {
+    if (name == "preReleaseBuild") dependsOn(verifyReleaseComponents)
+}

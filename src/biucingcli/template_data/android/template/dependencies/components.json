@@ -7,6 +7,9 @@
     "testing": "0.1.0",
     "sharedcore": "0.1.0",
     "home": "0.1.0",
-    "settings": "0.1.0"
+    "settings": "0.1.0",
+    "homestate": "0.1.0",
+    "wearhome": "0.1.0",
+    "tvhome": "0.1.0"
   }
 }

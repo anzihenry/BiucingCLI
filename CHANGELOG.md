@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- generate mobile/tablet, standalone Wear OS and Android TV shells by default;
+  share binary Home state and native services while using device-specific Compose UI.
+- add rotary scrolling, D-pad focus navigation, separate platform release identities,
+  `PLATFORM=mobile|wear|tv` commands, all-shell validation and armeabi-v7a native delivery.
+
 - align Android with the Apple component architecture: thin binary-only shell,
   independently published Maven AARs, separate Dagger 2.52 component/shell graphs,
   explicit service injection and typed navigation output.

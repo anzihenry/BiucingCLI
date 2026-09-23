@@ -10,6 +10,19 @@ permissions:
 jobs:
   binary-consumer:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: app
+            api: 35
+            target: google_apis
+          - module: wear
+            api: 34
+            target: android-wear
+          - module: tv
+            api: 36
+            target: android-tv
     env:
       PYTHONPATH: src
     steps:
@@ -34,15 +47,15 @@ jobs:
         run: |
           python3 scripts/components bootstrap
           ./scripts/test-native
-          ./gradlew :app:dependencies --write-locks
+          ./gradlew :app:dependencies :wear:dependencies :tv:dependencies --write-locks
           ./scripts/verify-di
-          ./gradlew :app:assembleRelease :app:testDebugUnitTest :app:lint
+          ./gradlew :app:assembleRelease :wear:assembleRelease :tv:assembleRelease :app:testDebugUnitTest :app:lint :wear:lint :tv:lint
       - name: Consume without SDK sources
         working-directory: generated/binary-demo
         run: |
           mkdir ../hidden-sources
           mv components core feature shared ../hidden-sources/
-          ./gradlew :app:clean :app:assembleDebug :app:assembleRelease
+          ./gradlew clean :app:assembleDebug :wear:assembleDebug :tv:assembleDebug :app:assembleRelease :wear:assembleRelease :tv:assembleRelease
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -50,15 +63,16 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: ${{ matrix.api }}
+          target: ${{ matrix.target }}
           arch: x86_64
           working-directory: generated/binary-demo
-          script: ./gradlew :app:connectedDebugAndroidTest
+          script: ./gradlew :${{ matrix.module }}:connectedDebugAndroidTest
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: android-verification
+          name: android-verification-${{ matrix.module }}
           path: |
-            generated/binary-demo/app/build/reports
+            generated/binary-demo/*/build/reports
             generated/binary-demo/dependencies/components.lock.json
             generated/binary-demo/.artifacts/maven/**/manifest.json

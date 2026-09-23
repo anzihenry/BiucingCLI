@@ -1,4 +1,4 @@
-package {{PACKAGE_NAME}}
+package {{PACKAGE_NAME}}.composition
 
 import {{PACKAGE_NAME}}.core.model.AnalysisService
 import {{PACKAGE_NAME}}.core.sharedcore.CoreSession

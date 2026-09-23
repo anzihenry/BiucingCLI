@@ -12,22 +12,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import {{PACKAGE_NAME}}.composition.SessionOwner
 import {{PACKAGE_NAME}}.core.designsystem.BiucingTheme
 import {{PACKAGE_NAME}}.core.model.HomeOutput
 import {{PACKAGE_NAME}}.feature.home.HomeRoute
 import {{PACKAGE_NAME}}.feature.settings.SettingsRoute
-
-// ViewModel retains the business session through configuration changes, never through process death.
-class SessionOwner : ViewModel() {
-    private val graph = ShellAssembly.session()
-    val home = graph.home().makeModel()
-    val environment = graph.environment()
-
-    override fun onCleared() {
-        graph.service().requestClose()
-    }
-}
 
 class MainActivity : ComponentActivity() {
     private val session: SessionOwner by viewModels()

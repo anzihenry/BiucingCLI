@@ -1,9 +1,13 @@
 default_platform(:android)
 
-APP_IDENTIFIER = "{{APPLICATION_ID}}"
+DEVICE_PLATFORM = ENV.fetch("PLATFORM", "mobile")
+DEVICE_MODULES = { "mobile" => "app", "wear" => "wear", "tv" => "tv" }.freeze
+UI.user_error!("PLATFORM must be mobile, wear, or tv") unless DEVICE_MODULES.key?(DEVICE_PLATFORM)
+APP_MODULE = DEVICE_MODULES.fetch(DEVICE_PLATFORM)
+APP_IDENTIFIER = "{{APPLICATION_ID}}" + (DEVICE_PLATFORM == "mobile" ? "" : ".#{DEVICE_PLATFORM}")
 PROJECT_ROOT = File.expand_path("..", __dir__)
-RELEASE_AAB_PATH = File.join(PROJECT_ROOT, "app/build/outputs/bundle/release/app-release.aab")
-METADATA_PATH = File.join(PROJECT_ROOT, "fastlane/metadata/android")
+RELEASE_AAB_PATH = File.join(PROJECT_ROOT, "#{APP_MODULE}/build/outputs/bundle/release/#{APP_MODULE}-release.aab")
+METADATA_PATH = File.join(PROJECT_ROOT, DEVICE_PLATFORM == "mobile" ? "fastlane/metadata/android" : "fastlane/metadata/#{DEVICE_PLATFORM}")
 
 def env_true?(name, default: false)
   value = ENV[name]

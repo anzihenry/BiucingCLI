@@ -1,1 +1,3 @@
-package_name("{{APPLICATION_ID}}")
+device_platform = ENV.fetch("PLATFORM", "mobile")
+raise "PLATFORM must be mobile, wear, or tv" unless %w[mobile wear tv].include?(device_platform)
+package_name("{{APPLICATION_ID}}" + (device_platform == "mobile" ? "" : ".#{device_platform}"))

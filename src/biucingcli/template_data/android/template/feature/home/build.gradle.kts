@@ -28,11 +28,9 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
-    api(project(":core:model"))
+    api(project(":core:homestate"))
 
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.dagger)
-    annotationProcessor(libs.dagger.compiler)
     api(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit4)
     implementation(platform(libs.androidx.compose.bom))

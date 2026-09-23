@@ -1,5 +1,20 @@
 SHELL := /bin/zsh
 
+PLATFORM ?= mobile
+ifeq ($(PLATFORM),mobile)
+APP_MODULE := app
+PLATFORM_SUFFIX :=
+else ifeq ($(PLATFORM),wear)
+APP_MODULE := wear
+PLATFORM_SUFFIX := .wear
+else ifeq ($(PLATFORM),tv)
+APP_MODULE := tv
+PLATFORM_SUFFIX := .tv
+else
+$(error PLATFORM must be mobile, wear, or tv)
+endif
+export PLATFORM
+
 APP_NAME={{PROJECT_NAME}}
 WORKTREE_ROOT ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 WORKTREE_LABEL ?= $(shell basename "$(WORKTREE_ROOT)" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$$//')
@@ -9,7 +24,7 @@ GRADLE_USER_HOME ?= $(WORKTREE_ROOT)/.gradle/worktree/$(WORKTREE_ID)
 GRADLE_PROJECT_CACHE ?= $(WORKTREE_ROOT)/.gradle
 ANDROID_LOCAL_PROPERTIES ?= $(WORKTREE_ROOT)/local.properties
 DEBUG_APPLICATION_ID_SUFFIX ?= .debug.$(WORKTREE_ID)
-EFFECTIVE_DEBUG_APPLICATION_ID ?= {{APPLICATION_ID}}$(DEBUG_APPLICATION_ID_SUFFIX)
+EFFECTIVE_DEBUG_APPLICATION_ID ?= {{APPLICATION_ID}}$(PLATFORM_SUFFIX)$(DEBUG_APPLICATION_ID_SUFFIX)
 GRADLE := GRADLE_USER_HOME=$(GRADLE_USER_HOME) ./gradlew -Dorg.gradle.project.biucing.worktree.applicationIdSuffix=$(DEBUG_APPLICATION_ID_SUFFIX)
 
 export GRADLE_USER_HOME
@@ -34,10 +49,10 @@ clean:
 	$(GRADLE) clean
 
 build:
-	$(GRADLE) assembleDebug
+	$(GRADLE) :$(APP_MODULE):assembleDebug
 
 bundle-release:
-	$(GRADLE) bundleRelease
+	$(GRADLE) :$(APP_MODULE):bundleRelease
 
 artifact-info:
 	./scripts/artifact-info
@@ -48,23 +63,23 @@ verify-release-artifact:
 verify: verify-supply-chain doctor lint test build core-test
 
 verify-release-signing:
-	$(GRADLE) :app:verifyReleaseSigning
+	$(GRADLE) :$(APP_MODULE):verifyReleaseSigning
 
 test:
-	$(GRADLE) test
+	$(GRADLE) :$(APP_MODULE):test
 
 test-ui:
-	$(GRADLE) connectedDebugAndroidTest
+	$(GRADLE) :$(APP_MODULE):connectedDebugAndroidTest
 
 lint:
-	$(GRADLE) lint
+	$(GRADLE) :$(APP_MODULE):lint
 
 format:
 	$(GRADLE) spotlessApply
 	$(GRADLE) -p components spotlessApply
 
 install-debug:
-	$(GRADLE) installDebug
+	$(GRADLE) :$(APP_MODULE):installDebug
 
 release-doctor:
 	fastlane release_doctor
@@ -98,15 +113,15 @@ worktree-doctor:
 	@printf '%s\n' "Android worktree isolation looks ready."
 
 clean-worktree:
-	rm -rf "$(GRADLE_USER_HOME)" app/build core/*/build feature/*/build components/build .build build
+	rm -rf "$(GRADLE_USER_HOME)" app/build wear/build tv/build core/*/build feature/*/build components/build .build build
 
 help:
-	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"
+	@printf '%s\n' "Common commands (PLATFORM=mobile|wear|tv, default mobile):" "  make verify-all Validate all three applications" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"
 
 .PHONY: components-bootstrap components-test components-info components-resolve core-test
 components-bootstrap:
 	python3 scripts/components bootstrap
-	$(GRADLE) :app:dependencies --write-locks
+	$(GRADLE) :app:dependencies :wear:dependencies :tv:dependencies --write-locks
 
 components-test:
 	$(GRADLE) -p components testReleaseUnitTest
@@ -121,3 +136,15 @@ core-test:
 	cmake -S shared/core -B .build/core -DCMAKE_BUILD_TYPE=Release
 	cmake --build .build/core
 	ctest --test-dir .build/core --output-on-failure
+
+.PHONY: build-all test-all lint-all verify-all
+build-all: verify-supply-chain
+	$(GRADLE) :app:assembleDebug :wear:assembleDebug :tv:assembleDebug
+
+test-all: verify-supply-chain
+	$(GRADLE) :app:test :wear:test :tv:test
+
+lint-all: verify-supply-chain
+	$(GRADLE) :app:lint :wear:lint :tv:lint
+
+verify-all: doctor lint-all test-all build-all components-test core-test

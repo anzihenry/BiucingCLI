@@ -5,11 +5,11 @@ dependencyResolutionManagement {
     versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
 }
 rootProject.name = "{{PROJECT_NAME}}-components"
-listOf("model", "designsystem", "network", "testing", "sharedcore").forEach {
+listOf("model", "designsystem", "network", "testing", "sharedcore", "homestate").forEach {
     include(":core:$it")
     project(":core:$it").projectDir = file("../core/$it")
 }
-listOf("home", "settings").forEach {
+listOf("home", "settings", "wearhome", "tvhome").forEach {
     include(":feature:$it")
     project(":feature:$it").projectDir = file("../feature/$it")
 }

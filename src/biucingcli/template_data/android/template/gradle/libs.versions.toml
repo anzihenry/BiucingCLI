@@ -13,6 +13,10 @@ ktlint = "1.8.0"
 spotless = "8.7.0"
 
 [libraries]
+wear-compose-material = { module = "androidx.wear.compose:compose-material", version = "1.4.1" }
+wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version = "1.4.1" }
+tv-material = { module = "androidx.tv:tv-material", version = "1.0.0" }
+
 dagger = { module = "com.google.dagger:dagger", version = "2.52" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version = "2.52" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version = "1.9.0" }

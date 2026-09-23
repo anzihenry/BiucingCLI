@@ -31,3 +31,6 @@ components/.gradle/
 components/local.properties
 dependencies/overrides.local.json
 **/.cxx/
+
+wear/build/
+tv/build/

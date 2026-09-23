@@ -19,3 +19,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "{{PROJECT_NAME}}"
 include(":app")
+include(":wear")
+include(":tv")

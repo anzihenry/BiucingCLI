@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-artifact_path="${1:-app/build/outputs/bundle/release/app-release.aab}"
+case "${PLATFORM:-mobile}" in
+  mobile) app_module=app ;;
+  wear) app_module=wear ;;
+  tv) app_module=tv ;;
+  *) echo "PLATFORM must be mobile, wear, or tv" >&2; exit 1 ;;
+esac
+
+artifact_path="${1:-${app_module}/build/outputs/bundle/release/${app_module}-release.aab}"
 properties_path="local.properties"
 keytool_bin="${KEYTOOL:-keytool}"
 jarsigner_bin="${JARSIGNER:-jarsigner}"

@@ -1,6 +1,6 @@
 # Android 对齐 Apple 的壳工程与组件架构
 
-整理日期：2026-09-23。
+整理日期：2026-09-24。
 状态：架构基线已实现；本地验证记录见第 8 节，远端 CI 与真实产品交付仍需验收。
 依据：当前仓库的 Apple 架构文档、组件与壳源码、产物脚本，以及 Android Gradle 与 Kotlin 源码。
 
@@ -16,7 +16,7 @@ Android 应沿用 Apple 的核心决策：薄壳、按功能划分的组件、�
 - 通过 Kotlin 包装与 JNI 接入共享 C ABI 和 C++20 核心。
 - 编译期 DI 采用 Dagger，组件内部生成与校验，壳通过公开工厂组装。
 
-已落地选型为 Dagger 2.52 Java annotation processor、NDK 28.2.13676358、CMake 3.22.1；原生 ABI 为 arm64-v8a 和 x86_64。保持现有手机/平板壳，其他设备按产品范围扩展。具体实现与验证边界见第 8 节。
+已落地选型为 Dagger 2.52 Java annotation processor、NDK 28.2.13676358、CMake 3.22.1；原生 ABI 为 armeabi-v7a、arm64-v8a 和 x86_64。默认生成手机/平板、Wear OS 和 Android TV 三个壳。具体实现与验证边界见第 8 节。
 
 ## 2. Apple 当前真正采用的架构
 
@@ -61,7 +61,7 @@ Android 应沿用 Apple 的核心决策：薄壳、按功能划分的组件、�
 | A04 | 协作取消、任务保活、关闭等待、完成一次 | 协程取消转发 native 取消令牌；原生操作实际结束后才释放句柄 |
 | A05 | 类型明确、UTF-8 与长度、无损转换 | 明确 Kotlin/JNI/C 类型转换；检查长度与无符号数范围；不混用 Modified UTF-8 和标准 UTF-8 |
 | A06 | 完整业务操作、有界批量、明确提交语义 | 沿用共享核心用例接口，避免 UI 高频调用细碎 JNI；明确取消与提交竞争时的结果 |
-| A07 | 多个平台壳同产品仓库 | 同产品 Android 壳放在同仓；先保留现有手机/平板 app，Wear OS/TV 按实际范围增加 |
+| A07 | 多个平台壳同产品仓库 | 同仓默认生成 app、wear、tv 三个壳，共享精确锁定组件 |
 | A08 | 少量包、内部功能模块、成熟后独立仓库 | 组件开发可同仓多 Gradle 模块；发布单元按功能稳定边界划分 |
 | A09 | 共享业务与适用状态，UI 按平台组织 | Kotlin/Compose 保持原生交互；不同设备导航、焦点与布局分别设计 |
 | A10 | 编译期 DI、构造依赖、明确作用域 | 已实现 Dagger 2.52 Java 编译期生成与校验；应用/会话/功能实例分层，禁止业务访问全局容器 |
@@ -80,7 +80,9 @@ Android 应沿用 Apple 的核心决策：薄壳、按功能划分的组件、�
 
 ```text
 AndroidProduct/
-  app/                     # 当前手机/平板壳；其他设备壳按产品需要增加
+  app/                     # 手机/平板壳
+  wear/                    # 独立 Wear OS 壳
+  tv/                      # Android TV 壳
   composition/             # 产品组装、公开工厂、会话与适配器
   dependencies/            # 产品组件声明、产物信息、本地覆盖配置
   gradle/                  # 版本目录、锁与校验配置（锁文件按 Gradle 布局放置）
@@ -147,7 +149,9 @@ Compose 公共 API、Kotlin 元数据、JNI 方法、资源和混淆规则都属
 
 ### 6.5 设备范围
 
-Apple 的四壳决策不应机械映射为 Android 四个 app。建议第一阶段保留手机/平板壳，后续根据产品范围增加 Wear OS、TV 等壳；同一仓库共享锁定组件，不强制所有设备拥有相同 UI 或功能。
+默认生成手机/平板、Wear OS、Android TV 三个应用。三者共享契约、HomeModel/HomeFactory、Dagger 产品组装与 C++ 核心；手机 Material、Wear Compose 和 TV Compose 界面分别发布。手表处理圆屏、旋钮、滑动返回；电视处理遥控器焦点和 Leanback 入口。
+
+Wear 与 TV 使用独立 applicationId 后缀 `.wear`、`.tv`，各自持有会话；没有跨设备同步或手机伴侣通信。最低 API 分别为 max(26, minSdk) 和 max(23, minSdk)。`PLATFORM=mobile|wear|tv` 选择构建、安装、测试和发布，默认 mobile；`make verify-all` 验证三壳。
 
 ## 7. 实施顺序与验收标准
 
@@ -165,16 +169,22 @@ Apple 的四壳决策不应机械映射为 Android 四个 app。建议第一阶�
 
 ## 8. 已实现的模版与验收边界
 
-- 产品 `settings.gradle.kts` 只包含 `app`，`components/` 是独立 Gradle 构建；SDK 源码仍按原有 `core/`、`feature/` 目录组织，减少迁移成本。
-- 发布 model、designsystem、network、testing、sharedcore、home、settings 七个小型 AAR。testing 仅用于测试依赖；当前 Android 库统一使用 AAR，未来纯 JVM 契约可独立提取 JAR。
-- Home SDK 内部和产品壳分别运行 Dagger 编译。HomeFactory 使用公开 AnalysisService；SettingsRoute 显式接收环境服务。壳处理 HomeOutput 导航意图。
+- 产品 `settings.gradle.kts` 只包含 `app`、`wear`、`tv`，`components/` 是独立 Gradle 构建；SDK 源码仍按原有 `core/`、`feature/` 目录组织，减少迁移成本。
+- 发布 model、designsystem、network、testing、sharedcore、homestate、home、settings、wearhome、tvhome 十个 AAR。testing 仅用于测试依赖；当前 Android 库统一使用 AAR，未来纯 JVM 契约可独立提取 JAR。
+- homestate SDK 内部和三个产品壳分别运行 Dagger 编译。HomeFactory 使用公开 AnalysisService；SettingsRoute 显式接收环境服务。壳处理 HomeOutput 导航意图。
 - 每个 SessionOwner 创建独立会话图，ViewModel 保留配置变化期间的会话；onCleared 发起关闭。Kotlin 包装复制输入、串行调用、转发取消并在实际结束后释放 native 资源；close 可等待完成且幂等。
 - `scripts/components` 提供 bootstrap、publish、lock、resolve、verify、info 和 override；同版本不可覆盖，源码缺失不回退，产物/清单摘要、POM 依赖、ABI、资源和核心链接归属均校验。
 - 正式 Gradle 构建在 settings 阶段验证锁定 SDK；Release 构建任务额外验证覆盖策略，Android Studio 直接构建同样适用。
 - 产品与组件都有 Gradle 依赖锁和第三方摘要校验。团队 SDK 由组件锁校验，Maven 仓库的专属 group 避免其他仓库静默替代。
 - 原生发布目录保存每个 ABI 的匹配未剥离符号；清单记录源码摘要和固定工具链。默认仓库为本地目录，未配置远端发布账户。
-- `scripts/test-native` 运行真实主机 JVM/JNI 测试；`scripts/verify-di` 运行组件与壳的四个故意错误图；模拟器测试覆盖发布核心、资源、计算、导航和 Activity 重建。
+- `scripts/test-native` 运行真实主机 JVM/JNI 测试；`scripts/verify-di` 运行共享状态组件与三个壳的八个故意错误图；模拟器测试覆盖发布核心、资源、计算、导航和 Activity 重建。
 
 本地验收结果单独记录于 [Android 组件验证](android-component-verification.md)。CI 工作流已加入 `.github/workflows/android-components.yml`，本次未获得远端运行结果。
 
-这是一套可运行架构基线。真实业务持久化、跨设备同步、长任务进度、真机性能、正式签名和商店发布不由示例代替。默认支持的两个 ABI 之外的设备需要扩充构建矩阵；minSdk 低于 21 的输入被拒绝。
+这是一套可运行架构基线。真实业务持久化、跨设备同步、长任务进度、真机性能、正式签名和商店发布不由示例代替。默认支持的三个 ABI 之外的设备需要扩充构建矩阵；minSdk 低于 21 的输入被拒绝。
+
+## 9. 三壳实现边界
+
+`core/homestate` 保留既有 `feature.home` 公共包名，移动 HomeModel、HomeFactory 和内部 Dagger 图，避免 UI SDK 重复持有状态或引入手机设计系统。`composition` 是产品代码，通过 sourceSets 编入每个应用，并非运行时共享容器；每个 SessionOwner 持有独立 native 会话。平台界面只发出类型化输出，导航仍属于壳。
+
+手机/平板沿用当前响应式布局；本次新增可运行的手表和电视架构入口，不代表已经完成真实产品所有尺寸、无障碍、功耗、后台任务和商店素材验收。

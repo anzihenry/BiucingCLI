@@ -71,11 +71,12 @@ val debugApplicationIdSuffix =
 android {
     namespace = "{{ANDROID_NAMESPACE}}"
     compileSdk = {{COMPILE_SDK}}
+    sourceSets["main"].java.srcDir("../composition/src/main/java")
 
     defaultConfig {
         applicationId = "{{APPLICATION_ID}}"
         minSdk = {{MIN_SDK}}
-        ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
+        ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64") }
         targetSdk = {{TARGET_SDK}}
         versionCode = {{VERSION_CODE}}
         versionName = "{{VERSION_NAME}}"
@@ -163,6 +164,7 @@ dependencies {
     implementation("{{PACKAGE_NAME}}.components:model:" + componentVersions.getValue("model"))
     implementation("{{PACKAGE_NAME}}.components:designsystem:" + componentVersions.getValue("designsystem"))
     implementation("{{PACKAGE_NAME}}.components:network:" + componentVersions.getValue("network"))
+    implementation("{{PACKAGE_NAME}}.components:homestate:" + componentVersions.getValue("homestate"))
     implementation("{{PACKAGE_NAME}}.components:home:" + componentVersions.getValue("home"))
     implementation("{{PACKAGE_NAME}}.components:settings:" + componentVersions.getValue("settings"))
 

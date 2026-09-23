@@ -20,10 +20,12 @@ DECLARATION = ROOT / 'dependencies/components.json'
 LOCK = ROOT / 'dependencies/components.lock.json'
 OVERRIDES = ROOT / 'dependencies/overrides.local.json'
 RESOLVED = ROOT / '.build/components'
-NAMES = ('model', 'designsystem', 'network', 'testing', 'sharedcore', 'home', 'settings')
+NAMES = ('model', 'designsystem', 'network', 'testing', 'sharedcore', 'homestate', 'home', 'settings', 'wearhome', 'tvhome')
 DEPS = {'model': [], 'designsystem': [], 'network': [], 'testing': ['network'],
-        'sharedcore': [], 'home': ['model', 'designsystem'], 'settings': ['network', 'designsystem']}
-ABIS = ('arm64-v8a', 'x86_64')
+        'sharedcore': [], 'homestate': ['model'], 'home': ['homestate', 'designsystem'],
+        'settings': ['network', 'designsystem'], 'wearhome': ['homestate', 'network'],
+        'tvhome': ['homestate', 'network']}
+ABIS = ('armeabi-v7a', 'arm64-v8a', 'x86_64')
 
 
 def read(path):
@@ -62,6 +64,10 @@ def declarations():
     return {name: version(v) for name, v in data['components'].items()}
 
 
+def minimum_sdk(name):
+    return str(max(int('{{MIN_SDK}}'), {'wearhome': 26, 'tvhome': 23}.get(name, 21)))
+
+
 def validate(folder, name, expected=None):
     manifest = read(folder / 'manifest.json')
     v = version(manifest['version'])
@@ -72,7 +78,7 @@ def validate(folder, name, expected=None):
         raise ValueError(f'SDK checksum mismatch: {name}')
     if set(manifest['dependencies']) != set(DEPS[name]):
         raise ValueError(f'SDK dependency mismatch: {name}')
-    if manifest['minSdk'] != '{{MIN_SDK}}' or manifest['abis'] != list(ABIS):
+    if manifest['minSdk'] != minimum_sdk(name) or manifest['abis'] != list(ABIS):
         raise ValueError(f'SDK platform mismatch: {name}')
     for dep_version in manifest['dependencies'].values():
         version(dep_version)
@@ -95,16 +101,16 @@ def validate(folder, name, expected=None):
         expected_native = {f'jni/{abi}/libbiucing_shared.so' for abi in ABIS} if name == 'sharedcore' else set()
         if native != expected_native:
             raise ValueError(f'Unexpected native ownership or missing ABI: {name}')
-        for abi, machine in [('arm64-v8a', 183), ('x86_64', 62)]:
+        for abi, machine, elf_class in [('armeabi-v7a', 40, 1), ('arm64-v8a', 183, 2), ('x86_64', 62, 2)]:
             if name != 'sharedcore':
                 break
             data = archive.read(f'jni/{abi}/libbiucing_shared.so')
-            if (data[:6] != b'\x7fELF\x02\x01' or int.from_bytes(data[16:18], 'little') != 3
+            if (data[:6] != b'\x7fELF' + bytes([elf_class, 1]) or int.from_bytes(data[16:18], 'little') != 3
                     or int.from_bytes(data[18:20], 'little') != machine):
                 raise ValueError(f'Invalid native ELF/ABI: {abi}')
             if not (folder / 'symbols' / abi / 'libbiucing_shared.so').is_file():
                 raise ValueError(f'Missing native debug symbols: {abi}')
-        if name == 'home' and not any(p.startswith('res/') for p in members):
+        if name in ('home', 'wearhome', 'tvhome') and not any(p.startswith('res/') for p in members):
             raise ValueError('Missing feature resources')
     return manifest
 
@@ -123,7 +129,7 @@ def build(name, new_version):
     stage_root.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='sdk-', dir=stage_root) as temporary:
         stage = Path(temporary)
-        module = 'feature' if name in ('home', 'settings') else 'core'
+        module = 'feature' if name in ('home', 'settings', 'wearhome', 'tvhome') else 'core'
         gradle(f':{module}:{name}:testReleaseUnitTest', f':{module}:{name}:publishReleasePublicationToComponentsRepository',
                f'-PcomponentName={name}', f'-PcomponentVersion={v}', f'-PcomponentRepository={stage}')
         folder = stage / GROUP_PATH / name / v
@@ -147,7 +153,7 @@ def build(name, new_version):
         write(folder / 'manifest.json', {
             'schema': 1, 'group': GROUP, 'name': name, 'version': v,
             'dependencies': {dep: versions[dep] for dep in DEPS[name]},
-            'minSdk': '{{MIN_SDK}}', 'abis': list(ABIS), 'sourceFiles': sources,
+            'minSdk': minimum_sdk(name), 'abis': list(ABIS), 'sourceFiles': sources,
             'toolchain': {'ndk': '28.2.13676358', 'cmake': '3.22.1', 'dagger': '2.52',
                           'catalogSHA256': sha(ROOT / 'gradle/libs.versions.toml')},
             'symbols': 'symbols/<abi>/libbiucing_shared.so contains the matching unstripped native binary.',
