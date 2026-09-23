@@ -1,5 +1,9 @@
 # Android Template Design
 
+本文保留 Android 模版初版设计背景，不代表当前实现或后续架构的完整状态。
+2026-09-23 的现状分析与对齐 Apple 的架构方案见
+[Android 壳工程与组件架构](android-shell-component-architecture.md)。
+
 ## Goal
 
 This document defines the first implementation target for an `android` template in BiucingCLI.

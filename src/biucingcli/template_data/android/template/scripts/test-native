@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+cmake -S core/sharedcore/src/main/cpp -B .build/host-native -DCMAKE_BUILD_TYPE=Debug
+cmake --build .build/host-native
+./gradlew -p components :core:sharedcore:testReleaseUnitTest -PhostNativePath="$PWD/.build/host-native" --rerun-tasks

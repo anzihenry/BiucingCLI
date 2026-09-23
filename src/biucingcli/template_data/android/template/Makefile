@@ -45,7 +45,7 @@ artifact-info:
 verify-release-artifact:
 	./scripts/verify-release-artifact
 
-verify: verify-supply-chain doctor lint test build
+verify: verify-supply-chain doctor lint test build core-test
 
 verify-release-signing:
 	$(GRADLE) :app:verifyReleaseSigning
@@ -61,6 +61,7 @@ lint:
 
 format:
 	$(GRADLE) spotlessApply
+	$(GRADLE) -p components spotlessApply
 
 install-debug:
 	$(GRADLE) installDebug
@@ -97,7 +98,26 @@ worktree-doctor:
 	@printf '%s\n' "Android worktree isolation looks ready."
 
 clean-worktree:
-	rm -rf "$(GRADLE_USER_HOME)" app/build core/*/build feature/*/build build
+	rm -rf "$(GRADLE_USER_HOME)" app/build core/*/build feature/*/build components/build .build build
 
 help:
 	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"
+
+.PHONY: components-bootstrap components-test components-info components-resolve core-test
+components-bootstrap:
+	python3 scripts/components bootstrap
+	$(GRADLE) :app:dependencies --write-locks
+
+components-test:
+	$(GRADLE) -p components testReleaseUnitTest
+
+components-info:
+	python3 scripts/components info
+
+components-resolve:
+	python3 scripts/components resolve
+
+core-test:
+	cmake -S shared/core -B .build/core -DCMAKE_BUILD_TYPE=Release
+	cmake --build .build/core
+	ctest --test-dir .build/core --output-on-failure

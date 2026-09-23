@@ -25,3 +25,10 @@ subprojects {
         }
     }
 }
+
+subprojects {
+    dependencyLocking {
+        lockAllConfigurations()
+        lockMode.set(LockMode.STRICT)
+    }
+}

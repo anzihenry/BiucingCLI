@@ -221,6 +221,8 @@ Local HarmonyOS validation status:
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
 - [Apple 四平台壳工程与组件架构（已确认目标）](docs/apple-shell-component-architecture.md)
 - [Android Team Environment Standard](docs/android-team-environment-standard.md)
+- [Android 壳工程与组件架构（已实现基线）](docs/android-shell-component-architecture.md)
+- [Android 组件验证记录](docs/android-component-verification.md)
 - [HarmonyOS Team Environment Standard](docs/harmonyos-team-environment-standard.md)
 - [Android Template Design](docs/android-template-design.md)
 - [Microservice Template Design](docs/microservice-template-design.md)

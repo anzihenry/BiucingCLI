@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""Materialize the authoritative portable core into distributable template trees."""
+import argparse
+from pathlib import Path
+import shutil
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCES = ROOT / 'shared/core'
+DESTINATIONS = [ROOT / 'src/biucingcli/template_data' / platform / 'template' / location
+                for platform, location in [('apple', 'Shared/Core'), ('android', 'shared/core')]]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--check', action='store_true')
+args = parser.parse_args()
+for destination in DESTINATIONS:
+    for source in sorted(SOURCES.rglob('*')):
+        if not source.is_file():
+            continue
+        relative = source.relative_to(SOURCES)
+        if relative.parts[0] not in ('Sources', 'Tests') and relative.name != 'CMakeLists.txt':
+            continue
+        output = destination / relative
+        if args.check:
+            if not output.is_file() or output.read_bytes() != source.read_bytes():
+                raise SystemExit(f'Portable core drift: {output}; run scripts/sync-shared-core')
+        else:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, output)
+print('Portable core sources are synchronized.')

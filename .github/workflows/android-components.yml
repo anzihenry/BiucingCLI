@@ -1,0 +1,64 @@
+name: Android binary components
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  binary-consumer:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify portable source authority
+        run: python scripts/sync-shared-core --check
+      - name: Install native tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358' 'cmake;3.22.1'
+      - name: Generate product
+        run: |
+          mkdir -p generated
+          python -m biucingcli.cli create android binary-demo --package-name com.example.binarydemo --output-dir generated --non-interactive
+      - name: Publish SDKs and verify JNI and Dagger
+        working-directory: generated/binary-demo
+        run: |
+          python3 scripts/components bootstrap
+          ./scripts/test-native
+          ./gradlew :app:dependencies --write-locks
+          ./scripts/verify-di
+          ./gradlew :app:assembleRelease :app:testDebugUnitTest :app:lint
+      - name: Consume without SDK sources
+        working-directory: generated/binary-demo
+        run: |
+          mkdir ../hidden-sources
+          mv components core feature shared ../hidden-sources/
+          ./gradlew :app:clean :app:assembleDebug :app:assembleRelease
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          working-directory: generated/binary-demo
+          script: ./gradlew :app:connectedDebugAndroidTest
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-verification
+          path: |
+            generated/binary-demo/app/build/reports
+            generated/binary-demo/dependencies/components.lock.json
+            generated/binary-demo/.artifacts/maven/**/manifest.json

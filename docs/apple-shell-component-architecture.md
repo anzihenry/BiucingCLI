@@ -381,7 +381,8 @@ Swift 包装实现串行调度、任务保活、取消、拒绝关闭后工作�
 - 外部产物托管、身份认证、签名证明及符号/源码访问服务。
 - 真实业务组件、平台功能范围、平台 UI 交互及无障碍验收。
 - 数据库、文件格式、网络与同步方案，以及数据迁移策略。
-- Android JNI、HarmonyOS Node-API、Windows/Linux UI 与平台适配层。
+- HarmonyOS Node-API、Windows/Linux UI 与平台适配层。Android 模版的 JNI 与组件实现见
+  [Android 架构](android-shell-component-architecture.md)，产品仍需完成各自平台验收。
 - iOS/watchOS/tvOS 真机、开发者签名、macOS 公证和商店交付。
 
 macOS 集成测试在实际 Mac 上运行；其他 Apple 平台测试使用模拟器。

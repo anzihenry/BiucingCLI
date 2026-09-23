@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "components": {
+    "model": "0.1.0",
+    "designsystem": "0.1.0",
+    "network": "0.1.0",
+    "testing": "0.1.0",
+    "sharedcore": "0.1.0",
+    "home": "0.1.0",
+    "settings": "0.1.0"
+  }
+}

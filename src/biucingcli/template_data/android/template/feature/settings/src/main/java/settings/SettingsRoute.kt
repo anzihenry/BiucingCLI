@@ -8,12 +8,12 @@ import androidx.compose.runtime.Composable
 import {{PACKAGE_NAME}}.core.designsystem.AppSectionCard
 import {{PACKAGE_NAME}}.core.designsystem.BiucingSpacing
 import {{PACKAGE_NAME}}.core.designsystem.StatusBadge
-import {{PACKAGE_NAME}}.core.network.DefaultAppEnvironmentProvider
+import {{PACKAGE_NAME}}.core.network.AppEnvironmentProvider
 
 @Composable
 @Suppress("ktlint:standard:function-naming")
-fun SettingsRoute() {
-    val environment = DefaultAppEnvironmentProvider().environment()
+fun SettingsRoute(provider: AppEnvironmentProvider) {
+    val environment = provider.environment()
 
     AppSectionCard(
         title = "Environment",

@@ -24,3 +24,10 @@ feature/**/build/
 /signing.properties
 /fastlane/*.json
 /play-store-service-account.json
+
+.artifacts/
+.build/
+components/.gradle/
+components/local.properties
+dependencies/overrides.local.json
+**/.cxx/

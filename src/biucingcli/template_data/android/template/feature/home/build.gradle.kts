@@ -28,8 +28,13 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
-    implementation(project(":core:model"))
+    api(project(":core:model"))
 
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.dagger)
+    annotationProcessor(libs.dagger.compiler)
+    api(libs.kotlinx.coroutines.core)
+    testImplementation(libs.junit4)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material3)
 }

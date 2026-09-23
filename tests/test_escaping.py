@@ -101,7 +101,7 @@ class EscapingTests(unittest.TestCase):
                 self.assertTrue(resource.text.startswith('"') and resource.text.endswith('"'))
                 self.assertEqual(re.sub(r"\\(.)", r"\1", resource.text[1:-1]), value)
                 kotlin = (project / "feature/home/src/main/java/home/HomeRoute.kt").read_text()
-                literal = re.search(r"title = (" + JS_STRING + ")", kotlin)[1]
+                literal = re.search(r"title: String = (" + JS_STRING + ")", kotlin)[1]
                 self.assertNotRegex(literal, r"(?<!\\)\$")
                 self.assertEqual(json.loads(literal.replace(r"\$", "$")), value)
 

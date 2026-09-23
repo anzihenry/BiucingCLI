@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- align Android with the Apple component architecture: thin binary-only shell,
+  independently published Maven AARs, separate Dagger 2.52 component/shell graphs,
+  explicit service injection and typed navigation output.
+- share one authoritative C++20 source baseline across Apple and Android; add
+  Kotlin/JNI sessions with serial execution, cooperative cancellation and async close.
+- pin NDK/CMake and arm64-v8a/x86_64 packaging; add immutable SDK manifests,
+  exact component/Gradle locks, explicit binary overrides, JNI consumer rules and
+  matching native symbols. Verify host JNI, emulator flows and source-free builds.
+
 - generate iOS, macOS, watchOS and tvOS shells in one Apple product repository;
   keep `--platform` as the default build/run selection. Shells consume versioned
   static XCFramework SDKs with exact manifest locks and explicit local overrides.
@@ -18,8 +27,8 @@
 
 - add a portable C++20 core to the Apple starter, with one source tree consumed
   by SwiftPM and CMake, a C ABI and throwing Swift facade, binary shell integration,
-  worktree-scoped test commands, and macOS/Linux/Windows core CI. Android JNI and
-  HarmonyOS Node-API integration are documented extension points, not shipped adapters.
+  worktree-scoped test commands, and macOS/Linux/Windows core CI. Android JNI is now implemented by the component architecture above;
+  HarmonyOS Node-API remains an extension point.
 
 - fix frontend generation baselines contaminated by local empty pnpm cache
   directories; guard shared and mode-specific resource layers against build artifacts.

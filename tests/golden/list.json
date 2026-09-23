@@ -10,7 +10,10 @@
         "Android",
         "Gradle",
         "Jetpack Compose",
-        "fastlane"
+        "fastlane",
+        "Dagger",
+        "C++20",
+        "JNI"
       ],
       "category": "native",
       "tags": [
@@ -24,7 +27,7 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Android starter with doctor, format, build, test, and UI smoke workflows."
+        "summary": "Thin Android shell with independently published AAR components, Dagger and a C++20 JNI core."
       },
       "validation": {
         "status": "generated-project-verified",
@@ -140,7 +143,7 @@
           "prompt": null,
           "validator": "positive-integer",
           "choices": [],
-          "minimum": 1,
+          "minimum": 21,
           "maximum": 100
         },
         {
@@ -213,6 +216,7 @@
       "next_steps": [
         "make bootstrap",
         "make doctor",
+        "make components-bootstrap",
         "make format",
         "make build",
         "make test",

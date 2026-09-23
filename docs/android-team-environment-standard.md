@@ -537,3 +537,15 @@ For a mid-sized Android team starting now, the default environment standard shou
 - `Version Catalog` for dependency version control;
 - `Makefile` as the stable command surface;
 - `fastlane` for beta and release automation.
+
+
+## Binary component architecture (2026-09-23)
+
+The current template separates its product Gradle build (`app`) from SDK development
+(`components/`, backed by `core/` and `feature/`). Product builds consume locked Maven
+AARs. Dagger 2.52 generates internal and shell graphs independently; the shared
+C++20 core uses NDK 28.2.13676358 / CMake 3.22.1 through Kotlin/JNI.
+
+Run `make components-bootstrap` before the first product build. See
+[Android shell/component architecture](android-shell-component-architecture.md)
+for boundaries, locking, local binary overrides and verification.

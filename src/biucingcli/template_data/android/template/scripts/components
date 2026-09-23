@@ -1,0 +1,303 @@
+#!/usr/bin/env python3
+"""Immutable Android SDK publication, exact closure locking and explicit binary overrides."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import tempfile
+import zipfile
+import xml.etree.ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[1]
+GROUP = '{{PACKAGE_NAME}}.components'
+GROUP_PATH = Path(*GROUP.split('.'))
+REGISTRY = Path(os.environ.get('COMPONENT_REGISTRY', ROOT / '.artifacts/maven')).resolve()
+DECLARATION = ROOT / 'dependencies/components.json'
+LOCK = ROOT / 'dependencies/components.lock.json'
+OVERRIDES = ROOT / 'dependencies/overrides.local.json'
+RESOLVED = ROOT / '.build/components'
+NAMES = ('model', 'designsystem', 'network', 'testing', 'sharedcore', 'home', 'settings')
+DEPS = {'model': [], 'designsystem': [], 'network': [], 'testing': ['network'],
+        'sharedcore': [], 'home': ['model', 'designsystem'], 'settings': ['network', 'designsystem']}
+ABIS = ('arm64-v8a', 'x86_64')
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def write(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def inventory(folder):
+    result = {}
+    for path in sorted(folder.rglob('*')):
+        if path.is_symlink():
+            raise ValueError(f'Symlink in SDK: {path}')
+        if path.is_file() and path.name != 'manifest.json':
+            result[path.relative_to(folder).as_posix()] = sha(path)
+    return result
+
+
+def version(value):
+    if not isinstance(value, str) or not re.fullmatch(r'\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?', value):
+        raise ValueError(f'Expected immutable semantic version: {value}')
+    return value
+
+
+def declarations():
+    data = read(DECLARATION)
+    if data.get('schema') != 1 or set(data['components']) != set(NAMES):
+        raise ValueError('Invalid component declaration')
+    return {name: version(v) for name, v in data['components'].items()}
+
+
+def validate(folder, name, expected=None):
+    manifest = read(folder / 'manifest.json')
+    v = version(manifest['version'])
+    if (manifest.get('schema') != 1 or manifest['name'] != name or
+            manifest.get('group') != GROUP or (expected and v != expected)):
+        raise ValueError(f'SDK identity mismatch: {name}')
+    if manifest['files'] != inventory(folder):
+        raise ValueError(f'SDK checksum mismatch: {name}')
+    if set(manifest['dependencies']) != set(DEPS[name]):
+        raise ValueError(f'SDK dependency mismatch: {name}')
+    if manifest['minSdk'] != '{{MIN_SDK}}' or manifest['abis'] != list(ABIS):
+        raise ValueError(f'SDK platform mismatch: {name}')
+    for dep_version in manifest['dependencies'].values():
+        version(dep_version)
+    for suffix in ('aar', 'pom', 'module', 'sources.jar'):
+        filename = f'{name}-{v}-{suffix}' if suffix == 'sources.jar' else f'{name}-{v}.{suffix}'
+        if filename not in manifest['files']:
+            raise ValueError(f'Missing SDK artifact: {filename}')
+    pom = ET.parse(folder / f'{name}-{v}.pom')
+    ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+    published_deps = {node.findtext('m:artifactId', namespaces=ns): node.findtext('m:version', namespaces=ns)
+                      for node in pom.findall('.//m:dependency', ns)
+                      if node.findtext('m:groupId', namespaces=ns) == GROUP}
+    if published_deps != manifest['dependencies']:
+        raise ValueError(f'POM disagrees with dependency contract: {name}')
+    with zipfile.ZipFile(folder / f'{name}-{v}.aar') as archive:
+        members = set(archive.namelist())
+        if 'classes.jar' not in members:
+            raise ValueError('Missing SDK classes')
+        native = {p for p in members if p.endswith('.so')}
+        expected_native = {f'jni/{abi}/libbiucing_shared.so' for abi in ABIS} if name == 'sharedcore' else set()
+        if native != expected_native:
+            raise ValueError(f'Unexpected native ownership or missing ABI: {name}')
+        for abi, machine in [('arm64-v8a', 183), ('x86_64', 62)]:
+            if name != 'sharedcore':
+                break
+            data = archive.read(f'jni/{abi}/libbiucing_shared.so')
+            if (data[:6] != b'\x7fELF\x02\x01' or int.from_bytes(data[16:18], 'little') != 3
+                    or int.from_bytes(data[18:20], 'little') != machine):
+                raise ValueError(f'Invalid native ELF/ABI: {abi}')
+            if not (folder / 'symbols' / abi / 'libbiucing_shared.so').is_file():
+                raise ValueError(f'Missing native debug symbols: {abi}')
+        if name == 'home' and not any(p.startswith('res/') for p in members):
+            raise ValueError('Missing feature resources')
+    return manifest
+
+
+def gradle(*args):
+    subprocess.run([str(ROOT / 'gradlew'), '-p', str(ROOT / 'components'), *args], cwd=ROOT, check=True)
+
+
+def build(name, new_version):
+    versions = declarations()
+    v = version(new_version or versions[name])
+    target = REGISTRY / GROUP_PATH / name / v
+    if target.exists():
+        raise ValueError(f'Immutable version already exists: {name}@{v}')
+    stage_root = ROOT / '.build'
+    stage_root.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='sdk-', dir=stage_root) as temporary:
+        stage = Path(temporary)
+        module = 'feature' if name in ('home', 'settings') else 'core'
+        gradle(f':{module}:{name}:testReleaseUnitTest', f':{module}:{name}:publishReleasePublicationToComponentsRepository',
+               f'-PcomponentName={name}', f'-PcomponentVersion={v}', f'-PcomponentRepository={stage}')
+        folder = stage / GROUP_PATH / name / v
+        source_roots = [ROOT / module / name, ROOT / 'components', ROOT / 'gradle/libs.versions.toml']
+        if name == 'sharedcore':
+            source_roots.append(ROOT / 'shared/core')
+        sources = {}
+        for source_root in source_roots:
+            paths = source_root.rglob('*') if source_root.is_dir() else [source_root]
+            for path in paths:
+                if path.is_file() and not any(part in ('build', '.gradle', '.cxx') for part in path.relative_to(ROOT).parts) and path.name != 'local.properties':
+                    sources[path.relative_to(ROOT).as_posix()] = sha(path)
+        if name == 'sharedcore':
+            for abi in ABIS:
+                candidates = list((ROOT / 'core/sharedcore/build/intermediates/cxx/RelWithDebInfo').glob(f'*/obj/{abi}/libbiucing_shared.so'))
+                if len(candidates) != 1:
+                    raise ValueError(f'Expected one unstripped symbol binary for {abi}: {candidates}')
+                symbol = folder / 'symbols' / abi / 'libbiucing_shared.so'
+                symbol.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(candidates[0], symbol)
+        write(folder / 'manifest.json', {
+            'schema': 1, 'group': GROUP, 'name': name, 'version': v,
+            'dependencies': {dep: versions[dep] for dep in DEPS[name]},
+            'minSdk': '{{MIN_SDK}}', 'abis': list(ABIS), 'sourceFiles': sources,
+            'toolchain': {'ndk': '28.2.13676358', 'cmake': '3.22.1', 'dagger': '2.52',
+                          'catalogSHA256': sha(ROOT / 'gradle/libs.versions.toml')},
+            'symbols': 'symbols/<abi>/libbiucing_shared.so contains the matching unstripped native binary.',
+            'files': inventory(folder),
+        })
+        validate(folder, name, v)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # mkdir reserves the immutable version; never overwrite an existing publication.
+        target.mkdir()
+        try:
+            shutil.copytree(folder, target, dirs_exist_ok=True)
+        except BaseException:
+            shutil.rmtree(target)
+            raise
+    print(f'Published {name}@{v}')
+
+
+def lock():
+    versions = declarations()
+    entries = {}
+    for name, v in versions.items():
+        folder = REGISTRY / GROUP_PATH / name / v
+        manifest = validate(folder, name, v)
+        if any(versions[dep] != required for dep, required in manifest['dependencies'].items()):
+            raise ValueError(f'Incompatible version closure: {name}')
+        entries[name] = {'version': v, 'manifestSHA256': sha(folder / 'manifest.json')}
+    write(LOCK, {'schema': 1, 'components': entries})
+
+
+def closure(release=False):
+    versions = declarations()
+    locked = read(LOCK)
+    overrides = read(OVERRIDES) if OVERRIDES.exists() else {}
+    if overrides and (release or os.environ.get('CI', '').lower() not in ('', '0', 'false')):
+        raise ValueError('CI/Release forbids local binary overrides')
+    if locked.get('schema') != 1 or set(locked['components']) != set(NAMES) or not set(overrides).issubset(NAMES):
+        raise ValueError('Invalid component lock/overrides')
+    result = {}
+    for name, entry in locked['components'].items():
+        if entry['version'] != versions[name]:
+            raise ValueError('Declaration changed: explicitly update the component lock')
+        folder = Path(overrides[name]).resolve() if name in overrides else REGISTRY / GROUP_PATH / name / entry['version']
+        manifest = validate(folder, name, entry['version'])
+        if name not in overrides and sha(folder / 'manifest.json') != entry['manifestSHA256']:
+            raise ValueError(f'Locked manifest changed: {name}')
+        if any(versions[dep] != required for dep, required in manifest['dependencies'].items()):
+            raise ValueError(f'Incompatible override dependencies: {name}')
+        result[name] = (folder, manifest)
+    return result, overrides
+
+
+def resolve(release=False):
+    items, overrides = closure(release)
+    RESOLVED.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=RESOLVED.parent) as tmp:
+        stage = Path(tmp) / 'resolved'
+        for name, (folder, manifest) in items.items():
+            shutil.copytree(folder, stage / 'maven' / GROUP_PATH / name / manifest['version'])
+        write(stage / 'resolution.json', {'lockSHA256': sha(LOCK), 'overrides': overrides,
+              'manifests': {name: manifest for name, (_, manifest) in items.items()}})
+        if RESOLVED.exists():
+            shutil.rmtree(RESOLVED)
+        stage.rename(RESOLVED)
+    info()
+
+
+def verify(release=False):
+    # Verify only the resolved snapshot, so consuming a binary-only checkout needs no SDK sources/registry.
+    versions = declarations()
+    locked = read(LOCK)
+    state = read(RESOLVED / 'resolution.json')
+    overrides = read(OVERRIDES) if OVERRIDES.exists() else {}
+    if overrides and (release or os.environ.get('CI', '').lower() not in ('', '0', 'false')):
+        raise ValueError('CI/Release forbids local binary overrides')
+    if state['lockSHA256'] != sha(LOCK) or state['overrides'] != overrides:
+        raise ValueError('Resolved SDKs are stale; run scripts/components resolve')
+    if set(locked['components']) != set(NAMES) or set(state['manifests']) != set(NAMES):
+        raise ValueError('Invalid resolved closure')
+    for name, entry in locked['components'].items():
+        if entry['version'] != versions[name]:
+            raise ValueError('Declaration differs from lock')
+        folder = RESOLVED / 'maven' / GROUP_PATH / name / entry['version']
+        manifest = validate(folder, name, entry['version'])
+        if manifest != state['manifests'][name]:
+            raise ValueError(f'Resolved manifest changed: {name}')
+        if name not in overrides and sha(folder / 'manifest.json') != entry['manifestSHA256']:
+            raise ValueError(f'Locked manifest changed: {name}')
+        if any(versions[dep] != required for dep, required in manifest['dependencies'].items()):
+            raise ValueError(f'Invalid resolved dependencies: {name}')
+
+
+def info():
+    state = read(RESOLVED / 'resolution.json')
+    for name, manifest in state['manifests'].items():
+        origin = state['overrides'].get(name, 'LOCKED')
+        print(f'{name}@{manifest["version"]} [{origin}]')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest='command', required=True)
+    for command in ('bootstrap', 'lock', 'info'):
+        sub.add_parser(command)
+    for command in ('resolve', 'verify'):
+        sub.add_parser(command).add_argument('--release', action='store_true')
+    publish = sub.add_parser('publish')
+    publish.add_argument('name', choices=NAMES)
+    publish.add_argument('--version')
+    override = sub.add_parser('override')
+    override.add_argument('action', choices=('set', 'clear', 'info'))
+    override.add_argument('name', nargs='?', choices=NAMES)
+    override.add_argument('path', nargs='?')
+    args = parser.parse_args()
+    if args.command == 'bootstrap':
+        for name, v in declarations().items():
+            if not (REGISTRY / GROUP_PATH / name / v).exists():
+                build(name, v)
+        if not LOCK.exists():
+            lock()
+        resolve()
+    elif args.command == 'publish':
+        build(args.name, args.version)
+    elif args.command == 'lock':
+        lock()
+    elif args.command == 'resolve':
+        resolve(args.release)
+    elif args.command == 'verify':
+        verify(args.release)
+    elif args.command == 'info':
+        info()
+    elif args.action == 'info':
+        print(json.dumps(read(OVERRIDES) if OVERRIDES.exists() else {}, indent=2))
+    else:
+        if not args.name:
+            parser.error('override set/clear requires a component name')
+        data = read(OVERRIDES) if OVERRIDES.exists() else {}
+        if args.action == 'set':
+            if not args.path:
+                parser.error('override set requires a published version directory')
+            folder = Path(args.path).resolve()
+            validate(folder, args.name, declarations()[args.name])
+            data[args.name] = str(folder)
+        else:
+            data.pop(args.name, None)
+        write(OVERRIDES, data)
+        resolve()
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError, KeyError, zipfile.BadZipFile, subprocess.CalledProcessError) as error:
+        raise SystemExit(f'Component error: {error}') from error

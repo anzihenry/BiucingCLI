@@ -1,11 +1,17 @@
+import groovy.json.JsonSlurper
+import java.security.KeyStore
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
-import java.util.Properties
-import java.security.KeyStore
+val componentLock = JsonSlurper().parse(rootProject.file("dependencies/components.lock.json")) as Map<*, *>
+val componentVersions = (componentLock["components"] as Map<*, *>).map { (name, entry) ->
+    name.toString() to (entry as Map<*, *>)["version"].toString()
+}.toMap()
 
 fun loadLocalProperties(rootDir: java.io.File): Properties {
     val properties = Properties()
@@ -69,6 +75,7 @@ android {
     defaultConfig {
         applicationId = "{{APPLICATION_ID}}"
         minSdk = {{MIN_SDK}}
+        ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
         targetSdk = {{TARGET_SDK}}
         versionCode = {{VERSION_CODE}}
         versionName = "{{VERSION_NAME}}"
@@ -97,7 +104,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             if (hasCompleteReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -153,26 +160,41 @@ tasks.register("verifyReleaseSigning") {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:network"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:settings"))
+    implementation("{{PACKAGE_NAME}}.components:model:" + componentVersions.getValue("model"))
+    implementation("{{PACKAGE_NAME}}.components:designsystem:" + componentVersions.getValue("designsystem"))
+    implementation("{{PACKAGE_NAME}}.components:network:" + componentVersions.getValue("network"))
+    implementation("{{PACKAGE_NAME}}.components:home:" + componentVersions.getValue("home"))
+    implementation("{{PACKAGE_NAME}}.components:settings:" + componentVersions.getValue("settings"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.dagger)
+    annotationProcessor(libs.dagger.compiler)
+    implementation("{{PACKAGE_NAME}}.components:sharedcore:" + componentVersions.getValue("sharedcore"))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.google.material)
 
     testImplementation(libs.junit4)
-    testImplementation(project(":core:testing"))
+    testImplementation("{{PACKAGE_NAME}}.components:testing:" + componentVersions.getValue("testing"))
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// A release task reached indirectly must also reject local binary overrides.
+val verifyReleaseComponents by tasks.registering(Exec::class) {
+    workingDir(rootProject.projectDir)
+    commandLine("python3", "scripts/components", "verify", "--release")
+}
+tasks.configureEach {
+    if (name == "preReleaseBuild") dependsOn(verifyReleaseComponents)
 }

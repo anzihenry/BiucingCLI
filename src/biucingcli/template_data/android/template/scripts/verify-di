@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Exercise the real Dagger compiler with missing binding and dependency cycle failures."""
+from pathlib import Path
+import subprocess
+
+root = Path(__file__).resolve().parents[1]
+cases = {
+    'missing': ('[Dagger/MissingBinding]', 'interface DiFailure { Runnable missing(); }'),
+    'cycle': ('[Dagger/DependencyCycle]', """interface DiFailure {
+        A a();
+        class A { @javax.inject.Inject A(B b) {} }
+        class B { @javax.inject.Inject B(A a) {} }
+    }"""),
+}
+# Check SDK internal compilation and the consumer's public-factory composition separately.
+for folder, args in [
+    ('feature/home/src/main/java', ['-p', 'components', ':feature:home:compileReleaseJavaWithJavac']),
+    ('app/src/main/java', [':app:compileDebugJavaWithJavac']),
+]:
+    source = root / folder / 'DiFailure.java'
+    if source.exists():
+        raise SystemExit(f'Refusing to replace {source}')
+    try:
+        for name, (diagnostic, body) in cases.items():
+            source.write_text('package di.failure; @dagger.Component ' + body)
+            result = subprocess.run([str(root / 'gradlew'), *args], cwd=root, text=True, capture_output=True)
+            if result.returncode == 0 or diagnostic not in result.stdout + result.stderr:
+                raise SystemExit(f'{folder}: {name} did not fail for {diagnostic}:\n{result.stdout}\n{result.stderr}')
+            print(f'{folder}: {name} correctly rejected')
+    finally:
+        source.unlink(missing_ok=True)
+    subprocess.run([str(root / 'gradlew'), *args], cwd=root, check=True)
