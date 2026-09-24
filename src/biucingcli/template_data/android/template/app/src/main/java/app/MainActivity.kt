@@ -2,6 +2,7 @@ package {{PACKAGE_NAME}}
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var settings by rememberSaveable { mutableStateOf(false) }
+            BackHandler(enabled = settings) { settings = false }
             BiucingTheme {
                 Surface {
                     if (settings) {
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
                             Button(onClick = { settings = false }) { Text("返回") }
                         }
                     } else {
-                        HomeRoute(session.home) { output ->
+                        HomeRoute(session.home, onRun = session::run) { output ->
                             when (output) {
                                 HomeOutput.ShowSettings -> settings = true
                             }

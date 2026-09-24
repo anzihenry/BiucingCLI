@@ -1,5 +1,7 @@
 # Apple 核心、静态组件与四平台验证
 
+本轮共同契约变更的新增验证见[实现与验证记录](cross-platform-architecture-verification.md)；以下保留原阶段证据，不能自动视为新实现的复测结果。
+
 更新：2026-09-23。技术基线和职责见 [完整架构](apple-shell-component-architecture.md)。
 
 模版一次生成 iOS、macOS、watchOS、tvOS 四个平台壳。Swift 6.4+ 工具链使用 Swift 6

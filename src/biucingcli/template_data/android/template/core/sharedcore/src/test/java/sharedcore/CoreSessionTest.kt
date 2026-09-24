@@ -1,5 +1,6 @@
 package {{PACKAGE_NAME}}.core.sharedcore
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -27,6 +28,23 @@ class CoreSessionTest {
                 first.close()
                 second.close()
             }
+        }
+
+    @Test fun cancellingCloseWaiterDoesNotCancelNativeShutdown() =
+        runBlocking {
+            val session = CoreSession()
+            val terminated = CompletableDeferred<Throwable?>()
+            session.invokeOnClose { error -> terminated.complete(error) }
+            val waiter =
+                launch(start = CoroutineStart.UNDISPATCHED) {
+                    coroutineContext.cancel()
+                    session.close()
+                }
+            waiter.join()
+            session.close()
+            assertEquals(null, terminated.await())
+            val error = runCatching { session.analyze(longArrayOf(1)) }.exceptionOrNull()
+            assertTrue(error is CoreException && error.code == 4)
         }
 
     @Test fun concurrentWorkAndRepeatedClose() =

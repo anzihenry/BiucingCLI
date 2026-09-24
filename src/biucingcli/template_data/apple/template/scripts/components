@@ -182,18 +182,36 @@ def check_di():
         for name, source in {
             'missing': '@Instantiable(isRoot: true) public struct Root { @Instantiated let missing: Missing; public init(missing: Missing) {} }',
             'cycle': '@Instantiable(isRoot: true) public struct Root { @Instantiated let child: Child; public init(child: Child) {} }\n'
-                     '@Instantiable public struct Child { @Instantiated let root: Root; public init(root: Root) {} }'
+                     '@Instantiable public struct Child { @Instantiated let root: Root; public init(root: Root) {} }',
+            'duplicate': '@Instantiable(isRoot: true) public struct Root { @Instantiated let service: Service; public init(service: Service) {} }\n'
+                         'public protocol Service {}\n'
+                         '@Instantiable(fulfillingAdditionalTypes: [Service.self]) public struct First: Service { public init() {} }\n'
+                         '@Instantiable(fulfillingAdditionalTypes: [Service.self]) public struct Second: Service { public init() {} }'
         }.items():
             (path / 'Graph.swift').write_text(source)
             result = subprocess.run([str(safedi()), 'generate', '--include', str(path),
                                      '--combined-output', str(path / 'out.swift')], capture_output=True, text=True)
             failed = result.returncode != 0 or (path / 'out.swift').exists() and '#error' in (path / 'out.swift').read_text()
             diagnostic = result.stdout + result.stderr
-            expected = 'type `Missing`' if name == 'missing' else 'Dependency cycle detected'
+            expected = {'missing': 'type `Missing`', 'cycle': 'Dependency cycle detected',
+                        'duplicate': 'fulfill globally unique types'}[name]
             if not failed or expected not in diagnostic:
                 raise ValueError(f'SafeDI did not reject the {name} graph for the expected reason: {diagnostic}')
             (path / 'out.swift').unlink(missing_ok=True)
-    print('SafeDI valid graph, missing dependency and cycle checks passed.')
+        # A valid descriptor can still drift from a real initializer. Compile the generated call.
+        descriptors = path / 'descriptors'
+        descriptors.mkdir()
+        (descriptors / 'Graph.swift').write_text(
+            '@Instantiable(isRoot: true) public struct Root { @Instantiated let child: Child; public init(child: Child) {} }\n'
+            '@Instantiable public struct Child { public init() {} }')
+        generated = path / 'Generated.swift'
+        generate_di(descriptors, generated)
+        actual = path / 'Actual.swift'
+        actual.write_text('public struct Root { public init(child: String) {} }\npublic struct Child { public init() {} }')
+        result = subprocess.run(['xcrun', 'swiftc', '-typecheck', str(actual), str(generated)], capture_output=True, text=True)
+        if result.returncode == 0 or "cannot convert value of type 'Child'" not in result.stderr:
+            raise ValueError('Swift did not reject constructor drift: ' + result.stderr)
+    print('SafeDI missing/cyclic/duplicate bindings and real Swift constructor drift checks passed.')
 
 
 def build(version, component=None):

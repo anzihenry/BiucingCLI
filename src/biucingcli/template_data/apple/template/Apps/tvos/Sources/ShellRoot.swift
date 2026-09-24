@@ -2,23 +2,19 @@ import HomeFeature
 import SwiftUI
 
 struct ShellRoot: View {
-    let application: ApplicationComposition
-
-    @State private var composition: AppComposition?
+    @StateObject private var owner: SessionOwner
     @State private var aboutPresented = false
+
+    init(application: ApplicationComposition) {
+        _owner = StateObject(wrappedValue: SessionOwner(sessions: application.sessions))
+    }
 
     var body: some View {
         NavigationStack {
-            Group {
-                if let composition {
-                    composition.home.makeView { output in
-                        switch output {
-                        case .showAbout: aboutPresented = true
-                        @unknown default: break
-                        }
-                    }
-                } else {
-                    ProgressView()
+            owner.composition.home.makeView(model: owner.model) { output in
+                switch output {
+                case .showAbout: aboutPresented = true
+                @unknown default: break
                 }
             }
             .navigationTitle("{{DISPLAY_NAME_SWIFT}}")
@@ -26,15 +22,6 @@ struct ShellRoot: View {
                 Text("{{DISPLAY_NAME_SWIFT}}")
             }
         }
-        .onAppear {
-            if composition == nil {
-                composition = application.sessions.make()
-            }
-        }
-        .onDisappear {
-            let departingSession = composition
-            composition = nil
-            Task { await departingSession?.close() }
-        }
+        // No visibility-triggered teardown: the scene's state storage owns the session.
     }
 }

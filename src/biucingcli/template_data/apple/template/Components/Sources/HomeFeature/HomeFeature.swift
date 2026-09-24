@@ -9,12 +9,14 @@ public final class HomeModel {
     public private(set) var isRunning = false
     private let service: any AnalysisService
     private var generation = 0
+    private var closed = false
 
     public init(service: any AnalysisService) {
         self.service = service
     }
 
     public func run() async {
+        guard !closed, !isRunning else { return }
         generation += 1
         let current = generation
         isRunning = true
@@ -33,6 +35,13 @@ public final class HomeModel {
             guard !Task.isCancelled, current == generation else { return }
             result = "计算失败，请重试"
         }
+    }
+
+    public func close() async {
+        closed = true
+        generation += 1
+        isRunning = false
+        await service.close()
     }
 }
 
@@ -56,13 +65,17 @@ public struct HomeFactory {
         self.service = service
     }
 
+    public func makeModel() -> HomeModel {
+        FeatureAssembly().policy.makeModel(service: service)
+    }
+
     public func makeView(
+        model: HomeModel? = nil,
         style: FeatureStyle? = nil,
         onOutput: @escaping @MainActor (HomeOutput) -> Void
     ) -> HomeView {
-        let assembly = FeatureAssembly()
         return HomeView(
-            model: assembly.policy.makeModel(service: service),
+            model: model ?? makeModel(),
             style: style ?? FeatureStyle(title: HomeResources.title),
             onOutput: onOutput
         )
@@ -71,10 +84,9 @@ public struct HomeFactory {
 
 @MainActor
 public struct HomeView: View {
-    @State private var model: HomeModel
+    private let model: HomeModel
     private let style: FeatureStyle
     private let onOutput: @MainActor (HomeOutput) -> Void
-    @State private var task: Task<Void, Never>?
 
     public init(model: HomeModel, style: FeatureStyle, onOutput: @escaping @MainActor (HomeOutput) -> Void) {
         self.model = model
@@ -87,14 +99,12 @@ public struct HomeView: View {
             Text(style.title).font(.headline)
             ResultLabel(value: model.result)
             Button(model.isRunning ? "计算中…" : "计算示例") {
-                task?.cancel()
-                task = Task { await model.run() }
+                Task { await model.run() }
             }
             .disabled(model.isRunning)
             Button("关于") { onOutput(.showAbout) }
         }
         .padding()
-        .onDisappear { task?.cancel() }
     }
 }
 

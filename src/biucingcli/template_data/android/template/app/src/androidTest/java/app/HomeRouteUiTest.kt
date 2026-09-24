@@ -32,5 +32,7 @@ class HomeRouteUiTest {
         composeRule.onNodeWithText("42").assertIsDisplayed()
         composeRule.onNodeWithText("设置").performClick()
         composeRule.onNodeWithText("Release channel: beta", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("返回").performClick()
+        composeRule.onNodeWithText("42").assertIsDisplayed()
     }
 }

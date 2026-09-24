@@ -127,3 +127,7 @@ verify: components-verify verify-di
 .PHONY: build-device-tests
 build-device-tests: components-verify di-shell
 	$(HVIGOR) assembleHap --mode module -p module={{HARMONY_MODULE_NAME}}@ohosTest
+
+.PHONY: verify-di-types
+verify-di-types: components-verify
+	./scripts/di --test --test-compile

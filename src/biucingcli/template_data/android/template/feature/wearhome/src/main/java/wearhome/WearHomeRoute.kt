@@ -32,7 +32,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 @Suppress("ktlint:standard:function-naming")
-fun WearHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Unit) {
+fun WearHomeRoute(
+    model: HomeModel,
+    title: String,
+    onRun: (() -> Unit)? = null,
+    onOutput: (HomeOutput) -> Unit,
+) {
     val state by model.state.collectAsState()
     val scope = rememberCoroutineScope()
     val list = rememberScalingLazyListState()
@@ -42,19 +47,27 @@ fun WearHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Uni
         Scaffold(timeText = { TimeText() }, positionIndicator = { PositionIndicator(scalingLazyListState = list) }) {
             ScalingLazyColumn(
                 state = list,
-                modifier = Modifier.fillMaxSize()
-                    .onRotaryScrollEvent { event ->
-                        scope.launch { list.scrollBy(event.verticalScrollPixels) }
-                        true
-                    }
-                    .focusRequester(rotaryFocus).focusable(),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .onRotaryScrollEvent { event ->
+                            scope.launch { list.scrollBy(event.verticalScrollPixels) }
+                            true
+                        }.focusRequester(rotaryFocus)
+                        .focusable(),
             ) {
                 item { Text(title, textAlign = TextAlign.Center) }
                 item { Text(state.result?.toString() ?: "—", style = MaterialTheme.typography.display2) }
                 if (state.failed) item { Text(stringResource(R.string.device_error)) }
                 item {
                     Chip(
-                        onClick = { scope.launch { model.run() } },
+                        onClick = {
+                            if (onRun != null) {
+                                onRun()
+                            } else {
+                                scope.launch { model.run() }
+                            }
+                        },
                         enabled = !state.running,
                         label = { Text(stringResource(R.string.device_calculate)) },
                         modifier = Modifier.fillMaxWidth(),
@@ -74,7 +87,10 @@ fun WearHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Uni
 
 @Composable
 @Suppress("ktlint:standard:function-naming")
-fun WearAboutRoute(provider: AppEnvironmentProvider, onBack: () -> Unit) {
+fun WearAboutRoute(
+    provider: AppEnvironmentProvider,
+    onBack: () -> Unit,
+) {
     MaterialTheme {
         SwipeToDismissBox(onDismissed = onBack) { background ->
             if (!background) {

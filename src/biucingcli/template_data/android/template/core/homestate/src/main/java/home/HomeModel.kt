@@ -16,17 +16,24 @@ class HomeModel(
 ) {
     private val mutableState = MutableStateFlow(HomeState())
     val state = mutableState.asStateFlow()
+    private var closed = false
+
+    fun stop() {
+        closed = true
+        mutableState.value = mutableState.value.copy(running = false)
+    }
 
     suspend fun run() {
-        if (mutableState.value.running) return
+        if (closed || mutableState.value.running) return
         mutableState.value = HomeState(running = true)
         try {
-            mutableState.value = HomeState(result = service.analyze(longArrayOf(10, 20, 12)))
+            val result = service.analyze(longArrayOf(10, 20, 12))
+            if (!closed) mutableState.value = HomeState(result = result)
         } catch (cancelled: CancellationException) {
-            mutableState.value = HomeState()
+            if (!closed) mutableState.value = HomeState()
             throw cancelled
         } catch (_: Exception) {
-            mutableState.value = HomeState(failed = true)
+            if (!closed) mutableState.value = HomeState(failed = true)
         }
     }
 }

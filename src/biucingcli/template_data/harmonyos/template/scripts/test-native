@@ -21,7 +21,7 @@ args += [str(root / 'components/sharedcore/src/main/cpp/bridge.cpp'), str(core /
 subprocess.run(args, check=True)
 subprocess.run([node, '--expose-gc', str(root / 'tests/native.cjs'), str(out / 'bridge.node')], check=True)
 
-subprocess.run(['python3', str(root / 'scripts/di'), '--scope', 'components'], check=True)
+subprocess.run(['python3', str(root / 'scripts/di'), '--scope', 'all'], check=True)
 sdk = Path(os.environ.get('HOS_SDK_HOME', os.environ.get('DEVECO_SDK_HOME', '') + '/default/openharmony'))
 typescript = Path(os.environ.get('TYPESCRIPT_PATH', str(sdk / 'ets/build-tools/ets-loader/node_modules/typescript')))
 if not typescript.is_dir():

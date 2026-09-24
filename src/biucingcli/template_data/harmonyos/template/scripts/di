@@ -5,6 +5,8 @@ import copy
 import json
 from pathlib import Path
 import re
+import os
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 GRAPHS = ['composition/di.json', 'components/homefeature/di.json']
@@ -59,6 +61,7 @@ def main():
     parser.add_argument('--scope', choices=['all', 'shell', 'components'], default='all')
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--graph', help='One component-owned graph relative to the product root')
+    parser.add_argument('--test-compile', action='store_true', help='Check constructor drift against installed HARs with hvigor; run in a disposable generated project')
     args = parser.parse_args()
     graphs = GRAPHS[:1] if args.scope == 'shell' else GRAPHS[1:] if args.scope == 'components' else GRAPHS
     if args.graph:
@@ -69,9 +72,12 @@ def main():
         graph = json.loads(source.read_text())
         text = generate(graph)
         if args.test:
-            for mode, expected in [('missing', 'Missing dependency'), ('cycle', 'Dependency cycle')]:
+            for mode, expected in [('missing', 'Missing dependency'), ('cycle', 'Dependency cycle'), ('duplicate', 'Duplicate binding')]:
                 broken = copy.deepcopy(graph)
-                broken['nodes'][0]['args'] = ['absent' if mode == 'missing' else broken['nodes'][0]['id']]
+                if mode == 'duplicate':
+                    broken['nodes'].append(copy.deepcopy(broken['nodes'][0]))
+                else:
+                    broken['nodes'][0]['args'] = ['absent' if mode == 'missing' else broken['nodes'][0]['id']]
                 try:
                     generate(broken)
                 except ValueError as error:
@@ -85,7 +91,32 @@ def main():
             output.parent.mkdir(parents=True, exist_ok=True)
             if not output.exists() or output.read_text() != text:
                 output.write_text(text)
-    print('DI graphs checked' + (' including missing/cyclic bindings' if args.test else ' and generated'))
+    if args.test_compile:
+        source = ROOT / GRAPHS[0]
+        original = source.read_bytes()
+        graph = json.loads(original)
+        output = (source.parent / graph['output']).resolve()
+        previous = output.read_bytes() if output.exists() else None
+        broken = copy.deepcopy(graph)
+        # Passing SessionFactory itself instead of its AnalysisService must fail real ArkTS compilation.
+        broken['nodes'][0].pop('methodArgs', None)
+        command = [os.environ.get('HVIGOR', 'hvigorw'), 'assembleHap', '--mode', 'module',
+                   '-p', 'module={{HARMONY_MODULE_NAME}}@default', '--no-daemon']
+        try:
+            source.write_text(json.dumps(broken))
+            result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+            diagnostic = result.stdout + result.stderr
+            if result.returncode == 0 or not all(word in diagnostic for word in ('SessionFactory', 'AnalysisService', 'not assignable')):
+                raise ValueError('ArkTS did not reject constructor drift: ' + diagnostic)
+        finally:
+            source.write_bytes(original)
+            if previous is None:
+                output.unlink(missing_ok=True)
+            else:
+                output.write_bytes(previous)
+        subprocess.run(command, cwd=ROOT, check=True)
+        print('Real ArkTS constructor drift rejected; valid shell rebuilt')
+    print('DI graphs checked'  + (' including missing/cyclic/duplicate bindings' if args.test else ' and generated'))
 
 
 if __name__ == '__main__':

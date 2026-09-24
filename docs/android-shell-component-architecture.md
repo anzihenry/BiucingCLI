@@ -175,7 +175,7 @@ Wear 与 TV 使用独立 applicationId 后缀 `.wear`、`.tv`，各自持有会�
 - 产品 `settings.gradle.kts` 只包含 `app`、`wear`、`tv`，`components/` 是独立 Gradle 构建；SDK 源码仍按原有 `core/`、`feature/` 目录组织，减少迁移成本。
 - 发布 model、designsystem、network、testing、sharedcore、homestate、home、settings、wearhome、tvhome 十个 AAR。testing 仅用于测试依赖；当前 Android 库统一使用 AAR，未来纯 JVM 契约可独立提取 JAR。
 - homestate SDK 内部和三个产品壳分别运行 Dagger 编译。HomeFactory 使用公开 AnalysisService；SettingsRoute 显式接收环境服务。壳处理 HomeOutput 导航意图。
-- 每个 SessionOwner 创建独立会话图，ViewModel 保留配置变化期间的会话；onCleared 发起关闭。Kotlin 包装复制输入、串行调用、转发取消并在实际结束后释放 native 资源；close 可等待完成且幂等。
+- 每个 SessionOwner 创建独立会话图，ViewModel 保留配置变化期间的会话；onCleared 停止模型并发起关闭，业务任务由 viewModelScope 持有。显式 close 可等待关闭，完成观察回调记录错误；取消单个等待者不会取消共享关闭信号。Kotlin 包装复制输入、串行调用、转发取消并在实际结束后释放 native 资源；close 可等待完成且幂等。
 - `scripts/components` 提供 bootstrap、publish、lock、resolve、verify、info 和 override；同版本不可覆盖，源码缺失不回退，产物/清单摘要、POM 依赖、ABI、资源和核心链接归属均校验。
 - 正式 Gradle 构建在 settings 阶段验证锁定 SDK；Release 构建任务额外验证覆盖策略，Android Studio 直接构建同样适用。
 - 产品与组件都有 Gradle 依赖锁和第三方摘要校验。团队 SDK 由组件锁校验，Maven 仓库的专属 group 避免其他仓库静默替代。
@@ -191,3 +191,5 @@ Wear 与 TV 使用独立 applicationId 后缀 `.wear`、`.tv`，各自持有会�
 `core/homestate` 保留既有 `feature.home` 公共包名，移动 HomeModel、HomeFactory 和内部 Dagger 图，避免 UI SDK 重复持有状态或引入手机设计系统。`composition` 是产品代码，通过 sourceSets 编入每个应用，并非运行时共享容器；每个 SessionOwner 持有独立 native 会话。平台界面只发出类型化输出，导航仍属于壳。
 
 手机/平板沿用当前响应式布局；本次新增可运行的手表和电视架构入口，不代表已经完成真实产品所有尺寸、无障碍、功耗、后台任务和商店素材验收。
+
+本轮所有者行为、DI 反例和构建范围见[共同契约验证记录](cross-platform-architecture-verification.md)。

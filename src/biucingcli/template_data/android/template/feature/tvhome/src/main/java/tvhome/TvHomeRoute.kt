@@ -28,7 +28,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 @Suppress("ktlint:standard:function-naming")
-fun TvHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Unit) {
+fun TvHomeRoute(
+    model: HomeModel,
+    title: String,
+    onRun: (() -> Unit)? = null,
+    onOutput: (HomeOutput) -> Unit,
+) {
     val state by model.state.collectAsState()
     val scope = rememberCoroutineScope()
     val calculate = remember { FocusRequester() }
@@ -44,10 +49,32 @@ fun TvHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Unit)
             if (state.failed) Text(stringResource(R.string.device_error))
             Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                 // Keep focus stable while work runs; the shared model rejects duplicate submissions.
-                Button(onClick = { scope.launch { model.run() } }, modifier = Modifier.focusRequester(calculate).focusProperties { right = about }) {
+                Button(
+                    onClick = {
+                        if (onRun !=
+                            null
+                        ) {
+                            onRun()
+                        } else {
+                            scope.launch { model.run() }
+                        }
+                    },
+                    modifier =
+                        Modifier.focusRequester(calculate).focusProperties {
+                            right =
+                                about
+                        },
+                ) {
                     Text(stringResource(R.string.device_calculate))
                 }
-                Button(onClick = { onOutput(HomeOutput.ShowSettings) }, modifier = Modifier.focusRequester(about).focusProperties { left = calculate }) {
+                Button(
+                    onClick = { onOutput(HomeOutput.ShowSettings) },
+                    modifier =
+                        Modifier.focusRequester(about).focusProperties {
+                            left =
+                                calculate
+                        },
+                ) {
                     Text(stringResource(R.string.device_about))
                 }
             }
@@ -57,7 +84,10 @@ fun TvHomeRoute(model: HomeModel, title: String, onOutput: (HomeOutput) -> Unit)
 
 @Composable
 @Suppress("ktlint:standard:function-naming")
-fun TvAboutRoute(provider: AppEnvironmentProvider, onBack: () -> Unit) {
+fun TvAboutRoute(
+    provider: AppEnvironmentProvider,
+    onBack: () -> Unit,
+) {
     val back = remember { FocusRequester() }
     LaunchedEffect(Unit) { back.requestFocus() }
     MaterialTheme {

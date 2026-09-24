@@ -148,3 +148,7 @@ lint-all: verify-supply-chain
 	$(GRADLE) :app:lint :wear:lint :tv:lint
 
 verify-all: doctor lint-all test-all build-all components-test core-test
+
+.PHONY: verify-di
+verify-di:
+	python3 scripts/verify-di

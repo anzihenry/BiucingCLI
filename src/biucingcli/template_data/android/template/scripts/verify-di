@@ -5,6 +5,19 @@ import subprocess
 
 root = Path(__file__).resolve().parents[1]
 cases = {
+    'duplicate': ('[Dagger/DuplicateBindings]', """interface DiFailure {
+        String value();
+        @dagger.Module class Bindings {
+            @dagger.Provides static String first() { return "first"; }
+            @dagger.Provides static String second() { return "second"; }
+        }
+    }"""),
+    'type': ('incompatible types', """interface DiFailure {
+        String value();
+        @dagger.Module class Bindings {
+            @dagger.Provides static String value() { return Integer.valueOf(1); }
+        }
+    }"""),
     'missing': ('[Dagger/MissingBinding]', 'interface DiFailure { Runnable missing(); }'),
     'cycle': ('[Dagger/DependencyCycle]', """interface DiFailure {
         A a();
@@ -24,7 +37,8 @@ for folder, args in [
         raise SystemExit(f'Refusing to replace {source}')
     try:
         for name, (diagnostic, body) in cases.items():
-            source.write_text('package di.failure; @dagger.Component ' + body)
+            annotation = '@dagger.Component(modules = DiFailure.Bindings.class) ' if name in ('duplicate', 'type') else '@dagger.Component '
+            source.write_text('package di.failure; ' + annotation + body)
             result = subprocess.run([str(root / 'gradlew'), *args], cwd=root, text=True, capture_output=True)
             if result.returncode == 0 or diagnostic not in result.stdout + result.stderr:
                 raise SystemExit(f'{folder}: {name} did not fail for {diagnostic}:\n{result.stdout}\n{result.stderr}')

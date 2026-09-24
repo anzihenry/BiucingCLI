@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "project": "{{PROJECT_NAME}}",
+  "platform": "android",
+  "device": null,
+  "applicableDevices": [
+    "mobile",
+    "wear",
+    "tv"
+  ],
+  "sourceRevision": null,
+  "artifactVersions": {},
+  "environment": {
+    "systemVersion": null,
+    "model": null,
+    "cpuArchitecture": null,
+    "toolchain": {},
+    "buildType": null,
+    "runtime": "not_selected"
+  },
+  "verifiedLevel": null,
+  "scenarios": [
+    {
+      "id": "L01",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "L02",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "L03",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "L04",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "L05",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "I01",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "I02",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "I03",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "I04",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "M01",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    },
+    {
+      "id": "V01",
+      "status": "not_run",
+      "expected": null,
+      "actual": null,
+      "evidence": null,
+      "reason": null
+    }
+  ],
+  "pending": [
+    "Complete target-device interaction, accessibility, performance and power checks before claiming V4."
+  ]
+}

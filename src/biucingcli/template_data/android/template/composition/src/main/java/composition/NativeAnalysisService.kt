@@ -10,5 +10,7 @@ internal class NativeAnalysisService : AnalysisService {
 
     fun requestClose() = core.requestClose()
 
+    fun invokeOnClose(handler: (Throwable?) -> Unit) = core.invokeOnClose(handler)
+
     suspend fun close() = core.close()
 }

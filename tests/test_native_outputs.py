@@ -542,7 +542,7 @@ class NativeOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("windowStage.loadContent('pages/Index'", ability)
             self.assertIn("this.style.title = AppConfig.displayName", page)
             self.assertIn("this.getUIContext().getRouter().pushUrl", page)
-            self.assertIn("HomeView({ createModel:", page)
+            self.assertIn("HomeView({ model:", page)
             self.assertIn("static readonly displayName: string = 'Demo Harmony';", app_config)
             self.assertIn("static readonly bundleName: string = 'com.example.demoharmony';", app_config)
             self.assertIn("static readonly worktreeBundleSuffix: string = '';", app_config)

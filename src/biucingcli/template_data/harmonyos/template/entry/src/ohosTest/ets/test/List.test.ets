@@ -1,8 +1,27 @@
 import { describe, expect, it } from '@ohos/hypium';
+import { Application } from '../../../main/ets/composition/Application';
 import { Cancellation } from '@biucing/contracts';
 import { SharedCoreFactory } from '@biucing/sharedcore';
 export default function testsuite() {
   describe('Published SharedCore on HarmonyOS', () => {
+    it('retains a window model and closes independent owners', 0, async () => {
+      const application = new Application();
+      const first = application.createSession();
+      const second = application.createSession();
+      const retained = first.home;
+      try {
+        expect(await retained.calculate()).assertEqual('42');
+        expect(first.home === retained).assertTrue();
+        expect(first.home.result).assertEqual('42');
+        const completion = first.close();
+        expect(first.close() === completion).assertTrue();
+        await completion;
+        let rejected = false;
+        try { await retained.calculate(); } catch (_) { rejected = true; }
+        expect(rejected).assertTrue();
+        expect(await second.home.calculate()).assertEqual('42');
+      } finally { await first.close(); await second.close(); }
+    });
     it('calls the real binary and preserves int64 values', 0, async () => {
       const session = new SharedCoreFactory().create();
       try {

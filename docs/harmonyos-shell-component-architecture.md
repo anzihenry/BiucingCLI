@@ -96,12 +96,12 @@ HomeFeature 不直接依赖 SharedCore，由壳通过 AnalysisService 注入。
 
 ## 5. 生命周期与作用域
 
-entry 的组装层持有应用级 SharedCoreFactory；每次显示 HomeView 通过公开工厂创建
-独立模型和会话。功能组件本身不访问 AppStorage 或全局容器。页面离开时显式关闭，
-再次进入获得新会话；旧任务结果不允许更新新会话的界面。
-
-以上描述当前实现。新确认的 D01 要求会话跟随业务所有者，不能仅因视图暂时不可见就关闭；
-现有 aboutToAppear/aboutToDisappear 管理方式列入待整改，当前尚未修改代码。
+entry 的组装层持有应用级 SharedCoreFactory；每个 WindowStage 创建独立 SessionOwner，
+通过局部 LocalStorage 传递稳定的 HomeModel。功能组件不访问 AppStorage 或全局容器。
+隐藏、页面遮挡及后台不关闭会话；stage/ability 销毁时显式关闭并记录完成或错误。
+HomeModel 拒绝关闭后的工作、取消在途任务并等待实际完成，旧结果不会更新已关闭模型。
+Mobile、Desktop、Watch、TV 共享业务模型并分别实现交互；实际 ArkUI 观察、输入及窗口行为
+仍待设备验证，见[本轮验证记录](cross-platform-architecture-verification.md)。
 
 ArkTS 包装复制输入并排队，关闭后排队操作拒绝开始；活动任务接收取消请求。
 原生 Job 自持会话资源，垃圾回收不能提前销毁正在使用的 C++ 对象。

@@ -117,6 +117,11 @@ class CoreSession {
         }
     }
 
+    /** Observe termination without exposing a cancellable handle to the shared completion signal. */
+    fun invokeOnClose(handler: (Throwable?) -> Unit) {
+        closed.invokeOnCompletion(handler)
+    }
+
     suspend fun close() {
         requestClose()
         closed.await()

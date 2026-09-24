@@ -14,10 +14,12 @@ function load(file) {
   const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
   const localRequire = id => {
     if (id === 'libbiucing_shared.so') return native;
+    if (id === '@biucing/homefeature') return load(path.join(root, 'components/homefeature/src/main/ets/HomeModel.ets'));
+    if (id === '@biucing/sharedcore') return load(path.join(root, 'components/sharedcore/src/main/ets/SharedCore.ets'));
     if (id === '@biucing/contracts') return load(path.join(root, 'components/contracts/Index.ets'));
     return load(path.resolve(path.dirname(file), id + '.ets'));
   };
-  new vm.Script('(function(require, module, exports) {' + compiled + '\n})', { filename: file }).runInThisContext()(localRequire, module, module.exports);
+  new vm.Script('(function(require, module, exports, Observed) {' + compiled + '\n})', { filename: file }).runInThisContext()(localRequire, module, module.exports, cls => cls);
   return module.exports;
 }
 (async () => {
@@ -59,5 +61,47 @@ function load(file) {
   const fake = { analyze: async values => { assert.deepEqual(values, ['20', '22']); return '42'; }, close: async () => { closed = true; } };
   const home = new HomeFactory(fake).create();
   assert.equal(await home.calculate(), '42'); await home.close(); assert.equal(closed, true);
+  const { Application } = load(path.join(root, 'entry/src/main/ets/composition/Application.ets'));
+  let created = 0, released = 0;
+  const instances = [];
+  const application = new Application({ create() {
+    created++;
+    const service = { analyze: async () => '42', close: async () => { released++; } };
+    instances.push(service); return service;
+  } });
+  const firstOwner = application.createSession(), secondOwner = application.createSession();
+  assert.equal(created, 2, 'One service per owner through the shell and component graphs');
+  const retained = firstOwner.home;
+  await retained.calculate();
+  assert.equal(firstOwner.home, retained);
+  assert.equal(firstOwner.home.result, '42');
+  assert.notEqual(firstOwner.home, secondOwner.home);
+  const firstClose = firstOwner.close();
+  assert.equal(firstOwner.close(), firstClose);
+  await firstClose;
+  await assert.rejects(firstOwner.home.calculate(), e => e.code === 4);
+  assert.equal(await secondOwner.home.calculate(), '42');
+  await secondOwner.close(); assert.equal(released, 2);
+
+  let finishWork, finishRelease, observedToken;
+  const work = new Promise(resolve => { finishWork = resolve; });
+  const release = new Promise(resolve => { finishRelease = resolve; });
+  const slow = new Application({ create: () => ({
+    analyze: (_, token) => { observedToken = token; return work; },
+    close: () => release
+  }) }).createSession();
+  const calculation = slow.home.calculate();
+  let closeFinished = false;
+  const completion = slow.close(); completion.then(() => { closeFinished = true; });
+  assert.equal(observedToken.cancelled, true);
+  await Promise.resolve(); assert.equal(closeFinished, false);
+  finishRelease(); await Promise.resolve(); assert.equal(closeFinished, false, 'Wait for in-flight work too');
+  finishWork('stale'); await calculation; await completion;
+  assert.equal(slow.home.result, 'Ready', 'No late output after business exit');
+  assert.equal(slow.home.busy, false);
+  const broken = new Application({ create: () => ({ analyze: async () => '0', close: async () => { throw new Error('release failed'); } }) }).createSession();
+  await assert.rejects(broken.close(), /release failed/);
+  assert.equal(broken.close(), broken.close(), 'Release failure is observable and stable');
+  console.log('L01/L03/L04/I02/I03: owner retention, nested injection, independent sessions, async teardown and stale output passed');
   console.log('ArkTS source on host: serial queue, defensive copy, cancellation, async close, isolation and injected HomeFactory passed');
 })().catch(error => { console.error(error); process.exitCode = 1; });

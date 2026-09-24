@@ -960,7 +960,7 @@
         "make test-ui",
         "open -a \"Android Studio\" ."
       ],
-      "template_file_count": 117,
+      "template_file_count": 119,
       "template_top_level_entries": [
         ".editorconfig",
         ".gitignore",
@@ -1011,7 +1011,7 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "06e68099ef810c6028e2cff3de9fac29d61612d3e33aa2ad8879eff5d30c4f6b",
+        "sha256": "155c95dc17107f5276741a34b83ab22cbe8dbf6f647a6f22dd61bf8551f69a1b",
         "execute_bits": "0o0"
       },
       "README.md": {
@@ -1051,12 +1051,12 @@
       },
       "app/src/androidTest/java/app/BinaryCoreTest.kt": {
         "kind": "file",
-        "sha256": "dad231905f84a71970342f6d689ccb416018f4340aa3932fbfb3d2a50eb63276",
+        "sha256": "834997b380b80580588d48227bf33ee158879b7c73557cbcbed0e2bce268468a",
         "execute_bits": "0o0"
       },
       "app/src/androidTest/java/app/HomeRouteUiTest.kt": {
         "kind": "file",
-        "sha256": "d4c0e4574e9d2cb63fb68eeb7daa5f73c18352e6acbf7266e6159d88a41bf4e1",
+        "sha256": "d13e7fd3410589aa5a0d3778b699c217513e0a607df3a629cc181b8ac62793cf",
         "execute_bits": "0o0"
       },
       "app/src/main": {
@@ -1075,7 +1075,7 @@
       },
       "app/src/main/java/app/MainActivity.kt": {
         "kind": "file",
-        "sha256": "6e5de8c31ba8205ac7fa34aea6c5270552fe90d39d01000224a6b142083017ce",
+        "sha256": "7f86c235ff5a46b5ba862af98dd6b6b1f3df199ec7e3522d9ff892d6bf269371",
         "execute_bits": "0o0"
       },
       "app/src/main/res": {
@@ -1156,12 +1156,12 @@
       },
       "composition/src/main/java/composition/NativeAnalysisService.kt": {
         "kind": "file",
-        "sha256": "c0381461a84d370be87566d9a1ee8ae88dedb54ef67ff83e2a75a1b9fe615b61",
+        "sha256": "09540debc00d45bb830aa288be02755c1a12bb604b5c096c6841071fbb5ddc4a",
         "execute_bits": "0o0"
       },
       "composition/src/main/java/composition/SessionOwner.kt": {
         "kind": "file",
-        "sha256": "0a1bd8c0c87d8277cd8430e221ec4809f63fe589586b12ac2396f2480ca7f2f5",
+        "sha256": "fd6e70ead8b379077da59c739f22dd99c5e35af26ca1ec83ffeb687ef6f92739",
         "execute_bits": "0o0"
       },
       "composition/src/main/java/composition/ShellAssembly.java": {
@@ -1244,7 +1244,7 @@
       },
       "core/homestate/src/main/java/home/HomeModel.kt": {
         "kind": "file",
-        "sha256": "88f037f6c2d6383164c5e5af5b30159b6d8c3e25c6ded0891a4cde4629b13480",
+        "sha256": "37ab5e1b3a149a14c43ab2ac02447b6e35c3d2987fbe8b9a6a4a02b3eea72cb7",
         "execute_bits": "0o0"
       },
       "core/homestate/src/test": {
@@ -1258,7 +1258,7 @@
       },
       "core/homestate/src/test/java/home/HomeModelTest.kt": {
         "kind": "file",
-        "sha256": "ddbd5eae1615775138bab6565f825ce6181e277431445716656e4c917fdc4412",
+        "sha256": "762a60ba961a4043f937d518f7939f13fcf764d5aafb1da3961103676f37d1b3",
         "execute_bits": "0o0"
       },
       "core/model": {
@@ -1385,7 +1385,7 @@
       },
       "core/sharedcore/src/main/java/sharedcore/CoreSession.kt": {
         "kind": "file",
-        "sha256": "62f1164d4ee9c0e9b8cd8a901270aaa907a79b3d6ffe61e7b6ee9d48db2789fc",
+        "sha256": "30d481d4cf94f62ec0f580adec19e5f6b23f4a74b1984d10b704bdd7d2b542dc",
         "execute_bits": "0o0"
       },
       "core/sharedcore/src/test": {
@@ -1399,7 +1399,7 @@
       },
       "core/sharedcore/src/test/java/sharedcore/CoreSessionTest.kt": {
         "kind": "file",
-        "sha256": "bdf4395bdd4181c2b728c5b1385873a62cbedd92ba9200c8d5182c4cd5d0e858",
+        "sha256": "2ce6da7682d4ba1b94c005fd787512a03e39e52e631b2fa4c2e7569b778bca6e",
         "execute_bits": "0o0"
       },
       "core/testing": {
@@ -1443,6 +1443,11 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "ec59daabd03e32c73fa0d74d30d8b6e725875cce75cb76dcc4c5da3603892b5b",
+        "execute_bits": "0o0"
+      },
       "docs/release-delivery.md": {
         "kind": "file",
         "sha256": "f8e4df1817aec059f1209b7789cc0a04ced911a8abc9dccf0c4971c8db4bc194",
@@ -1451,6 +1456,11 @@
       "docs/release-signing.properties.example": {
         "kind": "file",
         "sha256": "4d78b734e08801ecd7827ca93bcdabe5f80d7007d4d15f2a1fd88d0d6e23a2a4",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "08ed6755449fe8184b25835eeac5910946178cc6928043e3c1cc428398cb0636",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -1501,7 +1511,7 @@
       },
       "feature/home/src/main/java/home/HomeRoute.kt": {
         "kind": "file",
-        "sha256": "4cba933affd7e61dde3fd683918d006d95f4af15fb30a153395f1a1bca139d4b",
+        "sha256": "097b76e8cd09df3e9317097350ceca9dbfe093966b61689766da4e4c09fcb465",
         "execute_bits": "0o0"
       },
       "feature/home/src/main/res": {
@@ -1572,7 +1582,7 @@
       },
       "feature/tvhome/src/main/java/tvhome/TvHomeRoute.kt": {
         "kind": "file",
-        "sha256": "31473229d4ed12667060c815ba9ab3ce67f851ea04203edb3030ef3fd0e4d341",
+        "sha256": "9604d9f0a047b558944f81451934415174efa174876a28fd4c4f8bbf78a0aa71",
         "execute_bits": "0o0"
       },
       "feature/tvhome/src/main/res": {
@@ -1613,7 +1623,7 @@
       },
       "feature/wearhome/src/main/java/wearhome/WearHomeRoute.kt": {
         "kind": "file",
-        "sha256": "a59e3f13d9706d6d842c4bc917d3167f926304c55d5075bfa5626574c235baab",
+        "sha256": "4e3e8c96de75ce3ce2063b08ec27ddc5d3ca49ef474e669e13732d82d079f5a5",
         "execute_bits": "0o0"
       },
       "feature/wearhome/src/main/res": {
@@ -1713,7 +1723,7 @@
       },
       "scripts/verify-di": {
         "kind": "file",
-        "sha256": "a7f67bc0b358f9fb4ee0e31508cfced5eceb72c96b04fe4ae0421cf21b45365a",
+        "sha256": "00c81ade673f2d9fa872a84701a2934d845eb39e31cf941fb5081628ed2f8385",
         "execute_bits": "0o100"
       },
       "scripts/verify-gradle-supply-chain": {
@@ -1833,7 +1843,7 @@
       },
       "tv/src/main/java/tv/MainActivity.kt": {
         "kind": "file",
-        "sha256": "672c1f203032d20b51e99632e99209caab929818bc656c2d0d60be0609619e9b",
+        "sha256": "b591c2dda312fae2461af6c6c800552e558568b9c5d40b34f27db5cf5fbd6525",
         "execute_bits": "0o0"
       },
       "tv/src/main/res": {
@@ -1916,7 +1926,7 @@
       },
       "wear/src/main/java/wear/MainActivity.kt": {
         "kind": "file",
-        "sha256": "836956fc9854a805c57eb6eec134812346a76964e36d4ee2f34c82cac1b5a9f1",
+        "sha256": "66a842a4fd86cef76b75bf2d7836b327b80961ef6bb8cdc75bf5316532da41b2",
         "execute_bits": "0o0"
       },
       "wear/src/main/res": {
@@ -2039,7 +2049,7 @@
         "make release-preflight",
         "open -a \"DevEco Studio\" ."
       ],
-      "template_file_count": 91,
+      "template_file_count": 95,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -2115,7 +2125,7 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "2c5c54c1949cb23e7d61b9b32e367d0b096f2ea964269ca4ddf2c188b59c4c05",
+        "sha256": "1169ffa7b4cdcbb6c28bc4f38c75bfc1629fca335e2dd24ffdf3022341568ba3",
         "execute_bits": "0o0"
       },
       "README.md": {
@@ -2257,14 +2267,19 @@
       "components/homefeature/src/main/ets": {
         "kind": "directory"
       },
+      "components/homefeature/src/main/ets/DeviceHomeViews.ets": {
+        "kind": "file",
+        "sha256": "99635a8061b046305f8593fb7a63a47ef9c8555dcb3a43ff7a1306bb6e8f5bd6",
+        "execute_bits": "0o0"
+      },
       "components/homefeature/src/main/ets/HomeModel.ets": {
         "kind": "file",
-        "sha256": "e5d059bae4523edfdbead585679ad57a7722f2ee361db991a6381ab4ab15dd26",
+        "sha256": "811422216262a93c9245e31b7a86019e393b4b0f839a20d6d4f136c83ee98b1e",
         "execute_bits": "0o0"
       },
       "components/homefeature/src/main/ets/HomeView.ets": {
         "kind": "file",
-        "sha256": "3efc7050505c9b297f034d236d2e269122558f96dcab91af25bb90cd4d4256de",
+        "sha256": "995e3020f39a28a958b66ec682a9443f3ea47706306c6f90b0e10a26fea3f75e",
         "execute_bits": "0o0"
       },
       "components/homefeature/src/main/module.json5": {
@@ -2399,9 +2414,19 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "1f7b88c2bca0dbf6e3f5a7c76dc77b6db678e55572e2b8713e1c2da1f05c15c1",
+        "execute_bits": "0o0"
+      },
       "docs/release-signing.local.properties.example": {
         "kind": "file",
         "sha256": "3b09553613a0f7a53fe75b941c72af8690c92d72e8f932a4addeb3d9707b3c4a",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "11aa25f0b0a3bee215fca0369b0486f051a793358047aa076ad681ac581f07c7",
         "execute_bits": "0o0"
       },
       "entry": {
@@ -2436,7 +2461,12 @@
       },
       "entry/src/main/ets/composition/Application.ets": {
         "kind": "file",
-        "sha256": "6eedd5bfc00a5fc3499c683e0f8683de23e69c12c8ee7d05e603ea6a5736ffb8",
+        "sha256": "8154e620cd3579b148bc58347725ab9a2552835de4d3874f5ee675a6d6478840",
+        "execute_bits": "0o0"
+      },
+      "entry/src/main/ets/composition/SessionOwner.ets": {
+        "kind": "file",
+        "sha256": "3c5e6d5efcdebcf5c45a9d666858df929b2959460cd2bbe860cfedabe1561da6",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/core": {
@@ -2463,7 +2493,7 @@
       },
       "entry/src/main/ets/entryability/EntryAbility.ets": {
         "kind": "file",
-        "sha256": "c8ac9b7efcb7d6803ee479c6d559a22bbe2ea299e77fcf87ba9673fb05fc1bae",
+        "sha256": "adab3ff72083b94e24449b87e09c8401a4de7ba0e9e7108ec52caaaa276b495e",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/pages": {
@@ -2471,7 +2501,7 @@
       },
       "entry/src/main/ets/pages/Index.ets": {
         "kind": "file",
-        "sha256": "6f0f6e5e90f136e9ab20fd37785018a53150a4ed4bb7d9c857b16c515a0f8782",
+        "sha256": "9ca994558004b50e4a9b806c0904e9de529003d6ced0745a5a03d6160456baeb",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/pages/Settings.ets": {
@@ -2530,7 +2560,7 @@
       },
       "entry/src/ohosTest/ets/test/List.test.ets": {
         "kind": "file",
-        "sha256": "2bec610b7edc78a61fc3f2e29c3fc6a69d94821085848e241ee684868d1a6027",
+        "sha256": "48d28061709fddcfd58b914ccfe1e784ace46a7adea604747741854b4fba614a",
         "execute_bits": "0o0"
       },
       "entry/src/ohosTest/module.json5": {
@@ -2543,7 +2573,7 @@
       },
       "entry/src/test/List.test.ets": {
         "kind": "file",
-        "sha256": "e7937d26bb04e962fd7ec7712a43f5c37c634352866560c85a5fb63c8238dfa0",
+        "sha256": "deb2ec49eff5470f566889d21bd0aa74fcb874f20b1d25a3a335eecb0998eafd",
         "execute_bits": "0o0"
       },
       "hvigor": {
@@ -2594,7 +2624,7 @@
       },
       "scripts/di": {
         "kind": "file",
-        "sha256": "8b27825b06fdb72eff49cf99a54e1bd007727a37a3ff1fc1cc76b8c2806f0172",
+        "sha256": "22668109a0edfe5a4e2cb6c29d97f1ddfdb9a7e7e3ec9fb7872f76dd7e18c0ed",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
@@ -2624,7 +2654,7 @@
       },
       "scripts/test-native": {
         "kind": "file",
-        "sha256": "413dbb3a77fd16a596badd46888bde640cc996f62e508678d169cce57a1e0bab",
+        "sha256": "fafef125614e97532033fef1f48eea02d9283c8511482ac43d00c6709d2bb1c1",
         "execute_bits": "0o111"
       },
       "scripts/verify-release-artifact": {
@@ -2698,7 +2728,7 @@
       },
       "tests/wrapper.cjs": {
         "kind": "file",
-        "sha256": "a35464217f61cc6facdf6ea859f3dff5d750f96bc3eb084e6612c7bd419b8973",
+        "sha256": "d7228b1fcef5cad5dc4571bd2bfccd5522a1cafe4ab3df47d8bcb55e5960fd3c",
         "execute_bits": "0o0"
       }
     }
@@ -2788,7 +2818,7 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 60,
+      "template_file_count": 63,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -2851,7 +2881,7 @@
       },
       "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/ios/Tests": {
@@ -2859,7 +2889,7 @@
       },
       "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
+        "sha256": "bcb58a4962898fa7d93e86803a6ff1e040ce8a55c19036b2822ab5e60a53a694",
         "execute_bits": "0o0"
       },
       "Apps/macos": {
@@ -2880,7 +2910,7 @@
       },
       "Apps/macos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/macos/Tests": {
@@ -2888,7 +2918,7 @@
       },
       "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "sha256": "eb8a9de2e6969f17a07a900058a0f29dc03bffa81f8f4532c56c5f453f60dac3",
         "execute_bits": "0o0"
       },
       "Apps/tvos": {
@@ -2909,7 +2939,7 @@
       },
       "Apps/tvos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/tvos/Tests": {
@@ -2917,7 +2947,7 @@
       },
       "Apps/tvos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "sha256": "fff1f4e6bc3c9a23d83b3e9e300f245a1292e2494b15d3bf82ade830c5316f68",
         "execute_bits": "0o0"
       },
       "Apps/watchos": {
@@ -2938,7 +2968,7 @@
       },
       "Apps/watchos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/watchos/Tests": {
@@ -2946,7 +2976,7 @@
       },
       "Apps/watchos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
+        "sha256": "79bd29d7293d308f52baf845c61bd365a36ca2c098838bb84f59b3d6e1e3c8c2",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -3010,7 +3040,7 @@
       },
       "Components/Sources/HomeFeature/HomeFeature.swift": {
         "kind": "file",
-        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "sha256": "f781452b329c78b11622203ab7107620be1918c8c08cfef3e4e26aeeda9d9a1d",
         "execute_bits": "0o0"
       },
       "Components/Sources/ProductContracts": {
@@ -3054,6 +3084,11 @@
       "Composition/Sources/FactoryBindings.swift": {
         "kind": "file",
         "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/SessionOwner.swift": {
+        "kind": "file",
+        "sha256": "e13c48aa579618b56958e2143af7933c344318d781c500b2dfd7d70fe7d7db1f",
         "execute_bits": "0o0"
       },
       "Dependencies": {
@@ -3169,9 +3204,19 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "228f3aff2e613eeb6fea9148a74933fe4e5266185027d9a1c8dcae6824027d88",
+        "execute_bits": "0o0"
+      },
       "docs/release-delivery.md": {
         "kind": "file",
         "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "6bb5b6a6bd49af97a87a7f866e82460ce758b65d3e44ee6f1aee6afdb675f146",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -3207,7 +3252,7 @@
       },
       "scripts/components": {
         "kind": "file",
-        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
+        "sha256": "c21aed5d643345c282f80b1fcf17e589e27fc3ca3402948248f6ed5e49df7b8e",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
@@ -3317,7 +3362,7 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 60,
+      "template_file_count": 63,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -3380,7 +3425,7 @@
       },
       "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/ios/Tests": {
@@ -3388,7 +3433,7 @@
       },
       "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
+        "sha256": "bcb58a4962898fa7d93e86803a6ff1e040ce8a55c19036b2822ab5e60a53a694",
         "execute_bits": "0o0"
       },
       "Apps/macos": {
@@ -3409,7 +3454,7 @@
       },
       "Apps/macos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/macos/Tests": {
@@ -3417,7 +3462,7 @@
       },
       "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "sha256": "eb8a9de2e6969f17a07a900058a0f29dc03bffa81f8f4532c56c5f453f60dac3",
         "execute_bits": "0o0"
       },
       "Apps/tvos": {
@@ -3438,7 +3483,7 @@
       },
       "Apps/tvos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/tvos/Tests": {
@@ -3446,7 +3491,7 @@
       },
       "Apps/tvos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "sha256": "fff1f4e6bc3c9a23d83b3e9e300f245a1292e2494b15d3bf82ade830c5316f68",
         "execute_bits": "0o0"
       },
       "Apps/watchos": {
@@ -3467,7 +3512,7 @@
       },
       "Apps/watchos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/watchos/Tests": {
@@ -3475,7 +3520,7 @@
       },
       "Apps/watchos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
+        "sha256": "79bd29d7293d308f52baf845c61bd365a36ca2c098838bb84f59b3d6e1e3c8c2",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -3539,7 +3584,7 @@
       },
       "Components/Sources/HomeFeature/HomeFeature.swift": {
         "kind": "file",
-        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "sha256": "f781452b329c78b11622203ab7107620be1918c8c08cfef3e4e26aeeda9d9a1d",
         "execute_bits": "0o0"
       },
       "Components/Sources/ProductContracts": {
@@ -3583,6 +3628,11 @@
       "Composition/Sources/FactoryBindings.swift": {
         "kind": "file",
         "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/SessionOwner.swift": {
+        "kind": "file",
+        "sha256": "e13c48aa579618b56958e2143af7933c344318d781c500b2dfd7d70fe7d7db1f",
         "execute_bits": "0o0"
       },
       "Dependencies": {
@@ -3698,9 +3748,19 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "228f3aff2e613eeb6fea9148a74933fe4e5266185027d9a1c8dcae6824027d88",
+        "execute_bits": "0o0"
+      },
       "docs/release-delivery.md": {
         "kind": "file",
         "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "6bb5b6a6bd49af97a87a7f866e82460ce758b65d3e44ee6f1aee6afdb675f146",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -3736,7 +3796,7 @@
       },
       "scripts/components": {
         "kind": "file",
-        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
+        "sha256": "c21aed5d643345c282f80b1fcf17e589e27fc3ca3402948248f6ed5e49df7b8e",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
@@ -3846,7 +3906,7 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 60,
+      "template_file_count": 63,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -3909,7 +3969,7 @@
       },
       "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/ios/Tests": {
@@ -3917,7 +3977,7 @@
       },
       "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
+        "sha256": "bcb58a4962898fa7d93e86803a6ff1e040ce8a55c19036b2822ab5e60a53a694",
         "execute_bits": "0o0"
       },
       "Apps/macos": {
@@ -3938,7 +3998,7 @@
       },
       "Apps/macos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/macos/Tests": {
@@ -3946,7 +4006,7 @@
       },
       "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "sha256": "eb8a9de2e6969f17a07a900058a0f29dc03bffa81f8f4532c56c5f453f60dac3",
         "execute_bits": "0o0"
       },
       "Apps/tvos": {
@@ -3967,7 +4027,7 @@
       },
       "Apps/tvos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/tvos/Tests": {
@@ -3975,7 +4035,7 @@
       },
       "Apps/tvos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "sha256": "fff1f4e6bc3c9a23d83b3e9e300f245a1292e2494b15d3bf82ade830c5316f68",
         "execute_bits": "0o0"
       },
       "Apps/watchos": {
@@ -3996,7 +4056,7 @@
       },
       "Apps/watchos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/watchos/Tests": {
@@ -4004,7 +4064,7 @@
       },
       "Apps/watchos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
+        "sha256": "79bd29d7293d308f52baf845c61bd365a36ca2c098838bb84f59b3d6e1e3c8c2",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -4068,7 +4128,7 @@
       },
       "Components/Sources/HomeFeature/HomeFeature.swift": {
         "kind": "file",
-        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "sha256": "f781452b329c78b11622203ab7107620be1918c8c08cfef3e4e26aeeda9d9a1d",
         "execute_bits": "0o0"
       },
       "Components/Sources/ProductContracts": {
@@ -4112,6 +4172,11 @@
       "Composition/Sources/FactoryBindings.swift": {
         "kind": "file",
         "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/SessionOwner.swift": {
+        "kind": "file",
+        "sha256": "e13c48aa579618b56958e2143af7933c344318d781c500b2dfd7d70fe7d7db1f",
         "execute_bits": "0o0"
       },
       "Dependencies": {
@@ -4227,9 +4292,19 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "228f3aff2e613eeb6fea9148a74933fe4e5266185027d9a1c8dcae6824027d88",
+        "execute_bits": "0o0"
+      },
       "docs/release-delivery.md": {
         "kind": "file",
         "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "6bb5b6a6bd49af97a87a7f866e82460ce758b65d3e44ee6f1aee6afdb675f146",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -4265,7 +4340,7 @@
       },
       "scripts/components": {
         "kind": "file",
-        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
+        "sha256": "c21aed5d643345c282f80b1fcf17e589e27fc3ca3402948248f6ed5e49df7b8e",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
@@ -4375,7 +4450,7 @@
         "make test",
         "open demo.xcworkspace"
       ],
-      "template_file_count": 60,
+      "template_file_count": 63,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -4438,7 +4513,7 @@
       },
       "Apps/ios/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/ios/Tests": {
@@ -4446,7 +4521,7 @@
       },
       "Apps/ios/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "a1124dd19682c98eb54975410e2041885f1b53e07c3bc6f98c2c5ec9e578bd38",
+        "sha256": "bcb58a4962898fa7d93e86803a6ff1e040ce8a55c19036b2822ab5e60a53a694",
         "execute_bits": "0o0"
       },
       "Apps/macos": {
@@ -4467,7 +4542,7 @@
       },
       "Apps/macos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/macos/Tests": {
@@ -4475,7 +4550,7 @@
       },
       "Apps/macos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "3f8d245cee22f5e61f3df3fe815f0de2c32255c7f1ab397b1deffe6d92f155e3",
+        "sha256": "eb8a9de2e6969f17a07a900058a0f29dc03bffa81f8f4532c56c5f453f60dac3",
         "execute_bits": "0o0"
       },
       "Apps/tvos": {
@@ -4496,7 +4571,7 @@
       },
       "Apps/tvos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/tvos/Tests": {
@@ -4504,7 +4579,7 @@
       },
       "Apps/tvos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "9da8a1cdcefea44a2216aedfb837f4e29e8ef80910bad5bc057b7a5db50d81ba",
+        "sha256": "fff1f4e6bc3c9a23d83b3e9e300f245a1292e2494b15d3bf82ade830c5316f68",
         "execute_bits": "0o0"
       },
       "Apps/watchos": {
@@ -4525,7 +4600,7 @@
       },
       "Apps/watchos/Sources/ShellRoot.swift": {
         "kind": "file",
-        "sha256": "eadb753428c184ff6bea592f6c6b0d31657a3075ebb83e61da6e9a1533637bf5",
+        "sha256": "c83caba5b177939240b8747f11fe74dac2bba4583a318db4c1f7f19e197dc4b8",
         "execute_bits": "0o0"
       },
       "Apps/watchos/Tests": {
@@ -4533,7 +4608,7 @@
       },
       "Apps/watchos/Tests/AppTests.swift": {
         "kind": "file",
-        "sha256": "4b289096be5af221075a3b5c677a9639e2949fc8113217e6fae76684e173f44d",
+        "sha256": "79bd29d7293d308f52baf845c61bd365a36ca2c098838bb84f59b3d6e1e3c8c2",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -4597,7 +4672,7 @@
       },
       "Components/Sources/HomeFeature/HomeFeature.swift": {
         "kind": "file",
-        "sha256": "6e67b808baebdc0949974675fd9a41548e95d9f6f1bf655bc5f72e6eae597a76",
+        "sha256": "f781452b329c78b11622203ab7107620be1918c8c08cfef3e4e26aeeda9d9a1d",
         "execute_bits": "0o0"
       },
       "Components/Sources/ProductContracts": {
@@ -4641,6 +4716,11 @@
       "Composition/Sources/FactoryBindings.swift": {
         "kind": "file",
         "sha256": "66b6073b5ef78c6a9b06027a767c0facf3bf2b50ac0bc72379de3eecb9317e98",
+        "execute_bits": "0o0"
+      },
+      "Composition/Sources/SessionOwner.swift": {
+        "kind": "file",
+        "sha256": "e13c48aa579618b56958e2143af7933c344318d781c500b2dfd7d70fe7d7db1f",
         "execute_bits": "0o0"
       },
       "Dependencies": {
@@ -4756,9 +4836,19 @@
       "docs": {
         "kind": "directory"
       },
+      "docs/architecture-acceptance.md": {
+        "kind": "file",
+        "sha256": "228f3aff2e613eeb6fea9148a74933fe4e5266185027d9a1c8dcae6824027d88",
+        "execute_bits": "0o0"
+      },
       "docs/release-delivery.md": {
         "kind": "file",
         "sha256": "9e84744da43838431cd25b41f50def5b350fdccf25f965545f6cd98f1c12b6a5",
+        "execute_bits": "0o0"
+      },
+      "docs/verification-record.example.json": {
+        "kind": "file",
+        "sha256": "6bb5b6a6bd49af97a87a7f866e82460ce758b65d3e44ee6f1aee6afdb675f146",
         "execute_bits": "0o0"
       },
       "fastlane": {
@@ -4794,7 +4884,7 @@
       },
       "scripts/components": {
         "kind": "file",
-        "sha256": "72a67c79fa58d46748c36038e524b0a606b0bf51fa94c21c6467eb7ebe7d90de",
+        "sha256": "c21aed5d643345c282f80b1fcf17e589e27fc3ca3402948248f6ed5e49df7b8e",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {

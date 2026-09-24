@@ -1,5 +1,7 @@
 # HarmonyOS 核心、字节码组件与壳验证
 
+本轮共同契约变更的新增验证见[实现与验证记录](cross-platform-architecture-verification.md)；以下保留原阶段证据，不能自动视为新实现的复测结果。
+
 更新：2026-09-24。设计与决策见 [HarmonyOS 架构](harmonyos-shell-component-architecture.md)。
 
 ## 本地环境
