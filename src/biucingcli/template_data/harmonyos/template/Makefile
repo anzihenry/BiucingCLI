@@ -38,7 +38,7 @@ lint:
 test:
 	./scripts/test
 
-build:
+build: components-verify di-shell
 	$(HVIGOR) assembleHap --mode module $(HVIGOR_PROPS)
 
 package: build
@@ -104,3 +104,26 @@ clean-worktree:
 
 help:
 	@printf '%s\n' "Common commands:" "  make bootstrap  Prepare project dependencies and tooling" "  make doctor     Check the local environment" "  make lint       Run static checks" "  make test       Run automated tests" "  make verify     Run the template quality gate" "  make build      Build the project" "  make clean      Remove generated build state" "  make help       Show this command contract"
+
+.PHONY: components-bootstrap components-verify components-info di-shell verify-di core-test test-native
+components-bootstrap:
+	./scripts/components bootstrap
+components-verify:
+	./scripts/components verify
+components-info:
+	./scripts/components info
+di-shell:
+	./scripts/di --scope shell
+verify-di:
+	./scripts/di --test
+core-test:
+	cmake -S shared/core -B .biucing/core-test -DCMAKE_BUILD_TYPE=Release
+	cmake --build .biucing/core-test
+	ctest --test-dir .biucing/core-test --output-on-failure
+test-native:
+	./scripts/test-native
+verify: components-verify verify-di
+
+.PHONY: build-device-tests
+build-device-tests: components-verify di-shell
+	$(HVIGOR) assembleHap --mode module -p module={{HARMONY_MODULE_NAME}}@ohosTest

@@ -19,3 +19,15 @@ local.properties
 *.p8
 *.p12
 *.pfx
+
+.artifacts/
+**/build/
+**/oh_modules/
+**/.hvigor/
+components/oh-package-lock.json5
+components/*/oh-package-lock.json5
+entry/oh-package-lock.json5
+components/homefeature/src/main/ets/GeneratedGraph.ets
+entry/src/main/ets/composition/GeneratedGraph.ets
+**/.test/
+**/.cxx/

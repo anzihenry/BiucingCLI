@@ -1,0 +1,25 @@
+{
+  "function": "createHomeModel",
+  "output": "src/main/ets/GeneratedGraph.ets",
+  "imports": {
+    "@biucing/contracts": [
+      "AnalysisService"
+    ],
+    "./HomeModel": [
+      "HomeModel"
+    ]
+  },
+  "inputs": {
+    "service": "AnalysisService"
+  },
+  "nodes": [
+    {
+      "id": "model",
+      "type": "HomeModel",
+      "args": [
+        "service"
+      ]
+    }
+  ],
+  "result": "model"
+}

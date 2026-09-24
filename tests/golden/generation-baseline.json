@@ -2028,6 +2028,7 @@
       ],
       "derived_values": {},
       "next_steps": [
+        "make components-bootstrap",
         "make bootstrap",
         "make doctor",
         "make lint",
@@ -2038,7 +2039,7 @@
         "make release-preflight",
         "open -a \"DevEco Studio\" ."
       ],
-      "template_file_count": 39,
+      "template_file_count": 91,
       "template_top_level_entries": [
         ".gitignore",
         ".mise.toml",
@@ -2047,24 +2048,29 @@
         "README.md",
         "build-profile.json5",
         "code-linter.json5",
+        "components",
+        "composition",
+        "dependencies",
         "docs",
         "entry",
         "hvigor",
         "hvigorfile.ts",
         "oh-package-lock.json5",
         "oh-package.json5",
-        "scripts"
+        "scripts",
+        "shared",
+        "tests"
       ]
     },
     "entries": {
       ".gitignore": {
         "kind": "file",
-        "sha256": "93283e476ff3e2eadc3633a070434e5df38d354b3da91ebc8518e12cfe7e56da",
+        "sha256": "99701088de4024955855ef164c16ebc80e196340e5dd58a5a421e0ec2abe4251",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "ce98956f06283b132562f74ba10fe88b2c9569b36439cbe7d3585c8a15a6d1fc",
+        "sha256": "30a256ab18f8f59fd23aa744da0d548e06001b557355c4d6e82fdf11f6ec325d",
         "execute_bits": "0o0"
       },
       "AppScope": {
@@ -2109,22 +2115,285 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "3c0b45b7f48e0c6e9b69309bba8f4ce2b40ae54662257e86136c66afa6d59382",
+        "sha256": "2c5c54c1949cb23e7d61b9b32e367d0b096f2ea964269ca4ddf2c188b59c4c05",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "5958a5138be65b97be94d5917ef29c95c946bf410e3ca0456caa02c0e8fcb6d2",
+        "sha256": "5f3c029b86c58fe9b8ba10f174df7f53e7bd214d7a468241c0f43879e6946a4c",
         "execute_bits": "0o0"
       },
       "build-profile.json5": {
         "kind": "file",
-        "sha256": "76e446e1938d864d837c385897903ad8bba00ea39d85e5fb59702ae3629eaaff",
+        "sha256": "ce11e0ca4ba6148a9fc6cff4e8e76b3ca372710b6527480663d1cef03fc63fa5",
         "execute_bits": "0o0"
       },
       "code-linter.json5": {
         "kind": "file",
         "sha256": "fd45000fc073faeb768713320a0cb07657bcb7a5d9127e721de44cef07f3ea7f",
+        "execute_bits": "0o0"
+      },
+      "components": {
+        "kind": "directory"
+      },
+      "components/AppScope": {
+        "kind": "directory"
+      },
+      "components/AppScope/app.json5": {
+        "kind": "file",
+        "sha256": "a87e86a6fdeea3b91feb50c2c624cda305ed049413e8f17690211db110c0ec6b",
+        "execute_bits": "0o0"
+      },
+      "components/AppScope/resources": {
+        "kind": "directory"
+      },
+      "components/AppScope/resources/base": {
+        "kind": "directory"
+      },
+      "components/AppScope/resources/base/element": {
+        "kind": "directory"
+      },
+      "components/AppScope/resources/base/element/string.json": {
+        "kind": "file",
+        "sha256": "8510befc5d4ba40525e14314b7119b5dae0dafc20323012e2acd2a7082aa352b",
+        "execute_bits": "0o0"
+      },
+      "components/AppScope/resources/base/media": {
+        "kind": "directory"
+      },
+      "components/AppScope/resources/base/media/background.svg": {
+        "kind": "file",
+        "sha256": "83f3db3866a27187c23c05bc05ea78ff6d8330e33c22fa84bcc7a719b9974271",
+        "execute_bits": "0o0"
+      },
+      "components/AppScope/resources/base/media/foreground.svg": {
+        "kind": "file",
+        "sha256": "d641be492d03a7a756558664c4d0b8d2ce277a898c3ad32695b5a5b68a7f2223",
+        "execute_bits": "0o0"
+      },
+      "components/AppScope/resources/base/media/layered_image.json": {
+        "kind": "file",
+        "sha256": "e583b2f5d6d9896d8f92c4598d664a6cf3cd61acdeb84538f2f30bfa68ac2bd2",
+        "execute_bits": "0o0"
+      },
+      "components/build-profile.json5": {
+        "kind": "file",
+        "sha256": "f3796dd2f4cf094762e8fb1c41302adfeced3b2daa054da7db05929df5de67aa",
+        "execute_bits": "0o0"
+      },
+      "components/contracts": {
+        "kind": "directory"
+      },
+      "components/contracts/DesignSystem.ets": {
+        "kind": "file",
+        "sha256": "72650aff5449ad586baac901346f5fc76bb78559f20199745ca0b8ba808c5266",
+        "execute_bits": "0o0"
+      },
+      "components/contracts/Index.ets": {
+        "kind": "file",
+        "sha256": "63a14031bdcb2b1b54d42fde3548256f4f0438e9a1495d0fd9345d8b2477d21e",
+        "execute_bits": "0o0"
+      },
+      "components/contracts/build-profile.json5": {
+        "kind": "file",
+        "sha256": "9c93eada137aea1ea071958e9129b0ff2b2dddf15461a5087e87b811c212214c",
+        "execute_bits": "0o0"
+      },
+      "components/contracts/hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "ec10a36e82caa46c6e8acc7475d6a889080c130e6d825335745a52d03dd3b0de",
+        "execute_bits": "0o0"
+      },
+      "components/contracts/oh-package.json5": {
+        "kind": "file",
+        "sha256": "d548f8378aef4f6d89a353c9f9fcca2914be40efa25663ab3aedfbd02579f314",
+        "execute_bits": "0o0"
+      },
+      "components/contracts/src": {
+        "kind": "directory"
+      },
+      "components/contracts/src/main": {
+        "kind": "directory"
+      },
+      "components/contracts/src/main/module.json5": {
+        "kind": "file",
+        "sha256": "bd4afcd855efe65d0b108e69edd24cc3a445015fa71d4fd9dde6274a80c7f48d",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature": {
+        "kind": "directory"
+      },
+      "components/homefeature/Index.ets": {
+        "kind": "file",
+        "sha256": "138f3dc54ab351da27ecdae08f083de939ddd5528a490fa79391309f1bab9b55",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/build-profile.json5": {
+        "kind": "file",
+        "sha256": "9c93eada137aea1ea071958e9129b0ff2b2dddf15461a5087e87b811c212214c",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/di.json": {
+        "kind": "file",
+        "sha256": "86c8d4e8f0b86d56c42f6eb591bca2cb21efc934871eb7f09605e4c5a88b9197",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "ec10a36e82caa46c6e8acc7475d6a889080c130e6d825335745a52d03dd3b0de",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/oh-package.json5": {
+        "kind": "file",
+        "sha256": "7a3e64356c1d16b019c737364a18d4f4e1e683b00ae0e60579680329f8f62ea3",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/src": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main/ets": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main/ets/HomeModel.ets": {
+        "kind": "file",
+        "sha256": "e5d059bae4523edfdbead585679ad57a7722f2ee361db991a6381ab4ab15dd26",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/src/main/ets/HomeView.ets": {
+        "kind": "file",
+        "sha256": "3efc7050505c9b297f034d236d2e269122558f96dcab91af25bb90cd4d4256de",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/src/main/module.json5": {
+        "kind": "file",
+        "sha256": "6628c37da12b28e08682a8d3e42ef4dc320bfd503d117bbe392059b866f47bf6",
+        "execute_bits": "0o0"
+      },
+      "components/homefeature/src/main/resources": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main/resources/base": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main/resources/base/element": {
+        "kind": "directory"
+      },
+      "components/homefeature/src/main/resources/base/element/string.json": {
+        "kind": "file",
+        "sha256": "46ddccc97ff601665b1556064fed648a0d0d7176a66d00b752f7c91d5e81ac8f",
+        "execute_bits": "0o0"
+      },
+      "components/hvigor": {
+        "kind": "directory"
+      },
+      "components/hvigor/hvigor-config.json5": {
+        "kind": "file",
+        "sha256": "875d669a4a58a7cfac802ffdbc6fbf2e5272f98a00831a99c0b3814ebd6d0278",
+        "execute_bits": "0o0"
+      },
+      "components/hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "2378c5e0c5246005ada73a67e8c9834fa08adb9ffd6fb6c219051456753bed5a",
+        "execute_bits": "0o0"
+      },
+      "components/oh-package.json5": {
+        "kind": "file",
+        "sha256": "e79c5071dc5f1fd834bee3a79485c62b0f378c04b068530a35bc4cca372e5ba6",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore": {
+        "kind": "directory"
+      },
+      "components/sharedcore/Index.ets": {
+        "kind": "file",
+        "sha256": "3e78a6e81af307b54771c3eb21c4ac495630be25c06dfbb6fb0badf5f262b1bb",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/build-profile.json5": {
+        "kind": "file",
+        "sha256": "29f768817199df246a2caa532d864e6b0d2902c9e56bc0df12544150b5d6fc2b",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/hvigorfile.ts": {
+        "kind": "file",
+        "sha256": "ec10a36e82caa46c6e8acc7475d6a889080c130e6d825335745a52d03dd3b0de",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/oh-package.json5": {
+        "kind": "file",
+        "sha256": "382fab114091c89c95070f76908478e7e919d0e0c86ad35338f2a6e4bd6c80a0",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main/cpp": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main/cpp/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "73b39cdfbf8cf4b83f73756fdf35f51ae07619f7670e22a2638a07d2d5272448",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src/main/cpp/bridge.cpp": {
+        "kind": "file",
+        "sha256": "bfdeecc7ca35ae1cc08aa15b3f43c92986157e4cc142d0bae63576fa7a4d7605",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src/main/cpp/types": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main/cpp/types/libbiucing_shared": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main/cpp/types/libbiucing_shared/Index.d.ts": {
+        "kind": "file",
+        "sha256": "0d74a711881e09958fd5d02d591a0e07520bf0ee871464e5811290e33264491f",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src/main/cpp/types/libbiucing_shared/oh-package.json5": {
+        "kind": "file",
+        "sha256": "d8f0563b047c534a85a9fafbb77a9b857ce32445f2c318f59b9f52ed6f9b33e8",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src/main/ets": {
+        "kind": "directory"
+      },
+      "components/sharedcore/src/main/ets/SharedCore.ets": {
+        "kind": "file",
+        "sha256": "7b4d8a6cee1fdc8ff38e39a0b0e3c4e08a4adb88063c0a91b4b49f57e5a65bc1",
+        "execute_bits": "0o0"
+      },
+      "components/sharedcore/src/main/module.json5": {
+        "kind": "file",
+        "sha256": "ea144958068d8c3d6e0854a415e6bf6aa99ac3cbea57c3891657c4c206a6b199",
+        "execute_bits": "0o0"
+      },
+      "composition": {
+        "kind": "directory"
+      },
+      "composition/di.json": {
+        "kind": "file",
+        "sha256": "89210dcba1d76ed8ab2cb7c369005e95188ebff4cc2de2df5202e268da0fe1e4",
+        "execute_bits": "0o0"
+      },
+      "dependencies": {
+        "kind": "directory"
+      },
+      "dependencies/components.json": {
+        "kind": "file",
+        "sha256": "7134caebc49fb20b13a098d0650969ca4141a29c950c7824ba87ed9446f87b94",
+        "execute_bits": "0o0"
+      },
+      "dependencies/toolchain.json": {
+        "kind": "file",
+        "sha256": "3c24eff60b3209db492aa2623755c7fc56df3f405fbd13aa88cb3f7615115751",
         "execute_bits": "0o0"
       },
       "docs": {
@@ -2140,7 +2409,7 @@
       },
       "entry/build-profile.json5": {
         "kind": "file",
-        "sha256": "46d1b87a9913197745942b7aad13d81bf029e71fd07436ed5cf5bfbbb15d01eb",
+        "sha256": "a06f7e430293c22c626ed34c0f7c5d7baf0a9446cf5b1b70fec9333622c37842",
         "execute_bits": "0o0"
       },
       "entry/hvigorfile.ts": {
@@ -2150,7 +2419,7 @@
       },
       "entry/oh-package.json5": {
         "kind": "file",
-        "sha256": "1066a75d78e47e7d25c25c957da7af77357d237d23d129c58de4ffea26596461",
+        "sha256": "c79dfa54a51835153fd7892d2b3112c79b9c3ffdb009c9d3e168cd7dc06de11f",
         "execute_bits": "0o0"
       },
       "entry/src": {
@@ -2161,6 +2430,14 @@
       },
       "entry/src/main/ets": {
         "kind": "directory"
+      },
+      "entry/src/main/ets/composition": {
+        "kind": "directory"
+      },
+      "entry/src/main/ets/composition/Application.ets": {
+        "kind": "file",
+        "sha256": "6eedd5bfc00a5fc3499c683e0f8683de23e69c12c8ee7d05e603ea6a5736ffb8",
+        "execute_bits": "0o0"
       },
       "entry/src/main/ets/core": {
         "kind": "directory"
@@ -2178,7 +2455,7 @@
       },
       "entry/src/main/ets/core/designsystem/Tokens.ets": {
         "kind": "file",
-        "sha256": "72650aff5449ad586baac901346f5fc76bb78559f20199745ca0b8ba808c5266",
+        "sha256": "b4b3e1da919a7c4c08e8386dfd457e53793d6cce88987fac04ada2d1b694c692",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/entryability": {
@@ -2186,7 +2463,7 @@
       },
       "entry/src/main/ets/entryability/EntryAbility.ets": {
         "kind": "file",
-        "sha256": "688798bbbf8eb6cbfd1b7df251b1e38524decbc01cf87e78f30266fb3bc00f6f",
+        "sha256": "c8ac9b7efcb7d6803ee479c6d559a22bbe2ea299e77fcf87ba9673fb05fc1bae",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/pages": {
@@ -2194,7 +2471,7 @@
       },
       "entry/src/main/ets/pages/Index.ets": {
         "kind": "file",
-        "sha256": "fc61b0f829aa668b84c184622be2631a9d9f6cabeba558b7d828b92a6300ec89",
+        "sha256": "6f0f6e5e90f136e9ab20fd37785018a53150a4ed4bb7d9c857b16c515a0f8782",
         "execute_bits": "0o0"
       },
       "entry/src/main/ets/pages/Settings.ets": {
@@ -2204,7 +2481,7 @@
       },
       "entry/src/main/module.json5": {
         "kind": "file",
-        "sha256": "2a6a909ab7bc90ce7049e54294fc90478c1e778acd4d3743fed82762809b940c",
+        "sha256": "66806eb32b892814d54c18ae6c41d2f4cf2b8796d89d20fa5a2c06cb1d966a5b",
         "execute_bits": "0o0"
       },
       "entry/src/main/resources": {
@@ -2242,12 +2519,31 @@
         "sha256": "aec3e4783f812b5ced83d73b22c3a0bed55e899296ef6fa19943027b21064102",
         "execute_bits": "0o0"
       },
+      "entry/src/ohosTest": {
+        "kind": "directory"
+      },
+      "entry/src/ohosTest/ets": {
+        "kind": "directory"
+      },
+      "entry/src/ohosTest/ets/test": {
+        "kind": "directory"
+      },
+      "entry/src/ohosTest/ets/test/List.test.ets": {
+        "kind": "file",
+        "sha256": "2bec610b7edc78a61fc3f2e29c3fc6a69d94821085848e241ee684868d1a6027",
+        "execute_bits": "0o0"
+      },
+      "entry/src/ohosTest/module.json5": {
+        "kind": "file",
+        "sha256": "111c25a7ed9d6e5c6b3390322822a0609b155aa29bb7da3b81c3ab55381ad386",
+        "execute_bits": "0o0"
+      },
       "entry/src/test": {
         "kind": "directory"
       },
       "entry/src/test/List.test.ets": {
         "kind": "file",
-        "sha256": "62217d4f506a651c2c80d5e141ea0b0a3350a29098c9e0203a7c832b16929537",
+        "sha256": "e7937d26bb04e962fd7ec7712a43f5c37c634352866560c85a5fb63c8238dfa0",
         "execute_bits": "0o0"
       },
       "hvigor": {
@@ -2260,17 +2556,17 @@
       },
       "hvigorfile.ts": {
         "kind": "file",
-        "sha256": "2438d9d66674d5cf7d40d426a925f3ccfa2015791f62fa38473c3a27d7474b09",
+        "sha256": "ed36c29a10073e9f562e8927dd4c98bb2b2c0898806a461522fcb51c3e20e497",
         "execute_bits": "0o0"
       },
       "oh-package-lock.json5": {
         "kind": "file",
-        "sha256": "6891f9db4f84bb2bfea5c3c7befa41a41fd100672b1c7c8a93147b5b578f0bdb",
+        "sha256": "e1c1d66e335c61a8b73806a31b932a30a42a193b21fa32f204d091be2a6e483c",
         "execute_bits": "0o0"
       },
       "oh-package.json5": {
         "kind": "file",
-        "sha256": "916c9d5b35b119a326d175ada373c5ccac6b3d087dbf49163fe5c61de9a91fc7",
+        "sha256": "f38de3e6dbf8b2c5e9d86b403ff2b174ecacee4e32164d38d6b289e522600417",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -2283,17 +2579,32 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "19af6414a9a4b3c93ceb8590c092a7c0a64db5b774da081d7f43cbbf83ed945a",
+        "sha256": "73261d5d2df82f020fd01dffa2d9830a66e1a54d0e60e42804c23ffd36303777",
         "execute_bits": "0o100"
+      },
+      "scripts/check-toolchain": {
+        "kind": "file",
+        "sha256": "c8270fc3019e343b70ba96be9c7b03faac24ef534e34ff775003e57c81c2a6ce",
+        "execute_bits": "0o111"
+      },
+      "scripts/components": {
+        "kind": "file",
+        "sha256": "983e03218e3e50e137ec1512d0bfb74553534b4a724ceb0bf9f7f63f4cafd592",
+        "execute_bits": "0o111"
+      },
+      "scripts/di": {
+        "kind": "file",
+        "sha256": "8b27825b06fdb72eff49cf99a54e1bd007727a37a3ff1fc1cc76b8c2806f0172",
+        "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "874f23140bc2d6c868ac74b871087d13f6ca7d961e98fae2574ac4bf1c6abb79",
+        "sha256": "fcb4510b4db2b474d7e4037896c445af6b859e34517b4e38f9904eb3a8828efb",
         "execute_bits": "0o100"
       },
       "scripts/lint": {
         "kind": "file",
-        "sha256": "3e9f82499ffb54589b1257acb77a6da52dcd17a67c13843684c7638d197975df",
+        "sha256": "cf704ede92ee236f078e790f71c8a498d6aa5266f540221de8ed44abeac385b9",
         "execute_bits": "0o100"
       },
       "scripts/release-build": {
@@ -2311,6 +2622,11 @@
         "sha256": "f1ec2abc8f7924d027111aeaf577e1ac13d97b8e9a4e987776f1b0a6b53cc281",
         "execute_bits": "0o111"
       },
+      "scripts/test-native": {
+        "kind": "file",
+        "sha256": "413dbb3a77fd16a596badd46888bde640cc996f62e508678d169cce57a1e0bab",
+        "execute_bits": "0o111"
+      },
       "scripts/verify-release-artifact": {
         "kind": "file",
         "sha256": "4a9e05512e24cebf5130e42fe6f727c346af142d441b9eea0c71e558d7024958",
@@ -2320,6 +2636,70 @@
         "kind": "file",
         "sha256": "e5ba01ce28d418142c1456a8cc46b793376cef1a82ab50babb1d3c206f872228",
         "execute_bits": "0o111"
+      },
+      "shared": {
+        "kind": "directory"
+      },
+      "shared/core": {
+        "kind": "directory"
+      },
+      "shared/core/CMakeLists.txt": {
+        "kind": "file",
+        "sha256": "41150906b3ecfcf353ec0685249d9758ce36132512da94a5729087009a9b60a4",
+        "execute_bits": "0o0"
+      },
+      "shared/core/Sources": {
+        "kind": "directory"
+      },
+      "shared/core/Sources/CoreNative": {
+        "kind": "directory"
+      },
+      "shared/core/Sources/CoreNative/bridge.cpp": {
+        "kind": "file",
+        "sha256": "43e8833d37dd3e3a5e716ab1a010552abe3c071cbc6006b6e72ee9ec3806bfb0",
+        "execute_bits": "0o0"
+      },
+      "shared/core/Sources/CoreNative/core.cpp": {
+        "kind": "file",
+        "sha256": "ad86cab86a6a0d7c78d9f3680117325559e580f5c576f489f1f02ad8bead07b4",
+        "execute_bits": "0o0"
+      },
+      "shared/core/Sources/CoreNative/core.hpp": {
+        "kind": "file",
+        "sha256": "3b5782549b6590db62513f22a43b7e843daa3004abcfddda820f82da8580d731",
+        "execute_bits": "0o0"
+      },
+      "shared/core/Sources/CoreNative/include": {
+        "kind": "directory"
+      },
+      "shared/core/Sources/CoreNative/include/CoreNative.h": {
+        "kind": "file",
+        "sha256": "1ce8453a0c5c897a965edffc07e82bf0c0b6120c47b127ac53ab4a4b21354dc2",
+        "execute_bits": "0o0"
+      },
+      "shared/core/Tests": {
+        "kind": "directory"
+      },
+      "shared/core/Tests/Native": {
+        "kind": "directory"
+      },
+      "shared/core/Tests/Native/core_test.c": {
+        "kind": "file",
+        "sha256": "93515f1519f6a1dbe0af09a3c0cac671ae0a7f3a5bdb29e412daf0680a307026",
+        "execute_bits": "0o0"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/native.cjs": {
+        "kind": "file",
+        "sha256": "f333a56dba776328356c494245e631238deb3ef299fea8f891a9833249218a89",
+        "execute_bits": "0o0"
+      },
+      "tests/wrapper.cjs": {
+        "kind": "file",
+        "sha256": "a35464217f61cc6facdf6ea859f3dff5d750f96bc3eb084e6612c7bd419b8973",
+        "execute_bits": "0o0"
       }
     }
   },

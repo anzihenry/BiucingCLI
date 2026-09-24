@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(BiucingHarmony LANGUAGES C CXX)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../shared/core" "${CMAKE_CURRENT_BINARY_DIR}/core")
+add_library(biucing_shared SHARED bridge.cpp)
+target_compile_features(biucing_shared PRIVATE cxx_std_20)
+target_compile_options(biucing_shared PRIVATE -Wall -Wextra -Werror -Wno-error=unused-command-line-argument -g)
+target_link_libraries(biucing_shared PRIVATE Biucing::Core libace_napi.z.so)

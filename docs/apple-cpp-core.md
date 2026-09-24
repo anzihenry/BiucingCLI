@@ -66,7 +66,7 @@ Swift interface/ABI 描述及符号说明。静态对象包含 DWARF，最终应
 - Windows/Linux CMake CI 已配置但没有本次远端运行结果。
 - 四平台完整 CI 工作流已提供，需配置 `apple-swift64` macOS runner 后启用。
 - Android 模版已提供 Kotlin/JNI 与二进制组件基线，见 [Android 验证](android-component-verification.md)；
-  Apple 工程不会同时生成 Android 壳。HarmonyOS/Node-API、Windows/Linux UI 及适配器仍待实现。
+  Apple 工程不会同时生成 Android 壳。HarmonyOS/Node-API 已接入共享核心与组件基线，见 [HarmonyOS 验证](harmonyos-component-verification.md)；Windows/Linux UI 及适配器仍待实现。
 - 外部产物托管和认证由团队配置；默认实现是本地不可变仓库及明确的目录/清单契约。
 - 当前示例没有真实业务数据库、迁移或长任务进度回调；后续组件须继续落实相关契约。
 

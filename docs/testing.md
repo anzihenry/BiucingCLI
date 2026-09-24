@@ -220,3 +220,13 @@ previously become stale and was no longer used by the partial CLI assertions.
 Its maturity-summary line was reconciled against the pre-stage-6 committed CLI
 output, not inferred from the new implementation. Generated-project and JSON
 goldens were unchanged.
+
+
+HarmonyOS binary architecture adds `test_harmony_components.py` to the Python core suite:
+locked closure integrity, independent upgrades, overrides, installed-SDK tampering,
+source substitution, DI rejection and canonical core synchronization. The optional
+`harmonyos-components.yml` workflow requires a runner labeled `harmonyos-sdk611` with the
+reviewed tools on PATH. Generated projects expose `make core-test`, `make test-native`,
+`make verify-di`, `make verify` and `make build-device-tests`. See
+[HarmonyOS verification](harmonyos-component-verification.md) for actual execution evidence
+and the distinction between host tests, test-package compilation and device runtime tests.

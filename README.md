@@ -224,5 +224,7 @@ Local HarmonyOS validation status:
 - [Android 壳工程与组件架构（已实现基线）](docs/android-shell-component-architecture.md)
 - [Android 组件验证记录](docs/android-component-verification.md)
 - [HarmonyOS Team Environment Standard](docs/harmonyos-team-environment-standard.md)
+- [HarmonyOS shell/component architecture](docs/harmonyos-shell-component-architecture.md)
+- [HarmonyOS component verification](docs/harmonyos-component-verification.md)
 - [Android Template Design](docs/android-template-design.md)
 - [Microservice Template Design](docs/microservice-template-design.md)

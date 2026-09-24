@@ -22,7 +22,7 @@
   ],
   "maturity": {
     "level": "experimental",
-    "summary": "HarmonyOS starter with DevEco-compatible project files, ArkTS entry ability, doctor checks, Hypium test wiring, build verification, artifact checks, and local release-signing preflight."
+    "summary": "Thin ArkTS shell consuming independently versioned bytecode HARs, shared C++20/Node-API sessions, build-time DI graphs, exact artifact locks and five-device architecture scope; device runtime acceptance remains required."
   },
   "validation": {
     "status": "generated-project-verified",
@@ -30,12 +30,17 @@
     "evidence": [
       "python unittest template rendering coverage",
       "repo-level template metadata and placeholder validation",
-      "generated-project bootstrap, lint, test, build, artifact, and release-preflight commands"
+      "generated-project bootstrap, lint, test, build, artifact, and release-preflight commands",
+      "real bytecode HAR and unsigned HAP builds with pinned DevEco SDK",
+      "host Node-API and ArkTS wrapper/model behavior; published-component Hypium tests",
+      "source-free Debug/Release consumption and binary closure rejection tests"
     ]
   },
   "operating_assumptions": [
     "The starter assumes DevEco Studio or a local HarmonyOS SDK provides ohpm and hvigor.",
-    "Generated projects are structured for an ArkTS Stage model app with one entry module."
+    "Generated projects are structured for an ArkTS Stage model app with one entry module.",
+    "Run make components-bootstrap before make bootstrap on a newly generated producer project.",
+    "The reviewed SDK supports arm64-v8a and x86_64; device declarations are not runtime certification."
   ],
   "workflow_labels": [
     "bootstrap",
@@ -152,6 +157,7 @@
     }
   ],
   "next_steps": [
+    "make components-bootstrap",
     "make bootstrap",
     "make doctor",
     "make lint",

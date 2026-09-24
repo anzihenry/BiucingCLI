@@ -117,7 +117,7 @@ flowchart TD
 
 Kotlin 包装负责调用调度、持有任务资源、错误映射和安全关闭。JNI 仅负责类型转换和转发，不复制领域规则。不得把某线程的 `JNIEnv` 交给其他线程使用；字符串转换需要区分标准 UTF-8 与 JNI 的 Modified UTF-8；跨调用引用须有明确释放路径。这些是 Android 官方 [JNI 契约](https://developer.android.com/ndk/guides/jni-tips) 对包装实现的额外约束。
 
-核心源码的权威来源为仓库 `shared/core/`，通过 `scripts/sync-shared-core` 同步到两套自包含模版；测试检查逐字节一致，禁止分别维护。平台包装仍在各自模版中。生成后的独立产品拥有交付副本，后续跨仓协作应消费同一版本化核心源码来源；Apple 的预编译产物不能直接给 Android 使用。
+核心源码的权威来源为仓库 `shared/core/`，通过 `scripts/sync-shared-core` 同步到 Apple、Android、HarmonyOS 三套自包含模版；测试检查逐字节一致，禁止分别维护。平台包装仍在各自模版中。生成后的独立产品拥有交付副本，后续跨仓协作应消费同一版本化核心源码来源；Apple 的预编译产物不能直接给 Android 使用。
 
 固定 NDK/CMake 和目标 ABI，检查 native 符号与运行库。单一 JNI 库可优先验证静态 libc++；如果引入其他 native SDK，则重新评估运行库、符号隔离与所有权，不能在多个 `.so` 中盲目静态复制运行库。面向外部分发的通用 AAR 与团队统一构建的应用应分别验证。参见官方 [C++ 运行库说明](https://developer.android.com/ndk/guides/cpp-support)。
 

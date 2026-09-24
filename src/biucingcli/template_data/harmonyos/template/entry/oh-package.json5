@@ -5,5 +5,9 @@
   "main": "",
   "author": "{{ORGANIZATION_NAME_JSON}}",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@biucing/contracts": "file:../.biucing/components/contracts.har",
+    "@biucing/sharedcore": "file:../.biucing/components/sharedcore.har",
+    "@biucing/homefeature": "file:../.biucing/components/homefeature.har"
+  }
 }

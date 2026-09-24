@@ -1,0 +1,28 @@
+{
+  "function": "createHomeFactory",
+  "output": "../entry/src/main/ets/composition/GeneratedGraph.ets",
+  "imports": {
+    "@biucing/contracts": [
+      "SessionFactory"
+    ],
+    "@biucing/homefeature": [
+      "HomeFactory"
+    ]
+  },
+  "inputs": {
+    "sessions": "SessionFactory"
+  },
+  "nodes": [
+    {
+      "id": "factory",
+      "type": "HomeFactory",
+      "args": [
+        "sessions"
+      ],
+      "methodArgs": {
+        "sessions": "create"
+      }
+    }
+  ],
+  "result": "factory"
+}

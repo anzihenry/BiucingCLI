@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "components": {
+    "contracts": "0.1.0",
+    "sharedcore": "0.1.0",
+    "homefeature": "0.1.0"
+  }
+}

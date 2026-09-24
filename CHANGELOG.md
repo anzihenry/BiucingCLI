@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- implement the HarmonyOS thin shell, contracts/design system, SharedCore and HomeFeature
+  bytecode HARs; reuse the canonical C++20 core through a cancellable Node-API session wrapper.
+- add component/shell constructor-graph generation, immutable publication, exact manifest
+  locks, installed-SDK byte verification, explicit local overrides and CI/Release rejection.
+- include phone, tablet, 2in1, wearable and TV in the architecture; pin the reviewed
+  DevEco toolchain and arm64-v8a/x86_64 native outputs. Add host, Hypium, device-test-package
+  and source-free consumer checks; real-device and signed delivery remain separate gates.
+
 - generate mobile/tablet, standalone Wear OS and Android TV shells by default;
   share binary Home state and native services while using device-specific Compose UI.
 - add rotary scrolling, D-pad focus navigation, separate platform release identities,

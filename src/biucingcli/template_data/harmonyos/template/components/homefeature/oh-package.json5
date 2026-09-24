@@ -1,0 +1,8 @@
+{
+  "name": "@biucing/homefeature",
+  "version": "0.1.0",
+  "main": "Index.ets",
+  "dependencies": {
+    "@biucing/contracts": "file:../contracts"
+  }
+}

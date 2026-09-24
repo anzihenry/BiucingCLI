@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "sdk": "6.1.1.125",
+  "hvigorPlugin": "6.24.4",
+  "nativeAbis": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "compatibleSdk": "{{COMPATIBLE_SDK_VERSION}}",
+  "targetSdk": "{{TARGET_SDK_VERSION}}",
+  "coreAbi": 1,
+  "node": "18.20.1",
+  "ohpm": "6.1.2.285",
+  "clang": "15.0.4",
+  "cmake": "3.28.2"
+}

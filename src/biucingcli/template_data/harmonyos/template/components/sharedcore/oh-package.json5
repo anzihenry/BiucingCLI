@@ -1,0 +1,9 @@
+{
+  "name": "@biucing/sharedcore",
+  "version": "0.1.0",
+  "main": "Index.ets",
+  "dependencies": {
+    "@biucing/contracts": "file:../contracts",
+    "libbiucing_shared.so": "file:./src/main/cpp/types/libbiucing_shared"
+  }
+}

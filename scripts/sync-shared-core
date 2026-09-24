@@ -7,7 +7,7 @@ import shutil
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ROOT / 'shared/core'
 DESTINATIONS = [ROOT / 'src/biucingcli/template_data' / platform / 'template' / location
-                for platform, location in [('apple', 'Shared/Core'), ('android', 'shared/core')]]
+                for platform, location in [('apple', 'Shared/Core'), ('android', 'shared/core'), ('harmonyos', 'shared/core')]]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--check', action='store_true')
 args = parser.parse_args()

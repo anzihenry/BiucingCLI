@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Reject unreviewed component producer/consumer toolchains."""
+import json
+import os
+from pathlib import Path
+import shutil
+import re
+import subprocess
+
+root = Path(__file__).resolve().parents[1]
+expected = json.loads((root / 'dependencies/toolchain.json').read_text())
+sdk = os.environ.get('HOS_SDK_HOME')
+if not sdk:
+    sdk_root = os.environ.get('DEVECO_SDK_HOME')
+    if not sdk_root:
+        raise SystemExit('Set HOS_SDK_HOME or DEVECO_SDK_HOME')
+    sdk = str(Path(sdk_root) / 'default/openharmony')
+native = Path(sdk) / 'native'
+cli = shutil.which(os.environ.get('HVIGOR', 'hvigorw'))
+ohpm = shutil.which('ohpm')
+if not cli or not ohpm:
+    raise SystemExit('hvigorw and ohpm must be on PATH')
+actual = {
+    'sdk': json.loads((native / 'oh-uni-package.json').read_text())['version'],
+    'hvigorPlugin': json.loads((Path(cli).resolve().parent.parent / 'hvigor-ohos-plugin/package.json').read_text())['version'],
+    'ohpm': json.loads((Path(ohpm).resolve().parent.parent / 'package.json').read_text())['version'],
+    'node': subprocess.check_output(['node', '--version'], text=True).strip().lstrip('v'),
+}
+actual['clang'] = re.search(r'clang version ([0-9.]+)', subprocess.check_output([str(native / 'llvm/bin/clang'), '--version'], text=True)).group(1)
+actual['cmake'] = subprocess.check_output([str(native / 'build-tools/cmake/bin/cmake'), '--version'], text=True).splitlines()[0].split()[-1]
+for key, value in actual.items():
+    if expected.get(key) != value:
+        raise SystemExit(f'Toolchain mismatch: {key}: expected {expected.get(key)}, found {value}')
+print('HarmonyOS toolchain matches reviewed versions: ' + json.dumps(actual))
+
+profile = json.loads((root / 'build-profile.json5').read_text())
+for product in profile['app']['products']:
+    if product['compatibleSdkVersion'] != expected['compatibleSdk'] or product['targetSdkVersion'] != expected['targetSdk']:
+        raise SystemExit('Product SDK range differs from component toolchain contract')

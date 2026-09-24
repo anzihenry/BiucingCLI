@@ -1,0 +1,45 @@
+name: HarmonyOS binary components
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  binary-consumer:
+    runs-on: [self-hosted, macOS, harmonyos-sdk611]
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: src
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check source authority and generate product
+        run: |
+          python3 scripts/sync-shared-core --check
+          python3 -m biucingcli.cli create harmonyos harmony-ci --bundle-name com.example.harmonyci --output-dir generated --non-interactive
+      - name: Publish and validate components
+        working-directory: generated/harmony-ci
+        run: |
+          ./scripts/check-toolchain
+          make components-bootstrap
+          make bootstrap
+          make core-test test-native verify-di
+          make verify build-device-tests
+      - name: Consume without component sources
+        working-directory: generated/harmony-ci
+        run: |
+          mkdir ../hidden-sdk
+          mv components shared ../hidden-sdk/
+          hvigorw clean assembleHap --mode module -p module=entry@default --no-daemon
+          hvigorw clean assembleHap --mode module -p module=entry@default -p buildMode=release --no-daemon
+          ./scripts/components verify-installed --release
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: harmonyos-build-evidence
+          path: |
+            generated/harmony-ci/entry/build/**/outputs/**
+            generated/harmony-ci/entry/.test/default/outputs/test/reports/**
+            generated/harmony-ci/dependencies/components.lock.json

@@ -1,3 +1,4 @@
+import { Application } from '../composition/Application';
 import AbilityConstant from '@ohos.app.ability.AbilityConstant';
 import UIAbility from '@ohos.app.ability.UIAbility';
 import Want from '@ohos.app.ability.Want';
@@ -9,6 +10,7 @@ const TAG = '{{ABILITY_NAME}}';
 
 export default class {{ABILITY_NAME}} extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    AppStorage.setOrCreate('application', new Application());
     hilog.info(DOMAIN, TAG, 'Ability created for {{DISPLAY_NAME_JS_SINGLE}}.');
   }
 

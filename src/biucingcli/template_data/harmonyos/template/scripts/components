@@ -1,0 +1,376 @@
+#!/usr/bin/env python3
+"""Immutable HarmonyOS bytecode HAR delivery; never falls back to SDK source."""
+import argparse
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import tarfile
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+NAMES = ('contracts', 'sharedcore', 'homefeature')
+ABIS = {'arm64-v8a': (183, 2), 'x86_64': (62, 2)}
+DEPS = {'contracts': (), 'sharedcore': ('contracts',), 'homefeature': ('contracts',)}
+REGISTRY = Path(os.environ.get('COMPONENT_REGISTRY', str(ROOT / '.artifacts/components'))).resolve()
+RESOLVED = ROOT / '.biucing/components'
+LOCK = ROOT / 'dependencies/components.lock.json'
+OVERRIDES = ROOT / '.biucing/component-overrides.json'
+DECLARATION = ROOT / 'dependencies/components.json'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def write(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode='w', dir=path.parent, delete=False) as stream:
+        stream.write(json.dumps(value, indent=2, sort_keys=True) + '\n')
+        temporary = Path(stream.name)
+    temporary.chmod(path.stat().st_mode & 0o777 if path.exists() else 0o644)
+    temporary.replace(path)
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def version(value):
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?', value):
+        raise ValueError('Exact semantic version required')
+    return value
+
+
+def run(args, cwd=ROOT):
+    subprocess.run(args, cwd=cwd, check=True)
+
+
+def inventory(folder):
+    files = {}
+    for path in sorted(folder.rglob('*')):
+        if path.is_symlink():
+            raise ValueError('Symlink in artifact')
+        if path.is_file() and path.name != 'manifest.json':
+            files[path.relative_to(folder).as_posix()] = digest(path)
+    return files
+
+
+def inspect_har(path, name, expected_version, dependencies):
+    with tarfile.open(path, 'r:*') as archive:
+        members = archive.getmembers()
+        for member in members:
+            if (not (member.isfile() or member.isdir()) or not Path(member.name).parts or
+                    Path(member.name).parts[0] != 'package' or '..' in Path(member.name).parts):
+                raise ValueError('Unsafe HAR member')
+        names = [m.name for m in members if m.isfile()]
+        if len(names) != len(set(names)):
+            raise ValueError('Duplicate HAR member')
+        manifests = [n for n in names if n.endswith('/oh-package.json5') and len(Path(n).parts) == 2]
+        if len(manifests) != 1:
+            raise ValueError('Missing HAR package manifest')
+        metadata = json.loads(archive.extractfile(manifests[0]).read())
+        if metadata.get('name') != '@biucing/' + name or metadata.get('version') != expected_version:
+            raise ValueError('HAR identity mismatch')
+        if not metadata.get('metadata', {}).get('byteCodeHar') or not any(n.endswith('.abc') for n in names):
+            raise ValueError('Expected compiled bytecode HAR')
+        if any(n.endswith(('.ets', '.ts', '.cpp', '.cc')) and not n.endswith(('.d.ets', '.d.ts')) for n in names):
+            raise ValueError('HAR contains implementation source')
+        declared = metadata.get('dependencies', {})
+        for dep, dep_version in dependencies.items():
+            if declared.get('@biucing/' + dep) != dep_version:
+                raise ValueError('HAR dependency version mismatch')
+        if set(k for k in declared if k.startswith('@biucing/')) != {'@biucing/' + n for n in dependencies}:
+            raise ValueError('Unexpected HAR dependency')
+        natives = [n for n in names if n.endswith('.so')]
+        if name != 'sharedcore' and natives:
+            raise ValueError('Only SharedCore owns native implementation')
+        if name == 'sharedcore':
+            for abi, (machine, elf_class) in ABIS.items():
+                slices = [n for n in natives if n.endswith('/' + abi + '/libbiucing_shared.so')]
+                if len(slices) != 1:
+                    raise ValueError('Missing native ABI: ' + abi)
+                data = archive.extractfile(slices[0]).read(20)
+                if data[:6] != b'\x7fELF' + bytes([elf_class, 1]) or int.from_bytes(data[16:18], 'little') != 3 or int.from_bytes(data[18:20], 'little') != machine:
+                    raise ValueError('Invalid native ELF slice')
+        if name == 'homefeature' and not any('/resources/' in n for n in names):
+            raise ValueError('Missing component resources')
+
+
+def validate(folder, name, expected_version, manifest_hash=None):
+    if manifest_hash and digest(folder / 'manifest.json') != manifest_hash:
+        raise ValueError('Locked manifest checksum mismatch: ' + name)
+    manifest = read(folder / 'manifest.json')
+    if manifest.get('schema') != 1 or manifest.get('name') != name or manifest.get('version') != expected_version:
+        raise ValueError('Component identity mismatch')
+    if manifest['files'] != inventory(folder):
+        raise ValueError('Artifact checksum mismatch: ' + name)
+    deps = manifest['dependencies']
+    if set(deps) != set(DEPS[name]):
+        raise ValueError('Component dependency graph mismatch')
+    if manifest['toolchain'] != read(ROOT / 'dependencies/toolchain.json'):
+        raise ValueError('Incompatible component toolchain')
+    inspect_har(folder / (name + '.har'), name, expected_version, deps)
+    if name == 'sharedcore':
+        for abi in ABIS:
+            if not (folder / 'symbols' / abi / 'libbiucing_shared.so').is_file():
+                raise ValueError('Missing native debug symbols')
+    return manifest
+
+
+def declarations():
+    result = read(DECLARATION)['components']
+    if set(result) != set(NAMES):
+        raise ValueError('Complete component selection required')
+    for v in result.values():
+        version(v)
+    return result
+
+
+def lock():
+    selected = declarations()
+    result = {}
+    for name, v in selected.items():
+        folder = REGISTRY / name / v
+        manifest = validate(folder, name, v)
+        if manifest['dependencies'] != {d: selected[d] for d in DEPS[name]}:
+            raise ValueError('Dependency version conflict')
+        result[name] = {'version': v, 'manifest': digest(folder / 'manifest.json')}
+    write(LOCK, {'schema': 1, 'components': result})
+
+
+def selection(release=False):
+    selected = read(LOCK)['components']
+    if {n: v['version'] for n, v in selected.items()} != declarations():
+        raise ValueError('Declaration differs from lock; update explicitly')
+    overrides = read(OVERRIDES) if OVERRIDES.exists() else {}
+    if set(overrides) - set(NAMES):
+        raise ValueError('Unknown override')
+    if overrides and (release or os.environ.get('CI', '').lower() not in ('', '0', 'false')):
+        raise ValueError('CI/Release forbids local overrides')
+    return selected, overrides
+
+
+def resolve(release=False):
+    selected, overrides = selection(release)
+    RESOLVED.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=RESOLVED.parent) as temporary:
+        stage = Path(temporary)
+        origins = {}
+        for name, info in selected.items():
+            source = Path(overrides[name]).resolve() if name in overrides else REGISTRY / name / info['version']
+            manifest = validate(source, name, info['version'], None if name in overrides else info['manifest'])
+            if manifest['dependencies'] != {d: selected[d]['version'] for d in DEPS[name]}:
+                raise ValueError('Override dependency conflict')
+            shutil.copytree(source, stage / name)
+            shutil.copy2(source / (name + '.har'), stage / (name + '.har'))
+            origins[name] = {'path': str(source), 'override': name in overrides, 'manifest': digest(source / 'manifest.json')}
+        write(stage / 'origins.json', origins)
+        if RESOLVED.exists():
+            shutil.rmtree(RESOLVED)
+        shutil.copytree(stage, RESOLVED)
+    verify(release)
+
+
+def verify(release=False):
+    selected, overrides = selection(release)
+    origins = read(RESOLVED / 'origins.json')
+    for name, info in selected.items():
+        origin = origins[name]
+        if origin['override'] != (name in overrides):
+            raise ValueError('Resolved override state is stale')
+        if name in overrides and origin['path'] != str(Path(overrides[name]).resolve()):
+            raise ValueError('Resolved override path is stale')
+        manifest = validate(RESOLVED / name, name, info['version'], origin['manifest'] if name in overrides else info['manifest'])
+        if manifest['dependencies'] != {d: selected[d]['version'] for d in DEPS[name]}:
+            raise ValueError('Resolved dependency conflict')
+        if digest(RESOLVED / (name + '.har')) != manifest['files'][name + '.har']:
+            raise ValueError('Resolved HAR checksum mismatch')
+    print('Locked bytecode components verified')
+
+
+def normalize(source, target, name, v, deps):
+    # Preserve compiler output, replace development paths with exact public versions.
+    with tarfile.open(source, 'r:*') as src, tarfile.open(target, 'w:gz') as out:
+        for member in src.getmembers():
+            if not member.isfile():
+                out.addfile(member)
+                continue
+            data = src.extractfile(member).read()
+            if member.name.endswith('/oh-package.json5') and len(Path(member.name).parts) == 2:
+                package = json.loads(data)
+                package['version'] = v
+                package['dependencies'] = {'@biucing/' + d: dv for d, dv in deps.items()}
+                data = (json.dumps(package, indent=2) + '\n').encode()
+                member.size = len(data)
+            out.addfile(member, io.BytesIO(data))
+
+
+def publish(name, v):
+    version(v)
+    if name not in NAMES:
+        raise ValueError('Unknown component')
+    destination = REGISTRY / name / v
+    if destination.exists():
+        raise ValueError('Immutable version already exists')
+    run(['python3', 'scripts/check-toolchain'])
+    selected = declarations()
+    deps = {d: selected[d] for d in DEPS[name]}
+    if (ROOT / 'components' / name / 'di.json').exists():
+        run(['python3', 'scripts/di', '--graph', 'components/' + name + '/di.json'])
+    build_parent = ROOT / '.biucing/sdk-build'
+    build_parent.mkdir(parents=True, exist_ok=True)
+    temporary_build = tempfile.TemporaryDirectory(dir=build_parent)
+    build_root = Path(temporary_build.name)
+    workspace = build_root / 'components'
+    workspace.mkdir()
+    for entry in ('AppScope', 'hvigor', 'hvigorfile.ts', 'oh-package.json5', 'build-profile.json5'):
+        source = ROOT / 'components' / entry
+        if source.is_dir():
+            shutil.copytree(source, workspace / entry)
+        else:
+            shutil.copy2(source, workspace / entry)
+    profile = read(workspace / 'build-profile.json5')
+    profile['modules'] = [m for m in profile['modules'] if m['name'] == name]
+    write(workspace / 'build-profile.json5', profile)
+    shutil.copytree(ROOT / 'components' / name, workspace / name,
+                    ignore=shutil.ignore_patterns('build', 'oh_modules', '.hvigor', 'oh-package-lock.json5'))
+    if name == 'sharedcore':
+        shutil.copytree(ROOT / 'shared/core', build_root / 'shared/core')
+    # Contracts have no dependencies. Downstream compilation consumes the exact published HAR.
+    package_file = workspace / name / 'oh-package.json5'
+    original = package_file.read_bytes()
+    try:
+        package = read(package_file)
+        package['version'] = v
+        for dep, dv in deps.items():
+            folder = REGISTRY / dep / dv
+            validate(folder, dep, dv)
+            package['dependencies']['@biucing/' + dep] = 'file:' + str(folder / (dep + '.har'))
+        write(package_file, package)
+        run(['ohpm', 'install', '--all', '--resolve_conflict_strict'], workspace)
+        run([os.environ.get('HVIGOR', 'hvigorw'), 'assembleHar', '--mode', 'module', '-p', 'module=' + name + '@default', '--no-daemon'], workspace)
+        candidates = list((workspace / name / 'build/default/outputs/default').glob('*.har'))
+        if len(candidates) != 1:
+            raise ValueError('Expected one built HAR')
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=destination.parent) as temporary:
+            stage = Path(temporary)
+            normalize(candidates[0], stage / (name + '.har'), name, v, deps)
+            if name == 'sharedcore':
+                with tarfile.open(stage / (name + '.har'), 'r:*') as archive:
+                    for abi in ABIS:
+                        member = next(m for m in archive.getmembers() if m.name.endswith('/' + abi + '/libbiucing_shared.so'))
+                        symbol = stage / 'symbols' / abi / 'libbiucing_shared.so'
+                        symbol.parent.mkdir(parents=True, exist_ok=True)
+                        symbol.write_bytes(archive.extractfile(member).read())
+            sources = {}
+            for base in [workspace / name, ROOT / 'shared/core'] if name == 'sharedcore' else [workspace / name]:
+                for p in base.rglob('*'):
+                    if p.is_file() and not set(p.relative_to(base).parts) & {'build', '.hvigor', 'oh_modules', '.cxx'} and p.name != 'oh-package-lock.json5':
+                        sources[str(p.relative_to(build_root)) if p.is_relative_to(build_root) else str(p.relative_to(ROOT))] = digest(p)
+            write(stage / 'manifest.json', {'schema': 1, 'name': name, 'version': v, 'dependencies': deps,
+                  'toolchain': read(ROOT / 'dependencies/toolchain.json'), 'sources': sources, 'files': inventory(stage)})
+            validate(stage, name, v)
+            stage.chmod(0o755)
+            stage.rename(destination)
+    finally:
+        package_file.write_bytes(original)
+        temporary_build.cleanup()
+
+
+
+def verify_installed(release=False):
+    verify(release)
+    root_manifest = read(ROOT / 'oh-package.json5')
+    expected = {'@biucing/' + n: 'file:./.biucing/components/' + n + '.har' for n in NAMES}
+    if root_manifest.get('overrides') != expected:
+        raise ValueError('Product component overrides must reference locked HARs')
+    entry = read(ROOT / 'entry/oh-package.json5')
+    if entry.get('dependencies') != {'@biucing/' + n: 'file:../.biucing/components/' + n + '.har' for n in NAMES}:
+        raise ValueError('Shell must consume locked HARs only')
+    for name in NAMES:
+        installed = ROOT / 'entry/oh_modules/@biucing' / name
+        if not installed.is_dir():
+            raise ValueError('Missing installed component; run scripts/components install')
+        for dependency in DEPS[name]:
+            transitive = installed.resolve().parent / dependency
+            selected = ROOT / 'entry/oh_modules/@biucing' / dependency
+            if transitive.resolve() != selected.resolve():
+                raise ValueError('Installed transitive dependency differs from product selection: ' + name)
+        with tarfile.open(RESOLVED / (name + '.har'), 'r:*') as archive:
+            files = {}
+            for member in archive.getmembers():
+                if not member.isfile():
+                    continue
+                relative = Path(*Path(member.name).parts[1:])
+                content = archive.extractfile(member).read()
+                files[str(relative)] = hashlib.sha256(content).hexdigest()
+                target = installed / relative
+                if not target.is_file() or digest(target) != files[str(relative)]:
+                    raise ValueError('Installed SDK differs from locked HAR: ' + name + '/' + str(relative))
+            extra_code = [p for p in installed.rglob('*') if p.is_file() and p.suffix in ('.abc', '.so', '.ets', '.ts') and str(p.relative_to(installed)) not in files]
+            if extra_code:
+                raise ValueError('Unexpected installed SDK code: ' + name)
+    print('Installed SDK bytes match locked HARs')
+
+
+def install():
+    verify()
+    # Explicit overrides are part of the generated dependency contract, never SDK source paths.
+    run(['ohpm', 'install', '--all', '--lockfile_stable_order', '--resolve_conflict_strict'])
+    verify_installed()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=['bootstrap', 'publish', 'lock', 'resolve', 'verify', 'install', 'info', 'override', 'verify-installed'])
+    parser.add_argument('name', nargs='?', choices=NAMES)
+    parser.add_argument('value', nargs='?')
+    parser.add_argument('--release', action='store_true')
+    args = parser.parse_args()
+    if args.action == 'bootstrap':
+        for name, v in declarations().items():
+            if not (REGISTRY / name / v).exists():
+                publish(name, v)
+        lock()
+        resolve()
+        install()
+    elif args.action == 'publish':
+        if not args.name or not args.value:
+            parser.error('publish requires NAME VERSION')
+        publish(args.name, args.value)
+    elif args.action == 'lock':
+        lock()
+    elif args.action == 'resolve':
+        resolve(args.release)
+    elif args.action == 'verify':
+        verify(args.release)
+    elif args.action == 'verify-installed':
+        verify_installed(args.release)
+    elif args.action == 'install':
+        install()
+    elif args.action == 'info':
+        verify(args.release)
+        print(json.dumps(read(RESOLVED / 'origins.json'), indent=2))
+    elif args.action == 'override':
+        if not args.name or not args.value:
+            parser.error('override requires NAME PATH, or NAME clear')
+        values = read(OVERRIDES) if OVERRIDES.exists() else {}
+        if args.value == 'clear':
+            values.pop(args.name, None)
+        else:
+            values[args.name] = str(Path(args.value).resolve())
+        write(OVERRIDES, values)
+        resolve(args.release)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError, KeyError, subprocess.CalledProcessError) as error:
+        raise SystemExit(str(error))

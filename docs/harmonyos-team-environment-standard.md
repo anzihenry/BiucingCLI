@@ -1,5 +1,14 @@
 # HarmonyOS Team Environment Standard
 
+## Architecture baseline (2026-09-24)
+
+The starter now uses a thin shell, independently versioned bytecode HAR components,
+Node-API and the canonical C++20 core. See [HarmonyOS architecture](harmonyos-shell-component-architecture.md)
+and [verification evidence](harmonyos-component-verification.md) for the current source layout,
+toolchain pins and device boundaries. Run `make components-bootstrap` before `make bootstrap`.
+`dependencies/toolchain.json` is authoritative for reviewed tool versions; the older starter
+layout below describes the retained shell/configuration surfaces only.
+
 ## Goal
 
 This document defines a standard development environment for a mid-sized HarmonyOS team.

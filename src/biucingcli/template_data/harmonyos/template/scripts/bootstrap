@@ -9,6 +9,7 @@ if ! command -v ohpm >/dev/null 2>&1; then
 fi
 
 ./scripts/verify-supply-chain
+./scripts/components verify
 lock_backup="$(mktemp "${TMPDIR:-/tmp}/biucing-ohpm-lock.XXXXXX")"
 cp -p oh-package-lock.json5 "$lock_backup"
 restore_lock() {
@@ -33,6 +34,7 @@ if [[ "$lock_after" != "$lock_before" ]]; then
   exit 1
 fi
 ./scripts/verify-supply-chain
+./scripts/components verify-installed
 trap - EXIT HUP INT TERM
 rm -f "$lock_backup"
 ./scripts/doctor

@@ -636,6 +636,10 @@ class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
                 encoding="utf-8",
             )
             fake_ohpm.chmod(0o755)
+            # This test isolates third-party lock drift; binary closure has separate tests.
+            component_guard = project_dir / "scripts" / "components"
+            component_guard.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+            component_guard.chmod(0o755)
             env = os.environ.copy()
             env["PATH"] = f"{fake_bin}{os.pathsep}{env['PATH']}"
             result = subprocess.run(

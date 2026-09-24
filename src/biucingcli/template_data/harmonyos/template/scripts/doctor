@@ -145,3 +145,5 @@ if (( warnings > 0 )); then
 else
   echo "Environment looks ready."
 fi
+
+python3 ./scripts/check-toolchain

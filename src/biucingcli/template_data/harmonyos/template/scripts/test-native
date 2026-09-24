@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""Run the same Node-API bridge on the host; device validation remains separate."""
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path(__file__).resolve().parents[1]
+node = os.environ.get('NODE', 'node')
+executable = Path(subprocess.check_output([node, '-p', 'process.execPath'], text=True).strip())
+include = Path(os.environ.get('NODE_INCLUDE', str(executable.parent.parent / 'include/node')))
+if not (include / 'node_api.h').is_file():
+    raise SystemExit('Set NODE_INCLUDE to matching Node.js development headers')
+out = root / '.biucing/native-test'
+out.mkdir(parents=True, exist_ok=True)
+core = root / 'shared/core/Sources/CoreNative'
+args = [os.environ.get('CXX', 'c++'), '-std=c++20', '-shared', '-fPIC', '-g', '-Wall', '-Wextra', '-Werror', '-DBIUCING_NODE_TEST', '-I' + str(include), '-I' + str(core / 'include')]
+if sys.platform == 'darwin':
+    args += ['-undefined', 'dynamic_lookup']
+args += [str(root / 'components/sharedcore/src/main/cpp/bridge.cpp'), str(core / 'core.cpp'), str(core / 'bridge.cpp'), '-o', str(out / 'bridge.node')]
+subprocess.run(args, check=True)
+subprocess.run([node, '--expose-gc', str(root / 'tests/native.cjs'), str(out / 'bridge.node')], check=True)
+
+subprocess.run(['python3', str(root / 'scripts/di'), '--scope', 'components'], check=True)
+sdk = Path(os.environ.get('HOS_SDK_HOME', os.environ.get('DEVECO_SDK_HOME', '') + '/default/openharmony'))
+typescript = Path(os.environ.get('TYPESCRIPT_PATH', str(sdk / 'ets/build-tools/ets-loader/node_modules/typescript')))
+if not typescript.is_dir():
+    raise SystemExit('Set TYPESCRIPT_PATH to the reviewed SDK TypeScript compiler for wrapper tests')
+subprocess.run([node, str(root / 'tests/wrapper.cjs'), str(out / 'bridge.node'), str(typescript)], check=True)

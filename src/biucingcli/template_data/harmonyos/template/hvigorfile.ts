@@ -1,6 +1,10 @@
 import { appTasks } from '@ohos/hvigor-ohos-plugin';
-
-export default {
-  system: appTasks,
-  plugins: []
-}
+import { hvigor } from '@ohos/hvigor';
+import { execFileSync } from 'child_process';
+import path from 'path';
+const root = __dirname;
+execFileSync('python3', [path.join(root, 'scripts/check-toolchain')], { cwd: root, stdio: 'inherit' });
+const release = hvigor.getParameter().getExtParam('buildMode') === 'release';
+execFileSync('python3', [path.join(root, 'scripts/components'), 'verify-installed', ...(release ? ['--release'] : [])], { cwd: root, stdio: 'inherit' });
+execFileSync('python3', [path.join(root, 'scripts/di'), '--scope', 'shell'], { cwd: root, stdio: 'inherit' });
+export default { system: appTasks, plugins: [] };
