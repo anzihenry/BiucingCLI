@@ -39,7 +39,7 @@
   "operating_assumptions": [
     "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
     "Generated projects are expected to validate protobuf, service runtime, and container packaging together.",
-    "Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages."
+    "Database and cache are independent components. P1 provides guarded runtime infrastructure only; persistence, sessions and authentication require later architecture stages."
   ],
   "workflow_labels": [
     "bootstrap",
@@ -165,7 +165,16 @@
     "internal/runtime/server_test.go",
     "tests/server_test.go",
     "scripts/verify-container",
-    ".github/workflows/verify.yml"
+    ".github/workflows/verify.yml",
+    "compose.yaml",
+    "scripts/task",
+    "scripts/check",
+    "scripts/init-workspace",
+    "internal/app/app.go",
+    "internal/runtime/admin.go",
+    "internal/pipeline/http.go",
+    "internal/security/principal.go",
+    "internal/observability/log.go"
   ],
   "rule": "microservice",
   "derived_outputs": [

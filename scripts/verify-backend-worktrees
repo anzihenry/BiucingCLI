@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Local P1 acceptance: real Git worktrees, Docker reload, private admin and persistent volumes."""
+
+import argparse, json, os, pathlib, subprocess, tempfile, time, urllib.request, urllib.error
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--output-dir", type=pathlib.Path)
+args = parser.parse_args()
+if args.output_dir:
+    base = args.output_dir.resolve()
+    base.mkdir(exist_ok=False)
+else:
+    base = pathlib.Path(tempfile.mkdtemp(prefix="biucing-worktrees-"))
+report = {"result": "failed"}
+verification_env = dict(os.environ)
+for key in (
+    "COMPOSE_PROJECT_NAME",
+    "COMPOSE_FILE",
+    "COMPOSE_PROFILES",
+    "IMAGE",
+    "TAG",
+    "HOST_PORT",
+    "HOST_HTTP_PORT",
+    "HOST_GRPC_PORT",
+):
+    verification_env.pop(key, None)
+
+
+def run(args, cwd=None, env=None):
+    result = subprocess.run(
+        args,
+        cwd=cwd,
+        env=env or verification_env,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    with (base / "commands.log").open("a") as log:
+        log.write(repr(args) + "\n" + result.stdout + "\n")
+    if result.returncode:
+        raise RuntimeError(result.stdout[-3000:])
+    return result.stdout.strip()
+
+
+def get(url):
+    try:
+        with urllib.request.urlopen(url, timeout=2) as r:
+            return r.status, r.read().decode()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode()
+
+
+def wait(url, code=200, contains=None):
+    for i in range(90):
+        try:
+            status, body = get(url)
+            if status == code and (contains is None or contains in body):
+                return body
+        except (OSError, TimeoutError):
+            pass
+        time.sleep(1)
+    raise RuntimeError("probe timed out: " + url)
+
+
+repo = base / "source"
+run(
+    [
+        str(pathlib.Path(".venv/bin/biucing").resolve()),
+        "create",
+        "web-service",
+        "source",
+        "--module-name",
+        "example.org/p1/web",
+        "--output-dir",
+        str(base),
+        "--non-interactive",
+    ]
+)
+run(["git", "init"], repo)
+run(["git", "add", "."], repo)
+run(
+    [
+        "git",
+        "-c",
+        "user.name=P1 Verification",
+        "-c",
+        "user.email=p1@example.invalid",
+        "commit",
+        "-m",
+        "fixture",
+    ],
+    repo,
+)
+second = base / "second"
+run(["git", "worktree", "add", "--detach", str(second)], repo)
+roots = [repo, second]
+projects = []
+try:
+    for root in roots:
+        run(["./scripts/task", "bootstrap"], root)
+        run(["./scripts/task", "up"], root)
+        info = run(["./scripts/task", "worktree-info"], root)
+        name = next(
+            x.split(": ", 1)[1] for x in info.splitlines() if x.startswith("Compose project: ")
+        )
+        projects.append(name)
+        compose = ["docker", "compose", "-p", name, "-f", "compose.dev.yaml"]
+        endpoint = run(compose + ["port", "app-dev", "8080"], root)
+        url = "http://" + endpoint
+        wait(url + "/api/v1/ping")
+        assert get(url + "/api/v1/users")[0] == 401
+        assert get(url + "/healthz")[0] != 200
+        cid = run(compose + ["ps", "-q", "app-dev"], root)
+        run(
+            [
+                "docker",
+                "exec",
+                cid,
+                "/workspace/tmp/server",
+                "healthcheck",
+                "http://127.0.0.1:9000/readyz",
+            ]
+        )
+        report[str(root)] = {
+            "project": name,
+            "endpoint": endpoint,
+            "admin_private": True,
+            "users_denied": True,
+        }
+    assert projects[0] != projects[1]
+    assert report[str(repo)]["endpoint"] != report[str(second)]["endpoint"]
+    # Touch actual application code and observe a changed response after Air reload.
+    p = second / "internal/service/ping.go"
+    p.write_text(p.read_text().replace('"pong"', '"reloaded"'))
+    wait("http://" + report[str(second)]["endpoint"] + "/api/v1/ping", contains="reloaded")
+    assert "pong" in get("http://" + report[str(repo)]["endpoint"] + "/api/v1/ping")[1]
+    # Build output belongs to the invoking developer rather than root.
+    assert (second / "tmp/server").stat().st_uid == os.getuid()
+    name = projects[0]
+    compose = ["docker", "compose", "-p", name, "-f", "compose.dev.yaml"]
+    cid = run(compose + ["ps", "-q", "postgres"], repo)
+    volume = next(
+        m["Name"]
+        for m in json.loads(run(["docker", "inspect", cid]))[0]["Mounts"]
+        if m["Destination"] == "/var/lib/postgresql/data"
+    )
+    run(["./scripts/task", "down"], repo)
+    run(["docker", "volume", "inspect", volume])
+    report["worktree_isolation"] = "passed"
+    report["reload_and_permissions"] = "passed"
+    report["down_preserves_database_volume"] = "passed"
+    # Exercise startup, private readiness and shutdown in the runtime image.
+    image_name = "biucing-worktree-" + str(os.getpid())
+    image = image_name + ":verify"
+    env = {**verification_env, "IMAGE": image_name, "TAG": "verify"}
+    run(["./scripts/task", "image"], repo, env)
+    cid = run(["docker", "run", "-d", "--rm", "-p", "127.0.0.1::8080", image])
+    try:
+        endpoint = run(["docker", "port", cid, "8080/tcp"])
+        wait("http://" + endpoint + "/api/v1/ping")
+        run(["docker", "exec", cid, "/app/server", "healthcheck", "http://127.0.0.1:9000/readyz"])
+        run(["docker", "stop", "-t", "15", cid])
+        report["runtime_image_and_stop"] = "passed"
+    finally:
+        subprocess.run(["docker", "rm", "-f", cid], capture_output=True)
+    report["result"] = "passed"
+finally:
+    for root in roots:
+        if root.exists():
+            subprocess.run(
+                ["./scripts/task", "clean-worktree"],
+                cwd=root,
+                env={**verification_env, "CONFIRM_DELETE_DATA": "yes"},
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+    (base / "evidence.json").write_text(json.dumps(report, indent=2) + "\n")
+print(json.dumps(report, indent=2))

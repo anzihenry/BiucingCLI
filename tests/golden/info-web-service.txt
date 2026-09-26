@@ -13,7 +13,7 @@ Stack: Go, Gin
 Operating assumptions:
 - The starter is optimized for Go service development with Docker-based dev and runtime flows.
 - Generated projects are expected to keep config, build, and verification workflows repo-local.
-- Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages.
+- Database and cache are independent components. P1 provides guarded runtime infrastructure only; persistence, sessions and authentication require later architecture stages.
 Worktree diagnostics:
 - make worktree-info
 - make worktree-doctor

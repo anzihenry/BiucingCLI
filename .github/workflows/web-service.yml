@@ -30,4 +30,5 @@ jobs:
         run: |
           docker run --rm -d --name audit-web-ci -p 18081:8080 audit-web-ci:ci
           trap 'docker rm -f audit-web-ci >/dev/null 2>&1 || true' EXIT
-          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:18081/healthz
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:18081/api/v1/ping
+          docker exec audit-web-ci /app/server healthcheck http://127.0.0.1:9000/readyz

@@ -26,7 +26,7 @@ class BackendComponentsTests(unittest.TestCase):
                             main(["create", family, "audit-edge", "--module-name", "example.org/platform/audit-edge",
                                   "--output-dir", tmp, "--non-interactive", "--database", database, "--cache", cache, *options])
                         root = Path(tmp) / "audit-edge"
-                        for filename in ("compose.dev.yaml", "compose.yaml" if family == "web-service" else "deploy/compose.yaml"):
+                        for filename in ("compose.dev.yaml", "compose.yaml" if family == "web-service" else "compose.yaml"):
                             services = yaml.safe_load((root / filename).read_text())["services"]
                             self.assertEqual("postgres" in services, database == "postgres")
                             self.assertEqual("redis" in services, cache == "redis")
@@ -80,10 +80,12 @@ class BackendComponentsTests(unittest.TestCase):
                 (root / "tools").mkdir()
                 source = Path("src/biucingcli/template_data") / family / "template/scripts/verify-container"
                 shutil.copy2(source, root / "scripts/verify-container")
+                shutil.copy2(source.parent / "task", root / "scripts/task")
+                (root / "scripts/task").write_text((source.parent / "task").read_text().replace("{{SERVICE_NAME}}", "fixture").replace("{{HTTP_PORT}}", "8080"))
                 fake = "#!" + sys.executable + "\n" + """import json, os, sys
 with open(os.environ["CALL_LOG"], "a") as log:
     log.write(json.dumps([os.path.basename(sys.argv[0]), *sys.argv[1:]]) + "\\n")
-sys.exit(7 if os.path.basename(sys.argv[0]) == "make" else 0)
+sys.exit(7 if "run" in sys.argv else 0)
 """
                 for tool in ("docker", "make"):
                     executable = root / "tools" / tool
@@ -102,7 +104,7 @@ sys.exit(7 if os.path.basename(sys.argv[0]) == "make" else 0)
                 self.assertIn("--volumes", cleanup)
                 project = cleanup[cleanup.index("--project-name") + 1]
                 self.assertTrue(project.startswith("verify-"))
-                make = next(call for call in calls if call[0] == "make")
-                self.assertIn("COMPOSE=docker compose --project-name " + project, make)
-                self.assertIn("DEV_COMPOSE_FILE=compose.dev.yaml", make)
-                self.assertNotIn("production", " ".join(make + cleanup))
+                run = next(call for call in calls if "run" in call)
+                self.assertEqual(run[run.index("--project-name") + 1], project)
+                self.assertIn("compose.dev.yaml", run)
+                self.assertNotIn("production", " ".join(run + cleanup))

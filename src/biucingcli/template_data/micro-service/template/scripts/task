@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+id="$(printf '%s' "$root" | cksum | awk '{print $1}')"
+if [ "${DOCKER_VARIANT:-alpine}" = ubuntu ]; then export BUILDER_IMAGE="${BUILDER_IMAGE:-public.ecr.aws/docker/library/golang:1.26.8}" RUNTIME_IMAGE="${RUNTIME_IMAGE:-public.ecr.aws/docker/library/ubuntu:26.04}"; fi
+export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-{{SERVICE_NAME}}-$id}"
+export IMAGE="${IMAGE:-$COMPOSE_PROJECT_NAME}"
+export LOCAL_UID="$(id -u)"
+export LOCAL_GID="$(id -g)"
+export TAG="${TAG:-dev}"
+export HOST_PORT="${HOST_PORT:-0}"
+export HOST_HTTP_PORT="${HOST_HTTP_PORT:-0}"
+export HOST_GRPC_PORT="${HOST_GRPC_PORT:-0}"
+compose=(docker compose --project-name "$COMPOSE_PROJECT_NAME" -f compose.dev.yaml)
+run=("${compose[@]}" run --rm --no-deps app-dev)
+case "${1:-help}" in
+ bootstrap) "${compose[@]}" build app-dev; "${compose[@]}" run --rm --no-deps --user 0 app-dev ./scripts/init-workspace ;;
+ dev|up) "${compose[@]}" up -d app-dev otel-collector; "${compose[@]}" port app-dev {{HTTP_PORT}} ;;
+ down|clean) "${compose[@]}" down --remove-orphans ;;
+ clean-worktree) if [ "${CONFIRM_DELETE_DATA:-}" != yes ]; then echo 'Set CONFIRM_DELETE_DATA=yes to delete this project data and caches.' >&2; exit 2; fi; "${compose[@]}" down --volumes --remove-orphans ;;
+ logs) "${compose[@]}" logs -f ;;
+ doctor) docker info >/dev/null; "${compose[@]}" config --quiet; "${run[@]}" ./scripts/check proto; "${run[@]}" ./scripts/doctor ;;
+ verify) "${run[@]}" ./scripts/check ;;
+ lint|test|build|proto|tidy) "${run[@]}" ./scripts/check "$1" ;;
+ run) "${compose[@]}" run --rm --service-ports app-dev ;;
+ dev-shell) "${run[@]}" bash ;;
+ image|docker-build) "${run[@]}" ./scripts/check proto
+ docker build ${DOCKER_PLATFORM:+--platform=$DOCKER_PLATFORM} --build-arg GOPROXY="${GOPROXY:-https://proxy.golang.org,direct}" --build-arg GOSUMDB="${GOSUMDB:-sum.golang.org}" --build-arg BUILDER_IMAGE="${BUILDER_IMAGE:-golang:1.26.8-alpine}" --build-arg RUNTIME_IMAGE="${RUNTIME_IMAGE:-alpine:3.20}" --build-arg VERSION="${VERSION:-dev}" --build-arg COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}" --build-arg BUILT_AT="${BUILT_AT:-$(date -u +%FT%TZ)}" -t "$IMAGE:$TAG" . ;;
+ docker-run) docker compose --project-name "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml up -d ;;
+ docker-push) docker push "$IMAGE:$TAG" ;;
+ migrate) echo 'Database migrations are not implemented until B10; refusing a no-op success.' >&2;exit 2 ;;
+ worktree-compose-config) "${compose[@]}" config ;;
+ worktree-info|worktree-doctor) printf 'Worktree: %s\nCompose project: %s\nImage: %s:%s\n' "$root" "$COMPOSE_PROJECT_NAME" "$IMAGE" "$TAG"; "${compose[@]}" ps ;;
+ help) printf '%s\n' 'Commands: bootstrap dev verify image migrate up down logs doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
+ *) echo 'Unknown task' >&2;exit 2 ;;
+esac

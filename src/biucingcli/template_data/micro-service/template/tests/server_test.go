@@ -22,38 +22,12 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
-func TestHealthz(t *testing.T) {
-	engine := router.New(config.Config{
-		Service: config.ServiceConfig{
-			Name:     "{{SERVICE_NAME}}",
-			HTTPPort: "{{HTTP_PORT}}",
-			GRPCPort: "{{GRPC_PORT}}",
-		},
-		Database: config.ComponentConfig{
-			Driver: "{{DATABASE}}",
-		},
-	})
-
-	request := httptest.NewRequest(http.MethodGet, "/healthz", nil)
-	recorder := httptest.NewRecorder()
-
-	engine.ServeHTTP(recorder, request)
-
-	if recorder.Code != http.StatusOK {
-		t.Fatalf("expected status %d, got %d", http.StatusOK, recorder.Code)
-	}
-
-	var response model.HealthResponse
-	if err := json.Unmarshal(recorder.Body.Bytes(), &response); err != nil {
-		t.Fatal(err)
-	}
-
-	if response.Service != "{{SERVICE_NAME}}" {
-		t.Fatalf("expected service %q, got %q", "{{SERVICE_NAME}}", response.Service)
-	}
-
-	if response.Database != "{{DATABASE}}" {
-		t.Fatalf("expected store %q, got %q", "{{DATABASE}}", response.Database)
+func TestHealthzIsNotPublic(t *testing.T) {
+	engine := router.New(config.Config{})
+	response := httptest.NewRecorder()
+	engine.ServeHTTP(response, httptest.NewRequest("GET", "/healthz", nil))
+	if response.Code == http.StatusOK {
+		t.Fatal("admin health exposed on application listener")
 	}
 }
 
@@ -95,7 +69,8 @@ func TestPing(t *testing.T) {
 func TestGRPCPingContract(t *testing.T) {
 	listener := bufconn.Listen(1024 * 1024)
 	pingService := service.NewPingService("{{SERVICE_NAME}}", "{{PROTO_PACKAGE}}")
-	server := transport.NewGRPCServer("{{SERVICE_NAME}}", pingService)
+	server := transport.NewGRPCServer("{{SERVICE_NAME}}", pingService, transport.Options{Public: map[string]bool{servicev1.{{SERVICE_TYPE_NAME}}Service_Ping_FullMethodName: true}})
+	server.SetServing(true)
 
 	go func() {
 		_ = server.Serve(listener)

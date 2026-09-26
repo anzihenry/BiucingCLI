@@ -6,16 +6,21 @@ services:
       args:
         GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
         GOSUMDB: ${GOSUMDB:-sum.golang.org}
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace
     command: air -c .air.toml
     environment:
 {{COMPONENT_ENVIRONMENT}}
+      HOME: /tmp
+      GOFLAGS: -buildvcs=false
+      LOCAL_UID: "${LOCAL_UID:-1000}"
+      LOCAL_GID: "${LOCAL_GID:-1000}"
       CONFIG_FILE: /workspace/configs/config.yaml
       GOCACHE: /workspace/.cache/go-build
       GOMODCACHE: /workspace/.cache/go-mod
       GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
     ports:
-      - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
+      - "127.0.0.1:${HOST_PORT:-0}:{{HTTP_PORT}}"
     depends_on: {{COMPONENT_DEPENDENCIES}}
     stop_grace_period: 15s
     volumes:

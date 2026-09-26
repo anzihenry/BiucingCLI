@@ -95,6 +95,7 @@ func Serve(
 	select {
 	case err := <-httpDone:
 		if err != nil {
+			_ = httpServer.Close()
 			shutdownErr = errors.Join(shutdownErr, fmt.Errorf("HTTP shutdown: %w", err))
 		}
 	case <-shutdownCtx.Done():

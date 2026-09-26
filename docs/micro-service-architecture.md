@@ -42,6 +42,7 @@ Micro Service 默认不会接收浏览器 Cookie、承担公开登录页面或�
 除通用运行验收，还需证明错误身份/过期证书被拒、证书轮换、用户上下文授权、
 截止时间和取消、客户端固定版本消费、旧新服务兼容、重复安全操作及下游隔离。
 
-当前模板有 Ping gRPC、Buf、HTTP/gRPC 健康与关闭基础、trace provider 和本地 Collector。
-默认 gRPC 服务端尚无生产 mTLS/方法授权；数据库配置不等于真实持久化；
+P1 已实现统一 Docker 工作流、配置与文件密钥校验、HTTP/gRPC unary/stream 请求预算、
+Principal/Policy 默认拒绝策略、私有管理口、有限退出和结构化日志。保留 Buf、trace provider 和本地 Collector。
+生产 mTLS 和身份到方法策略的接入仍待实现；数据库配置不等于真实持久化；
 完整指标、出站客户端、生产 Compose 和高可用参考仍待建设。

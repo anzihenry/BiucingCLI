@@ -2,3 +2,8 @@
 .cache/
 bin/
 .env.local
+
+.secrets/
+*.key
+.env*
+!.env.example

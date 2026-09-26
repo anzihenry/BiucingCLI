@@ -194,9 +194,8 @@ Micro 的本地测试证书。按需的观测/缓存/消息等使用 Compose pro
 profiles 只用于可选设施；生产必需依赖缺失时启动失败，不静默关闭功能。
 保留既有 worktree 隔离：project name、端口、镜像、volume、缓存按项目/工作树命名。
 
-建议命令契约（目标名称，当前尚未全部实现）：
-`make bootstrap`、`make dev`、`make verify`、`make image`、`make migrate`、
-`make up`、`make down`、`make logs`、`make doctor`。对已有命令提供清楚迁移说明。
+P1 已提供 `./scripts/task bootstrap/dev/verify/image/up/down/logs/doctor`；
+Make 保留同名包装。`migrate` 在 B10 实现前明确报错。生成 README 记录已有命令迁移说明。
 普通 `down` 不删持久数据；破坏性清理使用独立显式命令。
 
 ### 9.2 单机生产
@@ -253,11 +252,12 @@ Compose 的启动顺序要用健康条件或单次任务成功条件表达；服
 
 | 当前仓库证据 | 距离目标的差距 |
 | --- | --- |
-| 两模板已有 Docker 开发/运行、超时和优雅退出基础 | 尚未统一生产 Compose、配置/密钥与网络安全基线 |
-| Web 仍是内存用户示例和 `/healthz` | 缺 OIDC/共享会话、真实数据接入、独立迁移、完整遥测与运维口 |
-| Micro 有 Ping gRPC、Buf、健康服务和 trace provider/本地 Collector | 缺生产 mTLS/授权、完整指标与协议埋点、通用出站客户端与持久化实际接入 |
-| Micro Compose 使用依赖选择与简单 depends_on，Collector 使用 latest | 需拆分组件模型、固定版本、就绪条件与生产端口策略 |
-| Web/Micro 入口不同 | 不应让生产基础能力只存在于其中一类 |
+| 两模板已有独立 dev/runtime Compose、统一 Docker 命令与 worktree 隔离 | 生产代理、镜像 digest、权限加固和网络交付在 B20 实施 |
+| 两模板已有配置/文件密钥校验、请求预算、默认拒绝策略、私有管理口和结构化日志 | 真实依赖、身份验证、完整观测及部署验收仍待实现 |
+| Web 内存用户示例已受保护，公开入口仅有 ping | 缺 OIDC/共享会话、真实数据接入与独立迁移 |
+| Micro 有 Ping gRPC、Buf、健康服务、trace provider 和本地 Collector | 缺生产 mTLS、身份到策略的接入、完整指标、出站客户端与真实持久化 |
+
+P0/P1 的完成范围见 [实施任务](backend-service-implementation-tasks.md) 和 [P1 验证记录](backend-service-p1-verification.md)。
 
 建议实施顺序：
 1. 统一容器、配置、启动/退出、健康、管理端口和日志。

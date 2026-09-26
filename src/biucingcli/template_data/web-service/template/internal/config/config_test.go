@@ -7,6 +7,8 @@ import (
 )
 
 func TestLoadDefaultConfig(t *testing.T) {
+	unset(t, "DATABASE_DSN")
+	unset(t, "CACHE_DSN")
 	t.Setenv("CONFIG_FILE", "")
 	tempDir := t.TempDir()
 	configDir := filepath.Join(tempDir, "configs")

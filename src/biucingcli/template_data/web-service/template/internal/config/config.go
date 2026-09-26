@@ -1,8 +1,9 @@
 package config
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
+	"io"
 	"os"
 	"strconv"
 
@@ -17,10 +18,14 @@ type ComponentConfig struct {
 }
 
 type Config struct {
-	Database ComponentConfig `yaml:"database"`
-	Cache    ComponentConfig `yaml:"cache"`
-	Service  ServiceConfig   `yaml:"service"`
-	Server   ServerConfig    `yaml:"server"`
+	Environment string          `yaml:"environment"`
+	AdminAddr   string          `yaml:"admin_addr"`
+	LogLevel    string          `yaml:"log_level"`
+	Request     RequestConfig   `yaml:"request"`
+	Database    ComponentConfig `yaml:"database"`
+	Cache       ComponentConfig `yaml:"cache"`
+	Service     ServiceConfig   `yaml:"service"`
+	Server      ServerConfig    `yaml:"server"`
 }
 
 type ServiceConfig struct {
@@ -44,12 +49,14 @@ func Load() (Config, error) {
 
 	data, err := os.ReadFile(configFile)
 	if err != nil {
-		return Config{}, err
+		return Config{}, errors.New("configuration file cannot be read")
 	}
 
 	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return Config{}, err
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&cfg); err != nil {
+		return Config{}, errors.New("invalid configuration YAML")
 	}
 	if value, set := os.LookupEnv("SERVICE_NAME"); set {
 		cfg.Service.Name = value
@@ -58,6 +65,10 @@ func Load() (Config, error) {
 		cfg.Service.Port = value
 	}
 
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		return Config{}, errors.New("expected one configuration document")
+	}
 	if cfg.Service.Name == "" {
 		return Config{}, errors.New("service.name is required")
 	}
@@ -67,7 +78,7 @@ func Load() (Config, error) {
 	}
 	port, err := strconv.Atoi(cfg.Service.Port)
 	if err != nil || port < 1 || port > 65535 {
-		return Config{}, fmt.Errorf("service.port must be between 1 and 65535: %q", cfg.Service.Port)
+		return Config{}, errors.New("service.port must be between 1 and 65535")
 	}
 
 	if err := cfg.Server.applyDefaults(); err != nil {
@@ -86,12 +97,6 @@ func Load() (Config, error) {
 	if cfg.Cache.DSN == "" {
 		cfg.Cache.DSN = "{{CACHE_DSN}}"
 	}
-	if value, set := os.LookupEnv("DATABASE_DSN"); set {
-		cfg.Database.DSN = value
-	}
-	if value, set := os.LookupEnv("CACHE_DSN"); set {
-		cfg.Cache.DSN = value
-	}
 	if cfg.Database.Driver != "none" && cfg.Database.Driver != "postgres" {
 		return Config{}, errors.New("unsupported database.driver")
 	}
@@ -103,6 +108,9 @@ func Load() (Config, error) {
 	}
 	if cfg.Cache.Driver == "none" {
 		cfg.Cache.DSN = ""
+	}
+	if err := cfg.validateCommon(); err != nil {
+		return Config{}, err
 	}
 	return cfg, nil
 }
@@ -121,8 +129,8 @@ func (cfg *ServerConfig) applyDefaults() error {
 	}
 
 	for _, item := range values {
-		if *item.value < 0 {
-			return errors.New(item.name + " must be greater than zero")
+		if *item.value < 0 || *item.value > 3600 {
+			return errors.New(item.name + " must be between 1 and 3600 seconds")
 		}
 		if *item.value == 0 {
 			*item.value = item.defaultValue

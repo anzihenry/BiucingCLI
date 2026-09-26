@@ -10,7 +10,7 @@ ARG GOSUMDB=sum.golang.org
 ENV GOPROXY=${GOPROXY}
 ENV GOSUMDB=${GOSUMDB}
 
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN set -eux; \
     attempt=1; \
     until go mod download; do \
@@ -22,7 +22,11 @@ RUN set -eux; \
     done
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -o /out/server ./cmd/server
+ARG TARGETARCH
+ARG VERSION=dev
+ARG COMMIT=unknown
+ARG BUILT_AT=unknown
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -buildvcs=false -trimpath -ldflags="-X {{MODULE_NAME}}/internal/runtime.Version=${VERSION} -X {{MODULE_NAME}}/internal/runtime.Commit=${COMMIT} -X {{MODULE_NAME}}/internal/runtime.BuiltAt=${BUILT_AT}" -o /out/server ./cmd/server
 
 FROM ${RUNTIME_IMAGE}
 
@@ -39,6 +43,6 @@ ENV CONFIG_FILE=/app/configs/config.yaml
 ENV OTEL_EXPORTER_OTLP_ENDPOINT="{{OTEL_EXPORTER_ENDPOINT_DOCKER}}"
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/app/server", "healthcheck", "http://127.0.0.1:{{HTTP_PORT}}/healthz"]
+    CMD ["/app/server", "healthcheck", "http://127.0.0.1:9000/livez"]
 
 CMD ["/app/server"]

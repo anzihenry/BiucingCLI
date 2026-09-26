@@ -218,6 +218,7 @@ Local HarmonyOS validation status:
 - [Template System](docs/template-system.md)
 - [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
 - [后端服务整体架构（通用组件与 Docker 开发/部署）](docs/backend-service-architecture.md)
+- [后端服务 P1 实施与验证](docs/backend-service-p1-verification.md)
 - [后端服务工程契约与 P0 选型](docs/backend-service-engineering-contract.md)
 - [后端服务架构实施任务（阶段、依赖与验收）](docs/backend-service-implementation-tasks.md)
 - [Web Service 架构（终端用户入口）](docs/web-service-architecture.md)

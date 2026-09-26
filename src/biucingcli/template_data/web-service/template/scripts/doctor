@@ -63,7 +63,7 @@ if ! go list -m >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! CONFIG_FILE=./configs/config.yaml go test ./internal/config -run TestLoadDefaultConfig -count=1 >/dev/null; then
+if ! CONFIG_FILE=./configs/config.yaml go run ./cmd/server check-config >/dev/null; then
   echo "config loader could not read configs/config.yaml successfully."
   exit 1
 fi

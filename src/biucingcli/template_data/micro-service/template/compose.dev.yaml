@@ -6,9 +6,14 @@ services:
       args:
         GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}
         GOSUMDB: ${GOSUMDB:-sum.golang.org}
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace
-    command: air -c .air.toml
+    command: bash -c "./scripts/check proto && exec air -c .air.toml"
     environment:
+      HOME: /tmp
+      GOFLAGS: -buildvcs=false
+      LOCAL_UID: "${LOCAL_UID:-1000}"
+      LOCAL_GID: "${LOCAL_GID:-1000}"
       CONFIG_FILE: /workspace/configs/config.yaml
       GOCACHE: /workspace/.cache/go-build
       GOMODCACHE: /workspace/.cache/go-mod
@@ -16,8 +21,8 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
 {{COMPONENT_ENVIRONMENT}}
     ports:
-      - "${HOST_HTTP_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
-      - "${HOST_GRPC_PORT:-{{GRPC_PORT}}}:{{GRPC_PORT}}"
+      - "127.0.0.1:${HOST_HTTP_PORT:-0}:{{HTTP_PORT}}"
+      - "127.0.0.1:${HOST_GRPC_PORT:-0}:{{GRPC_PORT}}"
     depends_on: {{COMPONENT_DEPENDENCIES}}
     stop_grace_period: 15s
     volumes:
@@ -32,9 +37,6 @@ services:
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
     volumes:
       - ./deploy/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
-    ports:
-      - "${HOST_OTEL_GRPC_PORT:-4317}:4317"
-      - "${HOST_OTEL_HTTP_PORT:-4318}:4318"
 
 volumes:
   postgres-data:

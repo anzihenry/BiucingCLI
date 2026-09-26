@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- implement backend P1 runtime foundations: Docker task wrappers and worktree-safe ports,
+  validated file secrets, deny-by-default HTTP/gRPC pipelines, private health/admin listeners,
+  bounded shutdown, JSON logs and rate-limited audit hooks; identity verifiers remain P2 work.
+
 - implement backend architecture P0: engineering decisions, independent `database`/`cache`
   choices, generated Docker verification scripts and CI, plus six-case evidence collection.
 - remove `--dependency-store` / `dependency_store`; use `--database postgres --cache none`

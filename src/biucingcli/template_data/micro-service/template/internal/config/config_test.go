@@ -7,6 +7,8 @@ import (
 )
 
 func TestLoadDefaultConfig(t *testing.T) {
+	unset(t, "DATABASE_DSN")
+	unset(t, "CACHE_DSN")
 	tempDir := t.TempDir()
 	configDir := filepath.Join(tempDir, "configs")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {

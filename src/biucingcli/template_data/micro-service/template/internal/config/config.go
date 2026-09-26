@@ -1,7 +1,9 @@
 package config
 
 import (
+	"bytes"
 	"errors"
+	"io"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -10,11 +12,15 @@ import (
 const defaultConfigFile = "configs/config.yaml"
 
 type Config struct {
-	Service   ServiceConfig   `yaml:"service"`
-	Server    ServerConfig    `yaml:"server"`
-	Telemetry TelemetryConfig `yaml:"telemetry"`
-	Database  ComponentConfig `yaml:"database"`
-	Cache     ComponentConfig `yaml:"cache"`
+	Environment string          `yaml:"environment"`
+	AdminAddr   string          `yaml:"admin_addr"`
+	LogLevel    string          `yaml:"log_level"`
+	Request     RequestConfig   `yaml:"request"`
+	Service     ServiceConfig   `yaml:"service"`
+	Server      ServerConfig    `yaml:"server"`
+	Telemetry   TelemetryConfig `yaml:"telemetry"`
+	Database    ComponentConfig `yaml:"database"`
+	Cache       ComponentConfig `yaml:"cache"`
 }
 
 type ServerConfig struct {
@@ -48,22 +54,40 @@ func Load() (Config, error) {
 
 	data, err := os.ReadFile(configFile)
 	if err != nil {
-		return Config{}, err
+		return Config{}, errors.New("configuration file cannot be read")
 	}
 
 	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return Config{}, err
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	decoder.KnownFields(true)
+	if err := decoder.Decode(&cfg); err != nil {
+		return Config{}, errors.New("invalid configuration YAML")
 	}
 
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		return Config{}, errors.New("expected one configuration document")
+	}
 	if cfg.Service.Name == "" {
 		return Config{}, errors.New("service.name is required")
+	}
+	if value, set := os.LookupEnv("HTTP_PORT"); set {
+		cfg.Service.HTTPPort = value
+	}
+	if value, set := os.LookupEnv("GRPC_PORT"); set {
+		cfg.Service.GRPCPort = value
 	}
 	if cfg.Service.HTTPPort == "" {
 		cfg.Service.HTTPPort = "{{HTTP_PORT}}"
 	}
 	if cfg.Service.GRPCPort == "" {
 		cfg.Service.GRPCPort = "{{GRPC_PORT}}"
+	}
+	if !validPort(cfg.Service.HTTPPort) || !validPort(cfg.Service.GRPCPort) {
+		return Config{}, errors.New("invalid service port")
+	}
+	if cfg.Service.HTTPPort == cfg.Service.GRPCPort {
+		return Config{}, errors.New("service ports must differ")
 	}
 	if err := cfg.Server.applyDefaults(); err != nil {
 		return Config{}, err
@@ -87,12 +111,6 @@ func Load() (Config, error) {
 	if cfg.Cache.DSN == "" {
 		cfg.Cache.DSN = "{{CACHE_DSN}}"
 	}
-	if value, set := os.LookupEnv("DATABASE_DSN"); set {
-		cfg.Database.DSN = value
-	}
-	if value, set := os.LookupEnv("CACHE_DSN"); set {
-		cfg.Cache.DSN = value
-	}
 	if cfg.Database.Driver != "none" && cfg.Database.Driver != "postgres" {
 		return Config{}, errors.New("unsupported database.driver")
 	}
@@ -104,6 +122,9 @@ func Load() (Config, error) {
 	}
 	if cfg.Cache.Driver == "none" {
 		cfg.Cache.DSN = ""
+	}
+	if err := cfg.validateCommon(); err != nil {
+		return Config{}, err
 	}
 	return cfg, nil
 }
@@ -122,8 +143,8 @@ func (cfg *ServerConfig) applyDefaults() error {
 	}
 
 	for _, item := range values {
-		if *item.value < 0 {
-			return errors.New(item.name + " must be greater than zero")
+		if *item.value < 0 || *item.value > 3600 {
+			return errors.New(item.name + " must be between 1 and 3600 seconds")
 		}
 		if *item.value == 0 {
 			*item.value = item.defaultValue

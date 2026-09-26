@@ -4,6 +4,8 @@ tmp_dir = "tmp"
 [build]
 cmd = "go build -o ./tmp/server ./cmd/server"
 bin = "./tmp/server"
+send_interrupt = true
+kill_delay = "12s"
 exclude_dir = [".git", ".cache", "bin", "tmp"]
 include_ext = ["go", "yaml"]
 

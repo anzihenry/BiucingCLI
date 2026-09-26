@@ -1234,7 +1234,7 @@
         "make docker-build",
         "make docker-run"
       ],
-      "template_file_count": 37,
+      "template_file_count": 51,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -1260,12 +1260,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "3bbff65bdb8eeda235dc2e1c940bba2b3dffb44f047bad06b0ca2d88b100b90b",
+        "sha256": "53f0a6f49463411f2558ed8c1a1d0eb7f06db972bab00fac3bf1740316d8ec61",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -1281,7 +1281,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "4be2b7d7fdda7921a1509c85aa4368b9d7a6e134d23760f444b19137797f5ec0",
+        "sha256": "39f499d61f242d5793cacf127f5467244f72566094396d3e37fd9197220df3e3",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -1296,7 +1296,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "0f298523df78cd2b033f3ea2fdc736f48377a59ddf687991270623f85a39a381",
+        "sha256": "500c8e7b190c5f14513e2536c9c1df3084f01867f49964b22356164bba2948d5",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -1306,12 +1306,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "0ed2dfb49c7bc3af46de577d3f06ca48309379cfa7a290fbb3aafa78de26e76d",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "e884d511fc1eb56bc11ab699fca3c3bb8f672178b4fd961d92c1b7ab5aa16ab2",
+        "sha256": "11af00d71fc12c376f52d9817a505c2ae70df64c175141464fd0c1304a9938aa",
         "execute_bits": "0o0"
       },
       "cmd": {
@@ -1322,17 +1322,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "5dedfbba493266a0392c40671c47f2fe28d64bfa0fbf1d15b468b907d99a20cd",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "613d3bce3729817ee5277ac6b54584889483ad1c3406b7a52d7b924ea58ba423",
+        "sha256": "90c166c2e7b426635327fa720901733237a2ad24b149310876efaadb10df635f",
         "execute_bits": "0o0"
       },
       "compose.yaml": {
         "kind": "file",
-        "sha256": "22c68f7956cad2ff128c3c36343a295ca2c9a6057914a6f7b90d5174f6b7e7b2",
+        "sha256": "b1364aac4a597cb8fa02308917078894cc01d2f3e6fd4fe5db8626adc00c42c3",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -1340,7 +1340,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "d1812403f64f0bb5909306215e592fb0be0fb4e4911cde74e8e7c51b800874cb",
+        "sha256": "7bde0a0dd2b05c6e15d164f8152beaa63dc4e9f2ada9d9d1ad2cd0ba3acd213f",
         "execute_bits": "0o0"
       },
       "go.mod": {
@@ -1356,17 +1356,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "302260b681eb4302a9ed4210fe1e1d8771453b23736d77fd2faa028b149888ed",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "ae841b16d439ec0ff79584b90fe22c001a46fe9c8fab386b24a38a03ba74e99c",
+        "sha256": "d0c9a86ef9d4a7e1692ed0f2a5239f23e0d32227a5574b8157ff08f950711b1f",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "0f49c9b6aa72655f497c1e32ae8a53309c5786bae8cefbd2ca1ea0bba4587168",
+        "sha256": "58adde62915a40d4f757522bb718c8acf3658f09afd0d72a712e309b7067a650",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -1405,6 +1423,37 @@
         "sha256": "c3220b2127954f97f2c3072eebccb9d5dee84646175a2f065b9bfb9fcbdad7ae",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -1423,11 +1472,21 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "d1b6ca4796443c6e69dbc933593225d45fcd67d8c49446889ec28153cc9b55e4",
+        "sha256": "738ea31a43b11b4a949fbf41f41724a584379f715dc4af1a84ec40bb9ff800e1",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
+      },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
       },
       "internal/runtime/server.go": {
         "kind": "file",
@@ -1437,6 +1496,14 @@
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "8eca89f4d2cc816ea11df92de73f2bb8025f948fb22a47dfeaa2ef4de789eca8",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -1467,17 +1534,32 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "8ea1d9174d6a00be644a99e0a0e9e12203814ca61be0a30879977350f3e800b9",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
+        "execute_bits": "0o111"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a4c23db0475da1f56ec965bb98c8eb5903138a289c09907fed970dc19e0c7a5a",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "14af5ddc61af41b75f9bbfac7b6eed25790293ec93525812e0234936b495d323",
+        "sha256": "252d10c4e024df8381e96ad46043697af3feb5cfd07d57dca925ed7f2f9f662c",
+        "execute_bits": "0o111"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "3898ddabc60aec0dcdf20da1a176f52d4b84ffe441f3806ad64849c07a3efa78",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "5d4c05a8522316bbf6f38fc0cb7e76059dd0c78a53d388d53f2ff903a54c45ef",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -1485,7 +1567,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "aa0f4af6d2f0bd226f5048a58723870b7f5438e020ad6bf3ef53e5ec8f3af2d8",
+        "sha256": "a401b6a89187826095bb60c9d4f0ea58777f2bd732626a7f01b905dd0af52af8",
         "execute_bits": "0o0"
       }
     }
@@ -5840,7 +5922,7 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 39,
+      "template_file_count": 56,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -5855,6 +5937,7 @@
         "api",
         "cmd",
         "compose.dev.yaml",
+        "compose.yaml",
         "configs",
         "deploy",
         "go.mod",
@@ -5867,12 +5950,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "sha256": "6d9fa3dbb70cf2c3f1233f64af46293b4e42334a13327ba0f4da769a55731159",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -5888,7 +5971,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "sha256": "d01a01638b7f279f5488219658c11470fa8c2a916c8c6f46705d2854eec1b7b4",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -5903,7 +5986,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "sha256": "b9ff9a8c8b815df05f2d4183f5227d3c8a353ca016944e90f9f8a96d6f1f4668",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -5913,12 +5996,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "1c64ecad0a4dbef30c2fd7c5adc04d7604d93ab19a157884ba50c65d71d6fb2a",
+        "sha256": "e3e40de1db1330fdd7724d1bc290e275c4e04b1a6b7534ede4eddeecc7f572db",
         "execute_bits": "0o0"
       },
       "api": {
@@ -5956,12 +6039,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "fc7d7c292e59d48a6c153d743558110786adc06f302ca47fecfae418d0a3e443",
+        "sha256": "e20130d33eb28a74c9a9626d6c87c1d4f55be6596670508036daff38e7455c48",
+        "execute_bits": "0o0"
+      },
+      "compose.yaml": {
+        "kind": "file",
+        "sha256": "34bb7e976b4ce269059e428ee09be947d0bce13996b62e909ccb657b825256c4",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -5969,7 +6057,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "2b63c6a7527d44d91f14883f6351f126689c68a6aa9a279905c02d3d48217152",
+        "sha256": "0956a2a2667b7ce19902c9ef1717c2d66faeb39127a055e1dc0a4c334ef18da2",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -5977,7 +6065,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "f93713d2dccad7e8b296d0c25f118de36cda7f062cc470eb40494070dff5e65d",
+        "sha256": "87f23c7da69b206637f81a715402c8d1a5ff8aca70f82a93714405f18f5daaf0",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -5998,17 +6086,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "cb7ef005a9af223f0183431d431f3c14f73e955da40840b15bd9a08c3d5f0470",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "d8549eef7eff2684d741f4caa67d03cee0bc1b56102945be3e9ee0598befc227",
+        "sha256": "edf032ab02a034e09ed75099a98c0849e9a2deeb2eb090fa57701ca16dc44af2",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "sha256": "f69618c35aab159ad92f4da5b3fd7226a7111e821e18d305ccd570779edf6024",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -6037,6 +6143,37 @@
         "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -6050,20 +6187,38 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
       },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
+      },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "sha256": "109bb0ab655e0ac4ac7b07f723e54db989d8885d2e7b0856aa310be5dc12b90c",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -6092,7 +6247,7 @@
       },
       "internal/transport/grpc.go": {
         "kind": "file",
-        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "sha256": "6e1e22d1d373d44d44f2f030f8fa6dfa42f57247837e167f96f478e383f29bbc",
         "execute_bits": "0o0"
       },
       "internal/transport/ping.go": {
@@ -6100,22 +6255,47 @@
         "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
         "execute_bits": "0o0"
       },
+      "internal/transport/pipeline.go": {
+        "kind": "file",
+        "sha256": "0469935ad330d8958012e83ef9bb15ec71dd4f6c61f284a9304a653a6f6537e2",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/pipeline_test.go": {
+        "kind": "file",
+        "sha256": "833062ef6f3f99038a835ffc43da197254532ce9198a9ea57bea6278fbca9426",
+        "execute_bits": "0o0"
+      },
       "scripts": {
         "kind": "directory"
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
         "execute_bits": "0o100"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a2a547d1825760a86e4f0a9a9e25a55c39e3301bf0a0cf1b7ed474b70d4f6f64",
+        "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "sha256": "629715ab603790cdfeb80b1a24e19292ed58b6a91c23021c146957ee8033efec",
         "execute_bits": "0o100"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "3cc9a1322e28992dbd0e1c3e4d4f40f53ed6f2ee05b7125b407502716fe5d620",
+        "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -6123,7 +6303,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "4bf2e59719471b8c4d4ca4d34cc5492a1e4dcdc28d3d049944cd7eec585fbcd2",
+        "sha256": "0a9a6321783d19c110734373f4b3c33d63cf44ff3730496232a21f9d4be5eede",
         "execute_bits": "0o0"
       }
     }
@@ -6212,7 +6392,7 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 39,
+      "template_file_count": 56,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6227,6 +6407,7 @@
         "api",
         "cmd",
         "compose.dev.yaml",
+        "compose.yaml",
         "configs",
         "deploy",
         "go.mod",
@@ -6239,12 +6420,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "sha256": "6d9fa3dbb70cf2c3f1233f64af46293b4e42334a13327ba0f4da769a55731159",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -6260,7 +6441,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "sha256": "d01a01638b7f279f5488219658c11470fa8c2a916c8c6f46705d2854eec1b7b4",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -6275,7 +6456,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "sha256": "b9ff9a8c8b815df05f2d4183f5227d3c8a353ca016944e90f9f8a96d6f1f4668",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -6285,12 +6466,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "e18d04044aec265a7781b9a2d950a4bb0e7ecc8d0ec1ed78d9c5c47fb5103eba",
+        "sha256": "8467db66fd92daee42948a6e549fb2122708cebc54c84c3963ceb63bb56c7f54",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6328,12 +6509,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "4bb9ccab0a9fc80f7efd8d78d53820e0e9d540200abe72302e307cd26eb4ccea",
+        "sha256": "7334c514788508fae528978f04970f09c7dae3372b4bd81dca3dc6d66d419890",
+        "execute_bits": "0o0"
+      },
+      "compose.yaml": {
+        "kind": "file",
+        "sha256": "584075cbb682450ddd32cffbfd42d02d3e21941f6d88e68a699c2b176aa6d09d",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -6341,7 +6527,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "a0a26d1a0bc8c51cf022617412c4794983161ccbc319d59010527aae962f758d",
+        "sha256": "e03e3368ee3e1513fe5e99e57ac1f307b30ceb442f7b5bd3c6e9807c9d050480",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -6349,7 +6535,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "f5c8929f2997f48d582478ec032fa28884836eb09cdc5f5616f65629bd9c015e",
+        "sha256": "87f23c7da69b206637f81a715402c8d1a5ff8aca70f82a93714405f18f5daaf0",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -6370,17 +6556,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "cb7ef005a9af223f0183431d431f3c14f73e955da40840b15bd9a08c3d5f0470",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "53fe4302705a8659b7be0cc052779a7e6ecf43cfbb74063eac2bbcec247bd0e2",
+        "sha256": "f2bc24fb04405ea3e7fc7ca7940afcdfcd297791c8df692118f9d7ad7023bfef",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "sha256": "f69618c35aab159ad92f4da5b3fd7226a7111e821e18d305ccd570779edf6024",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -6409,6 +6613,37 @@
         "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -6422,20 +6657,38 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
       },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
+      },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "sha256": "109bb0ab655e0ac4ac7b07f723e54db989d8885d2e7b0856aa310be5dc12b90c",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -6464,7 +6717,7 @@
       },
       "internal/transport/grpc.go": {
         "kind": "file",
-        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "sha256": "6e1e22d1d373d44d44f2f030f8fa6dfa42f57247837e167f96f478e383f29bbc",
         "execute_bits": "0o0"
       },
       "internal/transport/ping.go": {
@@ -6472,22 +6725,47 @@
         "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
         "execute_bits": "0o0"
       },
+      "internal/transport/pipeline.go": {
+        "kind": "file",
+        "sha256": "0469935ad330d8958012e83ef9bb15ec71dd4f6c61f284a9304a653a6f6537e2",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/pipeline_test.go": {
+        "kind": "file",
+        "sha256": "833062ef6f3f99038a835ffc43da197254532ce9198a9ea57bea6278fbca9426",
+        "execute_bits": "0o0"
+      },
       "scripts": {
         "kind": "directory"
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
         "execute_bits": "0o100"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a2a547d1825760a86e4f0a9a9e25a55c39e3301bf0a0cf1b7ed474b70d4f6f64",
+        "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "sha256": "629715ab603790cdfeb80b1a24e19292ed58b6a91c23021c146957ee8033efec",
         "execute_bits": "0o100"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "3cc9a1322e28992dbd0e1c3e4d4f40f53ed6f2ee05b7125b407502716fe5d620",
+        "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -6495,7 +6773,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "4bf2e59719471b8c4d4ca4d34cc5492a1e4dcdc28d3d049944cd7eec585fbcd2",
+        "sha256": "0a9a6321783d19c110734373f4b3c33d63cf44ff3730496232a21f9d4be5eede",
         "execute_bits": "0o0"
       }
     }
@@ -6584,7 +6862,7 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 39,
+      "template_file_count": 56,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6599,6 +6877,7 @@
         "api",
         "cmd",
         "compose.dev.yaml",
+        "compose.yaml",
         "configs",
         "deploy",
         "go.mod",
@@ -6611,12 +6890,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "sha256": "6d9fa3dbb70cf2c3f1233f64af46293b4e42334a13327ba0f4da769a55731159",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -6632,7 +6911,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "sha256": "d01a01638b7f279f5488219658c11470fa8c2a916c8c6f46705d2854eec1b7b4",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -6647,7 +6926,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "sha256": "b9ff9a8c8b815df05f2d4183f5227d3c8a353ca016944e90f9f8a96d6f1f4668",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -6657,12 +6936,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "72ec77606be489225e0e8ddc08b17b0a7196d9716b16be7b00b998c33a7f9e57",
+        "sha256": "7e25eaedee88de7de4c4f80ffe67ac44ef8d3f7fb3de429f5748f313b9f0198f",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6700,12 +6979,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "744520b645c36bb61c6d753387dbdb2e358c7d459f0b81026c8d5701668bb07f",
+        "sha256": "8bb09924eac6e6f213802156ffcf4fe2ab4a6def0406aa353a940ea7349ac3df",
+        "execute_bits": "0o0"
+      },
+      "compose.yaml": {
+        "kind": "file",
+        "sha256": "3d06db753a3772be47c60430efb8db39f41dc4415e139be3d2ff14e9e1934820",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -6713,7 +6997,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "5a762ecee94dcbf38e95dd0ec4636a8a53f276757b3eb3d7bea3509af35d0669",
+        "sha256": "c87af59fd2c82a53625a1bddfcd9edf057170f7697512bf260cf4f1202a42561",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -6721,7 +7005,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "e82b70038c75cd3141214e56ff51782e9d863fdf32e5b3613327196e646640fc",
+        "sha256": "87f23c7da69b206637f81a715402c8d1a5ff8aca70f82a93714405f18f5daaf0",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -6742,17 +7026,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "cb7ef005a9af223f0183431d431f3c14f73e955da40840b15bd9a08c3d5f0470",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "21ef225ceda6afb22404fa0989fe86eca229090340b8f905a85d2540efd53453",
+        "sha256": "526cf76a2ce4f27b8befacaadfaa209c25cd5fd3bb3fec802d941b6c43e91ecd",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "sha256": "f69618c35aab159ad92f4da5b3fd7226a7111e821e18d305ccd570779edf6024",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -6781,6 +7083,37 @@
         "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -6794,20 +7127,38 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
       },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
+      },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "sha256": "109bb0ab655e0ac4ac7b07f723e54db989d8885d2e7b0856aa310be5dc12b90c",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -6836,7 +7187,7 @@
       },
       "internal/transport/grpc.go": {
         "kind": "file",
-        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "sha256": "6e1e22d1d373d44d44f2f030f8fa6dfa42f57247837e167f96f478e383f29bbc",
         "execute_bits": "0o0"
       },
       "internal/transport/ping.go": {
@@ -6844,22 +7195,47 @@
         "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
         "execute_bits": "0o0"
       },
+      "internal/transport/pipeline.go": {
+        "kind": "file",
+        "sha256": "0469935ad330d8958012e83ef9bb15ec71dd4f6c61f284a9304a653a6f6537e2",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/pipeline_test.go": {
+        "kind": "file",
+        "sha256": "833062ef6f3f99038a835ffc43da197254532ce9198a9ea57bea6278fbca9426",
+        "execute_bits": "0o0"
+      },
       "scripts": {
         "kind": "directory"
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
         "execute_bits": "0o100"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a2a547d1825760a86e4f0a9a9e25a55c39e3301bf0a0cf1b7ed474b70d4f6f64",
+        "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "sha256": "629715ab603790cdfeb80b1a24e19292ed58b6a91c23021c146957ee8033efec",
         "execute_bits": "0o100"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "3cc9a1322e28992dbd0e1c3e4d4f40f53ed6f2ee05b7125b407502716fe5d620",
+        "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -6867,7 +7243,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "31613e923588b0fd8eaf21ef717838a8abf7d6931c6ad4bc924c59eb27564b05",
+        "sha256": "155bbc3740a2dfcd94794f8d47044b43945ba1206bb2655848ca120faaa42102",
         "execute_bits": "0o0"
       }
     }
@@ -6956,7 +7332,7 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 39,
+      "template_file_count": 56,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6971,6 +7347,7 @@
         "api",
         "cmd",
         "compose.dev.yaml",
+        "compose.yaml",
         "configs",
         "deploy",
         "go.mod",
@@ -6983,12 +7360,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "sha256": "6d9fa3dbb70cf2c3f1233f64af46293b4e42334a13327ba0f4da769a55731159",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -7004,7 +7381,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "sha256": "d01a01638b7f279f5488219658c11470fa8c2a916c8c6f46705d2854eec1b7b4",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -7019,7 +7396,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "sha256": "b9ff9a8c8b815df05f2d4183f5227d3c8a353ca016944e90f9f8a96d6f1f4668",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -7029,12 +7406,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "644db9f9e330fec9b927a8f2e270d682cb1361d2dd5e8a60c3ab9604e927d199",
+        "sha256": "48cd99a151c74ae5b4287d833a619b7df54951b2e5ebeba4b4d9bf9d168f21cd",
         "execute_bits": "0o0"
       },
       "api": {
@@ -7072,12 +7449,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "e9877b40d9074f3edf79873229d9ddcfe49f29f9256e45fc0f6f23fc51985198",
+        "sha256": "d9adf10ef795124150106886611196ddfad8e245d23cdadb532fc3f2b5564471",
+        "execute_bits": "0o0"
+      },
+      "compose.yaml": {
+        "kind": "file",
+        "sha256": "ae2360ab5ae87f8800c113ed56ffe78ccf91a07eb2b0e82616c4c63105260f4e",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -7085,7 +7467,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "0e19f629d57af5cf455d280f20779cba17979096e93e88c9b70702dad7cc47a0",
+        "sha256": "aa53159b89b2e50ed975a84177260291b6cc809eae4342d7359bf3bf4ce50fee",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -7093,7 +7475,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "df06383b52c38465f453746fa51d7ce8b7ac7bad7fba5bf92dec02647329c7f1",
+        "sha256": "87f23c7da69b206637f81a715402c8d1a5ff8aca70f82a93714405f18f5daaf0",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -7114,17 +7496,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "cb7ef005a9af223f0183431d431f3c14f73e955da40840b15bd9a08c3d5f0470",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "7123e1194f3d3deee0170851b49ae54608ccd5781a1de3b0747e7c59b098b8a3",
+        "sha256": "891be9434de97404e720f858aba972adc1742e111fbeec8c9e2bef933a4752a1",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "sha256": "f69618c35aab159ad92f4da5b3fd7226a7111e821e18d305ccd570779edf6024",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -7153,6 +7553,37 @@
         "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -7166,20 +7597,38 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
       },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
+      },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "sha256": "109bb0ab655e0ac4ac7b07f723e54db989d8885d2e7b0856aa310be5dc12b90c",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -7208,7 +7657,7 @@
       },
       "internal/transport/grpc.go": {
         "kind": "file",
-        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "sha256": "6e1e22d1d373d44d44f2f030f8fa6dfa42f57247837e167f96f478e383f29bbc",
         "execute_bits": "0o0"
       },
       "internal/transport/ping.go": {
@@ -7216,22 +7665,47 @@
         "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
         "execute_bits": "0o0"
       },
+      "internal/transport/pipeline.go": {
+        "kind": "file",
+        "sha256": "0469935ad330d8958012e83ef9bb15ec71dd4f6c61f284a9304a653a6f6537e2",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/pipeline_test.go": {
+        "kind": "file",
+        "sha256": "833062ef6f3f99038a835ffc43da197254532ce9198a9ea57bea6278fbca9426",
+        "execute_bits": "0o0"
+      },
       "scripts": {
         "kind": "directory"
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
         "execute_bits": "0o100"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a2a547d1825760a86e4f0a9a9e25a55c39e3301bf0a0cf1b7ed474b70d4f6f64",
+        "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "sha256": "629715ab603790cdfeb80b1a24e19292ed58b6a91c23021c146957ee8033efec",
         "execute_bits": "0o100"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "3cc9a1322e28992dbd0e1c3e4d4f40f53ed6f2ee05b7125b407502716fe5d620",
+        "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -7239,7 +7713,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "31613e923588b0fd8eaf21ef717838a8abf7d6931c6ad4bc924c59eb27564b05",
+        "sha256": "155bbc3740a2dfcd94794f8d47044b43945ba1206bb2655848ca120faaa42102",
         "execute_bits": "0o0"
       }
     }
@@ -7308,7 +7782,7 @@
         "make docker-build",
         "make docker-run"
       ],
-      "template_file_count": 37,
+      "template_file_count": 51,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -7334,12 +7808,12 @@
     "entries": {
       ".air.toml": {
         "kind": "file",
-        "sha256": "3bbff65bdb8eeda235dc2e1c940bba2b3dffb44f047bad06b0ca2d88b100b90b",
+        "sha256": "53f0a6f49463411f2558ed8c1a1d0eb7f06db972bab00fac3bf1740316d8ec61",
         "execute_bits": "0o0"
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "sha256": "b0cae8628aaf207924f3e4c47106a59dcd21d73b6feace00368ccf83a9403a85",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -7355,7 +7829,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "4be2b7d7fdda7921a1509c85aa4368b9d7a6e134d23760f444b19137797f5ec0",
+        "sha256": "39f499d61f242d5793cacf127f5467244f72566094396d3e37fd9197220df3e3",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -7370,7 +7844,7 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "0f298523df78cd2b033f3ea2fdc736f48377a59ddf687991270623f85a39a381",
+        "sha256": "500c8e7b190c5f14513e2536c9c1df3084f01867f49964b22356164bba2948d5",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
@@ -7380,12 +7854,12 @@
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "0ed2dfb49c7bc3af46de577d3f06ca48309379cfa7a290fbb3aafa78de26e76d",
+        "sha256": "bb031d8670bc688cc3b472c563b44df86c177aa7f685ec0599178e30a50b0b24",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "6f14831510e889e705deed40bf803ff0e3baa50c128956ad68ff369b089c63a7",
+        "sha256": "dff50e6e29bb65f01087e4267174bc326bd3af6c5f3352ed05b290816022d02c",
         "execute_bits": "0o0"
       },
       "cmd": {
@@ -7396,17 +7870,17 @@
       },
       "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "5dedfbba493266a0392c40671c47f2fe28d64bfa0fbf1d15b468b907d99a20cd",
+        "sha256": "59d25b5a6bc2a86955183825ba01d9bba14f598ff904a0f2857cfaed46854b32",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "02da4c0619a14a45552000a698c8621c229788e5f2d54662b94975454a026631",
+        "sha256": "4293c475137fb4c9413a14ca4c1ac86b541bfa5edf1f734eba3c16665c0d32d8",
         "execute_bits": "0o0"
       },
       "compose.yaml": {
         "kind": "file",
-        "sha256": "2382db09ee3e8e19cc72a1d37daab40e1865f95ace0d7d89ee4212daa527d646",
+        "sha256": "86f898d7dd49248f4e9f33047e84b24228f1b0b819b94db533d9afb46bec597c",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -7414,7 +7888,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "a959c196973f661683724aa31fe7721fa6e5cc30b9fb792512f5af5ff7f90317",
+        "sha256": "5b863a336e0dc95ce8335a8d48aa69179d2862a250df3e006fd56001da158296",
         "execute_bits": "0o0"
       },
       "go.mod": {
@@ -7430,17 +7904,35 @@
       "internal": {
         "kind": "directory"
       },
+      "internal/app": {
+        "kind": "directory"
+      },
+      "internal/app/app.go": {
+        "kind": "file",
+        "sha256": "302260b681eb4302a9ed4210fe1e1d8771453b23736d77fd2faa028b149888ed",
+        "execute_bits": "0o0"
+      },
       "internal/config": {
         "kind": "directory"
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "5a92a7cf1a838bb64b4d234e553b636830b2dd0dc729445772ef1d0227c1d78d",
+        "sha256": "e3f265f1d3933c235930a7065ca75e2a3280d73b117af0c4c33d596169e14efb",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "0f49c9b6aa72655f497c1e32ae8a53309c5786bae8cefbd2ca1ea0bba4587168",
+        "sha256": "58adde62915a40d4f757522bb718c8acf3658f09afd0d72a712e309b7067a650",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety.go": {
+        "kind": "file",
+        "sha256": "0debaef7bd2974cfb867951376e3f55fca75be5fbe1390f2c48472bb62378036",
+        "execute_bits": "0o0"
+      },
+      "internal/config/safety_test.go": {
+        "kind": "file",
+        "sha256": "427d99eec8e9fa54fc295b64b7d487152cd68d94154707f0d23aa28788a921ad",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -7479,6 +7971,37 @@
         "sha256": "c3220b2127954f97f2c3072eebccb9d5dee84646175a2f065b9bfb9fcbdad7ae",
         "execute_bits": "0o0"
       },
+      "internal/observability": {
+        "kind": "directory"
+      },
+      "internal/observability/log.go": {
+        "kind": "file",
+        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "execute_bits": "0o0"
+      },
+      "internal/observability/log_test.go": {
+        "kind": "file",
+        "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline": {
+        "kind": "directory"
+      },
+      "internal/pipeline/http.go": {
+        "kind": "file",
+        "sha256": "8f64ee93318050b994106c4af2e8eb8ee237441679a069cdd8fd2c33b0136b25",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/http_test.go": {
+        "kind": "file",
+        "sha256": "5252bdc8b825543d9d1a880a86ad71f95cd313f4354fb46d37086083fa88b4c6",
+        "execute_bits": "0o0"
+      },
+      "internal/pipeline/json.go": {
+        "kind": "file",
+        "sha256": "5c73e01343f1bed7d7e65fe0d6788d7ea2bf21105c4b79c6214030de4942f827",
+        "execute_bits": "0o0"
+      },
       "internal/repository": {
         "kind": "directory"
       },
@@ -7497,11 +8020,21 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "d1b6ca4796443c6e69dbc933593225d45fcd67d8c49446889ec28153cc9b55e4",
+        "sha256": "738ea31a43b11b4a949fbf41f41724a584379f715dc4af1a84ec40bb9ff800e1",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
         "kind": "directory"
+      },
+      "internal/runtime/admin.go": {
+        "kind": "file",
+        "sha256": "745672bc1b114903df377c0f5b8838b1abd250d2cfdf198aa71dfa9058b60e3d",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/admin_test.go": {
+        "kind": "file",
+        "sha256": "68fb77ef535f11983a3417d40ef8d55d9c3cb2d01f90802a28b6b91fffa2fdea",
+        "execute_bits": "0o0"
       },
       "internal/runtime/server.go": {
         "kind": "file",
@@ -7511,6 +8044,14 @@
       "internal/runtime/server_test.go": {
         "kind": "file",
         "sha256": "8eca89f4d2cc816ea11df92de73f2bb8025f948fb22a47dfeaa2ef4de789eca8",
+        "execute_bits": "0o0"
+      },
+      "internal/security": {
+        "kind": "directory"
+      },
+      "internal/security/principal.go": {
+        "kind": "file",
+        "sha256": "0e35336cb93447596bae11f03822e81dcde1df9c63269dc219a70bea8544b3fb",
         "execute_bits": "0o0"
       },
       "internal/service": {
@@ -7541,17 +8082,32 @@
       },
       "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "8ea1d9174d6a00be644a99e0a0e9e12203814ca61be0a30879977350f3e800b9",
+        "sha256": "c8dfdad510def2f6c1dccda06a569512c0dee0421798ac871591a83fb95a1c6e",
+        "execute_bits": "0o111"
+      },
+      "scripts/check": {
+        "kind": "file",
+        "sha256": "a4c23db0475da1f56ec965bb98c8eb5903138a289c09907fed970dc19e0c7a5a",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "14af5ddc61af41b75f9bbfac7b6eed25790293ec93525812e0234936b495d323",
+        "sha256": "252d10c4e024df8381e96ad46043697af3feb5cfd07d57dca925ed7f2f9f662c",
+        "execute_bits": "0o111"
+      },
+      "scripts/init-workspace": {
+        "kind": "file",
+        "sha256": "3898ddabc60aec0dcdf20da1a176f52d4b84ffe441f3806ad64849c07a3efa78",
+        "execute_bits": "0o111"
+      },
+      "scripts/task": {
+        "kind": "file",
+        "sha256": "5d4c05a8522316bbf6f38fc0cb7e76059dd0c78a53d388d53f2ff903a54c45ef",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
         "kind": "file",
-        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "sha256": "d83583696cf12748901bcee1a120a3f265d8aa38474a3c7de19ad9373b56a870",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -7559,7 +8115,7 @@
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "aa0f4af6d2f0bd226f5048a58723870b7f5438e020ad6bf3ef53e5ec8f3af2d8",
+        "sha256": "a401b6a89187826095bb60c9d4f0ea58777f2bd732626a7f01b905dd0af52af8",
         "execute_bits": "0o0"
       }
     }

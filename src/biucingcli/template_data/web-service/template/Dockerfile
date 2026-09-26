@@ -23,7 +23,10 @@ RUN set -eux; \
     done
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -o /out/server ./cmd/server
+ARG VERSION=dev
+ARG COMMIT=unknown
+ARG BUILT_AT=unknown
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -buildvcs=false -trimpath -ldflags="-X {{MODULE_NAME}}/internal/runtime.Version=${VERSION} -X {{MODULE_NAME}}/internal/runtime.Commit=${COMMIT} -X {{MODULE_NAME}}/internal/runtime.BuiltAt=${BUILT_AT}" -o /out/server ./cmd/server
 
 FROM ${RUNTIME_IMAGE}
 
@@ -37,6 +40,6 @@ EXPOSE {{HTTP_PORT}}
 ENV CONFIG_FILE=/app/configs/config.yaml
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/app/server", "healthcheck", "http://127.0.0.1:{{HTTP_PORT}}/healthz"]
+    CMD ["/app/server", "healthcheck", "http://127.0.0.1:9000/livez"]
 
 CMD ["/app/server"]

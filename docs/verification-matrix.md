@@ -154,3 +154,11 @@ runs the generated Docker verification entry points, and writes evidence plus lo
 `--generate-only` checks generation only and must not count as real-build evidence.
 The generated `.github/workflows/verify.yml` uses the same project-local `scripts/verify-container`.
 This is the P0 starter gate, not authentication, database integration, or production readiness.
+
+## Backend P1 runtime foundation
+
+See [P1 verification](backend-service-p1-verification.md). Generated `scripts/task verify` runs
+configuration checks, lint, protocol checks where applicable, race tests and compilation in Docker.
+`uv run --locked python scripts/verify-backend-worktrees --output-dir /tmp/new-worktree-evidence`
+exercises real worktree isolation, reload, file ownership, retained volumes and a runtime image.
+Production identity, persistence and HA remain separate gates.

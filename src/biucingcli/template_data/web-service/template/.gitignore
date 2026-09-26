@@ -3,3 +3,8 @@ dist/
 .cache/
 .DS_Store
 coverage.out
+
+.secrets/
+*.key
+.env*
+!.env.example

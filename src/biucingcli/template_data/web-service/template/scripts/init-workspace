@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /workspace
+mkdir -p .cache bin tmp
+chown -R "$LOCAL_UID:$LOCAL_GID" .cache bin tmp
