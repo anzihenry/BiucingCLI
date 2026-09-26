@@ -1,0 +1,30 @@
+name: Backend generated projects
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  generated-project:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [web, web-cache, micro, micro-data, micro-cache, micro-both]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.12.16"
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run --locked python scripts/verify-backends --case "${{ matrix.case }}" --output-dir "${{ runner.temp }}/backend-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-${{ matrix.case }}-evidence
+          path: |
+            ${{ runner.temp }}/backend-evidence/evidence.json
+            ${{ runner.temp }}/backend-evidence/*.log

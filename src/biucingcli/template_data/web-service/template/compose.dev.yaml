@@ -9,12 +9,14 @@ services:
     working_dir: /workspace
     command: air -c .air.toml
     environment:
+{{COMPONENT_ENVIRONMENT}}
       CONFIG_FILE: /workspace/configs/config.yaml
       GOCACHE: /workspace/.cache/go-build
       GOMODCACHE: /workspace/.cache/go-mod
       GOLANGCI_LINT_CACHE: /workspace/.cache/golangci-lint
     ports:
       - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
+    depends_on: {{COMPONENT_DEPENDENCIES}}
     stop_grace_period: 15s
     volumes:
       - .:/workspace
@@ -22,7 +24,9 @@ services:
       - web-service-go-mod:/workspace/.cache/go-mod
       - web-service-golangci-lint:/workspace/.cache/golangci-lint
 
+{{COMPONENT_SERVICES}}
 volumes:
+  postgres-data:
   web-service-go-build:
   web-service-go-mod:
   web-service-golangci-lint:

@@ -432,7 +432,7 @@ my-apple-app/
     setup-xcode
 ```
 
-### `microservice`
+### `micro-service`
 
 Core variables:
 

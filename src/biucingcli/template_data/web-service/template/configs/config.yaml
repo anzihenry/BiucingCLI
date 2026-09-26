@@ -8,3 +8,11 @@ server:
   write_timeout_seconds: 15
   idle_timeout_seconds: 60
   shutdown_timeout_seconds: 10
+
+database:
+  driver: {{DATABASE}}
+  dsn: "{{DATABASE_DSN}}"
+
+cache:
+  driver: {{CACHE}}
+  dsn: "{{CACHE_DSN}}"

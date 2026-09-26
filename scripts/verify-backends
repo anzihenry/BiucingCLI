@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""Generate isolated backend variants and record honest, incremental verification evidence."""
+import argparse
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+from biucingcli.cli import main as cli_main
+
+CASES = {
+    "web": ("web-service", "edge-api", ["--module-name", "example.org/platform/edge-api"]),
+    "web-cache": ("web-service", "cached-edge", ["--module-name", "example.org/platform/cached-edge", "--cache", "redis"]),
+    "micro": ("micro-service", "internal-api", ["--module-name", "example.org/platform/internal-api", "--proto-package", "platform.internal.v2"]),
+    "micro-data": ("micro-service", "data-api", ["--module-name", "example.org/platform/data-api", "--proto-package", "platform.data.v2", "--database", "postgres"]),
+    "micro-cache": ("micro-service", "cache-api", ["--module-name", "example.org/platform/cache-api", "--proto-package", "platform.cache.v2", "--cache", "redis"]),
+    "micro-both": ("micro-service", "combined-api", ["--module-name", "example.org/platform/combined-api", "--proto-package", "platform.combined.v2", "--database", "postgres", "--cache", "redis"]),
+}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--case", choices=CASES, action="append", dest="cases")
+    parser.add_argument("--generate-only", action="store_true", help="Only render; never records Docker verification as passed")
+    parser.add_argument("--output-dir", type=Path, help="Must be a new directory; preserves generated projects and logs")
+    args = parser.parse_args()
+    if args.output_dir:
+        root = args.output_dir.resolve()
+        root.mkdir(parents=True, exist_ok=False)
+    else:
+        root = Path(tempfile.mkdtemp(prefix="biucing-backends-"))
+    report = {"schema_version": 1, "task": "P0/B03", "started_at": datetime.now(timezone.utc).isoformat(),
+              "mode": "generate-only" if args.generate_only else "docker", "environment": {}, "cases": []}
+    report_path = root / "evidence.json"
+
+    def save():
+        report_path.write_text(json.dumps(report, indent=2) + "\n")
+
+    save()
+    print(f"Evidence: {report_path}", flush=True)
+    try:
+        if not args.generate_only:
+            for command in (["docker", "version", "--format", "{{json .}}"], ["docker", "compose", "version"]):
+                result = subprocess.run(command, check=True, capture_output=True, text=True, timeout=60)
+                report["environment"][" ".join(command[:2])] = result.stdout.strip()
+        for key in args.cases or CASES:
+            template, name, options = CASES[key]
+            item = {"case": key, "template": template, "generation": "running", "container": "not-run"}
+            report["cases"].append(item)
+            save()
+            code = cli_main(["create", template, name, "--output-dir", str(root), "--non-interactive", *options])
+            if code:
+                raise RuntimeError(f"generation failed: {key}")
+            item["generation"] = "passed"
+            save()
+            if args.generate_only:
+                continue
+            item["container"] = "running"
+            item["command"] = ["./scripts/verify-container"]
+            item["log"] = f"{key}.log"
+            save()
+            with (root / item["log"]).open("w") as log:
+                result = subprocess.run(item["command"], cwd=root / name, stdout=log, stderr=subprocess.STDOUT,
+                                        env=os.environ.copy(), check=False)
+            item["container"] = "passed" if result.returncode == 0 else "failed"
+            save()
+            if result.returncode:
+                raise RuntimeError(f"container verification failed: {key}; see {root / item['log']}")
+        report["result"] = "rendered" if args.generate_only else "passed"
+    except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+        for item in report["cases"]:
+            for stage in ("generation", "container"):
+                if item[stage] == "running":
+                    item[stage] = "failed"
+        report["result"] = "failed"
+        report["error"] = str(exc)
+        print(str(exc), file=sys.stderr)
+        return 1
+    finally:
+        report["finished_at"] = datetime.now(timezone.utc).isoformat()
+        save()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

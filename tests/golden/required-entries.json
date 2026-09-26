@@ -62,8 +62,9 @@
     "scripts",
     "scripts/doctor"
   ],
-  "microservice": [
+  "micro-service": [
     ".dockerignore",
+    ".github/workflows/verify.yml",
     ".gitignore",
     "Makefile",
     "README.md",
@@ -82,10 +83,12 @@
     "internal/transport/ping.go",
     "scripts",
     "scripts/doctor",
+    "scripts/verify-container",
     "tests/server_test.go"
   ],
   "web-service": [
     ".dockerignore",
+    ".github/workflows/verify.yml",
     ".gitignore",
     "Makefile",
     "README.md",
@@ -98,7 +101,8 @@
     "internal/runtime/server.go",
     "internal/runtime/server_test.go",
     "scripts",
-    "scripts/doctor"
+    "scripts/doctor",
+    "scripts/verify-container"
   ],
   "worker": [
     ".dockerignore",

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- implement backend architecture P0: engineering decisions, independent `database`/`cache`
+  choices, generated Docker verification scripts and CI, plus six-case evidence collection.
+- remove `--dependency-store` / `dependency_store`; use `--database postgres --cache none`
+  or `--database none --cache redis` for the equivalent micro-service configuration.
+  Micro-service now defaults to no database/cache; web-service requires PostgreSQL.
+
+- rename the `microservice` template to `micro-service` for consistency with
+  `web-service`; the old CLI template name is no longer accepted.
+
 - implement the HarmonyOS thin shell, contracts/design system, SharedCore and HomeFeature
   bytecode HARs; reuse the canonical C++20 core through a cancellable Node-API session wrapper.
 - add component/shell constructor-graph generation, immutable publication, exact manifest

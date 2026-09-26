@@ -1,0 +1,33 @@
+name: Web service artifact
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  generated-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.16"
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: mkdir -p /tmp/biucing-web-service-ci
+      - run: uv run --locked biucing create web-service audit-web --module-name example.com/audit-web --output-dir /tmp/biucing-web-service-ci --non-interactive
+      - run: make bootstrap
+        working-directory: /tmp/biucing-web-service-ci/audit-web
+      - run: make verify
+        working-directory: /tmp/biucing-web-service-ci/audit-web
+      - run: make docker-build DOCKER_PLATFORM=linux/amd64 IMAGE=audit-web-ci TAG=ci
+        working-directory: /tmp/biucing-web-service-ci/audit-web
+      - name: Smoke test runtime image
+        run: |
+          docker run --rm -d --name audit-web-ci -p 18081:8080 audit-web-ci:ci
+          trap 'docker rm -f audit-web-ci >/dev/null 2>&1 || true' EXIT
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:18081/healthz

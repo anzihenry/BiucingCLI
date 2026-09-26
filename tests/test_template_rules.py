@@ -45,40 +45,40 @@ class TemplateRuleTests(unittest.TestCase):
             self.assertEqual(result.render_only_values, {})
             self.assertEqual(values, before)
 
-    def test_microservice_store_variants_and_service_name(self):
-        for store, port in (("postgres", "5432"), ("redis", "6379")):
-            values = {"project_name": "my-service", "service_name": "database-name", "dependency_store": store}
-            before = dict(values)
-            result = microservice.derive(values)
-            self.assertEqual(result.derived_values["service_type_name"], "MyService")
-            self.assertEqual(result.derived_values["dependency_store_port"], port)
-            self.assertEqual(result.derived_values["dependency_store"], store)
-            self.assertEqual(result.render_only_values, {})
-            self.assertEqual(values, before)
-            if store == "postgres":
-                self.assertIn("/database-name?", result.derived_values["dependency_store_dsn"])
-            else:
-                self.assertEqual(result.derived_values["dependency_store_env_block"], "")
+    def test_microservice_components_are_independent(self):
+        for database in ("none", "postgres"):
+            for cache in ("none", "redis"):
+                values = {"project_name": "my-service", "service_name": "database-name", "database": database, "cache": cache}
+                before = dict(values)
+                result = microservice.derive(values)
+                self.assertEqual(result.derived_values["service_type_name"], "MyService")
+                self.assertEqual(bool(result.derived_values["database_dsn"]), database == "postgres")
+                self.assertEqual(bool(result.derived_values["cache_dsn"]), cache == "redis")
+                self.assertEqual(values, before)
+                if database == "postgres":
+                    self.assertIn("/database-name?", result.derived_values["database_dsn"])
         default = microservice.derive({"project_name": "demo"})
-        self.assertIn("/demo?", default.derived_values["dependency_store_dsn"])
+        self.assertEqual(default.derived_values["database_dsn"], "")
+        self.assertEqual(default.derived_values["cache_dsn"], "")
 
     def test_invalid_selections_preserve_errors(self):
         with self.assertRaisesRegex(ValueError, "Unsupported Apple platform"):
             apple.derive({"project_name": "demo", "apple_platform": "invalid"})
-        with self.assertRaisesRegex(ValueError, "Unsupported dependency store"):
-            microservice.derive({"project_name": "demo", "dependency_store": "invalid"})
+        with self.assertRaisesRegex(ValueError, "Unsupported database"):
+            microservice.derive({"project_name": "demo", "database": "invalid"})
         with self.assertRaisesRegex(InvalidTemplateError, "unknown built-in template rule"):
             registry.get_rule("missing")
 
     def test_generic_fallback_and_missing_assigned_rule(self):
-        for template in ("frontend", "web-service", "worker", "harmonyos", "future-template"):
+        for template in ("frontend", "worker", "harmonyos", "future-template"):
             self.assertEqual(registry.derive_template_values(template, {"project_name": "demo"}), RuleResult())
         with patch.object(registry, "TEMPLATE_RULES", {"fixture": "missing"}):
             with self.assertRaises(InvalidTemplateError):
                 registry.derive_template_values("fixture", {})
-        for name, derive in (("apple", apple.derive), ("android", android.derive),
-                             ("microservice", microservice.derive)):
-            self.assertIs(registry.get_rule(name), derive)
+        for name, rule_name, derive in (("apple", "apple", apple.derive),
+                                        ("android", "android", android.derive),
+                                        ("micro-service", "microservice", microservice.derive)):
+            self.assertIs(registry.get_rule(rule_name), derive)
             values = {"project_name": "demo"}
             self.assertEqual(registry.derive_template_values(name, values), derive(values))
 
@@ -99,7 +99,6 @@ class TemplateRuleTests(unittest.TestCase):
         for name in ("default_swift_module_name", "apple_platform_config", "apple_platform_snippets"):
             self.assertIs(getattr(cli, name), getattr(apple, name))
         self.assertIs(cli.default_kotlin_module_name, android.default_kotlin_module_name)
-        self.assertIs(cli.microservice_dependency_config, microservice.microservice_dependency_config)
         for module in ("apple", "android", "microservice", "registry"):
             with self.subTest(module=module):
                 result = subprocess.run([

@@ -358,6 +358,818 @@
       }
     }
   },
+  "frontend-ssg": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "frontend",
+        "description": "React Router + TypeScript + Tailwind starter for independent projects",
+        "category": "frontend",
+        "stack": [
+          "React",
+          "React Router",
+          "TypeScript",
+          "Tailwind CSS",
+          "shadcn/ui"
+        ],
+        "platforms": [
+          "web"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "package_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "rendering",
+          "value": "ssg",
+          "source": "provided"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make test",
+        "export SITE_URL=https://example.com",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 57,
+      "template_top_level_entries": [
+        ".dockerignore",
+        ".env.example",
+        ".gitignore",
+        ".prettierignore",
+        ".prettierrc.json",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Dockerfile.dev.full",
+        "Makefile",
+        "README.md",
+        "THIRD_PARTY_NOTICES.md",
+        "app",
+        "components.json",
+        "compose.dev.yaml",
+        "eslint.config.js",
+        "nginx.conf",
+        "package.json",
+        "playwright.build.config.ts",
+        "playwright.production.config.ts",
+        "playwright.smoke.config.ts",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "public",
+        "react-router.config.ts",
+        "scripts",
+        "tests",
+        "tsconfig.json",
+        "vite.config.ts",
+        "vite.preview.config.ts",
+        "vitest.config.ts"
+      ],
+      "selected_variant": {
+        "selector": "rendering",
+        "value": "ssg"
+      }
+    },
+    "entries": {
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
+        "execute_bits": "0o0"
+      },
+      ".env.example": {
+        "kind": "file",
+        "sha256": "12cbd06994bc5cd8b26d072edde8c48b21e61ba462189224e13ed136eabf039b",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
+        "execute_bits": "0o0"
+      },
+      ".prettierignore": {
+        "kind": "file",
+        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
+        "execute_bits": "0o0"
+      },
+      ".prettierrc.json": {
+        "kind": "file",
+        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "334149d990e8bd092ab5f588b2502938e0822ae1ebc5a9ff8ad8a9b41b2f3e90",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev.full": {
+        "kind": "file",
+        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "0f039505adba4aee03564ffd38c7fd44485bc4dca0b8ba2e7f5255d717bb4917",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "8933bac711432b20ca6265bdf44c49e0c06ba3756d33400a4ea59a388c2ed558",
+        "execute_bits": "0o0"
+      },
+      "THIRD_PARTY_NOTICES.md": {
+        "kind": "file",
+        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
+        "execute_bits": "0o0"
+      },
+      "app": {
+        "kind": "directory"
+      },
+      "app/app.css": {
+        "kind": "file",
+        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
+        "execute_bits": "0o0"
+      },
+      "app/components": {
+        "kind": "directory"
+      },
+      "app/components/ui": {
+        "kind": "directory"
+      },
+      "app/components/ui/button.tsx": {
+        "kind": "file",
+        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+        "execute_bits": "0o0"
+      },
+      "app/components/ui/dialog.tsx": {
+        "kind": "file",
+        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
+        "execute_bits": "0o0"
+      },
+      "app/content.ts": {
+        "kind": "file",
+        "sha256": "27be87d2a2362d8491748f7559ea7dd1b72e72cf850af2703c90dc94ac106963",
+        "execute_bits": "0o0"
+      },
+      "app/features": {
+        "kind": "directory"
+      },
+      "app/features/welcome.test.tsx": {
+        "kind": "file",
+        "sha256": "f475964ad7305325c595fdcb703b53890958200c7af7465d4b2f69b17f6f92fe",
+        "execute_bits": "0o0"
+      },
+      "app/features/welcome.tsx": {
+        "kind": "file",
+        "sha256": "31cf39abd1777b190c496db1b9671f70223d047e9d50d0ad2df8dc060f493b85",
+        "execute_bits": "0o0"
+      },
+      "app/lib": {
+        "kind": "directory"
+      },
+      "app/lib/content.server.ts": {
+        "kind": "file",
+        "sha256": "cfc6b333369cb2a67e157c0fe4bf0353e63202be5c47c4b76b051104eeaa0aa6",
+        "execute_bits": "0o0"
+      },
+      "app/lib/metadata.ts": {
+        "kind": "file",
+        "sha256": "d3a8d2e57edb37fa187e2c4e00d038de93758d908d85fd5cc59f896a972bcbf4",
+        "execute_bits": "0o0"
+      },
+      "app/lib/project.ts": {
+        "kind": "file",
+        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
+        "execute_bits": "0o0"
+      },
+      "app/lib/site.test.ts": {
+        "kind": "file",
+        "sha256": "b4c95a3f360f6cd82de10bfdbe43947a11c4440f0b52c505030da8a84d7d2e90",
+        "execute_bits": "0o0"
+      },
+      "app/lib/site.ts": {
+        "kind": "file",
+        "sha256": "6a7612f751e1ed340ccb2b50e26f169bf6d0ddbe6abd99579df239b1c437b12a",
+        "execute_bits": "0o0"
+      },
+      "app/lib/use-hydrated.ts": {
+        "kind": "file",
+        "sha256": "441bcc28914f7a261ad7ed55ba9d953b2eddfc883422a66bcfff8ecb5cb9cd19",
+        "execute_bits": "0o0"
+      },
+      "app/lib/utils.ts": {
+        "kind": "file",
+        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
+        "execute_bits": "0o0"
+      },
+      "app/root.tsx": {
+        "kind": "file",
+        "sha256": "ae2cbe1da4296b67335a3cb2488f40e28d9f06e29a8fd1da362092aac6598b7a",
+        "execute_bits": "0o0"
+      },
+      "app/routes": {
+        "kind": "directory"
+      },
+      "app/routes/about.tsx": {
+        "kind": "file",
+        "sha256": "59c4e0d75f9b7976eb7768ffbe594166656147ade3243afd5041b62f2a4d38c2",
+        "execute_bits": "0o0"
+      },
+      "app/routes/article.tsx": {
+        "kind": "file",
+        "sha256": "c4f2103b9c2b952085f8bc9551be942e0c8f34d8967508578152730b7cb9d87e",
+        "execute_bits": "0o0"
+      },
+      "app/routes/home.tsx": {
+        "kind": "file",
+        "sha256": "0ad5fe9564374452d5e844f17997c1043dd7a6600b19a727adc0149bb669eb4e",
+        "execute_bits": "0o0"
+      },
+      "app/routes/robots.ts": {
+        "kind": "file",
+        "sha256": "a59b6d435f0d3b56e4d4fb44842b9945679a29e43ea5595684eaf05646f22e78",
+        "execute_bits": "0o0"
+      },
+      "app/routes/sitemap.ts": {
+        "kind": "file",
+        "sha256": "93e53c7a46ed71e6454fb0c4dcf39969029027e7248bf9ed0c2eca2d673f3a6d",
+        "execute_bits": "0o0"
+      },
+      "app/routes.ts": {
+        "kind": "file",
+        "sha256": "85905abf96f419e1c901ab4b3062bb433219b40029b4e8f1b852233520bd9360",
+        "execute_bits": "0o0"
+      },
+      "app/test": {
+        "kind": "directory"
+      },
+      "app/test/setup.ts": {
+        "kind": "file",
+        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
+        "execute_bits": "0o0"
+      },
+      "components.json": {
+        "kind": "file",
+        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "51bdc7bf51c64cbdbe27129401e233c194f88a452a12d97f7bf787cb98fef38b",
+        "execute_bits": "0o0"
+      },
+      "eslint.config.js": {
+        "kind": "file",
+        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
+        "execute_bits": "0o0"
+      },
+      "nginx.conf": {
+        "kind": "file",
+        "sha256": "8e3b2d4a8f04725afbc5793a9e54678cc1c1ad7919a05fb7a0e020ec71b8aa64",
+        "execute_bits": "0o0"
+      },
+      "package.json": {
+        "kind": "file",
+        "sha256": "1b19fe832e751ced17f0cea8ab9cc4157795c106ee184e75208b27e6c00ba228",
+        "execute_bits": "0o0"
+      },
+      "playwright.build.config.ts": {
+        "kind": "file",
+        "sha256": "e1a1ea2159f29157d9359ae09f3c90c35b8a81cb2472976c899c22ac52ecc82e",
+        "execute_bits": "0o0"
+      },
+      "playwright.production.config.ts": {
+        "kind": "file",
+        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
+        "execute_bits": "0o0"
+      },
+      "playwright.smoke.config.ts": {
+        "kind": "file",
+        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
+        "execute_bits": "0o0"
+      },
+      "pnpm-lock.yaml": {
+        "kind": "file",
+        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
+        "execute_bits": "0o0"
+      },
+      "pnpm-workspace.yaml": {
+        "kind": "file",
+        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
+        "execute_bits": "0o0"
+      },
+      "public": {
+        "kind": "directory"
+      },
+      "public/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "public/404.html": {
+        "kind": "file",
+        "sha256": "bddde06e0c933275bafa25360ce856356ed70e13c9d7e31cb7bf9acaafe6fae5",
+        "execute_bits": "0o0"
+      },
+      "public/favicon.svg": {
+        "kind": "file",
+        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
+        "execute_bits": "0o0"
+      },
+      "react-router.config.ts": {
+        "kind": "file",
+        "sha256": "f632bd232939ca98e54a63cbdedfaa08d79c81f43c97d9ab58ff5ee980656698",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/browser-smoke-production": {
+        "kind": "file",
+        "sha256": "053c203240c47922e0900d34d71f2df25bb3aa0f32fd215a96ad937ded6af16d",
+        "execute_bits": "0o111"
+      },
+      "scripts/check-toolchain.mjs": {
+        "kind": "file",
+        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
+        "execute_bits": "0o111"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "f625a9782398505907a0aac1a8f5a0f3a029bd90fcac4e62fbee53adc4f48fee",
+        "execute_bits": "0o0"
+      },
+      "tests/interactions.ts": {
+        "kind": "file",
+        "sha256": "78f37033b7444c80b10e560dfb385c9b2e4861a59150bfd6baa27c289aff19e6",
+        "execute_bits": "0o0"
+      },
+      "tests/production-browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "d45915dd06e050740f44101405898d2fabf8cada4ace1a0b8407a68e3e6c2de1",
+        "execute_bits": "0o0"
+      },
+      "tests/ssg.ts": {
+        "kind": "file",
+        "sha256": "fefdf3971a042554ea011c2179fb9aa12075b8e4cab93fdd39d00ca04eef4df1",
+        "execute_bits": "0o0"
+      },
+      "tsconfig.json": {
+        "kind": "file",
+        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
+        "execute_bits": "0o0"
+      },
+      "vite.config.ts": {
+        "kind": "file",
+        "sha256": "23002d574e50139151b60ba243c9013c43409884b9c0b3a3eba03d50e2470508",
+        "execute_bits": "0o0"
+      },
+      "vite.preview.config.ts": {
+        "kind": "file",
+        "sha256": "86dd2304996701fd3fa760919ea70013e132be5218f7e335bbd3907cbb7a843f",
+        "execute_bits": "0o0"
+      },
+      "vitest.config.ts": {
+        "kind": "file",
+        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "frontend-ssr": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "frontend",
+        "description": "React Router + TypeScript + Tailwind starter for independent projects",
+        "category": "frontend",
+        "stack": [
+          "React",
+          "React Router",
+          "TypeScript",
+          "Tailwind CSS",
+          "shadcn/ui"
+        ],
+        "platforms": [
+          "web"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "display_name",
+          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "source": "provided"
+        },
+        {
+          "name": "package_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "rendering",
+          "value": "ssr",
+          "source": "provided"
+        }
+      ],
+      "derived_values": {},
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make test",
+        "make docker-build",
+        "make docker-run"
+      ],
+      "template_file_count": 55,
+      "template_top_level_entries": [
+        ".dockerignore",
+        ".env.example",
+        ".gitignore",
+        ".prettierignore",
+        ".prettierrc.json",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Dockerfile.dev.full",
+        "Makefile",
+        "README.md",
+        "THIRD_PARTY_NOTICES.md",
+        "app",
+        "components.json",
+        "compose.dev.yaml",
+        "eslint.config.js",
+        "package.json",
+        "playwright.build.config.ts",
+        "playwright.production.config.ts",
+        "playwright.smoke.config.ts",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "public",
+        "react-router.config.ts",
+        "scripts",
+        "server",
+        "tests",
+        "tsconfig.json",
+        "vite.config.ts",
+        "vite.preview.config.ts",
+        "vitest.config.ts"
+      ],
+      "selected_variant": {
+        "selector": "rendering",
+        "value": "ssr"
+      }
+    },
+    "entries": {
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
+        "execute_bits": "0o0"
+      },
+      ".env.example": {
+        "kind": "file",
+        "sha256": "9773b77ea193cccc4ec7ef19aeaf1f91505207b3924197aeabf29241dc21f6ab",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
+        "execute_bits": "0o0"
+      },
+      ".prettierignore": {
+        "kind": "file",
+        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
+        "execute_bits": "0o0"
+      },
+      ".prettierrc.json": {
+        "kind": "file",
+        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "6aaf484fd5847d8657d95c9d003ecffabd13ef5efc87d9e8762d6d59114c7c8b",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev.full": {
+        "kind": "file",
+        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "246ccc693252702c3c83e0289f2bd2c3b8fd851b3652f340d4d1699bc452548b",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "a380192bb5af8470076ac7112ba37d6f3229610abd8c884333b099da0797e1f6",
+        "execute_bits": "0o0"
+      },
+      "THIRD_PARTY_NOTICES.md": {
+        "kind": "file",
+        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
+        "execute_bits": "0o0"
+      },
+      "app": {
+        "kind": "directory"
+      },
+      "app/app.css": {
+        "kind": "file",
+        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
+        "execute_bits": "0o0"
+      },
+      "app/components": {
+        "kind": "directory"
+      },
+      "app/components/ui": {
+        "kind": "directory"
+      },
+      "app/components/ui/button.tsx": {
+        "kind": "file",
+        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
+        "execute_bits": "0o0"
+      },
+      "app/components/ui/dialog.tsx": {
+        "kind": "file",
+        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
+        "execute_bits": "0o0"
+      },
+      "app/entry.server.test.tsx": {
+        "kind": "file",
+        "sha256": "785817f1f2605bca4a921de32339f64cc62a3283d611b8f90eb6b6ebcec09c42",
+        "execute_bits": "0o0"
+      },
+      "app/entry.server.tsx": {
+        "kind": "file",
+        "sha256": "22046708f401f6c43504d5c805a9544298e4715c4bf3a74747dba124b1a4bbcb",
+        "execute_bits": "0o0"
+      },
+      "app/features": {
+        "kind": "directory"
+      },
+      "app/features/welcome.test.tsx": {
+        "kind": "file",
+        "sha256": "f475964ad7305325c595fdcb703b53890958200c7af7465d4b2f69b17f6f92fe",
+        "execute_bits": "0o0"
+      },
+      "app/features/welcome.tsx": {
+        "kind": "file",
+        "sha256": "31cf39abd1777b190c496db1b9671f70223d047e9d50d0ad2df8dc060f493b85",
+        "execute_bits": "0o0"
+      },
+      "app/lib": {
+        "kind": "directory"
+      },
+      "app/lib/project.ts": {
+        "kind": "file",
+        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
+        "execute_bits": "0o0"
+      },
+      "app/lib/request.server.test.ts": {
+        "kind": "file",
+        "sha256": "68801c8dea34907a12ec23b59fa616c0c3d77eade10078e17b30427681bcf197",
+        "execute_bits": "0o0"
+      },
+      "app/lib/request.server.ts": {
+        "kind": "file",
+        "sha256": "f77ad115e7d0f78eb1ad72dafa29017392b3a3a18417c0008bd0b28c2bf0afbe",
+        "execute_bits": "0o0"
+      },
+      "app/lib/runtime.test.ts": {
+        "kind": "file",
+        "sha256": "d5baf505d3a1d83188257d12aaa0b4698ce0ed9d3368ca7be0ddfa3b6839b204",
+        "execute_bits": "0o0"
+      },
+      "app/lib/use-hydrated.ts": {
+        "kind": "file",
+        "sha256": "441bcc28914f7a261ad7ed55ba9d953b2eddfc883422a66bcfff8ecb5cb9cd19",
+        "execute_bits": "0o0"
+      },
+      "app/lib/utils.ts": {
+        "kind": "file",
+        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
+        "execute_bits": "0o0"
+      },
+      "app/root.tsx": {
+        "kind": "file",
+        "sha256": "ae2cbe1da4296b67335a3cb2488f40e28d9f06e29a8fd1da362092aac6598b7a",
+        "execute_bits": "0o0"
+      },
+      "app/routes": {
+        "kind": "directory"
+      },
+      "app/routes/about.tsx": {
+        "kind": "file",
+        "sha256": "a79d5f99e88d1f7176093264e8a104b7e44f4b264165d35b5a4b71f05daadf17",
+        "execute_bits": "0o0"
+      },
+      "app/routes/home.tsx": {
+        "kind": "file",
+        "sha256": "c2a171aaa84d25f2879651130578d85d143a5503a523e766b1b1dd9429cfe9f5",
+        "execute_bits": "0o0"
+      },
+      "app/routes.ts": {
+        "kind": "file",
+        "sha256": "5884d6daf61bac403245eafbf20a7b4663d09f267ec09a666c32641a789137a5",
+        "execute_bits": "0o0"
+      },
+      "app/test": {
+        "kind": "directory"
+      },
+      "app/test/setup.ts": {
+        "kind": "file",
+        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
+        "execute_bits": "0o0"
+      },
+      "components.json": {
+        "kind": "file",
+        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "fbc3d64a142a0b377de1289e53c60ca18aa895abc6ecce872e8c93d60be40bf3",
+        "execute_bits": "0o0"
+      },
+      "eslint.config.js": {
+        "kind": "file",
+        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
+        "execute_bits": "0o0"
+      },
+      "package.json": {
+        "kind": "file",
+        "sha256": "1b19fe832e751ced17f0cea8ab9cc4157795c106ee184e75208b27e6c00ba228",
+        "execute_bits": "0o0"
+      },
+      "playwright.build.config.ts": {
+        "kind": "file",
+        "sha256": "2e89462dd6a6f39d012e84488ead88acb36f7bdaee8b097173a758529b2a7ade",
+        "execute_bits": "0o0"
+      },
+      "playwright.production.config.ts": {
+        "kind": "file",
+        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
+        "execute_bits": "0o0"
+      },
+      "playwright.smoke.config.ts": {
+        "kind": "file",
+        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
+        "execute_bits": "0o0"
+      },
+      "pnpm-lock.yaml": {
+        "kind": "file",
+        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
+        "execute_bits": "0o0"
+      },
+      "pnpm-workspace.yaml": {
+        "kind": "file",
+        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
+        "execute_bits": "0o0"
+      },
+      "public": {
+        "kind": "directory"
+      },
+      "public/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "public/favicon.svg": {
+        "kind": "file",
+        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
+        "execute_bits": "0o0"
+      },
+      "react-router.config.ts": {
+        "kind": "file",
+        "sha256": "36e26035d3120a27f4af35a7ba4ac2813375110aa7c77fe56cfd425be36e79c8",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/browser-smoke-production": {
+        "kind": "file",
+        "sha256": "970b5da797a6b9462862b4ad7aecd28b5066bafee85c5e0ba78a1c4e362eb3c5",
+        "execute_bits": "0o111"
+      },
+      "scripts/check-toolchain.mjs": {
+        "kind": "file",
+        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
+        "execute_bits": "0o111"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
+        "execute_bits": "0o111"
+      },
+      "server": {
+        "kind": "directory"
+      },
+      "server/index.ts": {
+        "kind": "file",
+        "sha256": "c135cc4cf5d22ca665ba15e2e71b1cf56c2dd8ee04ecbe65bb0579ab17c989e4",
+        "execute_bits": "0o0"
+      },
+      "server/runtime.ts": {
+        "kind": "file",
+        "sha256": "7689ab9e09bed55825e8a26bac42d6aa77a4b544bf27dbc93ffc95f5c6bb712a",
+        "execute_bits": "0o0"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "f2cce7548331c31439694c917445b5ead75f17a8d11dc0512cec097c87e2dfec",
+        "execute_bits": "0o0"
+      },
+      "tests/interactions.ts": {
+        "kind": "file",
+        "sha256": "78f37033b7444c80b10e560dfb385c9b2e4861a59150bfd6baa27c289aff19e6",
+        "execute_bits": "0o0"
+      },
+      "tests/node-runtime.spec.ts": {
+        "kind": "file",
+        "sha256": "657743408c57b987ed2c8dcfcfb01954858d4e9dde3e93a058d26cb124cabe54",
+        "execute_bits": "0o0"
+      },
+      "tests/production-browser-smoke.spec.ts": {
+        "kind": "file",
+        "sha256": "547dbb1d60a63213928326a329c4d700a545b65a75d4757f07e67d7149e0a69b",
+        "execute_bits": "0o0"
+      },
+      "tests/ssr.ts": {
+        "kind": "file",
+        "sha256": "341048fcc5a7fe003b9702fbd682cbad49e129a4121541d1d094fa8461a7889d",
+        "execute_bits": "0o0"
+      },
+      "tsconfig.json": {
+        "kind": "file",
+        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
+        "execute_bits": "0o0"
+      },
+      "vite.config.ts": {
+        "kind": "file",
+        "sha256": "23002d574e50139151b60ba243c9013c43409884b9c0b3a3eba03d50e2470508",
+        "execute_bits": "0o0"
+      },
+      "vite.preview.config.ts": {
+        "kind": "file",
+        "sha256": "6ceeae25ce40d49636094fe602edc50587396cab12eb1c2f43bb8780f51b154d",
+        "execute_bits": "0o0"
+      },
+      "vitest.config.ts": {
+        "kind": "file",
+        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
+        "execute_bits": "0o0"
+      }
+    }
+  },
   "web-service": {
     "manifest": {
       "schema_version": 1,
@@ -399,9 +1211,22 @@
           "name": "http_port",
           "value": "8080",
           "source": "default"
+        },
+        {
+          "name": "database",
+          "value": "postgres",
+          "source": "default"
+        },
+        {
+          "name": "cache",
+          "value": "none",
+          "source": "default"
         }
       ],
-      "derived_values": {},
+      "derived_values": {
+        "cache_dsn": "",
+        "database_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable"
+      },
       "next_steps": [
         "make bootstrap",
         "make dev",
@@ -409,10 +1234,11 @@
         "make docker-build",
         "make docker-run"
       ],
-      "template_file_count": 34,
+      "template_file_count": 37,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
+        ".github",
         ".gitignore",
         ".mise.toml",
         "Brewfile",
@@ -442,6 +1268,17 @@
         "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
         "execute_bits": "0o0"
       },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
+        "execute_bits": "0o0"
+      },
       ".gitignore": {
         "kind": "file",
         "sha256": "4be2b7d7fdda7921a1509c85aa4368b9d7a6e134d23760f444b19137797f5ec0",
@@ -449,7 +1286,7 @@
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "93a6765b0d67c2c839bfb3c2698287c3a5627931ce0c605ceacf8f63727494b8",
+        "sha256": "8f7f861572a91514660231a8d63ec396cc06f7c418980f8409dffc0ec95ec99e",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -459,22 +1296,22 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "dd1cb4a47cf6529f3e0e79181bd80c4d6d414cf48b1624176000638aa6ca705e",
+        "sha256": "0f298523df78cd2b033f3ea2fdc736f48377a59ddf687991270623f85a39a381",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
         "kind": "file",
-        "sha256": "19aac858d6946d33f61f020d695d46980f0085e48db02dd794652ce1da892375",
+        "sha256": "805aaadca0d6eda170229936179db4ffc2df247bad567249aaae2408c2d2206d",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "4a1504fa37d489b738bb4123a1d9afc83893cab65521c71ee245eb4843dc99ad",
+        "sha256": "0ed2dfb49c7bc3af46de577d3f06ca48309379cfa7a290fbb3aafa78de26e76d",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "73162d52293f5d822dd6138c9834ec45222e9bd0172d4e6b20d30c173c2306ce",
+        "sha256": "e884d511fc1eb56bc11ab699fca3c3bb8f672178b4fd961d92c1b7ab5aa16ab2",
         "execute_bits": "0o0"
       },
       "cmd": {
@@ -490,12 +1327,12 @@
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "04e68275d7f3bf7a6862aa5565c7cb573dc457043f66c514a4277925e41135f6",
+        "sha256": "613d3bce3729817ee5277ac6b54584889483ad1c3406b7a52d7b924ea58ba423",
         "execute_bits": "0o0"
       },
       "compose.yaml": {
         "kind": "file",
-        "sha256": "2bba4ae27b5ae212000268d66563ea8394f88d791414e576b9fe5e42df3cbb93",
+        "sha256": "22c68f7956cad2ff128c3c36343a295ca2c9a6057914a6f7b90d5174f6b7e7b2",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -503,7 +1340,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "71fa6d00769c4f41792662cc5540eaec7a0d0e34749b925d8304a203ea23b208",
+        "sha256": "d1812403f64f0bb5909306215e592fb0be0fb4e4911cde74e8e7c51b800874cb",
         "execute_bits": "0o0"
       },
       "go.mod": {
@@ -524,12 +1361,12 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "ceba6da857fff4fe4ff1821385a43e255c1838891b96901b8249d587f00ff825",
+        "sha256": "ae841b16d439ec0ff79584b90fe22c001a46fe9c8fab386b24a38a03ba74e99c",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "2a362ad5a2905d66bddee1473a719532432e0b3b9e4035b0d6d634938af2a86f",
+        "sha256": "0f49c9b6aa72655f497c1e32ae8a53309c5786bae8cefbd2ca1ea0bba4587168",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -547,7 +1384,7 @@
       },
       "internal/handler/user.go": {
         "kind": "file",
-        "sha256": "cc72d7e7b2870c7547dc919fa5ca14e668006622296c7520cf685d4fe1c38e62",
+        "sha256": "ddda40b4b7323e607acd6e7222c5d0fbb8b6dd8045bedfe54231d2ae57c2c85e",
         "execute_bits": "0o0"
       },
       "internal/model": {
@@ -578,7 +1415,7 @@
       },
       "internal/repository/user.go": {
         "kind": "file",
-        "sha256": "5f05ec85a7bfb5dc16f5b9a33ab4109e32e8d1ac280b6df6aef660cbe38f2696",
+        "sha256": "43b985003fa1b92825dda59a3d9e8f9403ab0d2b978463d30aac9bc479f26042",
         "execute_bits": "0o0"
       },
       "internal/router": {
@@ -594,7 +1431,7 @@
       },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "0ad26d499b79145764c79203372fcd4474e19429354b1ec27f8a729664234fdf",
+        "sha256": "5a2de77d8986315c91c41cacad26d0c3cd1b35c9b93c01a26e63f956186559f6",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
@@ -617,7 +1454,12 @@
       },
       "internal/service/user.go": {
         "kind": "file",
-        "sha256": "aaf5b9fdc948fdca8a2c1b63c1ca02a23f2ea7504d9a435b3e67ca02daadf370",
+        "sha256": "8b90f03fe759fa24d45b0c541a78bcaf1ee25c10da63abaa1fbc12784e8dc369",
+        "execute_bits": "0o0"
+      },
+      "internal/service/user_test.go": {
+        "kind": "file",
+        "sha256": "33ff912db06420818a267cc2f9bdd237570e9e672c4ce4e881d36aa07e809184",
         "execute_bits": "0o0"
       },
       "scripts": {
@@ -631,6 +1473,11 @@
       "scripts/doctor": {
         "kind": "file",
         "sha256": "14af5ddc61af41b75f9bbfac7b6eed25790293ec93525812e0234936b495d323",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -4909,13 +5756,13 @@
       }
     }
   },
-  "microservice-postgres": {
+  "micro-service-none-none": {
     "manifest": {
       "schema_version": 1,
       "generator_version": "<VERSION>",
       "operation": "create",
       "template": {
-        "name": "microservice",
+        "name": "micro-service",
         "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
         "category": "backend",
         "stack": [
@@ -4966,23 +5813,768 @@
           "source": "default"
         },
         {
-          "name": "dependency_store",
+          "name": "otel_exporter_endpoint",
+          "value": "http://localhost:4318",
+          "source": "default"
+        },
+        {
+          "name": "database",
+          "value": "none",
+          "source": "provided"
+        },
+        {
+          "name": "cache",
+          "value": "none",
+          "source": "provided"
+        }
+      ],
+      "derived_values": {
+        "cache_dsn": "",
+        "database_dsn": "",
+        "service_type_name": "Demo"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make up",
+        "make docker-build"
+      ],
+      "template_file_count": 39,
+      "template_top_level_entries": [
+        ".air.toml",
+        ".dockerignore",
+        ".github",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "api",
+        "cmd",
+        "compose.dev.yaml",
+        "configs",
+        "deploy",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".air.toml": {
+        "kind": "file",
+        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "execute_bits": "0o0"
+      },
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "8e3c9ff0c84cad951548a94cc2c181a5adb4f22f8527dcd3fe9c809d7f334b07",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "9a55851ef9ad704684053a2c9c1ba944a4017e2a667998ddcb64c055d46ef986",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "a366647d22c9612b731ad2ed4d841445cbc8cddbdb68cb8d44eae0e9ade917c8",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "1c64ecad0a4dbef30c2fd7c5adc04d7604d93ab19a157884ba50c65d71d6fb2a",
+        "execute_bits": "0o0"
+      },
+      "api": {
+        "kind": "directory"
+      },
+      "api/buf.gen.yaml": {
+        "kind": "file",
+        "sha256": "573cd194bc14cbc531a4a2ec30fcbaa2d4c2273aee0198fdc7c359ab089028ff",
+        "execute_bits": "0o0"
+      },
+      "api/buf.yaml": {
+        "kind": "file",
+        "sha256": "886e923eed72224b498d35b47999159b51917129a0509fc0279a31c020636773",
+        "execute_bits": "0o0"
+      },
+      "api/proto": {
+        "kind": "directory"
+      },
+      "api/proto/service": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1/service.proto": {
+        "kind": "file",
+        "sha256": "92fe3c925150c596e7fbcac67de69ca4a0b96cdedde81755add5f84421111591",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/server": {
+        "kind": "directory"
+      },
+      "cmd/server/main.go": {
+        "kind": "file",
+        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "fc7d7c292e59d48a6c153d743558110786adc06f302ca47fecfae418d0a3e443",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "2b63c6a7527d44d91f14883f6351f126689c68a6aa9a279905c02d3d48217152",
+        "execute_bits": "0o0"
+      },
+      "deploy": {
+        "kind": "directory"
+      },
+      "deploy/compose.yaml": {
+        "kind": "file",
+        "sha256": "f93713d2dccad7e8b296d0c25f118de36cda7f062cc470eb40494070dff5e65d",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "e79fd15d4244026a89312b24a27e1a5f83e1b49cb26920e428a47ada0ea650b8",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "dbc65a3369e2ec2971c61af3bc9e716d73bacd5761655d60dcc4756d424d0c1f",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "d8549eef7eff2684d741f4caa67d03cee0bc1b56102945be3e9ee0598befc227",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "94a4f6978b17288bbc41d2c2293c219a16a57adaa57e7df801a8f89b0e2c9a25",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "4b030bcc22490a5f21225f225617ca11ca424c9c5d6031cfc2aa82caa97246fa",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "3084809da4243ecdca4656aecaaf87d2ee8c5571625d56c30c9d054e4e2853ae",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
+        "kind": "file",
+        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
+        "kind": "file",
+        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "7f90035d7ca0376b4ef8de5b3e499b41e252cba580f9112388b4e363a909d3e8",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "d52e6de35dded3e129f5a108725f5c24fa85b0b24a91b456dfcf112f56d7373f",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "execute_bits": "0o0"
+      },
+      "internal/transport": {
+        "kind": "directory"
+      },
+      "internal/transport/grpc.go": {
+        "kind": "file",
+        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/ping.go": {
+        "kind": "file",
+        "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "execute_bits": "0o100"
+      },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "execute_bits": "0o111"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/server_test.go": {
+        "kind": "file",
+        "sha256": "4bf2e59719471b8c4d4ca4d34cc5492a1e4dcdc28d3d049944cd7eec585fbcd2",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "micro-service-none-redis": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "micro-service",
+        "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Gin",
+          "Protobuf",
+          "Buf",
+          "Docker Compose",
+          "OpenTelemetry"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "service_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "proto_package",
+          "value": "demo.v1",
+          "source": "provided"
+        },
+        {
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        },
+        {
+          "name": "grpc_port",
+          "value": "9090",
+          "source": "default"
+        },
+        {
+          "name": "otel_exporter_endpoint",
+          "value": "http://localhost:4318",
+          "source": "default"
+        },
+        {
+          "name": "database",
+          "value": "none",
+          "source": "provided"
+        },
+        {
+          "name": "cache",
+          "value": "redis",
+          "source": "provided"
+        }
+      ],
+      "derived_values": {
+        "cache_dsn": "redis://localhost:6379/0",
+        "database_dsn": "",
+        "service_type_name": "Demo"
+      },
+      "next_steps": [
+        "make bootstrap",
+        "make dev",
+        "make verify",
+        "make up",
+        "make docker-build"
+      ],
+      "template_file_count": 39,
+      "template_top_level_entries": [
+        ".air.toml",
+        ".dockerignore",
+        ".github",
+        ".gitignore",
+        ".mise.toml",
+        "Brewfile",
+        "Dockerfile",
+        "Dockerfile.dev",
+        "Makefile",
+        "README.md",
+        "api",
+        "cmd",
+        "compose.dev.yaml",
+        "configs",
+        "deploy",
+        "go.mod",
+        "go.sum",
+        "internal",
+        "scripts",
+        "tests"
+      ]
+    },
+    "entries": {
+      ".air.toml": {
+        "kind": "file",
+        "sha256": "7b5a4000b66a95b19cf9aa1b1aa2e91235747f31d9877aac561f2524d8338aa9",
+        "execute_bits": "0o0"
+      },
+      ".dockerignore": {
+        "kind": "file",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
+        "execute_bits": "0o0"
+      },
+      ".gitignore": {
+        "kind": "file",
+        "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
+        "execute_bits": "0o0"
+      },
+      ".mise.toml": {
+        "kind": "file",
+        "sha256": "8e3c9ff0c84cad951548a94cc2c181a5adb4f22f8527dcd3fe9c809d7f334b07",
+        "execute_bits": "0o0"
+      },
+      "Brewfile": {
+        "kind": "file",
+        "sha256": "9a55851ef9ad704684053a2c9c1ba944a4017e2a667998ddcb64c055d46ef986",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile": {
+        "kind": "file",
+        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
+        "execute_bits": "0o0"
+      },
+      "Dockerfile.dev": {
+        "kind": "file",
+        "sha256": "a366647d22c9612b731ad2ed4d841445cbc8cddbdb68cb8d44eae0e9ade917c8",
+        "execute_bits": "0o0"
+      },
+      "Makefile": {
+        "kind": "file",
+        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
+        "execute_bits": "0o0"
+      },
+      "README.md": {
+        "kind": "file",
+        "sha256": "e18d04044aec265a7781b9a2d950a4bb0e7ecc8d0ec1ed78d9c5c47fb5103eba",
+        "execute_bits": "0o0"
+      },
+      "api": {
+        "kind": "directory"
+      },
+      "api/buf.gen.yaml": {
+        "kind": "file",
+        "sha256": "573cd194bc14cbc531a4a2ec30fcbaa2d4c2273aee0198fdc7c359ab089028ff",
+        "execute_bits": "0o0"
+      },
+      "api/buf.yaml": {
+        "kind": "file",
+        "sha256": "886e923eed72224b498d35b47999159b51917129a0509fc0279a31c020636773",
+        "execute_bits": "0o0"
+      },
+      "api/proto": {
+        "kind": "directory"
+      },
+      "api/proto/service": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1": {
+        "kind": "directory"
+      },
+      "api/proto/service/v1/service.proto": {
+        "kind": "file",
+        "sha256": "92fe3c925150c596e7fbcac67de69ca4a0b96cdedde81755add5f84421111591",
+        "execute_bits": "0o0"
+      },
+      "cmd": {
+        "kind": "directory"
+      },
+      "cmd/server": {
+        "kind": "directory"
+      },
+      "cmd/server/main.go": {
+        "kind": "file",
+        "sha256": "783cd30e1afdbc724d1b07a6f1b7d668435df64f231fcc2632c818f4080ec25d",
+        "execute_bits": "0o0"
+      },
+      "compose.dev.yaml": {
+        "kind": "file",
+        "sha256": "4bb9ccab0a9fc80f7efd8d78d53820e0e9d540200abe72302e307cd26eb4ccea",
+        "execute_bits": "0o0"
+      },
+      "configs": {
+        "kind": "directory"
+      },
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "a0a26d1a0bc8c51cf022617412c4794983161ccbc319d59010527aae962f758d",
+        "execute_bits": "0o0"
+      },
+      "deploy": {
+        "kind": "directory"
+      },
+      "deploy/compose.yaml": {
+        "kind": "file",
+        "sha256": "f5c8929f2997f48d582478ec032fa28884836eb09cdc5f5616f65629bd9c015e",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "e79fd15d4244026a89312b24a27e1a5f83e1b49cb26920e428a47ada0ea650b8",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "dbc65a3369e2ec2971c61af3bc9e716d73bacd5761655d60dcc4756d424d0c1f",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "53fe4302705a8659b7be0cc052779a7e6ecf43cfbb74063eac2bbcec247bd0e2",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "94a4f6978b17288bbc41d2c2293c219a16a57adaa57e7df801a8f89b0e2c9a25",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "4b030bcc22490a5f21225f225617ca11ca424c9c5d6031cfc2aa82caa97246fa",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "3084809da4243ecdca4656aecaaf87d2ee8c5571625d56c30c9d054e4e2853ae",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "bb0dbc3492c9370f407bdc1cbca5245448171dee2f79b0201dc4df2eec121084",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
+        "kind": "file",
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "execute_bits": "0o0"
+      },
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
+        "kind": "file",
+        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
+        "kind": "file",
+        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "e362d26765dfed3bc708223a6996473653a25a3bb54fe10ddbe5ccd00dbc6713",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "7f90035d7ca0376b4ef8de5b3e499b41e252cba580f9112388b4e363a909d3e8",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "d52e6de35dded3e129f5a108725f5c24fa85b0b24a91b456dfcf112f56d7373f",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "execute_bits": "0o0"
+      },
+      "internal/transport": {
+        "kind": "directory"
+      },
+      "internal/transport/grpc.go": {
+        "kind": "file",
+        "sha256": "3e5c83d8e5021a0156105069cfec8d37670aafe71ae98d7f38098941f17d0264",
+        "execute_bits": "0o0"
+      },
+      "internal/transport/ping.go": {
+        "kind": "file",
+        "sha256": "5d18e1c06f3c6171944ba85867465e4da348b745837b16a24284b176271f1a10",
+        "execute_bits": "0o0"
+      },
+      "scripts": {
+        "kind": "directory"
+      },
+      "scripts/bootstrap": {
+        "kind": "file",
+        "sha256": "6c407a13cbdd944a8d2a0d470bea6622ecc8360a8f72cbb3c7d245690a183dbd",
+        "execute_bits": "0o100"
+      },
+      "scripts/doctor": {
+        "kind": "file",
+        "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
+        "execute_bits": "0o100"
+      },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "execute_bits": "0o111"
+      },
+      "tests": {
+        "kind": "directory"
+      },
+      "tests/server_test.go": {
+        "kind": "file",
+        "sha256": "4bf2e59719471b8c4d4ca4d34cc5492a1e4dcdc28d3d049944cd7eec585fbcd2",
+        "execute_bits": "0o0"
+      }
+    }
+  },
+  "micro-service-postgres-none": {
+    "manifest": {
+      "schema_version": 1,
+      "generator_version": "<VERSION>",
+      "operation": "create",
+      "template": {
+        "name": "micro-service",
+        "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+        "category": "backend",
+        "stack": [
+          "Go",
+          "Gin",
+          "Protobuf",
+          "Buf",
+          "Docker Compose",
+          "OpenTelemetry"
+        ],
+        "platforms": [
+          "linux",
+          "container"
+        ]
+      },
+      "project_name": "demo",
+      "output_path": "<OUTPUT>/demo",
+      "target_exists": true,
+      "resolved_variables": [
+        {
+          "name": "project_name",
+          "value": "demo",
+          "source": "provided"
+        },
+        {
+          "name": "module_name",
+          "value": "example.com/demo",
+          "source": "provided"
+        },
+        {
+          "name": "service_name",
+          "value": "demo",
+          "source": "default_from:project_name"
+        },
+        {
+          "name": "proto_package",
+          "value": "demo.v1",
+          "source": "provided"
+        },
+        {
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        },
+        {
+          "name": "grpc_port",
+          "value": "9090",
+          "source": "default"
+        },
+        {
+          "name": "otel_exporter_endpoint",
+          "value": "http://localhost:4318",
+          "source": "default"
+        },
+        {
+          "name": "database",
           "value": "postgres",
           "source": "provided"
         },
         {
-          "name": "otel_exporter_endpoint",
-          "value": "http://localhost:4318",
-          "source": "default"
+          "name": "cache",
+          "value": "none",
+          "source": "provided"
         }
       ],
       "derived_values": {
-        "dependency_store": "postgres",
-        "dependency_store_container_dsn": "postgres://postgres:postgres@postgres:5432/demo?sslmode=disable",
-        "dependency_store_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable",
-        "dependency_store_env_block": "    environment:\n      POSTGRES_DB: demo\n      POSTGRES_USER: postgres\n      POSTGRES_PASSWORD: postgres",
-        "dependency_store_image": "postgres:16-alpine",
-        "dependency_store_port": "5432",
+        "cache_dsn": "",
+        "database_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable",
         "service_type_name": "Demo"
       },
       "next_steps": [
@@ -4992,10 +6584,11 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 37,
+      "template_file_count": 39,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
+        ".github",
         ".gitignore",
         ".mise.toml",
         "Brewfile",
@@ -5026,6 +6619,17 @@
         "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
         "execute_bits": "0o0"
       },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
+        "execute_bits": "0o0"
+      },
       ".gitignore": {
         "kind": "file",
         "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
@@ -5033,7 +6637,7 @@
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "415175cd64aea4459800f49eb11fa9d7c9ae31d9ea1be1ae05a337eeccb3cd49",
+        "sha256": "8e3c9ff0c84cad951548a94cc2c181a5adb4f22f8527dcd3fe9c809d7f334b07",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -5043,22 +6647,22 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "ab98617780de6bde59bb5eafcf7f412eb1f1ea483a207655e74b113dd707e8e5",
+        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
         "kind": "file",
-        "sha256": "8e449367b85c00880c4f5b51921bb4d2552fe056814bb87b78bd8693e58ea3ac",
+        "sha256": "a366647d22c9612b731ad2ed4d841445cbc8cddbdb68cb8d44eae0e9ade917c8",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "7045ea850b4a7fbceafbbb1a4146d5ed8a92f9c76917ccc464233fffe7f1d956",
+        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "22c678871c8495525b78361515b05d9990d6da2452836f26334d6517cafd7005",
+        "sha256": "72ec77606be489225e0e8ddc08b17b0a7196d9716b16be7b00b998c33a7f9e57",
         "execute_bits": "0o0"
       },
       "api": {
@@ -5066,7 +6670,7 @@
       },
       "api/buf.gen.yaml": {
         "kind": "file",
-        "sha256": "dcb7fdc54b10397d076dff80a72d923755710a7c0b5d27226bd32f262b651414",
+        "sha256": "573cd194bc14cbc531a4a2ec30fcbaa2d4c2273aee0198fdc7c359ab089028ff",
         "execute_bits": "0o0"
       },
       "api/buf.yaml": {
@@ -5101,7 +6705,7 @@
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "4c9f916334d739e54bc95938a8ff0226a905f1d08f2b6a1b5198b78dd5ca6d0a",
+        "sha256": "744520b645c36bb61c6d753387dbdb2e358c7d459f0b81026c8d5701668bb07f",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -5109,7 +6713,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "403cda4d9488980e6e11472743c31713e60b8c663efabdcc0693b30f1ee1bece",
+        "sha256": "5a762ecee94dcbf38e95dd0ec4636a8a53f276757b3eb3d7bea3509af35d0669",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -5117,7 +6721,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "65204211974b901d0486fa8d474738052332a5115b8fa4ddf65863603918b1dc",
+        "sha256": "e82b70038c75cd3141214e56ff51782e9d863fdf32e5b3613327196e646640fc",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -5143,12 +6747,12 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "2424035ba8157a0776e304a822bc42ee8f158c5aa8f8dd0abc47158b9ee49395",
+        "sha256": "21ef225ceda6afb22404fa0989fe86eca229090340b8f905a85d2540efd53453",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "dc9bddf538f9b3317384e61c4ff7fdaa360902463b3c8a11c5b73ee496330d97",
+        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -5169,7 +6773,7 @@
       },
       "internal/model/health.go": {
         "kind": "file",
-        "sha256": "c2789da3fbcc72c6a3be246211ce32c3781c5d1451a9ff5f60d099160c2e98f9",
+        "sha256": "3084809da4243ecdca4656aecaaf87d2ee8c5571625d56c30c9d054e4e2853ae",
         "execute_bits": "0o0"
       },
       "internal/model/ping.go": {
@@ -5190,7 +6794,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "f39b0caebc9ec00a5fac54b9f5d9352c7aa861bc9935892a1fcc7ccc0bab7da5",
+        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -5198,7 +6802,7 @@
       },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "9578119104982101c8da0476b07fff3d31d1a9f4beda6863f17164d0b35007e1",
+        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
@@ -5211,7 +6815,7 @@
       },
       "internal/service/health.go": {
         "kind": "file",
-        "sha256": "895ce61cb4f7986a7aa5e35c7ae1668e345f53ad626267cde195bcb4b7717e7c",
+        "sha256": "7f90035d7ca0376b4ef8de5b3e499b41e252cba580f9112388b4e363a909d3e8",
         "execute_bits": "0o0"
       },
       "internal/service/ping.go": {
@@ -5253,23 +6857,28 @@
         "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
         "execute_bits": "0o100"
       },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "execute_bits": "0o111"
+      },
       "tests": {
         "kind": "directory"
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "0d2c99d26e69f2a017af26bfae06dc0c21411fd1429b495b51da16dc3ceca194",
+        "sha256": "31613e923588b0fd8eaf21ef717838a8abf7d6931c6ad4bc924c59eb27564b05",
         "execute_bits": "0o0"
       }
     }
   },
-  "microservice-redis": {
+  "micro-service-postgres-redis": {
     "manifest": {
       "schema_version": 1,
       "generator_version": "<VERSION>",
       "operation": "create",
       "template": {
-        "name": "microservice",
+        "name": "micro-service",
         "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
         "category": "backend",
         "stack": [
@@ -5320,23 +6929,24 @@
           "source": "default"
         },
         {
-          "name": "dependency_store",
-          "value": "redis",
-          "source": "provided"
-        },
-        {
           "name": "otel_exporter_endpoint",
           "value": "http://localhost:4318",
           "source": "default"
+        },
+        {
+          "name": "database",
+          "value": "postgres",
+          "source": "provided"
+        },
+        {
+          "name": "cache",
+          "value": "redis",
+          "source": "provided"
         }
       ],
       "derived_values": {
-        "dependency_store": "redis",
-        "dependency_store_container_dsn": "redis://redis:6379/0",
-        "dependency_store_dsn": "redis://localhost:6379/0",
-        "dependency_store_env_block": "",
-        "dependency_store_image": "redis:7-alpine",
-        "dependency_store_port": "6379",
+        "cache_dsn": "redis://localhost:6379/0",
+        "database_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable",
         "service_type_name": "Demo"
       },
       "next_steps": [
@@ -5346,10 +6956,11 @@
         "make up",
         "make docker-build"
       ],
-      "template_file_count": 37,
+      "template_file_count": 39,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
+        ".github",
         ".gitignore",
         ".mise.toml",
         "Brewfile",
@@ -5380,6 +6991,17 @@
         "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
         "execute_bits": "0o0"
       },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
+        "execute_bits": "0o0"
+      },
       ".gitignore": {
         "kind": "file",
         "sha256": "5bd71526affb74bc689cf09d287a2b36a1be161a452532d8be7cd7e10dcdfc84",
@@ -5387,7 +7009,7 @@
       },
       ".mise.toml": {
         "kind": "file",
-        "sha256": "415175cd64aea4459800f49eb11fa9d7c9ae31d9ea1be1ae05a337eeccb3cd49",
+        "sha256": "8e3c9ff0c84cad951548a94cc2c181a5adb4f22f8527dcd3fe9c809d7f334b07",
         "execute_bits": "0o0"
       },
       "Brewfile": {
@@ -5397,22 +7019,22 @@
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "ab98617780de6bde59bb5eafcf7f412eb1f1ea483a207655e74b113dd707e8e5",
+        "sha256": "516b08df4794032b0887b34fd670616140fe4ea9ef4e7d59679f9fd0c71c4de4",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
         "kind": "file",
-        "sha256": "8e449367b85c00880c4f5b51921bb4d2552fe056814bb87b78bd8693e58ea3ac",
+        "sha256": "a366647d22c9612b731ad2ed4d841445cbc8cddbdb68cb8d44eae0e9ade917c8",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "c04b5c2d7e9fd0270a82e9d7e39cace1dfce4beefa42fa54bf0f911727851a22",
+        "sha256": "c95fa9a0986fc03a0645b18a2c49b4fe441486f9435805dfc1b2c8e3da9121a8",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "463229ac245479ee80fdd3cdc779e27391aac61672dd2c21b463893fd12f873d",
+        "sha256": "644db9f9e330fec9b927a8f2e270d682cb1361d2dd5e8a60c3ab9604e927d199",
         "execute_bits": "0o0"
       },
       "api": {
@@ -5420,7 +7042,7 @@
       },
       "api/buf.gen.yaml": {
         "kind": "file",
-        "sha256": "dcb7fdc54b10397d076dff80a72d923755710a7c0b5d27226bd32f262b651414",
+        "sha256": "573cd194bc14cbc531a4a2ec30fcbaa2d4c2273aee0198fdc7c359ab089028ff",
         "execute_bits": "0o0"
       },
       "api/buf.yaml": {
@@ -5455,7 +7077,7 @@
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "bbf998036084d3aaa91347e7a5f11a832ccfab67301dd65d980765e9afc049a5",
+        "sha256": "e9877b40d9074f3edf79873229d9ddcfe49f29f9256e45fc0f6f23fc51985198",
         "execute_bits": "0o0"
       },
       "configs": {
@@ -5463,7 +7085,7 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "884716c3b42c70d566f5fc8e3c89d36ca1ea9cc8968382b69f2aefc01b282f9c",
+        "sha256": "0e19f629d57af5cf455d280f20779cba17979096e93e88c9b70702dad7cc47a0",
         "execute_bits": "0o0"
       },
       "deploy": {
@@ -5471,7 +7093,7 @@
       },
       "deploy/compose.yaml": {
         "kind": "file",
-        "sha256": "55ad4d34d1584ad80d88067c45037e2de4185762b3e55bde07d1695ecb5646bd",
+        "sha256": "df06383b52c38465f453746fa51d7ce8b7ac7bad7fba5bf92dec02647329c7f1",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -5497,12 +7119,12 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "0b233340b11dd7f9d84a0be964cbb130a73ce69711411bd65d48c9fee788244e",
+        "sha256": "7123e1194f3d3deee0170851b49ae54608ccd5781a1de3b0747e7c59b098b8a3",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
         "kind": "file",
-        "sha256": "dc9bddf538f9b3317384e61c4ff7fdaa360902463b3c8a11c5b73ee496330d97",
+        "sha256": "12834da008aecdedfd79ed83ec50151da1cb9265780e1bf4644227674a40b0ec",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -5523,7 +7145,7 @@
       },
       "internal/model/health.go": {
         "kind": "file",
-        "sha256": "c2789da3fbcc72c6a3be246211ce32c3781c5d1451a9ff5f60d099160c2e98f9",
+        "sha256": "3084809da4243ecdca4656aecaaf87d2ee8c5571625d56c30c9d054e4e2853ae",
         "execute_bits": "0o0"
       },
       "internal/model/ping.go": {
@@ -5544,7 +7166,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "f39b0caebc9ec00a5fac54b9f5d9352c7aa861bc9935892a1fcc7ccc0bab7da5",
+        "sha256": "dfe846c0d4538049a775b6c817b1491ddc83cc81f354fbc098a2e044531ebeac",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -5552,7 +7174,7 @@
       },
       "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "9578119104982101c8da0476b07fff3d31d1a9f4beda6863f17164d0b35007e1",
+        "sha256": "ff048003a04d6e95162378ae05d32dc4ea836a79381a9691f255ef18fc21236e",
         "execute_bits": "0o0"
       },
       "internal/runtime/server_test.go": {
@@ -5565,7 +7187,7 @@
       },
       "internal/service/health.go": {
         "kind": "file",
-        "sha256": "895ce61cb4f7986a7aa5e35c7ae1668e345f53ad626267cde195bcb4b7717e7c",
+        "sha256": "7f90035d7ca0376b4ef8de5b3e499b41e252cba580f9112388b4e363a909d3e8",
         "execute_bits": "0o0"
       },
       "internal/service/ping.go": {
@@ -5607,34 +7229,37 @@
         "sha256": "5c5dd2575424f606133175053d7ae3ae94b30e41b1e2f29e816a4c2a8f37fdf0",
         "execute_bits": "0o100"
       },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
+        "execute_bits": "0o111"
+      },
       "tests": {
         "kind": "directory"
       },
       "tests/server_test.go": {
         "kind": "file",
-        "sha256": "dbe457c0077cb03f49280e521fa7590799a9fe0601d59b08b1303c980804a711",
+        "sha256": "31613e923588b0fd8eaf21ef717838a8abf7d6931c6ad4bc924c59eb27564b05",
         "execute_bits": "0o0"
       }
     }
   },
-  "frontend-ssg": {
+  "web-service-redis": {
     "manifest": {
       "schema_version": 1,
       "generator_version": "<VERSION>",
       "operation": "create",
       "template": {
-        "name": "frontend",
-        "description": "React Router + TypeScript + Tailwind starter for independent projects",
-        "category": "frontend",
+        "name": "web-service",
+        "description": "Go + Gin web service starter",
+        "category": "backend",
         "stack": [
-          "React",
-          "React Router",
-          "TypeScript",
-          "Tailwind CSS",
-          "shadcn/ui"
+          "Go",
+          "Gin"
         ],
         "platforms": [
-          "web"
+          "linux",
+          "container"
         ]
       },
       "project_name": "demo",
@@ -5647,784 +7272,294 @@
           "source": "provided"
         },
         {
-          "name": "display_name",
-          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
+          "name": "module_name",
+          "value": "example.com/demo",
           "source": "provided"
         },
         {
-          "name": "package_name",
+          "name": "service_name",
           "value": "demo",
           "source": "default_from:project_name"
         },
         {
-          "name": "rendering",
-          "value": "ssg",
+          "name": "http_port",
+          "value": "8080",
+          "source": "default"
+        },
+        {
+          "name": "database",
+          "value": "postgres",
+          "source": "default"
+        },
+        {
+          "name": "cache",
+          "value": "redis",
           "source": "provided"
         }
       ],
-      "derived_values": {},
+      "derived_values": {
+        "cache_dsn": "redis://localhost:6379/0",
+        "database_dsn": "postgres://postgres:postgres@localhost:5432/demo?sslmode=disable"
+      },
       "next_steps": [
         "make bootstrap",
         "make dev",
-        "make test",
-        "export SITE_URL=https://example.com",
+        "make verify",
         "make docker-build",
         "make docker-run"
       ],
-      "template_file_count": 57,
+      "template_file_count": 37,
       "template_top_level_entries": [
+        ".air.toml",
         ".dockerignore",
-        ".env.example",
+        ".github",
         ".gitignore",
-        ".prettierignore",
-        ".prettierrc.json",
+        ".mise.toml",
+        "Brewfile",
         "Dockerfile",
         "Dockerfile.dev",
-        "Dockerfile.dev.full",
         "Makefile",
         "README.md",
-        "THIRD_PARTY_NOTICES.md",
-        "app",
-        "components.json",
+        "cmd",
         "compose.dev.yaml",
-        "eslint.config.js",
-        "nginx.conf",
-        "package.json",
-        "playwright.build.config.ts",
-        "playwright.production.config.ts",
-        "playwright.smoke.config.ts",
-        "pnpm-lock.yaml",
-        "pnpm-workspace.yaml",
-        "public",
-        "react-router.config.ts",
+        "compose.yaml",
+        "configs",
+        "go.mod",
+        "go.sum",
+        "internal",
         "scripts",
-        "tests",
-        "tsconfig.json",
-        "vite.config.ts",
-        "vite.preview.config.ts",
-        "vitest.config.ts"
-      ],
-      "selected_variant": {
-        "selector": "rendering",
-        "value": "ssg"
-      }
+        "tests"
+      ]
     },
     "entries": {
-      ".dockerignore": {
+      ".air.toml": {
         "kind": "file",
-        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
+        "sha256": "3bbff65bdb8eeda235dc2e1c940bba2b3dffb44f047bad06b0ca2d88b100b90b",
         "execute_bits": "0o0"
       },
-      ".env.example": {
+      ".dockerignore": {
         "kind": "file",
-        "sha256": "12cbd06994bc5cd8b26d072edde8c48b21e61ba462189224e13ed136eabf039b",
+        "sha256": "9659b4631530d363944c1decb7c0c23017ea25a1689fcedb1692e5e12d606908",
+        "execute_bits": "0o0"
+      },
+      ".github": {
+        "kind": "directory"
+      },
+      ".github/workflows": {
+        "kind": "directory"
+      },
+      ".github/workflows/verify.yml": {
+        "kind": "file",
+        "sha256": "0ae7afa16ed04d6eb7744bb3f9705cbb1040c4c5bab9cab415d72fa69bb407d5",
         "execute_bits": "0o0"
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
+        "sha256": "4be2b7d7fdda7921a1509c85aa4368b9d7a6e134d23760f444b19137797f5ec0",
         "execute_bits": "0o0"
       },
-      ".prettierignore": {
+      ".mise.toml": {
         "kind": "file",
-        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
+        "sha256": "8f7f861572a91514660231a8d63ec396cc06f7c418980f8409dffc0ec95ec99e",
         "execute_bits": "0o0"
       },
-      ".prettierrc.json": {
+      "Brewfile": {
         "kind": "file",
-        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
+        "sha256": "bca78589dc1c0b2c9d082922d98044b11e187a204364878b79463aee1dbe4185",
         "execute_bits": "0o0"
       },
       "Dockerfile": {
         "kind": "file",
-        "sha256": "334149d990e8bd092ab5f588b2502938e0822ae1ebc5a9ff8ad8a9b41b2f3e90",
+        "sha256": "0f298523df78cd2b033f3ea2fdc736f48377a59ddf687991270623f85a39a381",
         "execute_bits": "0o0"
       },
       "Dockerfile.dev": {
         "kind": "file",
-        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
-        "execute_bits": "0o0"
-      },
-      "Dockerfile.dev.full": {
-        "kind": "file",
-        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
+        "sha256": "805aaadca0d6eda170229936179db4ffc2df247bad567249aaae2408c2d2206d",
         "execute_bits": "0o0"
       },
       "Makefile": {
         "kind": "file",
-        "sha256": "0f039505adba4aee03564ffd38c7fd44485bc4dca0b8ba2e7f5255d717bb4917",
+        "sha256": "0ed2dfb49c7bc3af46de577d3f06ca48309379cfa7a290fbb3aafa78de26e76d",
         "execute_bits": "0o0"
       },
       "README.md": {
         "kind": "file",
-        "sha256": "8933bac711432b20ca6265bdf44c49e0c06ba3756d33400a4ea59a388c2ed558",
+        "sha256": "6f14831510e889e705deed40bf803ff0e3baa50c128956ad68ff369b089c63a7",
         "execute_bits": "0o0"
       },
-      "THIRD_PARTY_NOTICES.md": {
-        "kind": "file",
-        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
-        "execute_bits": "0o0"
-      },
-      "app": {
+      "cmd": {
         "kind": "directory"
       },
-      "app/app.css": {
-        "kind": "file",
-        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
-        "execute_bits": "0o0"
-      },
-      "app/components": {
+      "cmd/server": {
         "kind": "directory"
       },
-      "app/components/ui": {
-        "kind": "directory"
-      },
-      "app/components/ui/button.tsx": {
+      "cmd/server/main.go": {
         "kind": "file",
-        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
-        "execute_bits": "0o0"
-      },
-      "app/components/ui/dialog.tsx": {
-        "kind": "file",
-        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
-        "execute_bits": "0o0"
-      },
-      "app/content.ts": {
-        "kind": "file",
-        "sha256": "27be87d2a2362d8491748f7559ea7dd1b72e72cf850af2703c90dc94ac106963",
-        "execute_bits": "0o0"
-      },
-      "app/features": {
-        "kind": "directory"
-      },
-      "app/features/welcome.test.tsx": {
-        "kind": "file",
-        "sha256": "f475964ad7305325c595fdcb703b53890958200c7af7465d4b2f69b17f6f92fe",
-        "execute_bits": "0o0"
-      },
-      "app/features/welcome.tsx": {
-        "kind": "file",
-        "sha256": "31cf39abd1777b190c496db1b9671f70223d047e9d50d0ad2df8dc060f493b85",
-        "execute_bits": "0o0"
-      },
-      "app/lib": {
-        "kind": "directory"
-      },
-      "app/lib/content.server.ts": {
-        "kind": "file",
-        "sha256": "cfc6b333369cb2a67e157c0fe4bf0353e63202be5c47c4b76b051104eeaa0aa6",
-        "execute_bits": "0o0"
-      },
-      "app/lib/metadata.ts": {
-        "kind": "file",
-        "sha256": "d3a8d2e57edb37fa187e2c4e00d038de93758d908d85fd5cc59f896a972bcbf4",
-        "execute_bits": "0o0"
-      },
-      "app/lib/project.ts": {
-        "kind": "file",
-        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
-        "execute_bits": "0o0"
-      },
-      "app/lib/site.test.ts": {
-        "kind": "file",
-        "sha256": "b4c95a3f360f6cd82de10bfdbe43947a11c4440f0b52c505030da8a84d7d2e90",
-        "execute_bits": "0o0"
-      },
-      "app/lib/site.ts": {
-        "kind": "file",
-        "sha256": "6a7612f751e1ed340ccb2b50e26f169bf6d0ddbe6abd99579df239b1c437b12a",
-        "execute_bits": "0o0"
-      },
-      "app/lib/use-hydrated.ts": {
-        "kind": "file",
-        "sha256": "441bcc28914f7a261ad7ed55ba9d953b2eddfc883422a66bcfff8ecb5cb9cd19",
-        "execute_bits": "0o0"
-      },
-      "app/lib/utils.ts": {
-        "kind": "file",
-        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
-        "execute_bits": "0o0"
-      },
-      "app/root.tsx": {
-        "kind": "file",
-        "sha256": "ae2cbe1da4296b67335a3cb2488f40e28d9f06e29a8fd1da362092aac6598b7a",
-        "execute_bits": "0o0"
-      },
-      "app/routes": {
-        "kind": "directory"
-      },
-      "app/routes/about.tsx": {
-        "kind": "file",
-        "sha256": "59c4e0d75f9b7976eb7768ffbe594166656147ade3243afd5041b62f2a4d38c2",
-        "execute_bits": "0o0"
-      },
-      "app/routes/article.tsx": {
-        "kind": "file",
-        "sha256": "c4f2103b9c2b952085f8bc9551be942e0c8f34d8967508578152730b7cb9d87e",
-        "execute_bits": "0o0"
-      },
-      "app/routes/home.tsx": {
-        "kind": "file",
-        "sha256": "0ad5fe9564374452d5e844f17997c1043dd7a6600b19a727adc0149bb669eb4e",
-        "execute_bits": "0o0"
-      },
-      "app/routes/robots.ts": {
-        "kind": "file",
-        "sha256": "a59b6d435f0d3b56e4d4fb44842b9945679a29e43ea5595684eaf05646f22e78",
-        "execute_bits": "0o0"
-      },
-      "app/routes/sitemap.ts": {
-        "kind": "file",
-        "sha256": "93e53c7a46ed71e6454fb0c4dcf39969029027e7248bf9ed0c2eca2d673f3a6d",
-        "execute_bits": "0o0"
-      },
-      "app/routes.ts": {
-        "kind": "file",
-        "sha256": "85905abf96f419e1c901ab4b3062bb433219b40029b4e8f1b852233520bd9360",
-        "execute_bits": "0o0"
-      },
-      "app/test": {
-        "kind": "directory"
-      },
-      "app/test/setup.ts": {
-        "kind": "file",
-        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
-        "execute_bits": "0o0"
-      },
-      "components.json": {
-        "kind": "file",
-        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
+        "sha256": "5dedfbba493266a0392c40671c47f2fe28d64bfa0fbf1d15b468b907d99a20cd",
         "execute_bits": "0o0"
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "51bdc7bf51c64cbdbe27129401e233c194f88a452a12d97f7bf787cb98fef38b",
+        "sha256": "02da4c0619a14a45552000a698c8621c229788e5f2d54662b94975454a026631",
         "execute_bits": "0o0"
       },
-      "eslint.config.js": {
+      "compose.yaml": {
         "kind": "file",
-        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
+        "sha256": "2382db09ee3e8e19cc72a1d37daab40e1865f95ace0d7d89ee4212daa527d646",
         "execute_bits": "0o0"
       },
-      "nginx.conf": {
-        "kind": "file",
-        "sha256": "8e3b2d4a8f04725afbc5793a9e54678cc1c1ad7919a05fb7a0e020ec71b8aa64",
-        "execute_bits": "0o0"
-      },
-      "package.json": {
-        "kind": "file",
-        "sha256": "1b19fe832e751ced17f0cea8ab9cc4157795c106ee184e75208b27e6c00ba228",
-        "execute_bits": "0o0"
-      },
-      "playwright.build.config.ts": {
-        "kind": "file",
-        "sha256": "e1a1ea2159f29157d9359ae09f3c90c35b8a81cb2472976c899c22ac52ecc82e",
-        "execute_bits": "0o0"
-      },
-      "playwright.production.config.ts": {
-        "kind": "file",
-        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
-        "execute_bits": "0o0"
-      },
-      "playwright.smoke.config.ts": {
-        "kind": "file",
-        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
-        "execute_bits": "0o0"
-      },
-      "pnpm-lock.yaml": {
-        "kind": "file",
-        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
-        "execute_bits": "0o0"
-      },
-      "pnpm-workspace.yaml": {
-        "kind": "file",
-        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
-        "execute_bits": "0o0"
-      },
-      "public": {
+      "configs": {
         "kind": "directory"
       },
-      "public/.gitkeep": {
+      "configs/config.yaml": {
+        "kind": "file",
+        "sha256": "a959c196973f661683724aa31fe7721fa6e5cc30b9fb792512f5af5ff7f90317",
+        "execute_bits": "0o0"
+      },
+      "go.mod": {
+        "kind": "file",
+        "sha256": "9215e4832645051e077aa2027c968e2b4f972a60791e2bd90f01847a0dfb92b6",
+        "execute_bits": "0o0"
+      },
+      "go.sum": {
+        "kind": "file",
+        "sha256": "85ba8434ae98d851d0c8fc61841fe3c50168a6cdcabca9eb3188252abe7b1ab1",
+        "execute_bits": "0o0"
+      },
+      "internal": {
+        "kind": "directory"
+      },
+      "internal/config": {
+        "kind": "directory"
+      },
+      "internal/config/config.go": {
+        "kind": "file",
+        "sha256": "5a92a7cf1a838bb64b4d234e553b636830b2dd0dc729445772ef1d0227c1d78d",
+        "execute_bits": "0o0"
+      },
+      "internal/config/config_test.go": {
+        "kind": "file",
+        "sha256": "0f49c9b6aa72655f497c1e32ae8a53309c5786bae8cefbd2ca1ea0bba4587168",
+        "execute_bits": "0o0"
+      },
+      "internal/handler": {
+        "kind": "directory"
+      },
+      "internal/handler/health.go": {
+        "kind": "file",
+        "sha256": "938f00aa74eae154b19ea2f3c69cafc4f51df3e888c12c892d54751484b13b36",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/ping.go": {
+        "kind": "file",
+        "sha256": "aea7a563af32f058687ebeeab33dc76f2ec867a47486b72c34dc978aa129c4f4",
+        "execute_bits": "0o0"
+      },
+      "internal/handler/user.go": {
+        "kind": "file",
+        "sha256": "ddda40b4b7323e607acd6e7222c5d0fbb8b6dd8045bedfe54231d2ae57c2c85e",
+        "execute_bits": "0o0"
+      },
+      "internal/model": {
+        "kind": "directory"
+      },
+      "internal/model/health.go": {
+        "kind": "file",
+        "sha256": "11328df8eac6e0eb3f9ed36e650f8e360107c7c5a36adf70a81de157a573eaf5",
+        "execute_bits": "0o0"
+      },
+      "internal/model/ping.go": {
+        "kind": "file",
+        "sha256": "f5421863c8ecaf1f520e88e9671d243355482072d6f326c7ae0f64497286c56f",
+        "execute_bits": "0o0"
+      },
+      "internal/model/user.go": {
+        "kind": "file",
+        "sha256": "c3220b2127954f97f2c3072eebccb9d5dee84646175a2f065b9bfb9fcbdad7ae",
+        "execute_bits": "0o0"
+      },
+      "internal/repository": {
+        "kind": "directory"
+      },
+      "internal/repository/.gitkeep": {
         "kind": "file",
         "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         "execute_bits": "0o0"
       },
-      "public/404.html": {
+      "internal/repository/user.go": {
         "kind": "file",
-        "sha256": "bddde06e0c933275bafa25360ce856356ed70e13c9d7e31cb7bf9acaafe6fae5",
+        "sha256": "43b985003fa1b92825dda59a3d9e8f9403ab0d2b978463d30aac9bc479f26042",
         "execute_bits": "0o0"
       },
-      "public/favicon.svg": {
+      "internal/router": {
+        "kind": "directory"
+      },
+      "internal/router/router.go": {
         "kind": "file",
-        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
+        "sha256": "d1b6ca4796443c6e69dbc933593225d45fcd67d8c49446889ec28153cc9b55e4",
         "execute_bits": "0o0"
       },
-      "react-router.config.ts": {
+      "internal/runtime": {
+        "kind": "directory"
+      },
+      "internal/runtime/server.go": {
         "kind": "file",
-        "sha256": "f632bd232939ca98e54a63cbdedfaa08d79c81f43c97d9ab58ff5ee980656698",
+        "sha256": "5a2de77d8986315c91c41cacad26d0c3cd1b35c9b93c01a26e63f956186559f6",
+        "execute_bits": "0o0"
+      },
+      "internal/runtime/server_test.go": {
+        "kind": "file",
+        "sha256": "8eca89f4d2cc816ea11df92de73f2bb8025f948fb22a47dfeaa2ef4de789eca8",
+        "execute_bits": "0o0"
+      },
+      "internal/service": {
+        "kind": "directory"
+      },
+      "internal/service/health.go": {
+        "kind": "file",
+        "sha256": "4dbf619e8753743f3440f9ac78ceb467ecf8b99ecc9939cfc5eaefe032d29229",
+        "execute_bits": "0o0"
+      },
+      "internal/service/ping.go": {
+        "kind": "file",
+        "sha256": "5334c957ffd3e47976d4c630806a2eda6ee60553fbf54eb556a8a982fa500c01",
+        "execute_bits": "0o0"
+      },
+      "internal/service/user.go": {
+        "kind": "file",
+        "sha256": "8b90f03fe759fa24d45b0c541a78bcaf1ee25c10da63abaa1fbc12784e8dc369",
+        "execute_bits": "0o0"
+      },
+      "internal/service/user_test.go": {
+        "kind": "file",
+        "sha256": "33ff912db06420818a267cc2f9bdd237570e9e672c4ce4e881d36aa07e809184",
         "execute_bits": "0o0"
       },
       "scripts": {
         "kind": "directory"
       },
-      "scripts/browser-smoke-production": {
+      "scripts/bootstrap": {
         "kind": "file",
-        "sha256": "053c203240c47922e0900d34d71f2df25bb3aa0f32fd215a96ad937ded6af16d",
-        "execute_bits": "0o111"
-      },
-      "scripts/check-toolchain.mjs": {
-        "kind": "file",
-        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
+        "sha256": "8ea1d9174d6a00be644a99e0a0e9e12203814ca61be0a30879977350f3e800b9",
         "execute_bits": "0o111"
       },
       "scripts/doctor": {
         "kind": "file",
-        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
+        "sha256": "14af5ddc61af41b75f9bbfac7b6eed25790293ec93525812e0234936b495d323",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-container": {
+        "kind": "file",
+        "sha256": "27e7b8cc7a754e02aa6cebaf1c516d16dace63d3670e594a1cb5ddf6e0435c67",
         "execute_bits": "0o111"
       },
       "tests": {
         "kind": "directory"
       },
-      "tests/browser-smoke.spec.ts": {
+      "tests/server_test.go": {
         "kind": "file",
-        "sha256": "f625a9782398505907a0aac1a8f5a0f3a029bd90fcac4e62fbee53adc4f48fee",
-        "execute_bits": "0o0"
-      },
-      "tests/interactions.ts": {
-        "kind": "file",
-        "sha256": "78f37033b7444c80b10e560dfb385c9b2e4861a59150bfd6baa27c289aff19e6",
-        "execute_bits": "0o0"
-      },
-      "tests/production-browser-smoke.spec.ts": {
-        "kind": "file",
-        "sha256": "d45915dd06e050740f44101405898d2fabf8cada4ace1a0b8407a68e3e6c2de1",
-        "execute_bits": "0o0"
-      },
-      "tests/ssg.ts": {
-        "kind": "file",
-        "sha256": "fefdf3971a042554ea011c2179fb9aa12075b8e4cab93fdd39d00ca04eef4df1",
-        "execute_bits": "0o0"
-      },
-      "tsconfig.json": {
-        "kind": "file",
-        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
-        "execute_bits": "0o0"
-      },
-      "vite.config.ts": {
-        "kind": "file",
-        "sha256": "23002d574e50139151b60ba243c9013c43409884b9c0b3a3eba03d50e2470508",
-        "execute_bits": "0o0"
-      },
-      "vite.preview.config.ts": {
-        "kind": "file",
-        "sha256": "86dd2304996701fd3fa760919ea70013e132be5218f7e335bbd3907cbb7a843f",
-        "execute_bits": "0o0"
-      },
-      "vitest.config.ts": {
-        "kind": "file",
-        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
-        "execute_bits": "0o0"
-      }
-    }
-  },
-  "frontend-ssr": {
-    "manifest": {
-      "schema_version": 1,
-      "generator_version": "<VERSION>",
-      "operation": "create",
-      "template": {
-        "name": "frontend",
-        "description": "React Router + TypeScript + Tailwind starter for independent projects",
-        "category": "frontend",
-        "stack": [
-          "React",
-          "React Router",
-          "TypeScript",
-          "Tailwind CSS",
-          "shadcn/ui"
-        ],
-        "platforms": [
-          "web"
-        ]
-      },
-      "project_name": "demo",
-      "output_path": "<OUTPUT>/demo",
-      "target_exists": true,
-      "resolved_variables": [
-        {
-          "name": "project_name",
-          "value": "demo",
-          "source": "provided"
-        },
-        {
-          "name": "display_name",
-          "value": "R&D \"引号\" <研发> \\ $HOME {{PROJECT_NAME}}",
-          "source": "provided"
-        },
-        {
-          "name": "package_name",
-          "value": "demo",
-          "source": "default_from:project_name"
-        },
-        {
-          "name": "rendering",
-          "value": "ssr",
-          "source": "provided"
-        }
-      ],
-      "derived_values": {},
-      "next_steps": [
-        "make bootstrap",
-        "make dev",
-        "make test",
-        "make docker-build",
-        "make docker-run"
-      ],
-      "template_file_count": 55,
-      "template_top_level_entries": [
-        ".dockerignore",
-        ".env.example",
-        ".gitignore",
-        ".prettierignore",
-        ".prettierrc.json",
-        "Dockerfile",
-        "Dockerfile.dev",
-        "Dockerfile.dev.full",
-        "Makefile",
-        "README.md",
-        "THIRD_PARTY_NOTICES.md",
-        "app",
-        "components.json",
-        "compose.dev.yaml",
-        "eslint.config.js",
-        "package.json",
-        "playwright.build.config.ts",
-        "playwright.production.config.ts",
-        "playwright.smoke.config.ts",
-        "pnpm-lock.yaml",
-        "pnpm-workspace.yaml",
-        "public",
-        "react-router.config.ts",
-        "scripts",
-        "server",
-        "tests",
-        "tsconfig.json",
-        "vite.config.ts",
-        "vite.preview.config.ts",
-        "vitest.config.ts"
-      ],
-      "selected_variant": {
-        "selector": "rendering",
-        "value": "ssr"
-      }
-    },
-    "entries": {
-      ".dockerignore": {
-        "kind": "file",
-        "sha256": "8c2fe9b1b0922d0b8a3e3851fd301619d555718a223144b1f13c858464233722",
-        "execute_bits": "0o0"
-      },
-      ".env.example": {
-        "kind": "file",
-        "sha256": "9773b77ea193cccc4ec7ef19aeaf1f91505207b3924197aeabf29241dc21f6ab",
-        "execute_bits": "0o0"
-      },
-      ".gitignore": {
-        "kind": "file",
-        "sha256": "b32a7671dd7589420eb129f516428721087ee10fa6a0a92f1f0aad218b450d3c",
-        "execute_bits": "0o0"
-      },
-      ".prettierignore": {
-        "kind": "file",
-        "sha256": "63bc9e4c712b674933fbd36981a6d62be10e5d2b9c00b162580a84cf1127d46d",
-        "execute_bits": "0o0"
-      },
-      ".prettierrc.json": {
-        "kind": "file",
-        "sha256": "2c2edb52d7681f17187550069721e2bd3535b841cbcd503e93a9008cf793f158",
-        "execute_bits": "0o0"
-      },
-      "Dockerfile": {
-        "kind": "file",
-        "sha256": "6aaf484fd5847d8657d95c9d003ecffabd13ef5efc87d9e8762d6d59114c7c8b",
-        "execute_bits": "0o0"
-      },
-      "Dockerfile.dev": {
-        "kind": "file",
-        "sha256": "9fae45e84ba3239709758d5cf75b91d7b7ffe50b68607c04bb3ad8692049cffb",
-        "execute_bits": "0o0"
-      },
-      "Dockerfile.dev.full": {
-        "kind": "file",
-        "sha256": "7a81caef1da0cbb58718b46982836a9fbdc034680fcc6ece5f0974c90c1e7fad",
-        "execute_bits": "0o0"
-      },
-      "Makefile": {
-        "kind": "file",
-        "sha256": "246ccc693252702c3c83e0289f2bd2c3b8fd851b3652f340d4d1699bc452548b",
-        "execute_bits": "0o0"
-      },
-      "README.md": {
-        "kind": "file",
-        "sha256": "a380192bb5af8470076ac7112ba37d6f3229610abd8c884333b099da0797e1f6",
-        "execute_bits": "0o0"
-      },
-      "THIRD_PARTY_NOTICES.md": {
-        "kind": "file",
-        "sha256": "b06ff8606b73111730bb14277f43935de82a47adc0b8cd3baae09157f27361b7",
-        "execute_bits": "0o0"
-      },
-      "app": {
-        "kind": "directory"
-      },
-      "app/app.css": {
-        "kind": "file",
-        "sha256": "e9800e4cbbe978b6d90afcf90a8e2f5a13fd1165b755c101cbcac29fb561157c",
-        "execute_bits": "0o0"
-      },
-      "app/components": {
-        "kind": "directory"
-      },
-      "app/components/ui": {
-        "kind": "directory"
-      },
-      "app/components/ui/button.tsx": {
-        "kind": "file",
-        "sha256": "7439d4b8ae2772fb370b4c423a930623117fb24e88a896c5b6712028ad949443",
-        "execute_bits": "0o0"
-      },
-      "app/components/ui/dialog.tsx": {
-        "kind": "file",
-        "sha256": "62e5ceae34b610a47f0ac76522d080ccb3489b3f021e1dfd6c074f0bc9dd2970",
-        "execute_bits": "0o0"
-      },
-      "app/entry.server.test.tsx": {
-        "kind": "file",
-        "sha256": "785817f1f2605bca4a921de32339f64cc62a3283d611b8f90eb6b6ebcec09c42",
-        "execute_bits": "0o0"
-      },
-      "app/entry.server.tsx": {
-        "kind": "file",
-        "sha256": "22046708f401f6c43504d5c805a9544298e4715c4bf3a74747dba124b1a4bbcb",
-        "execute_bits": "0o0"
-      },
-      "app/features": {
-        "kind": "directory"
-      },
-      "app/features/welcome.test.tsx": {
-        "kind": "file",
-        "sha256": "f475964ad7305325c595fdcb703b53890958200c7af7465d4b2f69b17f6f92fe",
-        "execute_bits": "0o0"
-      },
-      "app/features/welcome.tsx": {
-        "kind": "file",
-        "sha256": "31cf39abd1777b190c496db1b9671f70223d047e9d50d0ad2df8dc060f493b85",
-        "execute_bits": "0o0"
-      },
-      "app/lib": {
-        "kind": "directory"
-      },
-      "app/lib/project.ts": {
-        "kind": "file",
-        "sha256": "8928524d4a4ebc70e162ed5dbea209fc132c0d185f81d4bdf11944dc5126f471",
-        "execute_bits": "0o0"
-      },
-      "app/lib/request.server.test.ts": {
-        "kind": "file",
-        "sha256": "68801c8dea34907a12ec23b59fa616c0c3d77eade10078e17b30427681bcf197",
-        "execute_bits": "0o0"
-      },
-      "app/lib/request.server.ts": {
-        "kind": "file",
-        "sha256": "f77ad115e7d0f78eb1ad72dafa29017392b3a3a18417c0008bd0b28c2bf0afbe",
-        "execute_bits": "0o0"
-      },
-      "app/lib/runtime.test.ts": {
-        "kind": "file",
-        "sha256": "d5baf505d3a1d83188257d12aaa0b4698ce0ed9d3368ca7be0ddfa3b6839b204",
-        "execute_bits": "0o0"
-      },
-      "app/lib/use-hydrated.ts": {
-        "kind": "file",
-        "sha256": "441bcc28914f7a261ad7ed55ba9d953b2eddfc883422a66bcfff8ecb5cb9cd19",
-        "execute_bits": "0o0"
-      },
-      "app/lib/utils.ts": {
-        "kind": "file",
-        "sha256": "55bbdc94cef3e0c8a8bba386e94f97228dd2c967fe61466fc565378890550c08",
-        "execute_bits": "0o0"
-      },
-      "app/root.tsx": {
-        "kind": "file",
-        "sha256": "ae2cbe1da4296b67335a3cb2488f40e28d9f06e29a8fd1da362092aac6598b7a",
-        "execute_bits": "0o0"
-      },
-      "app/routes": {
-        "kind": "directory"
-      },
-      "app/routes/about.tsx": {
-        "kind": "file",
-        "sha256": "a79d5f99e88d1f7176093264e8a104b7e44f4b264165d35b5a4b71f05daadf17",
-        "execute_bits": "0o0"
-      },
-      "app/routes/home.tsx": {
-        "kind": "file",
-        "sha256": "c2a171aaa84d25f2879651130578d85d143a5503a523e766b1b1dd9429cfe9f5",
-        "execute_bits": "0o0"
-      },
-      "app/routes.ts": {
-        "kind": "file",
-        "sha256": "5884d6daf61bac403245eafbf20a7b4663d09f267ec09a666c32641a789137a5",
-        "execute_bits": "0o0"
-      },
-      "app/test": {
-        "kind": "directory"
-      },
-      "app/test/setup.ts": {
-        "kind": "file",
-        "sha256": "c2ccf2417a8183a91935356b3d91c9aefc75b23abe2e72e335e671c12654f65d",
-        "execute_bits": "0o0"
-      },
-      "components.json": {
-        "kind": "file",
-        "sha256": "59e297d94e21ef46c0ba71c19fa08e645d866045c07783e860c9b6d8a4189823",
-        "execute_bits": "0o0"
-      },
-      "compose.dev.yaml": {
-        "kind": "file",
-        "sha256": "fbc3d64a142a0b377de1289e53c60ca18aa895abc6ecce872e8c93d60be40bf3",
-        "execute_bits": "0o0"
-      },
-      "eslint.config.js": {
-        "kind": "file",
-        "sha256": "fed5dcac1a3f3da6ec2a75bbab5826a6442c359b4a2b84cfc4b110221e488e83",
-        "execute_bits": "0o0"
-      },
-      "package.json": {
-        "kind": "file",
-        "sha256": "1b19fe832e751ced17f0cea8ab9cc4157795c106ee184e75208b27e6c00ba228",
-        "execute_bits": "0o0"
-      },
-      "playwright.build.config.ts": {
-        "kind": "file",
-        "sha256": "2e89462dd6a6f39d012e84488ead88acb36f7bdaee8b097173a758529b2a7ade",
-        "execute_bits": "0o0"
-      },
-      "playwright.production.config.ts": {
-        "kind": "file",
-        "sha256": "9ae54b5eb72a1cc061a16fa06801129d2092d3ad9183c906bc53ef930a30326d",
-        "execute_bits": "0o0"
-      },
-      "playwright.smoke.config.ts": {
-        "kind": "file",
-        "sha256": "1304aaef81e0c0f66c2b2020d411798f4defc40a0ebb69ff96c805b13ec326f3",
-        "execute_bits": "0o0"
-      },
-      "pnpm-lock.yaml": {
-        "kind": "file",
-        "sha256": "e58ec05dadcf0e5aae1f24c46890e58047c0307b4cf447629e3cfcf3d652cbd7",
-        "execute_bits": "0o0"
-      },
-      "pnpm-workspace.yaml": {
-        "kind": "file",
-        "sha256": "7280297e7616e6727a09b7028c6c39eb3a711b5453564409af0d989461c3aa38",
-        "execute_bits": "0o0"
-      },
-      "public": {
-        "kind": "directory"
-      },
-      "public/.gitkeep": {
-        "kind": "file",
-        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-        "execute_bits": "0o0"
-      },
-      "public/favicon.svg": {
-        "kind": "file",
-        "sha256": "e77c914de7b529bd2052b79177e85f6fd8fa3815b22bce2b1de66b3e69326954",
-        "execute_bits": "0o0"
-      },
-      "react-router.config.ts": {
-        "kind": "file",
-        "sha256": "36e26035d3120a27f4af35a7ba4ac2813375110aa7c77fe56cfd425be36e79c8",
-        "execute_bits": "0o0"
-      },
-      "scripts": {
-        "kind": "directory"
-      },
-      "scripts/browser-smoke-production": {
-        "kind": "file",
-        "sha256": "970b5da797a6b9462862b4ad7aecd28b5066bafee85c5e0ba78a1c4e362eb3c5",
-        "execute_bits": "0o111"
-      },
-      "scripts/check-toolchain.mjs": {
-        "kind": "file",
-        "sha256": "b0ba81da9520802212406260d26edf190de9a9ceac74c5a108c48153e934af98",
-        "execute_bits": "0o111"
-      },
-      "scripts/doctor": {
-        "kind": "file",
-        "sha256": "e3c15848fff5e5290bd5a7d207c3f3ffd804de16de2ad146763651e5c3b4f6f1",
-        "execute_bits": "0o111"
-      },
-      "server": {
-        "kind": "directory"
-      },
-      "server/index.ts": {
-        "kind": "file",
-        "sha256": "c135cc4cf5d22ca665ba15e2e71b1cf56c2dd8ee04ecbe65bb0579ab17c989e4",
-        "execute_bits": "0o0"
-      },
-      "server/runtime.ts": {
-        "kind": "file",
-        "sha256": "7689ab9e09bed55825e8a26bac42d6aa77a4b544bf27dbc93ffc95f5c6bb712a",
-        "execute_bits": "0o0"
-      },
-      "tests": {
-        "kind": "directory"
-      },
-      "tests/browser-smoke.spec.ts": {
-        "kind": "file",
-        "sha256": "f2cce7548331c31439694c917445b5ead75f17a8d11dc0512cec097c87e2dfec",
-        "execute_bits": "0o0"
-      },
-      "tests/interactions.ts": {
-        "kind": "file",
-        "sha256": "78f37033b7444c80b10e560dfb385c9b2e4861a59150bfd6baa27c289aff19e6",
-        "execute_bits": "0o0"
-      },
-      "tests/node-runtime.spec.ts": {
-        "kind": "file",
-        "sha256": "657743408c57b987ed2c8dcfcfb01954858d4e9dde3e93a058d26cb124cabe54",
-        "execute_bits": "0o0"
-      },
-      "tests/production-browser-smoke.spec.ts": {
-        "kind": "file",
-        "sha256": "547dbb1d60a63213928326a329c4d700a545b65a75d4757f07e67d7149e0a69b",
-        "execute_bits": "0o0"
-      },
-      "tests/ssr.ts": {
-        "kind": "file",
-        "sha256": "341048fcc5a7fe003b9702fbd682cbad49e129a4121541d1d094fa8461a7889d",
-        "execute_bits": "0o0"
-      },
-      "tsconfig.json": {
-        "kind": "file",
-        "sha256": "67a8b566353f0ddccecd0d1eaa50c8d673c513326eac621d09674f20fbd0369e",
-        "execute_bits": "0o0"
-      },
-      "vite.config.ts": {
-        "kind": "file",
-        "sha256": "23002d574e50139151b60ba243c9013c43409884b9c0b3a3eba03d50e2470508",
-        "execute_bits": "0o0"
-      },
-      "vite.preview.config.ts": {
-        "kind": "file",
-        "sha256": "6ceeae25ce40d49636094fe602edc50587396cab12eb1c2f43bb8780f51b154d",
-        "execute_bits": "0o0"
-      },
-      "vitest.config.ts": {
-        "kind": "file",
-        "sha256": "6fc3bc18432b7b3abee38a76d43ca6ed683772e41df70423ee67d6ebc390c8f8",
+        "sha256": "aa0f4af6d2f0bd226f5048a58723870b7f5438e020ad6bf3ef53e5ec8f3af2d8",
         "execute_bits": "0o0"
       }
     }

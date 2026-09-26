@@ -132,7 +132,7 @@ Applies to:
 
 - `frontend`;
 - `web-service`;
-- `microservice`;
+- `micro-service`;
 - `worker`.
 
 Required behavior:

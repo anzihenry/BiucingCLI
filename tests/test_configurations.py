@@ -23,8 +23,9 @@ class ConfigurationTests(unittest.TestCase):
         ]
         variants += [("apple", ["--bundle-identifier", "com.example.demo", "--platform", platform])
                      for platform in ("ios", "macos", "watchos", "tvos")]
-        variants += [("microservice", ["--module-name", "example.com/demo", "--proto-package", "demo.v1",
-                                       "--dependency-store", store]) for store in ("postgres", "redis")]
+        variants += [("micro-service", ["--module-name", "example.com/demo", "--proto-package", "demo.v1",
+                                       "--database", database, "--cache", cache])
+                     for database in ("none", "postgres") for cache in ("none", "redis")]
         seen = set()
         for template, options in variants:
             with self.subTest(template=template, options=options), tempfile.TemporaryDirectory() as tmp:

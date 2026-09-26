@@ -1,24 +1,28 @@
 # Microservice Template Design
 
+> 历史 starter 设计。2026-09-26 后的通用生产架构以[后端服务整体架构](backend-service-architecture.md)和 [Micro Service 架构](micro-service-architecture.md)为准；下文的早期范围限制不代表新架构目标。
+
 ## Goal
 
-This document defines the first implementation target for a `microservice` template in BiucingCLI.
+This document defines the first implementation target for a `micro-service` template in BiucingCLI.
 
 The intent is not to generate a full backend platform. The intent is to generate a contract-aware Go service starter that matches the environment standard defined in [Microservice Team Environment Standard](microservice-team-environment-standard.md).
 
 ## Position in Product Scope
 
-The `microservice` template should come after `web-service`, not replace it.
+The `micro-service` template serves internal service-to-service calls and
+machine-to-machine contracts. `web-service` serves customer-facing HTTP APIs.
+They have different identity and authorization boundaries.
 
 Why:
 
-- `web-service` is still the best simple starter for a plain HTTP backend;
+- `web-service` remains the customer-facing entrypoint;
 - protobuf, code generation, and local orchestration add real complexity;
 - the first microservice template should justify that complexity with a clearly better collaboration path.
 
 ## First Version Outcome
 
-`biucing create microservice <project-name>` should generate:
+`biucing create micro-service <project-name>` should generate:
 
 - a Go service starter with protobuf contract scaffolding;
 - `Buf` configuration and a reproducible generation path;
@@ -50,11 +54,11 @@ This keeps the first version practical and aligned with a contract-first service
 
 ## Template Metadata Proposal
 
-Suggested `templates/microservice/template.json`:
+Suggested `templates/micro-service/template.json`:
 
 ```json
 {
-  "name": "microservice",
+  "name": "micro-service",
   "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
   "stack": ["Go", "Gin", "Protobuf", "Buf", "Docker Compose", "OpenTelemetry"],
   "variables": [
@@ -237,18 +241,51 @@ The template should be considered healthy when a generated sample can:
 
 ## Relationship to `web-service`
 
-The `web-service` template should remain the simpler default when a project does not need:
+Choose by ownership and caller, not by which starter is simpler. `web-service`
+owns the customer-facing HTTP/API and user-login boundary. `micro-service`
+owns an internal capability, its protobuf/gRPC contract, and its own data.
+A customer-facing operation may call a microservice: the generated web project
+then needs a versioned gRPC client adapter, while the microservice remains the
+contract owner and server. Neither template should reach into the other's
+`internal/` packages or database tables.
 
-- protobuf contracts;
-- local dependency orchestration as a first-class workflow;
-- a standard telemetry path;
-- a stronger team-oriented environment contract.
+The production integration target is described in [Web Service architecture](web-service-architecture.md):
+workload identity and mTLS authenticate the calling service; an explicitly
+authorized web caller can pass a terminal user's trusted `(issuer, subject)`
+context for user-scoped RPCs. The receiving microservice must authorize both
+the calling service/method and the user's operation on its own resource.
+Client deadlines, bounded retries, trace propagation, contract compatibility,
+independent release, and downstream failure behavior are part of this boundary.
+The current template only serves a `Ping` RPC and does not yet implement this
+production authentication or a real database-backed business operation.
 
-The `microservice` template should be chosen when those needs are present on day one.
+### Cross-template integration acceptance
+
+An integration fixture should generate one project from each template and prove:
+
+1. The web project consumes a fixed, published version of the microservice's
+   protobuf contract and calls it through a generated gRPC client adapter.
+2. The microservice accepts only the expected workload identity over mTLS;
+   missing, untrusted, or wrong-client certificates fail before business logic.
+3. A user-scoped RPC carries an explicit `(issuer, subject)` asserted by an
+   authorized web caller. The microservice applies its own object-level rule;
+   a different user receives no data even when the caller is otherwise allowed.
+4. Deadline and cancellation reach the server; an unavailable dependency maps
+   to a stable external error without leaking internal addresses or details.
+5. Read retries are bounded; writes require an idempotency design before any
+   retry. Trace IDs connect the external request and internal RPC.
+6. A compatible protobuf change can roll out independently, while a breaking
+   change fails the contract check before release.
+
+Local Compose may generate ephemeral test CA and workload certificates for this
+fixture. Production certificate issuance, rotation, network policy, and the
+service trust domain are supplied by the deployment environment and documented
+as configuration requirements. Do not commit a production private key or use
+plaintext gRPC as a production default.
 
 ## Recommended Delivery Sequence
 
-1. Keep `web-service` stable as the lightweight starter.
-2. Introduce `microservice` as a second backend template, not as a mutation of `web-service`.
+1. Keep `web-service` and `micro-service` distinct by caller and business ownership.
+2. Introduce `micro-service` as a second backend template, not as a mutation of `web-service`.
 3. Implement the template with one clear path and minimal branching.
 4. Validate the generated project through real `make` and `docker compose` commands before promoting it as ready.

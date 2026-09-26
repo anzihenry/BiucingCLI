@@ -1,12 +1,15 @@
 # Web Service Team Environment Standard
 
+> 通用架构及 Docker 开发/部署目标见[后端服务整体架构](backend-service-architecture.md)。本文件保留既有环境细节；与新目标冲突时以整体架构为准，实际支持仍以生成项目验证为准。
+
 ## Goal
 
 This document defines a standard development environment for a mid-sized Go web service team.
 
 Scope:
 
-- HTTP API and internal web service development with Go;
+- customer-facing HTTP API development with Go; internal service-to-service
+  development belongs to the `microservice` template;
 - local onboarding and daily development;
 - dependency, runtime, and configuration consistency;
 - test, build, containerization, and delivery automation.
@@ -307,47 +310,27 @@ Expected flow:
 
 ## Current `web-service` Template Assessment
 
-The current `web-service` template already provides a solid starter-level backend shape:
+The generated project now includes `cmd/server`, internal config, HTTP handlers,
+services, repositories, response models, YAML defaults, `go.sum`, `Brewfile`,
+`.mise.toml`, bootstrap and doctor scripts, Docker development/runtime images,
+and `make verify`. The example user repository remains in memory.
 
-- `Go + Gin` stack selection;
-- `cmd/server` entrypoint;
-- `internal/config`, `handler`, `service`, `repository`, `model`, and `router` packages;
-- local YAML config;
-- `Makefile`;
-- `Dockerfile`;
-- HTTP-level tests using `httptest`.
+The layout follows the [Go server module guidance](https://go.dev/doc/modules/layout):
+commands live in `cmd` and implementation packages live in `internal`. Request
+contexts reach the service and repository, following [Go's cancellation guidance](https://go.dev/doc/database/cancel-operations)
+for future database or remote calls. YAML is a checked-in local default;
+`CONFIG_FILE`, `SERVICE_NAME`, and `HTTP_PORT` let deployments select or override
+their runtime configuration, consistent with [environment-based deployment config](https://12factor.net/config).
 
-This is enough for a useful personal starter and it matches the current product direction.
-
-However, it is not yet at the same maturity level as the `apple` and `android` templates because it is still missing environment-standard pieces:
-
-- no `Brewfile`;
-- no `.mise.toml`;
-- no `scripts/bootstrap`;
-- no `scripts/doctor`;
-- no committed `go.sum` in the generated project;
-- no explicit lint or CI-oriented command surface.
+The repository's macOS platform suite tests a fresh generated project's Go code.
+The web-service artifact workflow also builds the development image, runs
+`make verify`, and builds the runtime image on Linux. A local Docker daemon is
+still required to repeat that full workflow on a workstation.
 
 ## Recommendation
 
-The repo should keep `web-service` as a lighter starter for now, but it is worth promoting it toward a full team-environment template in a second step.
-
-Reasoning:
-
-- the current backend starter is already functional and validated on the main path;
-- adding environment standard files now would improve reproducibility without forcing a large framework decision;
-- unlike Apple and Android, a Go web service does not need heavy platform tooling before it becomes useful;
-- the highest-value gap is environment consistency, not application architecture.
-
-Recommended next phase:
-
-1. Add `Brewfile`, `.mise.toml`, `scripts/bootstrap`, and `scripts/doctor` to `web-service`.
-2. Update the generated README to prefer `make bootstrap` and `make doctor` over raw first-run commands.
-3. Ensure generation plus `make test` works on a clean machine with only the standard tools installed.
-4. Add lint only after the bootstrap path is stable.
-
-Not recommended yet:
-
-- introducing protobuf or microservice-specific code generation into `web-service`;
-- adding a heavyweight framework or service platform layer;
-- overfitting the starter to deployment infrastructure before the local environment contract is stable.
+Keep the default starter small. The next useful step is a realistic optional
+database example with migrations, transactions, and readiness checks, chosen
+for a concrete backing store. Add structured request logs and tracing when the
+deployment's collection and export path is defined. Those are extension points,
+not prerequisites for generating a basic HTTP service.

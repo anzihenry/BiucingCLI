@@ -21,6 +21,25 @@ from cli_support import CLIHelpers
 
 class PlatformIntegrationTests(CLIHelpers, unittest.TestCase):
     @platform_test
+    def test_create_web_service_generated_tests_pass(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.run_cli([
+                "create", "web-service", "audit-web", "--output-dir", tmpdir,
+                "--module-name", "example.com/audit-web", "--non-interactive",
+            ])
+            project_dir = Path(tmpdir) / "audit-web"
+            env = os.environ.copy()
+            env["GOCACHE"] = str(project_dir / ".cache" / "go-build")
+            result = subprocess.run(
+                ["go", "test", "./..."], cwd=project_dir, env=env,
+                capture_output=True, text=True,
+            )
+            self.assertEqual(
+                result.returncode, 0,
+                msg=f"generated web-service tests failed:\n{result.stdout}\n{result.stderr}",
+            )
+
+    @platform_test
     def test_all_templates_implement_the_common_make_command_contract(self):
         expected_commands = set(REQUIRED_COMMAND_CONTRACT)
 

@@ -5,7 +5,7 @@ from types import MappingProxyType
 
 from biucingcli.errors import InvalidTemplateError
 from biucingcli.models import TemplateDefinition
-from biucingcli.template_rules import apple, android, microservice
+from biucingcli.template_rules import apple, android, microservice, backend
 from biucingcli.template_rules.common import RuleResult
 
 
@@ -13,11 +13,12 @@ RULES = MappingProxyType({
     "apple": apple.derive,
     "android": android.derive,
     "microservice": microservice.derive,
+    "backend": backend.derive,
 })
 # Built-in release policy and compatibility assignments for the string API.
 # The generation path selects the rule from TemplateDefinition metadata.
 TEMPLATE_RULES = MappingProxyType({
-    "apple": "apple", "android": "android", "microservice": "microservice",
+    "apple": "apple", "android": "android", "micro-service": "microservice", "web-service": "backend",
 })
 
 
@@ -35,16 +36,14 @@ OUTPUTS = MappingProxyType({
         "minimum_os_version", "tuist_destinations", "tuist_deployment_targets",
         "xcodebuild_destination", "swiftpm_supported_platform", "swift_module_name",
     }), frozenset({"apple_scene_body", "apple_home_body", "apple_platform_output_note"})),
-    "microservice": (frozenset({
-        "dependency_store", "dependency_store_image", "dependency_store_port",
-        "dependency_store_dsn", "dependency_store_container_dsn", "dependency_store_env_block",
-        "service_type_name",
-    }), frozenset()),
+    "microservice": (backend.DERIVED | {"service_type_name"}, backend.SNIPPETS),
+    "backend": (backend.DERIVED, backend.SNIPPETS),
 })
 OVERWRITES = MappingProxyType({
     "apple": frozenset({"apple_platform", "minimum_os_version", "swift_module_name"}),
     "android": frozenset({"kotlin_module_name"}),
-    "microservice": frozenset({"dependency_store"}),
+    "microservice": frozenset(),
+    "backend": frozenset(),
 })
 
 

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+# Unique project: cleanup never targets the user's development Compose project.
+project="verify-$(date +%s)-$$"
+compose=(docker compose --project-name "$project" -f compose.dev.yaml)
+cleanup() { "${compose[@]}" down --remove-orphans --volumes >/dev/null; }
+trap cleanup EXIT
+"${compose[@]}" config --quiet
+"${compose[@]}" build app-dev
+# P0 verifies application code without requiring data or telemetry availability.
+make verify COMPOSE="docker compose --project-name $project" \
+  COMPOSE_PROJECT_NAME="$project" DEV_COMPOSE_FILE=compose.dev.yaml DEV_SERVICE=app-dev \
+  RUN_FLAGS="--rm --no-deps"

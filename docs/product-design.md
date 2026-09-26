@@ -75,6 +75,10 @@ Expected output:
 
 ### `web-service`
 
+Target scope is a customer-facing HTTP API; internal service-to-service APIs
+belong to `micro-service`. The production and identity target is described in
+[Web Service 架构](web-service-architecture.md).
+
 Default stack:
 
 - Go
@@ -112,7 +116,7 @@ Expected output:
 - at least one internal package under `Packages/`;
 - a README that explains the local environment workflow.
 
-### `microservice`
+### `micro-service`
 
 Default stack:
 

@@ -6,12 +6,12 @@
 
 - established the metadata-driven template system;
 - shipped `biucing list`, `biucing info`, `biucing create`, and `biucing --version`;
-- shipped five starters: `frontend`, `web-service`, `microservice`, `apple`, and `android`;
+- shipped five starters: `frontend`, `web-service`, `micro-service`, `apple`, and `android`;
 - aligned the repo around a focused scaffold-generator product direction.
 
 ### 0.2.0 - Template Maturity Expansion
 
-- fully Dockerized the `frontend`, `web-service`, and `microservice` starters for local development and runtime packaging;
+- fully Dockerized the `frontend`, `web-service`, and `micro-service` starters for local development and runtime packaging;
 - expanded the Apple starter into a stronger Tuist + SwiftPM baseline with platform-aware output and better doctor/lint/release guidance;
 - expanded the Android starter into a more complete Kotlin + Compose baseline with a committed Gradle wrapper, stronger doctor checks, UI smoke coverage, and release-signing placeholders;
 - validated generated starters repeatedly with real build and test workflows.
@@ -133,6 +133,19 @@ Planning anchors:
 
 - [0.9.0 Plan](0.9.0-plan.md)
 - [0.9.0 Release Prep](0.9.0-release-prep.md)
+
+## Planned — Backend Service Architecture
+
+The backend architecture direction is approved; implementation is tracked separately from the current release scope.
+No release version is assigned yet.
+
+- [Backend Service Architecture](backend-service-architecture.md)
+- [Backend Service Implementation Tasks](backend-service-implementation-tasks.md)
+
+The plan covers 27 baseline tasks across runtime foundations, protocol and identity, persistence,
+service calls, observability, Docker/Compose production delivery, and a separate Kubernetes HA reference.
+Fourteen optional extension tasks remain demand-driven. Existing starter validation does not imply
+completion of this architecture baseline.
 
 ## Deferred
 

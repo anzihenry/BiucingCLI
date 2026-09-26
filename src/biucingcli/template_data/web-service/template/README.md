@@ -47,6 +47,9 @@ make help
 ```
 
 The service reads configuration from `configs/config.yaml` by default.
+Set `CONFIG_FILE` to load another file. `SERVICE_NAME` and `HTTP_PORT` override
+the corresponding YAML values for each deployment. Keep secrets out of the
+checked-in YAML file.
 
 ## Runtime Safety
 
@@ -154,11 +157,28 @@ docker compose up --build
 
 The Docker defaults are:
 
-- `DOCKER_VARIANT=alpine`: `golang:1.26-alpine` + `alpine:3.20`
-- `DOCKER_VARIANT=ubuntu`: `public.ecr.aws/docker/library/golang:1.26` + `public.ecr.aws/docker/library/ubuntu:26.04`
+- `DOCKER_VARIANT=alpine`: `golang:1.26.8-alpine` + `alpine:3.20`
+- `DOCKER_VARIANT=ubuntu`: `public.ecr.aws/docker/library/golang:1.26.8` + `public.ecr.aws/docker/library/ubuntu:26.04`
 
 You can also override the exact images directly:
 
 ```bash
-make docker-build BUILDER_IMAGE=public.ecr.aws/docker/library/golang:1.26 RUNTIME_IMAGE=public.ecr.aws/docker/library/ubuntu:26.04
+make docker-build BUILDER_IMAGE=public.ecr.aws/docker/library/golang:1.26.8 RUNTIME_IMAGE=public.ecr.aws/docker/library/ubuntu:26.04
 ```
+
+## Component contract (P0)
+
+Database: `{{DATABASE}}`; cache: `{{CACHE}}`. These are independent generation choices.
+`DATABASE_DSN` and `CACHE_DSN` configure each component separately. Local Compose dependencies
+are development fixtures, not production credentials. P0 does not yet connect application
+repositories or sessions to them. No component availability is claimed by the health endpoint.
+Database/cache ports are not published; use Compose exec for local administration.
+
+The removed `dependency_store` / `--dependency-store` choice maps as follows:
+`postgres` → `--database postgres --cache none`; `redis` → `--database none --cache redis`
+(Micro only). Web requires PostgreSQL; Micro defaults to no database and no cache.
+Existing generated projects are not rewritten automatically.
+
+Run `./scripts/verify-container` to build the dev image, run the current verification
+contract, and clean up this verification run's isolated Compose project. This is a starter
+check, not proof of authentication, persistence or production readiness.

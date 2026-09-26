@@ -33,7 +33,7 @@ These checks apply to every release regardless of which template changed.
 | --- | --- | --- | --- | --- |
 | `frontend` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make test` and `make docker-build` in the generated project | Browser smoke is valuable when frontend behavior or dev-server flow changes |
 | `web-service` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify` and `make docker-build` in the generated project | Prefer both dev-image and runtime-image proof when Dockerfiles or Makefile flows change |
-| `microservice` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify`, `make up`, and `make docker-build` in the generated project | Re-check dependency-store variants when compose wiring or protobuf flow changes |
+| `micro-service` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify`, `make up`, and `make docker-build` in the generated project | Re-check independent database/cache combinations when Compose wiring or protobuf flow changes |
 | `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
 | `apple` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Apple project structure, Tuist wiring, or build settings change | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
 | `android` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Gradle, Android manifest, signing, packaging, or build settings change | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
@@ -83,7 +83,7 @@ Suggested fresh worktree proof:
 | --- | --- |
 | `frontend` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-frontend-alpha DEV_HOST_PORT=5174 docker compose -f compose.dev.yaml config` |
 | `web-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-service-alpha HOST_PORT=18081 docker compose -f compose.dev.yaml config` |
-| `microservice` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-micro-alpha HOST_HTTP_PORT=18080 HOST_GRPC_PORT=19090 HOST_DEPENDENCY_STORE_PORT=15432 HOST_OTEL_GRPC_PORT=14317 HOST_OTEL_HTTP_PORT=14318 docker compose -f compose.dev.yaml config` |
+| `micro-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-micro-alpha HOST_HTTP_PORT=18080 HOST_GRPC_PORT=19090 HOST_DEPENDENCY_STORE_PORT=15432 HOST_OTEL_GRPC_PORT=14317 HOST_OTEL_HTTP_PORT=14318 docker compose -f compose.dev.yaml config` |
 | `worker` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-worker-alpha DEV_IMAGE=demo-worker-alpha-dev DEV_TAG=dev docker compose -f compose.dev.yaml config` |
 | `apple` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
 | `android` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
@@ -97,7 +97,7 @@ These are the default commands to reach for when fresh proof is needed.
 | --- | --- | --- |
 | `frontend` | `uv run --locked biucing create frontend demo-frontend --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-frontend` | `make test`, `make docker-build` |
 | `web-service` | `uv run --locked biucing create web-service demo-service --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service` | `make verify`, `make docker-build` |
-| `microservice` | `uv run --locked biucing create microservice demo-microservice --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-microservice --set module_name=github.com/example/demo-microservice --set proto_package=demo.v1` | `make verify`, `make up`, `make docker-build` |
+| `micro-service` | `uv run --locked biucing create micro-service demo-microservice --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-microservice --set module_name=github.com/example/demo-microservice --set proto_package=demo.v1` | `make verify`, `make up`, `make docker-build` |
 | `worker` | `uv run --locked biucing create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
 | `apple` | `uv run --locked biucing create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
 | `android` | `uv run --locked biucing create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
@@ -113,7 +113,7 @@ When using these commands for release evidence, prefer a fresh empty output dire
 | Metadata-only change in one template | Release-wide checks plus `biucing info <template>` sanity check and, when semantics changed, fresh proof for that template |
 | Shared renderer or placeholder change | Release-wide checks plus fresh proof for at least one Dockerized template and one native template |
 | Worktree metadata or command-surface change | Release-wide checks plus fresh worktree proof for every touched template |
-| Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `microservice` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
+| Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `micro-service` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
 | Background-worker template change in `worker` | Release-wide checks plus fresh generated-project `go test ./...` proof and, when Docker paths changed, Docker packaging verification |
 | Native project structure change in `apple` or `android` | Release-wide checks plus fresh native `static`, `doctor`, and `real-build` evidence for the touched native template |
 | Native project structure change in `harmonyos` | Release-wide checks plus fresh native `static` and `doctor` evidence; run and record `real-build` evidence when DevEco Studio and HarmonyOS SDK are available |
@@ -123,7 +123,7 @@ When using these commands for release evidence, prefer a fresh empty output dire
 
 The current repository metadata declares:
 
-- `frontend`, `web-service`, and `microservice` as `real-build-verified`;
+- `frontend`, `web-service`, and `micro-service` as `real-build-verified`;
 - `worker`, `apple`, `android`, and `harmonyos` as `generated-project-verified`.
 
 The current repo-level automated baseline includes:
@@ -145,3 +145,12 @@ The `0.7.0` release additionally records fresh `real-build` evidence for all thr
 - When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
 - For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
 - For the latest concrete version-prep walkthrough, use [0.8.0-release-prep.md](0.8.0-release-prep.md).
+
+## Backend P0 verification
+
+See [engineering contract](backend-service-engineering-contract.md) and [P0 evidence](backend-service-p0-verification.md).
+`uv run --locked python scripts/verify-backends` generates six database/cache combinations,
+runs the generated Docker verification entry points, and writes evidence plus logs in a fresh directory.
+`--generate-only` checks generation only and must not count as real-build evidence.
+The generated `.github/workflows/verify.yml` uses the same project-local `scripts/verify-container`.
+This is the P0 starter gate, not authentication, database integration, or production readiness.

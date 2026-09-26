@@ -2,16 +2,25 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strconv"
 
 	"gopkg.in/yaml.v3"
 )
 
 const defaultConfigFile = "configs/config.yaml"
 
+type ComponentConfig struct {
+	Driver string `yaml:"driver"`
+	DSN    string `yaml:"dsn"`
+}
+
 type Config struct {
-	Service ServiceConfig `yaml:"service"`
-	Server  ServerConfig  `yaml:"server"`
+	Database ComponentConfig `yaml:"database"`
+	Cache    ComponentConfig `yaml:"cache"`
+	Service  ServiceConfig   `yaml:"service"`
+	Server   ServerConfig    `yaml:"server"`
 }
 
 type ServiceConfig struct {
@@ -42,6 +51,12 @@ func Load() (Config, error) {
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return Config{}, err
 	}
+	if value, set := os.LookupEnv("SERVICE_NAME"); set {
+		cfg.Service.Name = value
+	}
+	if value, set := os.LookupEnv("HTTP_PORT"); set {
+		cfg.Service.Port = value
+	}
 
 	if cfg.Service.Name == "" {
 		return Config{}, errors.New("service.name is required")
@@ -50,11 +65,45 @@ func Load() (Config, error) {
 	if cfg.Service.Port == "" {
 		cfg.Service.Port = "{{HTTP_PORT}}"
 	}
+	port, err := strconv.Atoi(cfg.Service.Port)
+	if err != nil || port < 1 || port > 65535 {
+		return Config{}, fmt.Errorf("service.port must be between 1 and 65535: %q", cfg.Service.Port)
+	}
 
 	if err := cfg.Server.applyDefaults(); err != nil {
 		return Config{}, err
 	}
 
+	if cfg.Database.Driver == "" {
+		cfg.Database.Driver = "{{DATABASE}}"
+	}
+	if cfg.Cache.Driver == "" {
+		cfg.Cache.Driver = "{{CACHE}}"
+	}
+	if cfg.Database.DSN == "" {
+		cfg.Database.DSN = "{{DATABASE_DSN}}"
+	}
+	if cfg.Cache.DSN == "" {
+		cfg.Cache.DSN = "{{CACHE_DSN}}"
+	}
+	if value, set := os.LookupEnv("DATABASE_DSN"); set {
+		cfg.Database.DSN = value
+	}
+	if value, set := os.LookupEnv("CACHE_DSN"); set {
+		cfg.Cache.DSN = value
+	}
+	if cfg.Database.Driver != "none" && cfg.Database.Driver != "postgres" {
+		return Config{}, errors.New("unsupported database.driver")
+	}
+	if cfg.Cache.Driver != "none" && cfg.Cache.Driver != "redis" {
+		return Config{}, errors.New("unsupported cache.driver")
+	}
+	if cfg.Database.Driver == "none" {
+		cfg.Database.DSN = ""
+	}
+	if cfg.Cache.Driver == "none" {
+		cfg.Cache.DSN = ""
+	}
 	return cfg, nil
 }
 

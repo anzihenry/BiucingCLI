@@ -1,0 +1,181 @@
+{
+  "name": "micro-service",
+  "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
+  "category": "backend",
+  "stack": [
+    "Go",
+    "Gin",
+    "Protobuf",
+    "Buf",
+    "Docker Compose",
+    "OpenTelemetry"
+  ],
+  "tags": [
+    "grpc",
+    "otel",
+    "protobuf",
+    "docker",
+    "service"
+  ],
+  "platforms": [
+    "linux",
+    "container"
+  ],
+  "maturity": {
+    "level": "validated",
+    "summary": "Containerized microservice starter with coordinated HTTP/gRPC shutdown, bounded timeouts, health checks, protobuf, and observability."
+  },
+  "validation": {
+    "status": "real-build-verified",
+    "verification_tier": "real-build",
+    "evidence": [
+      "python unittest template rendering coverage",
+      "generated-project HTTP and gRPC shutdown tests",
+      "HTTP and gRPC health checks",
+      "real docker runtime image builds",
+      "real docker development image builds"
+    ]
+  },
+  "operating_assumptions": [
+    "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
+    "Generated projects are expected to validate protobuf, service runtime, and container packaging together.",
+    "Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages."
+  ],
+  "workflow_labels": [
+    "bootstrap",
+    "dev",
+    "verify",
+    "build",
+    "runtime"
+  ],
+  "commands": {
+    "bootstrap": "make bootstrap",
+    "doctor": "make doctor",
+    "lint": "make lint",
+    "test": "make test",
+    "verify": "make verify",
+    "build": "make build",
+    "clean": "make clean",
+    "help": "make help"
+  },
+  "worktree": {
+    "support_level": "worktree-ready",
+    "isolation_dimensions": [
+      "runtime-names",
+      "ports",
+      "dependency-stores",
+      "caches",
+      "generated-output",
+      "cleanup",
+      "diagnostics"
+    ],
+    "diagnostics": [
+      "make worktree-info",
+      "make worktree-doctor"
+    ],
+    "cleanup": [
+      "make clean-worktree"
+    ]
+  },
+  "variables": [
+    {
+      "name": "project_name",
+      "required": true,
+      "validator": "project-name"
+    },
+    {
+      "name": "module_name",
+      "required": true,
+      "prompt": "Go module name: ",
+      "validator": "go-module"
+    },
+    {
+      "name": "service_name",
+      "required": false,
+      "default_from": "project_name",
+      "validator": "slug"
+    },
+    {
+      "name": "proto_package",
+      "required": true,
+      "prompt": "Proto package: ",
+      "validator": "protobuf-package"
+    },
+    {
+      "name": "http_port",
+      "required": false,
+      "default": "8080",
+      "validator": "port"
+    },
+    {
+      "name": "grpc_port",
+      "required": false,
+      "default": "9090",
+      "validator": "port"
+    },
+    {
+      "name": "otel_exporter_endpoint",
+      "required": false,
+      "default": "http://localhost:4318",
+      "validator": "url",
+      "contexts": [
+        "JSON",
+        "DOCKER"
+      ]
+    },
+    {
+      "name": "database",
+      "required": false,
+      "default": "none",
+      "validator": "choice",
+      "choices": [
+        "none",
+        "postgres"
+      ]
+    },
+    {
+      "name": "cache",
+      "required": false,
+      "default": "none",
+      "validator": "choice",
+      "choices": [
+        "none",
+        "redis"
+      ]
+    }
+  ],
+  "next_steps": [
+    "make bootstrap",
+    "make dev",
+    "make verify",
+    "make up",
+    "make docker-build"
+  ],
+  "contracts": [
+    "docker-compose",
+    "go-backend"
+  ],
+  "required_entries": [
+    "api/buf.gen.yaml",
+    "api/buf.yaml",
+    "api/proto/service/v1/service.proto",
+    "internal/transport/grpc.go",
+    "internal/transport/ping.go",
+    "internal/runtime/server.go",
+    "internal/runtime/server_test.go",
+    "tests/server_test.go",
+    "scripts/verify-container",
+    ".github/workflows/verify.yml"
+  ],
+  "rule": "microservice",
+  "derived_outputs": [
+    "database_dsn",
+    "cache_dsn",
+    "service_type_name"
+  ],
+  "render_outputs": [
+    "component_environment",
+    "component_services",
+    "component_dependencies"
+  ]
+}

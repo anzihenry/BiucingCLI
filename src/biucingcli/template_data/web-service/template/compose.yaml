@@ -4,11 +4,20 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}
+        BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26.8-alpine}
         RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
     image: ${IMAGE:-{{SERVICE_NAME}}}:${TAG:-latest}
     ports:
       - "${HOST_PORT:-{{HTTP_PORT}}}:{{HTTP_PORT}}"
     environment:
+{{COMPONENT_ENVIRONMENT}}
       CONFIG_FILE: /app/configs/config.yaml
+      SERVICE_NAME: ${SERVICE_NAME:-{{SERVICE_NAME}}}
+      HTTP_PORT: "{{HTTP_PORT}}"
+    depends_on: {{COMPONENT_DEPENDENCIES}}
     stop_grace_period: 15s
+
+{{COMPONENT_SERVICES}}
+
+volumes:
+  postgres-data:

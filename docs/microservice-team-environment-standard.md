@@ -1,5 +1,7 @@
 # Microservice Team Environment Standard
 
+> 通用架构及 Docker 开发/部署目标见[后端服务整体架构](backend-service-architecture.md)。本文件保留既有环境细节；与新目标冲突时以整体架构为准，实际支持仍以生成项目验证为准。
+
 ## Goal
 
 This document defines a standard development environment for a mid-sized Go microservice team.
@@ -186,7 +188,7 @@ Use this when each repository contains one deployable microservice, but every re
 └── README.md
 ```
 
-For BiucingCLI, the first `microservice` template should target Option B. It keeps the generated project understandable while still standardizing the contract, observability, and orchestration surfaces that distinguish a microservice from a plain web service.
+For BiucingCLI, the first `micro-service` template should target Option B. It keeps the generated project understandable while still standardizing the contract, observability, and orchestration surfaces that distinguish a microservice from a plain web service.
 
 ## Directory Rules
 
@@ -336,7 +338,7 @@ Expected flow:
 
 The existing `web-service` template should remain the lightweight single-service starter for straightforward HTTP backends.
 
-The future `microservice` template should be positioned differently:
+The future `micro-service` template should be positioned differently:
 
 - stronger contract-first workflow;
 - local multi-service orchestration by default;
@@ -361,6 +363,6 @@ Not recommended for version one:
 Recommended rollout:
 
 1. Add a microservice environment standard document.
-2. Add a matching `microservice` template design doc.
+2. Add a matching `micro-service` template design doc.
 3. Implement a single-service microservice starter with protobuf, buf, compose, and telemetry scaffolding.
 4. Validate that generated output supports both `make run` and `make up`.

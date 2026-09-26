@@ -22,13 +22,22 @@ func (handler UserHandler) RegisterRoutes(group *gin.RouterGroup) {
 }
 
 func (handler UserHandler) ListUsers(ctx *gin.Context) {
+	users, err := handler.service.ListUsers(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list users"})
+		return
+	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"items": handler.service.ListUsers(),
+		"items": users,
 	})
 }
 
 func (handler UserHandler) GetUser(ctx *gin.Context) {
-	user, found := handler.service.GetUser(ctx.Param("id"))
+	user, found, err := handler.service.GetUser(ctx.Request.Context(), ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user"})
+		return
+	}
 	if !found {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": "user not found",

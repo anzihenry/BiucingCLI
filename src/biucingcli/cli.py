@@ -42,7 +42,6 @@ from biucingcli.template_rules.apple import (
     apple_platform_snippets as apple_platform_snippets,
 )
 from biucingcli.template_rules.android import default_kotlin_module_name as default_kotlin_module_name
-from biucingcli.template_rules.microservice import microservice_dependency_config as microservice_dependency_config
 
 
 def parse_set_values(items: list[str]) -> dict[str, str]:
@@ -165,11 +164,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     create_parser.add_argument("--grpc-port", help="gRPC port for microservice projects.")
     create_parser.add_argument("--proto-package", help="Proto package for microservice projects.")
-    create_parser.add_argument(
-        "--dependency-store",
-        choices=["postgres", "redis"],
-        help="Local dependency store for microservice projects.",
-    )
+    create_parser.add_argument("--database", choices=["none", "postgres"], help="Database component (web-service requires postgres).")
+    create_parser.add_argument("--cache", choices=["none", "redis"], help="Optional cache component.")
     create_parser.add_argument(
         "--otel-exporter-endpoint",
         help="OpenTelemetry exporter endpoint for microservice projects.",
@@ -234,7 +230,8 @@ CLI_VARIABLE_ARGUMENTS = {
     "shutdown_timeout_seconds": "shutdown_timeout_seconds",
     "grpc_port": "grpc_port",
     "proto_package": "proto_package",
-    "dependency_store": "dependency_store",
+    "database": "database",
+    "cache": "cache",
     "otel_exporter_endpoint": "otel_exporter_endpoint",
     "apple_platform": "platform",
     "bundle_identifier": "bundle_identifier",

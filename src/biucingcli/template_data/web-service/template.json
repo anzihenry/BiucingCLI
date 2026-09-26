@@ -33,7 +33,8 @@
   },
   "operating_assumptions": [
     "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
-    "Generated projects are expected to keep config, build, and verification workflows repo-local."
+    "Generated projects are expected to keep config, build, and verification workflows repo-local.",
+    "Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages."
   ],
   "workflow_labels": [
     "bootstrap",
@@ -93,6 +94,25 @@
       "required": false,
       "default": "8080",
       "validator": "port"
+    },
+    {
+      "name": "database",
+      "required": false,
+      "default": "postgres",
+      "validator": "choice",
+      "choices": [
+        "postgres"
+      ]
+    },
+    {
+      "name": "cache",
+      "required": false,
+      "default": "none",
+      "validator": "choice",
+      "choices": [
+        "none",
+        "redis"
+      ]
     }
   ],
   "next_steps": [
@@ -108,9 +128,18 @@
   ],
   "required_entries": [
     "internal/runtime/server.go",
-    "internal/runtime/server_test.go"
+    "internal/runtime/server_test.go",
+    "scripts/verify-container",
+    ".github/workflows/verify.yml"
   ],
-  "rule": null,
-  "derived_outputs": [],
-  "render_outputs": []
+  "rule": "backend",
+  "derived_outputs": [
+    "database_dsn",
+    "cache_dsn"
+  ],
+  "render_outputs": [
+    "component_environment",
+    "component_services",
+    "component_dependencies"
+  ]
 }

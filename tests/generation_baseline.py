@@ -22,9 +22,11 @@ CASES = {
 for platform in ("ios", "macos", "watchos", "tvos"):
     CASES[f"apple-{platform}"] = ["apple", "--bundle-identifier", "com.example.demo",
                                  "--platform", platform]
-for store in ("postgres", "redis"):
-    CASES[f"microservice-{store}"] = ["microservice", "--module-name", "example.com/demo",
-                                     "--proto-package", "demo.v1", "--dependency-store", store]
+for database in ("none", "postgres"):
+    for cache in ("none", "redis"):
+        CASES[f"micro-service-{database}-{cache}"] = ["micro-service", "--module-name", "example.com/demo",
+            "--proto-package", "demo.v1", "--database", database, "--cache", cache]
+CASES["web-service-redis"] = ["web-service", "--module-name", "example.com/demo", "--cache", "redis"]
 
 
 def inventory(root):

@@ -745,7 +745,7 @@
       ]
     },
     {
-      "name": "microservice",
+      "name": "micro-service",
       "description": "Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry",
       "stack": [
         "Go",
@@ -803,7 +803,8 @@
       },
       "operating_assumptions": [
         "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
-        "Generated projects are expected to validate protobuf, service runtime, and container packaging together."
+        "Generated projects are expected to validate protobuf, service runtime, and container packaging together.",
+        "Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages."
       ],
       "workflow_labels": [
         "bootstrap",
@@ -880,20 +881,6 @@
           "maximum": 65535
         },
         {
-          "name": "dependency_store",
-          "required": false,
-          "default": "postgres",
-          "default_from": null,
-          "prompt": null,
-          "validator": "choice",
-          "choices": [
-            "postgres",
-            "redis"
-          ],
-          "minimum": null,
-          "maximum": null
-        },
-        {
           "name": "otel_exporter_endpoint",
           "required": false,
           "default": "http://localhost:4318",
@@ -901,6 +888,34 @@
           "prompt": null,
           "validator": "url",
           "choices": [],
+          "minimum": null,
+          "maximum": null
+        },
+        {
+          "name": "database",
+          "required": false,
+          "default": "none",
+          "default_from": null,
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "none",
+            "postgres"
+          ],
+          "minimum": null,
+          "maximum": null
+        },
+        {
+          "name": "cache",
+          "required": false,
+          "default": "none",
+          "default_from": null,
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "none",
+            "redis"
+          ],
           "minimum": null,
           "maximum": null
         }
@@ -966,7 +981,8 @@
       },
       "operating_assumptions": [
         "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
-        "Generated projects are expected to keep config, build, and verification workflows repo-local."
+        "Generated projects are expected to keep config, build, and verification workflows repo-local.",
+        "Database and cache are independent components. P0 configures local infrastructure only; persistence, sessions and authentication require later architecture stages."
       ],
       "workflow_labels": [
         "bootstrap",
@@ -1019,6 +1035,33 @@
           "choices": [],
           "minimum": 1,
           "maximum": 65535
+        },
+        {
+          "name": "database",
+          "required": false,
+          "default": "postgres",
+          "default_from": null,
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "postgres"
+          ],
+          "minimum": null,
+          "maximum": null
+        },
+        {
+          "name": "cache",
+          "required": false,
+          "default": "none",
+          "default_from": null,
+          "prompt": null,
+          "validator": "choice",
+          "choices": [
+            "none",
+            "redis"
+          ],
+          "minimum": null,
+          "maximum": null
         }
       ],
       "next_steps": [

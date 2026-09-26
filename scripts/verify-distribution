@@ -26,7 +26,7 @@ EXPECTED_TEMPLATES = {
     "apple",
     "frontend",
     "harmonyos",
-    "microservice",
+    "micro-service",
     "web-service",
     "worker",
 }
@@ -165,7 +165,7 @@ def main() -> None:
         create_commands = {
             "frontend": [],
             "web-service": ["--module-name", "github.com/example/audit-web"],
-            "microservice": [
+            "micro-service": [
                 "--module-name",
                 "github.com/example/audit-microservice",
                 "--proto-package",

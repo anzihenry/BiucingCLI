@@ -1,16 +1,17 @@
-ARG BUILDER_IMAGE=golang:1.26-alpine
+ARG BUILDER_IMAGE=golang:1.26.8-alpine
 ARG RUNTIME_IMAGE=alpine:3.20
 
 FROM ${BUILDER_IMAGE} AS builder
 
 WORKDIR /app
 
+ARG TARGETARCH
 ARG GOPROXY=https://proxy.golang.org,direct
 ARG GOSUMDB=sum.golang.org
 ENV GOPROXY=${GOPROXY}
 ENV GOSUMDB=${GOSUMDB}
 
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN set -eux; \
     attempt=1; \
     until go mod download; do \

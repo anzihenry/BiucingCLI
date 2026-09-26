@@ -92,7 +92,7 @@ BiucingCLI focuses on a small set of templates that match the maintainer's real 
 
 - `frontend`: React Router Framework Mode CSR/SSG/SSR, React 19.3, TypeScript 7, Tailwind 4 and shadcn/ui; shared pnpm lockfile, Vitest and Playwright checks
 - `web-service`: Go + Gin web service starter with Docker development/runtime workflows
-- `microservice`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
+- `micro-service`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
 - `worker`: Go background worker starter with scheduled and oneshot execution modes
 - `apple`: Swift 6.4 + SwiftUI + Tuist + SafeDI starter generating four thin Apple shells, versioned static XCFramework components, exact locks and a portable C++20 core; Android/HarmonyOS adapters remain future integrations
 - `android`: Kotlin + Gradle + Jetpack Compose Android app starter with fastlane and a committed Gradle wrapper
@@ -112,7 +112,7 @@ The value is not broad ecosystem coverage. The value is generating starters that
 biucing list
 biucing info frontend
 biucing info web-service
-biucing info microservice
+biucing info micro-service
 biucing info worker
 biucing info apple
 biucing info android
@@ -121,7 +121,7 @@ biucing create frontend my-app --dry-run
 biucing create web-service user-service --plan --json
 biucing create frontend my-app
 biucing create web-service user-service
-biucing create microservice user-service
+biucing create micro-service user-service
 biucing create worker email-worker
 biucing create apple my-apple-app
 biucing create android my-android-app
@@ -134,7 +134,7 @@ This repository contains a small internal template system with practical starter
 
 - `frontend`
 - `web-service`
-- `microservice`
+- `micro-service`
 - `worker`
 - `apple`
 - `android`
@@ -142,7 +142,7 @@ This repository contains a small internal template system with practical starter
 
 The current maturity split is:
 
-- `frontend`, `web-service`, and `microservice` include Docker development, verification, and runtime workflows. The migrated frontend's current verification limits are recorded in the [rendering plan](docs/frontend-rendering-plan.md).
+- `frontend`, `web-service`, and `micro-service` include Docker development, verification, and runtime workflows. The migrated frontend's current verification limits are recorded in the [rendering plan](docs/frontend-rendering-plan.md).
 - `worker` is a backend-adjacent starter for scheduled and oneshot background execution, with generated-project `go test ./...` validation and Docker packaging.
 - `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
 - `harmonyos` is an experimental native starter for ArkTS/ArkUI projects that open in DevEco Studio and expose bootstrap, doctor, lint, build, and signing guidance workflows.
@@ -217,6 +217,11 @@ Local HarmonyOS validation status:
 - [Roadmap](docs/roadmap.md)
 - [Template System](docs/template-system.md)
 - [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
+- [后端服务整体架构（通用组件与 Docker 开发/部署）](docs/backend-service-architecture.md)
+- [后端服务工程契约与 P0 选型](docs/backend-service-engineering-contract.md)
+- [后端服务架构实施任务（阶段、依赖与验收）](docs/backend-service-implementation-tasks.md)
+- [Web Service 架构（终端用户入口）](docs/web-service-architecture.md)
+- [Micro Service 架构（服务间调用入口）](docs/micro-service-architecture.md)
 - [Microservice Team Environment Standard](docs/microservice-team-environment-standard.md)
 - [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
 - [Apple 四平台壳工程与组件架构（已确认目标）](docs/apple-shell-component-architecture.md)
@@ -227,4 +232,4 @@ Local HarmonyOS validation status:
 - [HarmonyOS shell/component architecture](docs/harmonyos-shell-component-architecture.md)
 - [HarmonyOS component verification](docs/harmonyos-component-verification.md)
 - [Android Template Design](docs/android-template-design.md)
-- [Microservice Template Design](docs/microservice-template-design.md)
+- [Microservice Template Design（历史 starter 设计）](docs/microservice-template-design.md)

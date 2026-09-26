@@ -7,6 +7,7 @@ import (
 )
 
 func TestLoadDefaultConfig(t *testing.T) {
+	t.Setenv("CONFIG_FILE", "")
 	tempDir := t.TempDir()
 	configDir := filepath.Join(tempDir, "configs")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
@@ -84,5 +85,70 @@ func TestLoadUsesConfigFileOverride(t *testing.T) {
 
 	if cfg.Service.Port != "9090" {
 		t.Fatalf("expected service port %q, got %q", "9090", cfg.Service.Port)
+	}
+}
+
+func TestLoadUsesDeploymentOverrides(t *testing.T) {
+	configFile := filepath.Join(t.TempDir(), "config.yaml")
+	if err := os.WriteFile(configFile, []byte("service:\n  name: local\n  port: 8080\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", configFile)
+	t.Setenv("SERVICE_NAME", "deployed")
+	t.Setenv("HTTP_PORT", "9090")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Service.Name != "deployed" || cfg.Service.Port != "9090" {
+		t.Fatalf("unexpected deployment overrides: %+v", cfg.Service)
+	}
+}
+
+func TestLoadRejectsInvalidPort(t *testing.T) {
+	configFile := filepath.Join(t.TempDir(), "config.yaml")
+	if err := os.WriteFile(configFile, []byte("service:\n  name: local\n  port: 8080\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", configFile)
+	t.Setenv("HTTP_PORT", "invalid")
+	if _, err := Load(); err == nil {
+		t.Fatal("expected invalid HTTP_PORT to fail")
+	}
+}
+
+func TestComponentEnvironmentOverridesAreIndependent(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "components.yaml")
+	data := []byte("service:\n  name: components\ndatabase:\n  driver: postgres\ncache:\n  driver: redis\n")
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", path)
+	t.Setenv("DATABASE_DSN", "postgres://db.example/test")
+	t.Setenv("CACHE_DSN", "redis://cache.example/1")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Database.DSN != "postgres://db.example/test" || cfg.Cache.DSN != "redis://cache.example/1" {
+		t.Fatal("component configuration crossed database/cache boundaries")
+	}
+}
+
+func TestDisabledComponentsIgnoreStaleDSNs(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "components.yaml")
+	data := []byte("service:\n  name: components\ndatabase:\n  driver: none\ncache:\n  driver: none\n")
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("CONFIG_FILE", path)
+	t.Setenv("DATABASE_DSN", "postgres://stale/test")
+	t.Setenv("CACHE_DSN", "redis://stale/0")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Database.DSN != "" || cfg.Cache.DSN != "" {
+		t.Fatal("disabled component retained a DSN")
 	}
 }

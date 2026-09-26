@@ -160,7 +160,7 @@ class EscapingTests(unittest.TestCase):
     def test_endpoint_is_quoted_and_preserved_in_yaml_and_go(self):
         value = r'https://example.com/a"b\c?q=$HOME&x=1#frag'
         with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
-            main(["create", "microservice", "demo", "--output-dir", tmp,
+            main(["create", "micro-service", "demo", "--output-dir", tmp,
                   "--module-name", "example.com/demo", "--proto-package", "demo.v1",
                   "--otel-exporter-endpoint", value, "--non-interactive"])
             project = Path(tmp) / "demo"

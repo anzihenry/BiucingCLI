@@ -47,6 +47,9 @@ class CLIErrorTests(unittest.TestCase):
 
     def test_domain_errors_are_json(self):
         self.assert_json_error(self.invoke("info", "missing", "--json"), "unknown_template")
+        self.assert_json_error(self.invoke("info", "microservice", "--json"), "unknown_template")
+        self.assert_json_error(self.invoke("create", "microservice", "demo", "--json"),
+                               "unknown_template")
         self.assert_json_error(self.invoke("create", "frontend", "demo", "--set", "bad",
                                            "--json"), "invalid_input")
         with tempfile.TemporaryDirectory() as tmp:

@@ -155,7 +155,7 @@ Rules:
 
 Practical expectation:
 
-- `frontend`, `web-service`, `microservice` should keep their Docker-based proof current;
+- `frontend`, `web-service`, `micro-service` should keep their Docker-based proof current;
 - `worker` should keep its generated-project `go test ./...` proof current;
 - `apple`, `android`, and `harmonyos` should label native proof as `static`, `doctor`, or `real-build`;
 - `make -n` proof for native templates is useful static evidence, but it is never a real build;

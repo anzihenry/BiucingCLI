@@ -3,6 +3,6 @@ Available templates:
 - apple: Four Apple shells with versioned static component SDKs and a portable C++20 core
 - frontend: React Router + TypeScript + Tailwind starter for independent projects
 - harmonyos: ArkTS HarmonyOS app starter for DevEco Studio projects
-- microservice: Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry
+- micro-service: Go microservice starter with Protobuf, Buf, Compose, and OpenTelemetry
 - web-service: Go + Gin web service starter
 - worker: Go background worker starter with scheduled and oneshot execution modes

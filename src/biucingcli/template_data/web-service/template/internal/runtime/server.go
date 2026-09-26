@@ -30,7 +30,8 @@ func CheckHealth(ctx context.Context, url string) error {
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
+	// The probe only checks status; closing an unread response cannot change that result.
+	defer func() { _ = response.Body.Close() }()
 	if response.StatusCode != http.StatusOK {
 		return errors.New("health endpoint returned " + response.Status)
 	}

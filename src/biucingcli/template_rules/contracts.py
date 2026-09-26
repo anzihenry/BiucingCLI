@@ -14,7 +14,7 @@ BUILTIN_CONTRACTS = MappingProxyType({
     "frontend": frozenset({"docker-compose"}),
     "web-service": frozenset({"docker-compose", "go-backend"}),
     "worker": frozenset({"docker-compose", "go-backend"}),
-    "microservice": frozenset({"docker-compose", "go-backend"}),
+    "micro-service": frozenset({"docker-compose", "go-backend"}),
     "apple": frozenset({"native-tools"}),
     "android": frozenset({"native-tools"}),
     "harmonyos": frozenset({"native-tools"}),

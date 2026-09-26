@@ -42,7 +42,7 @@ class CatalogTests(unittest.TestCase):
     def test_bundled_catalog_is_sorted_and_independent_of_cwd(self):
         definitions = catalog.load_templates()
         names = [item.name for item in definitions]
-        self.assertEqual(names, sorted(["frontend", "web-service", "microservice", "worker",
+        self.assertEqual(names, sorted(["frontend", "web-service", "micro-service", "worker",
                                        "apple", "android", "harmonyos"]))
         for definition in definitions:
             self.assertIsInstance(definition, models.TemplateDefinition)

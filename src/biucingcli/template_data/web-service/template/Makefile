@@ -12,6 +12,7 @@ CONTAINER_PORT ?={{HTTP_PORT}}
 HOST_PORT ?={{HTTP_PORT}}
 DEV_COMPOSE_FILE ?=compose.dev.yaml
 DEV_SERVICE ?=app-dev
+RUN_FLAGS ?=--rm
 DOCKER_VARIANT ?=alpine
 DOCKER_PLATFORM ?=linux/arm64
 GOPROXY ?=https://proxy.golang.org,direct
@@ -29,10 +30,10 @@ export GOMODCACHE
 export GOLANGCI_LINT_CACHE
 
 ifeq ($(DOCKER_VARIANT),ubuntu)
-BUILDER_IMAGE ?= public.ecr.aws/docker/library/golang:1.26
+BUILDER_IMAGE ?= public.ecr.aws/docker/library/golang:1.26.8
 RUNTIME_IMAGE ?= public.ecr.aws/docker/library/ubuntu:26.04
 else
-BUILDER_IMAGE ?= golang:1.26-alpine
+BUILDER_IMAGE ?= golang:1.26.8-alpine
 RUNTIME_IMAGE ?= alpine:3.20
 endif
 
@@ -72,30 +73,30 @@ bootstrap:
 	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) build $(DEV_SERVICE)
 
 doctor:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) ./scripts/doctor
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) ./scripts/doctor
 
 dev:
 	GOPROXY=$(GOPROXY) GOSUMDB=$(GOSUMDB) $(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE)
 
 dev-shell:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) bash
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) bash
 
 tidy:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go mod tidy
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) go mod tidy
 
 lint:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) golangci-lint run --disable-all --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...
 
 test:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go test ./...
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) go test ./...
 
 verify: doctor lint test build
 
 run:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm --service-ports $(DEV_SERVICE)
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) --service-ports $(DEV_SERVICE)
 
 build:
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
+	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run $(RUN_FLAGS) $(DEV_SERVICE) go build -o bin/$(APP_NAME) ./cmd/server
 
 clean:
 	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down --remove-orphans

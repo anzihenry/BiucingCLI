@@ -61,9 +61,9 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
         self.assertIn("compatible_sdk_version", output)
 
     def test_info_prints_microservice_template_details(self):
-        output = self.run_cli(["info", "microservice"])
+        output = self.run_cli(["info", "micro-service"])
 
-        self.assertIn("Template: microservice", output)
+        self.assertIn("Template: micro-service", output)
         self.assertIn("Go, Gin, Protobuf, Buf, Docker Compose, OpenTelemetry", output)
         self.assertIn("proto_package", output)
         self.assertIn("grpc_port", output)
@@ -203,7 +203,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             output = self.run_cli(
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "demo",
                     "--output-dir",
                     tmpdir,
@@ -214,7 +214,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
                     "--service-name",
                     "  api  ",
                     "--set",
-                    "dependency_store= redis ",
+                    "cache= redis ",
                     "--non-interactive",
                     "--plan",
                     "--json",
@@ -226,9 +226,9 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             item for item in payload["resolved_variables"] if item["name"] == "service_name"
         )
         self.assertEqual(service_name["value"], "api")
-        self.assertEqual(payload["derived_values"]["dependency_store"], "redis")
+        self.assertEqual(next(v["value"] for v in payload["resolved_variables"] if v["name"] == "cache"), "redis")
         self.assertEqual(
-            payload["derived_values"]["dependency_store_dsn"],
+            payload["derived_values"]["cache_dsn"],
             "redis://localhost:6379/0",
         )
 
@@ -280,7 +280,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             (
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "bad-proto",
                     "--module-name",
                     "github.com/example/bad-proto",
@@ -460,7 +460,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             output = self.run_cli(
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "prompt-service",
                     "--output-dir",
                     tmpdir,
@@ -475,16 +475,16 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             ).read_text(encoding="utf-8")
             compose_yaml = (project_dir / "deploy" / "compose.yaml").read_text(encoding="utf-8")
 
-            self.assertIn("Created microservice project: prompt-service", output)
+            self.assertIn("Created micro-service project: prompt-service", output)
             self.assertIn("package prompt.v1;", proto_file)
-            self.assertIn("POSTGRES_DB: prompt-service", compose_yaml)
+            self.assertNotIn("POSTGRES_DB:", compose_yaml)
 
     def test_create_microservice_non_interactive_fails_fast(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             code, stdout, stderr = self.run_cli_failure(
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "non-interactive-service",
                     "--output-dir",
                     tmpdir,
@@ -506,7 +506,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             code, stdout, stderr = self.run_cli_failure(
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "needs-values",
                     "--output-dir",
                     tmpdir,
@@ -707,14 +707,18 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             self.assertIn("make docker-build", output)
             self.assertIn("make docker-run", output)
             self.assertIn("github.com/example/user-service", main_go)
-            self.assertIn("ARG BUILDER_IMAGE=golang:1.26-alpine", dockerfile)
+            self.assertIn("ARG BUILDER_IMAGE=golang:1.26.8-alpine", dockerfile)
             self.assertIn("ARG RUNTIME_IMAGE=alpine:3.20", dockerfile)
             self.assertIn("GOOS=linux GOARCH=${TARGETARCH:-amd64}", dockerfile)
+            self.assertIn("ARG TARGETARCH", dockerfile)
+            self.assertIn("COPY go.mod go.sum ./", dockerfile)
+            self.assertIn("golangci-lint run --default=none", makefile)
+            self.assertIn("SERVICE_NAME: ${SERVICE_NAME:-user-service}", compose_yaml)
             self.assertIn("EXPOSE 8080", dockerfile)
             self.assertIn("HEALTHCHECK", dockerfile)
             self.assertIn("http://127.0.0.1:8080/healthz", dockerfile)
             self.assertIn('["/app/server", "healthcheck"', dockerfile)
-            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}", compose_yaml)
+            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26.8-alpine}", compose_yaml)
             self.assertIn("RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}", compose_yaml)
             self.assertIn("image: ${IMAGE:-user-service}:${TAG:-latest}", compose_yaml)
             self.assertIn('- "${HOST_PORT:-8080}:8080"', compose_yaml)
@@ -781,7 +785,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             self.assertIn("make dev", readme)
             self.assertIn("scripts/bootstrap", readme)
             self.assertIn('brew "golangci-lint"', brewfile)
-            self.assertIn('go = "1.26.0"', mise_toml)
+            self.assertIn('go = "1.26.8"', mise_toml)
             self.assertIn("go 1.26.0", (project_dir / "go.mod").read_text(encoding="utf-8"))
             self.assertIn("github.com/gin-gonic/gin v1.10.0", go_sum)
             self.assertIn("yaml.Unmarshal", config_go)
@@ -814,7 +818,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             self.assertIn('group.GET("/ping"', ping_handler)
             self.assertIn('Message: "pong"', ping_service)
             self.assertIn('group.GET("/users"', user_handler)
-            self.assertIn("ListUsers() []model.User", user_service)
+            self.assertIn("ListUsers(ctx context.Context) ([]model.User, error)", user_service)
             self.assertIn("Ada Lovelace", user_repository)
             self.assertIn("type User struct", user_model)
             self.assertTrue(os.access(project_dir / "scripts" / "bootstrap", os.X_OK))

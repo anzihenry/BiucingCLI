@@ -1,10 +1,14 @@
 package repository
 
-import "{{MODULE_NAME}}/internal/model"
+import (
+	"context"
+
+	"{{MODULE_NAME}}/internal/model"
+)
 
 type UserRepository interface {
-	List() []model.User
-	GetByID(id string) (model.User, bool)
+	List(ctx context.Context) ([]model.User, error)
+	GetByID(ctx context.Context, id string) (model.User, bool, error)
 }
 
 type inMemoryUserRepository struct {
@@ -20,18 +24,24 @@ func NewUserRepository() UserRepository {
 	}
 }
 
-func (repository inMemoryUserRepository) List() []model.User {
+func (repository inMemoryUserRepository) List(ctx context.Context) ([]model.User, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	users := make([]model.User, len(repository.users))
 	copy(users, repository.users)
-	return users
+	return users, nil
 }
 
-func (repository inMemoryUserRepository) GetByID(id string) (model.User, bool) {
+func (repository inMemoryUserRepository) GetByID(ctx context.Context, id string) (model.User, bool, error) {
+	if err := ctx.Err(); err != nil {
+		return model.User{}, false, err
+	}
 	for _, user := range repository.users {
 		if user.ID == id {
-			return user, true
+			return user, true, nil
 		}
 	}
 
-	return model.User{}, false
+	return model.User{}, false, nil
 }

@@ -59,7 +59,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             output = self.run_cli(
                 [
                     "create",
-                    "microservice",
+                    "micro-service",
                     "user-service",
                     "--output-dir",
                     tmpdir,
@@ -69,7 +69,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
                     "user.v1",
                     "--grpc-port",
                     "9191",
-                    "--dependency-store",
+                    "--cache",
                     "redis",
                     "--otel-exporter-endpoint",
                     "http://localhost:14318",
@@ -122,7 +122,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             )
 
             self.assertTrue(project_dir.exists())
-            self.assertIn("Created microservice project: user-service", output)
+            self.assertIn("Created micro-service project: user-service", output)
             self.assertIn("make dev", output)
             self.assertIn("make verify", output)
             self.assertIn("make up", output)
@@ -130,7 +130,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("Docker Workflow", readme)
             self.assertIn("make dev-shell", readme)
             self.assertIn("Proto package: `user.v1`", readme)
-            self.assertIn("Local dependency store: `redis`", readme)
+            self.assertIn("Database: `none`; cache: `redis`", readme)
             self.assertIn("make verify", readme)
             self.assertIn(
                 "the first `make proto` may still fetch remote Buf plugin artifacts",
@@ -143,7 +143,6 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("Go module cache: $(GOMODCACHE)", makefile)
             self.assertIn("GOMODCACHE should stay inside this worktree", makefile)
             self.assertIn("WORKTREE_LABEL ?=$(shell basename", makefile)
-            self.assertIn("HOST_DEPENDENCY_STORE_PORT ?=6379", makefile)
             self.assertIn("HOST_OTEL_GRPC_PORT ?=4317", makefile)
             self.assertIn("HOST_OTEL_HTTP_PORT ?=4318", makefile)
             self.assertIn("worktree-info:", makefile)
@@ -151,21 +150,20 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("clean-worktree:", makefile)
             self.assertIn("Warning: HOST_HTTP_PORT $(HOST_HTTP_PORT) is already in use.", makefile)
             self.assertIn("Suggested override: HOST_HTTP_PORT=$$(( $(HOST_HTTP_PORT) + 10000 )) make dev", makefile)
-            self.assertIn("Suggested override: HOST_DEPENDENCY_STORE_PORT=$$(( $(HOST_DEPENDENCY_STORE_PORT) + 10000 )) make dev", makefile)
             self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) config", makefile)
-            self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) redis otel-collector", makefile)
-            self.assertIn('bash -lc "cd api && buf generate"', makefile)
-            self.assertIn('bash -lc "cd api && buf lint && cd .. && golangci-lint run', makefile)
+            self.assertIn("$(COMPOSE) -f $(DEV_COMPOSE_FILE) up $(DEV_SERVICE) otel-collector", makefile)
+            self.assertIn('bash -c "cd api && buf generate"', makefile)
+            self.assertIn('bash -c "cd api && buf lint && cd .. && golangci-lint run', makefile)
             self.assertIn("test: proto", makefile)
             self.assertIn("build: proto", makefile)
             self.assertIn("docker-build: proto", makefile)
             self.assertIn("HOST_GRPC_PORT ?=9191", makefile)
-            self.assertIn("BUILDER_IMAGE ?= golang:1.26-alpine", makefile)
+            self.assertIn("BUILDER_IMAGE ?= golang:1.26.8-alpine", makefile)
             self.assertIn("EXPOSE 9191", dockerfile)
             self.assertIn("HEALTHCHECK", dockerfile)
             self.assertIn("http://127.0.0.1:8080/healthz", dockerfile)
             self.assertIn('["/app/server", "healthcheck"', dockerfile)
-            self.assertIn("ARG BUILDER_IMAGE=golang:1.26-alpine", dockerfile)
+            self.assertIn("ARG BUILDER_IMAGE=golang:1.26.8-alpine", dockerfile)
             self.assertIn("ARG BUF_VERSION=1.70.0", dockerfile_dev)
             self.assertIn("ARG GOLANGCI_LINT_VERSION=2.12.2", dockerfile_dev)
             self.assertIn("ARG GOPROXY=https://proxy.golang.org,direct", dockerfile_dev)
@@ -179,22 +177,22 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("GOPROXY: ${GOPROXY:-https://proxy.golang.org,direct}", compose_dev)
             self.assertIn("GOSUMDB: ${GOSUMDB:-sum.golang.org}", compose_dev)
             self.assertIn("GOMODCACHE: /workspace/.cache/go-mod", compose_dev)
-            self.assertIn("microservice-go-mod:/workspace/.cache/go-mod", compose_dev)
+            self.assertIn("micro-service-go-mod:/workspace/.cache/go-mod", compose_dev)
             self.assertIn("otel/opentelemetry-collector-contrib:0.126.0", compose_dev)
-            self.assertIn("STORE_DSN: redis://redis:6379/0", compose_dev)
+            self.assertIn('CACHE_DSN: "redis://redis:6379/0"', compose_dev)
             self.assertIn("stop_grace_period: 15s", compose_dev)
             self.assertIn('cmd = "go build -o ./tmp/server ./cmd/server"', air_toml)
             self.assertIn("include_ext = [\"go\", \"yaml\", \"proto\"]", air_toml)
             self.assertIn(".cache/", dockerignore)
             self.assertIn('image: ${IMAGE:-user-service}:${TAG:-latest}', compose_yaml)
             self.assertIn('- "${HOST_GRPC_PORT:-9191}:9191"', compose_yaml)
-            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26-alpine}", compose_yaml)
-            self.assertIn("STORE_DSN: redis://redis:6379/0", compose_yaml)
+            self.assertIn("BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26.8-alpine}", compose_yaml)
+            self.assertIn('CACHE_DSN: "redis://redis:6379/0"', compose_yaml)
             self.assertIn("stop_grace_period: 15s", compose_yaml)
-            self.assertIn("image: redis:7-alpine", compose_yaml)
+            self.assertIn("image: redis:7.4.2-alpine", compose_yaml)
             self.assertNotIn("POSTGRES_PASSWORD", compose_yaml)
             self.assertIn("driver: redis", config_yaml)
-            self.assertIn("dsn: redis://localhost:6379/0", config_yaml)
+            self.assertIn('dsn: "redis://localhost:6379/0"', config_yaml)
             self.assertIn('otlp_http_endpoint: "http://localhost:14318"', config_yaml)
             self.assertIn("shutdown_timeout_seconds: 10", config_yaml)
             self.assertIn("package user.v1;", proto_file)
@@ -204,7 +202,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("PACKAGE_DIRECTORY_MATCH", buf_yaml)
             self.assertIn("remote: buf.build/protocolbuffers/go", buf_gen)
             self.assertIn("remote: buf.build/grpc/go", buf_gen)
-            self.assertIn('go = "1.26.0"', mise_toml)
+            self.assertIn('go = "1.26.8"', mise_toml)
             self.assertIn("go 1.26.0", go_mod)
             self.assertIn("go.opentelemetry.io/otel v1.43.0", go_sum)
             self.assertIn("telemetry.Setup", main_go)
@@ -223,7 +221,7 @@ class ServiceOutputTests(CLIHelpers, unittest.TestCase):
             self.assertIn("UnimplementedUserServiceServiceServer", grpc_ping_transport)
             self.assertIn("func (server *pingServer) Ping(", grpc_ping_transport)
             self.assertIn("servicev1.PingResponse", grpc_ping_transport)
-            self.assertIn('cfg.Store.Driver = "redis"', config_go)
+            self.assertIn('cfg.Cache.Driver = "redis"', config_go)
             self.assertIn('cfg.Telemetry.OTLPHTTPEndpoint = "http://localhost:14318"', config_go)
             self.assertIn("TestLoadUsesEnvironmentOverrides", config_test)
             self.assertIn("TestLoadRejectsNegativeTimeout", config_test)
