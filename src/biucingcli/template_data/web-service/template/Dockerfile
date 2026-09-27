@@ -28,11 +28,18 @@ ARG COMMIT=unknown
 ARG BUILT_AT=unknown
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -buildvcs=false -trimpath -ldflags="-X {{MODULE_NAME}}/internal/runtime.Version=${VERSION} -X {{MODULE_NAME}}/internal/runtime.Commit=${COMMIT} -X {{MODULE_NAME}}/internal/runtime.BuiltAt=${BUILT_AT}" -o /out/server ./cmd/server
 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -trimpath -o /out/migrate ./cmd/migrate
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -trimpath -o /out/session-cleanup ./cmd/session-cleanup
+
 FROM ${RUNTIME_IMAGE}
 
 WORKDIR /app
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /out/server /app/server
+COPY --from=builder /out/migrate /app/migrate
+COPY --from=builder /out/session-cleanup /app/session-cleanup
 COPY configs/config.yaml /app/configs/config.yaml
 
 EXPOSE {{HTTP_PORT}}

@@ -13,7 +13,7 @@ Stack: Go, Gin
 Operating assumptions:
 - The starter is optimized for Go service development with Docker-based dev and runtime flows.
 - Generated projects are expected to keep config, build, and verification workflows repo-local.
-- Database and cache are independent components. P1 provides guarded runtime infrastructure only; persistence, sessions and authentication require later architecture stages.
+- Database and cache are independent components. P2 adds PostgreSQL/migration and protocol identity foundations; production delivery, full telemetry and HA remain later architecture stages.
 Worktree diagnostics:
 - make worktree-info
 - make worktree-doctor
@@ -27,8 +27,7 @@ Variables:
 - database (optional, default=postgres)
 - cache (optional, default=none)
 Next steps:
-- make bootstrap
-- make dev
-- make verify
-- make docker-build
-- make docker-run
+- ./scripts/task bootstrap
+- ./scripts/task dev
+- ./scripts/task verify
+- ./scripts/task image

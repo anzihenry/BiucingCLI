@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -15,18 +16,30 @@ import (
 )
 
 type Gate struct {
-	limits pipeline.Limits
-	slots  chan struct{}
-	policy security.Policy
-	public map[string]bool
-	events *observability.Events
+	authenticate func(context.Context, string) (context.Context, error)
+	limits       pipeline.Limits
+	slots        chan struct{}
+	policy       security.Policy
+	public       map[string]bool
+	events       *observability.Events
 }
 
 func NewGate(limits pipeline.Limits, policy security.Policy, public map[string]bool, events *observability.Events) *Gate {
 	l := limits.Defaults()
-	return &Gate{l, make(chan struct{}, l.Concurrent), policy, public, events}
+	return &Gate{limits: l, slots: make(chan struct{}, l.Concurrent), policy: policy, public: public, events: events}
 }
 func (g *Gate) admit(ctx context.Context, method string) (context.Context, context.CancelFunc, error) {
+	if g.authenticate != nil {
+		verified, err := g.authenticate(ctx, method)
+		if err != nil {
+			code := codes.Unauthenticated
+			if errors.Is(err, security.ErrWorkloadDenied) {
+				code = codes.PermissionDenied
+			}
+			return ctx, func() {}, status.Error(code, "workload denied")
+		}
+		ctx = verified
+	}
 	md, _ := metadata.FromIncomingContext(ctx)
 	value := ""
 	if ids := md.Get("x-request-id"); len(ids) == 1 {
@@ -148,7 +161,12 @@ func publicError(err error) error {
 	if code == codes.Unknown {
 		code = codes.Internal
 	}
-	return status.Error(code, code.String())
+	safe := status.New(code, code.String())
+	withDetails, e := safe.WithDetails(&errdetails.ErrorInfo{Reason: code.String(), Domain: "rpc.service"})
+	if e != nil {
+		return safe.Err()
+	}
+	return withDetails.Err()
 }
 func validateMessage(value any) error {
 	if validator, ok := value.(interface{ Validate() error }); ok && validator.Validate() != nil {

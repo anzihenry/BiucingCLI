@@ -154,3 +154,11 @@ func TestDisabledComponentsIgnoreStaleDSNs(t *testing.T) {
 		t.Fatal("disabled component retained a DSN")
 	}
 }
+
+// Unit fixtures must not inherit the development Compose identity endpoints.
+func TestMain(m *testing.M) {
+	for _, name := range []string{"OIDC_CLIENT_SECRET", "OIDC_CLIENT_SECRET_FILE", "OIDC_ISSUER", "OIDC_JWKS", "OIDC_AUTHORIZE_URL", "OIDC_TOKEN_URL", "WEB_ORIGIN", "OIDC_CALLBACK"} {
+		_ = os.Unsetenv(name)
+	}
+	os.Exit(m.Run())
+}

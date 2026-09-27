@@ -1,0 +1,17 @@
+issuer: http://localhost:5556/dex
+storage:
+  type: memory
+web:
+  http: 0.0.0.0:5556
+staticClients:
+  - id: web-client
+    secret: local-web-secret
+    redirectURIs: ["http://localhost:8080/auth/callback"]
+    name: Local Web
+enablePasswordDB: true
+staticPasswords:
+  - email: developer@example.test
+    # bcrypt for local-only password: local-development-only
+    hash: "$2a$10$FBK93G6RqquzE2mMwUdfouT08cgoP.z.qSEBZ.uRcbl5p0LJlmuoO"
+    username: developer
+    userID: local-developer

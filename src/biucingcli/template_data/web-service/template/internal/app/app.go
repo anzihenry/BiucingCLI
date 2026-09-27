@@ -6,11 +6,14 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"{{MODULE_NAME}}/internal/auth"
 	"{{MODULE_NAME}}/internal/config"
+	"{{MODULE_NAME}}/internal/database"
 	"{{MODULE_NAME}}/internal/observability"
 	"{{MODULE_NAME}}/internal/pipeline"
 	"{{MODULE_NAME}}/internal/router"
 	serverruntime "{{MODULE_NAME}}/internal/runtime"
+	"{{MODULE_NAME}}/internal/security"
 )
 
 // Bind before starting resources; every exit path closes partial initialization.
@@ -30,9 +33,27 @@ func Run(ctx context.Context, cfg config.Config) error {
 	}()
 
 	state := &serverruntime.Readiness{}
+	var store *database.Store
+	if cfg.Database.Driver == "postgres" {
+		store, err = database.Open(ctx, cfg.Database.DSN, cfg.Data)
+		if err != nil {
+			return err
+		}
+		defer store.Close()
+		if err = store.Schema(ctx); err != nil {
+			return err
+		}
+		state.AddCritical(func(check context.Context) bool { return store.Ping(check) == nil && store.Schema(check) == nil })
+	}
 	admin := &http.Server{Handler: state.Handler(), ReadHeaderTimeout: 2 * time.Second, ReadTimeout: 3 * time.Second, WriteTimeout: 3 * time.Second, IdleTimeout: 30 * time.Second}
 	defer func() { _ = admin.Close() }()
-	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Events: events}), limits))
+	var identity *auth.Service
+	if cfg.Auth.Issuer != "" {
+		identity = auth.New(ctx, cfg.Auth, store)
+	}
+	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Events: events, Auth: identity, Policy: func(_ context.Context, p security.Principal, action string) bool {
+		return p.Subject != "" && (action == "GET /auth/session" || action == "POST /auth/logout")
+	}}), limits))
 	defer func() { _ = httpServer.Close() }()
 	child, cancel := context.WithCancel(ctx)
 	defer cancel()

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+mkdir -p .secrets
+if [ -e .secrets/server.key ] && [ "${ROTATE_LOCAL_CERTS:-no}" != yes ]; then echo 'Existing certificates preserved; ROTATE_LOCAL_CERTS=yes renews local leaves.';exit 0;fi
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "$PWD/.secrets:/certs" --entrypoint sh smallstep/step-cli:0.30.6 -ec '
+[ -e /certs/ca.key ] || step certificate create "local test CA" /certs/ca.crt /certs/ca.key --profile root-ca --no-password --insecure
+step certificate create "server" /certs/server.crt /certs/server.key --profile leaf --ca /certs/ca.crt --ca-key /certs/ca.key --san localhost --san {{SERVICE_NAME}} --san spiffe://local/server --not-after 24h --no-password --insecure --force
+step certificate create "client" /certs/client.crt /certs/client.key --profile leaf --ca /certs/ca.crt --ca-key /certs/ca.key --san spiffe://local/client --not-after 24h --no-password --insecure --force
+chmod 600 /certs/*.key
+'

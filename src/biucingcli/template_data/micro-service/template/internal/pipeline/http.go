@@ -31,7 +31,7 @@ func (l Limits) Defaults() Limits {
 	}
 	return l
 }
-func Middleware(limits Limits, public map[string]bool, policy security.Policy, events *observability.Events) gin.HandlerFunc {
+func Middleware(limits Limits, public map[string]bool, policy security.Policy, events *observability.Events, identity ...gin.HandlerFunc) gin.HandlerFunc {
 	l := limits.Defaults()
 	slots := make(chan struct{}, l.Concurrent)
 	return func(c *gin.Context) {
@@ -57,6 +57,16 @@ func Middleware(limits Limits, public map[string]bool, policy security.Policy, e
 			c.AbortWithStatusJSON(429, gin.H{"error": "overloaded"})
 			return
 		}
+		for _, authenticate := range identity {
+			authenticate(c)
+			if c.IsAborted() {
+				if c.Writer.Status() >= 400 {
+					events.Audit(c.Request.Context(), "authorize", false)
+				}
+				return
+			}
+		}
+		ctx = c.Request.Context()
 		action := c.Request.Method + " " + c.FullPath()
 		if !public[action] && !security.Authorized(ctx, action, policy) {
 			events.Audit(ctx, "authorize", false)

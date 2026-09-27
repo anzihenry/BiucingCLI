@@ -569,7 +569,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
             self.assertEqual(payload["target_exists"], False)
             self.assertEqual(payload["resolved_variables"][1]["name"], "module_name")
             self.assertEqual(payload["resolved_variables"][1]["source"], "provided")
-            self.assertIn("make verify", payload["next_steps"])
+            self.assertIn("./scripts/task verify", payload["next_steps"])
 
     def test_create_frontend_json_returns_manifest_after_generation(self):
         with tempfile.TemporaryDirectory() as tmpdir:

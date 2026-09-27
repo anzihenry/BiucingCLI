@@ -44,6 +44,7 @@ class BackendComponentsTests(unittest.TestCase):
     def test_invalid_and_removed_inputs_do_not_create_projects(self):
         cases = [
             ("web-service", ["--database", "none"]),
+            ("web-service", ["--service-name", "a" * 55]),
             ("micro-service", ["--set", "database=redis"]),
             ("micro-service", ["--set", "cache=postgres"]),
             ("micro-service", ["--set", "dependency_store=postgres"]),
@@ -81,6 +82,10 @@ class BackendComponentsTests(unittest.TestCase):
                 source = Path("src/biucingcli/template_data") / family / "template/scripts/verify-container"
                 shutil.copy2(source, root / "scripts/verify-container")
                 shutil.copy2(source.parent / "task", root / "scripts/task")
+                if family == "micro-service":
+                    stub = root / "scripts/local-ca"
+                    stub.write_text("#!/bin/sh\nexit 0\n")
+                    stub.chmod(0o755)
                 (root / "scripts/task").write_text((source.parent / "task").read_text().replace("{{SERVICE_NAME}}", "fixture").replace("{{HTTP_PORT}}", "8080"))
                 fake = "#!" + sys.executable + "\n" + """import json, os, sys
 with open(os.environ["CALL_LOG"], "a") as log:

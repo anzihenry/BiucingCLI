@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+"""Exercise the generated development Dex login with local fixture credentials only."""
+
+import argparse
+import http.cookiejar
+from html.parser import HTMLParser
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
+
+
+class Form(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.action = ""
+        self.fields = {}
+
+    def handle_starttag(self, tag, attrs):
+        values = dict(attrs)
+        if tag == "form":
+            self.action = values.get("action", "")
+        if tag == "input" and "name" in values:
+            self.fields[values["name"]] = values.get("value", "")
+
+
+def local(url):
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "http" or parsed.hostname not in ("localhost", "127.0.0.1"):
+        raise ValueError("This fixture may only contact local HTTP development endpoints")
+    return url
+
+
+class LocalRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return super().redirect_request(req, fp, code, msg, headers, local(newurl))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--origin", required=True)
+    parser.add_argument("--issuer", required=True)
+    args = parser.parse_args()
+    origin, issuer = local(args.origin.rstrip("/")), local(args.issuer.rstrip("/"))
+    client = urllib.request.build_opener(
+        urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()), LocalRedirect()
+    )
+    response = client.open(origin + "/auth/login", timeout=10)
+    for _ in range(6):
+        page = response.read().decode()
+        if response.url.startswith(origin + "/auth/callback?"):
+            if not json.loads(page).get("authenticated"):
+                raise RuntimeError("Login failed")
+            break
+        form = Form()
+        form.feed(page)
+        form.fields.update(
+            login="developer@example.test", password="local-development-only", approval="approve"
+        )
+        target = local(urllib.parse.urljoin(response.url, form.action))
+        response = client.open(target, urllib.parse.urlencode(form.fields).encode(), timeout=10)
+    else:
+        raise RuntimeError("Login did not reach the callback")
+    session = json.load(client.open(origin + "/auth/session", timeout=10))
+    if not session["subject"] or session["issuer"] != issuer:
+        raise RuntimeError("Unexpected verified identity")
+    request = urllib.request.Request(
+        origin + "/auth/logout",
+        method="POST",
+        headers={"Origin": origin, "X-CSRF-Token": session["csrf_token"]},
+    )
+    if client.open(request, timeout=10).status != 204:
+        raise RuntimeError("Logout failed")
+    try:
+        client.open(origin + "/auth/session", timeout=10)
+    except urllib.error.HTTPError as error:
+        if error.code != 401:
+            raise
+    else:
+        raise RuntimeError("Revoked session was accepted")
+    print(
+        json.dumps(
+            {
+                "dex_login": "passed",
+                "session": "passed",
+                "csrf_logout": "passed",
+                "revocation": "passed",
+            }
+        )
+    )
+
+
+if __name__ == "__main__":
+    main()

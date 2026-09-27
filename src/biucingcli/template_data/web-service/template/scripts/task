@@ -9,14 +9,20 @@ export IMAGE="${IMAGE:-$COMPOSE_PROJECT_NAME}"
 export LOCAL_UID="$(id -u)"
 export LOCAL_GID="$(id -g)"
 export TAG="${TAG:-dev}"
-export HOST_PORT="${HOST_PORT:-0}"
+runtime_host_port="${HOST_PORT:-0}"
+export HOST_PORT="${HOST_PORT:-$((20000 + id % 10000 * 2))}"
+export IDP_PORT="${IDP_PORT:-$((20001 + id % 10000 * 2))}"
+export WEB_ORIGIN="${WEB_ORIGIN:-http://localhost:$HOST_PORT}"
+export OIDC_CALLBACK="${OIDC_CALLBACK:-$WEB_ORIGIN/auth/callback}"
+export OIDC_ISSUER="${OIDC_ISSUER:-http://localhost:$IDP_PORT/dex}"
+export OIDC_AUTHORIZE_URL="${OIDC_AUTHORIZE_URL:-$OIDC_ISSUER/auth}"
 export HOST_HTTP_PORT="${HOST_HTTP_PORT:-0}"
 export HOST_GRPC_PORT="${HOST_GRPC_PORT:-0}"
 compose=(docker compose --project-name "$COMPOSE_PROJECT_NAME" -f compose.dev.yaml)
 run=("${compose[@]}" run --rm --no-deps app-dev)
 case "${1:-help}" in
  bootstrap) "${compose[@]}" build app-dev; "${compose[@]}" run --rm --no-deps --user 0 app-dev ./scripts/init-workspace ;;
- dev|up) "${compose[@]}" up -d app-dev; "${compose[@]}" port app-dev {{HTTP_PORT}} ;;
+ dev|up) if [ "{{DATABASE}}" = postgres ]; then ./scripts/task migrate; fi; mkdir -p .secrets; sed -e "s|http://localhost:5556/dex|$OIDC_ISSUER|g" -e "s|http://localhost:8080/auth/callback|$OIDC_CALLBACK|g" deploy/dex.yaml > .secrets/dex.yaml; "${compose[@]}" up -d dex app-dev; "${compose[@]}" port app-dev {{HTTP_PORT}} ;;
  down|clean) "${compose[@]}" down --remove-orphans ;;
  clean-worktree) if [ "${CONFIRM_DELETE_DATA:-}" != yes ]; then echo 'Set CONFIRM_DELETE_DATA=yes to delete this project data and caches.' >&2; exit 2; fi; "${compose[@]}" down --volumes --remove-orphans ;;
  logs) "${compose[@]}" logs -f ;;
@@ -26,11 +32,12 @@ case "${1:-help}" in
  run) "${compose[@]}" run --rm --service-ports app-dev ;;
  dev-shell) "${run[@]}" bash ;;
  image|docker-build) docker build ${DOCKER_PLATFORM:+--platform=$DOCKER_PLATFORM} --build-arg GOPROXY="${GOPROXY:-https://proxy.golang.org,direct}" --build-arg GOSUMDB="${GOSUMDB:-sum.golang.org}" --build-arg BUILDER_IMAGE="${BUILDER_IMAGE:-golang:1.26.8-alpine}" --build-arg RUNTIME_IMAGE="${RUNTIME_IMAGE:-alpine:3.20}" --build-arg VERSION="${VERSION:-dev}" --build-arg COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}" --build-arg BUILT_AT="${BUILT_AT:-$(date -u +%FT%TZ)}" -t "$IMAGE:$TAG" . ;;
- docker-run) docker compose --project-name "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml up -d ;;
+ docker-run) export HOST_PORT="$runtime_host_port"; runtime=(docker compose --project-name "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml); if [ "{{DATABASE}}" = postgres ]; then "${runtime[@]}" up -d --wait postgres; "${runtime[@]}" run --rm --no-deps -e MIGRATION_DSN="${MIGRATION_DSN:-postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable}" --entrypoint /app/migrate {{SERVICE_NAME}}; fi; "${runtime[@]}" up -d ;;
  docker-push) docker push "$IMAGE:$TAG" ;;
- migrate) echo 'Database migrations are not implemented until B10; refusing a no-op success.' >&2;exit 2 ;;
+ migrate) [ "{{DATABASE}}" = postgres ] || { echo 'No database configured' >&2; exit 2; }; "${compose[@]}" up -d --wait postgres; "${compose[@]}" run --rm --no-deps -e MIGRATION_DSN="${MIGRATION_DSN:-postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable}" app-dev go run ./cmd/migrate ;;
+ integration) [ "{{DATABASE}}" = postgres ] || exit 0; ./scripts/task migrate; "${compose[@]}" run --rm --no-deps -e TEST_DATABASE_DSN="postgres://{{SERVICE_NAME}}_app:local-app-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" -e TEST_MIGRATION_DSN="postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" app-dev go test -race -count=1 ./internal/database ./internal/migration ./internal/auth ;;
  worktree-compose-config) "${compose[@]}" config ;;
  worktree-info|worktree-doctor) printf 'Worktree: %s\nCompose project: %s\nImage: %s:%s\n' "$root" "$COMPOSE_PROJECT_NAME" "$IMAGE" "$TAG"; "${compose[@]}" ps ;;
- help) printf '%s\n' 'Commands: bootstrap dev verify image migrate up down logs doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
+ help) printf '%s\n' 'Commands: bootstrap dev verify integration image migrate up down logs doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
  *) echo 'Unknown task' >&2;exit 2 ;;
 esac

@@ -5,22 +5,27 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
+	"{{MODULE_NAME}}/internal/database"
+	"{{MODULE_NAME}}/internal/security"
 )
 
 const defaultConfigFile = "configs/config.yaml"
 
 type Config struct {
-	Environment string          `yaml:"environment"`
-	AdminAddr   string          `yaml:"admin_addr"`
-	LogLevel    string          `yaml:"log_level"`
-	Request     RequestConfig   `yaml:"request"`
-	Service     ServiceConfig   `yaml:"service"`
-	Server      ServerConfig    `yaml:"server"`
-	Telemetry   TelemetryConfig `yaml:"telemetry"`
-	Database    ComponentConfig `yaml:"database"`
-	Cache       ComponentConfig `yaml:"cache"`
+	Workload    security.WorkloadConfig `yaml:"workload"`
+	Data        database.Config         `yaml:"data"`
+	Environment string                  `yaml:"environment"`
+	AdminAddr   string                  `yaml:"admin_addr"`
+	LogLevel    string                  `yaml:"log_level"`
+	Request     RequestConfig           `yaml:"request"`
+	Service     ServiceConfig           `yaml:"service"`
+	Server      ServerConfig            `yaml:"server"`
+	Telemetry   TelemetryConfig         `yaml:"telemetry"`
+	Database    ComponentConfig         `yaml:"database"`
+	Cache       ComponentConfig         `yaml:"cache"`
 }
 
 type ServerConfig struct {
@@ -123,8 +128,26 @@ func Load() (Config, error) {
 	if cfg.Cache.Driver == "none" {
 		cfg.Cache.DSN = ""
 	}
+	if cfg.Data.MaxConnections == 0 {
+		cfg.Data.MaxConnections = 10
+	}
+	if cfg.Data.QueryTimeoutSeconds == 0 {
+		cfg.Data.QueryTimeoutSeconds = 3
+	}
+	if err := cfg.Data.Validate(); err != nil {
+		return Config{}, err
+	}
 	if err := cfg.validateCommon(); err != nil {
 		return Config{}, err
+	}
+	if cfg.Environment == "production" {
+		for _, identities := range cfg.Workload.Methods {
+			for _, identity := range identities {
+				if strings.HasPrefix(identity, "spiffe://local/") {
+					return Config{}, errors.New("local workload identity is forbidden in production")
+				}
+			}
+		}
 	}
 	return cfg, nil
 }

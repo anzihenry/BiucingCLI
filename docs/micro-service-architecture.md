@@ -44,5 +44,6 @@ Micro Service 默认不会接收浏览器 Cookie、承担公开登录页面或�
 
 P1 已实现统一 Docker 工作流、配置与文件密钥校验、HTTP/gRPC unary/stream 请求预算、
 Principal/Policy 默认拒绝策略、私有管理口、有限退出和结构化日志。保留 Buf、trace provider 和本地 Collector。
-生产 mTLS 和身份到方法策略的接入仍待实现；数据库配置不等于真实持久化；
-完整指标、出站客户端、生产 Compose 和高可用参考仍待建设。
+P2 已接入 mTLS 工作负载身份、方法/委托授权、证书重载与真实 pgx/独立迁移，
+以及实际 Proto baseline 的 breaking 检查。完整指标、出站客户端、生产 Compose 和高可用参考仍待建设。
+详见 [P2 验证记录](backend-service-p2-verification.md)。

@@ -7,10 +7,12 @@ import (
 	"os"
 	"time"
 	"{{MODULE_NAME}}/internal/config"
+	"{{MODULE_NAME}}/internal/database"
 	"{{MODULE_NAME}}/internal/observability"
 	"{{MODULE_NAME}}/internal/pipeline"
 	"{{MODULE_NAME}}/internal/router"
 	serverruntime "{{MODULE_NAME}}/internal/runtime"
+	"{{MODULE_NAME}}/internal/security"
 	"{{MODULE_NAME}}/internal/service"
 	"{{MODULE_NAME}}/internal/telemetry"
 	"{{MODULE_NAME}}/internal/transport"
@@ -40,10 +42,26 @@ func Run(ctx context.Context, cfg config.Config) error {
 		defer cancel()
 		_ = shutdown(closeCtx)
 	}()
-	grpcServer := transport.NewGRPCServer(cfg.Service.Name, service.NewPingService(cfg.Service.Name, "{{PROTO_PACKAGE}}"), transport.Options{Limits: limits, Events: events})
+	tlsConfig, err := cfg.Workload.TLS()
+	if err != nil {
+		return err
+	}
+	grpcServer := transport.NewGRPCServer(cfg.Service.Name, service.NewPingService(cfg.Service.Name, "{{PROTO_PACKAGE}}"), transport.Options{Limits: limits, Events: events, TLS: tlsConfig, Authenticate: cfg.Workload.Authenticate, Policy: func(_ context.Context, p security.Principal, _ string) bool { return p.Workload != "" }})
 	defer grpcServer.Stop()
 
 	state := &serverruntime.Readiness{}
+	var store *database.Store
+	if cfg.Database.Driver == "postgres" {
+		store, err = database.Open(ctx, cfg.Database.DSN, cfg.Data)
+		if err != nil {
+			return err
+		}
+		defer store.Close()
+		if err = store.Schema(ctx); err != nil {
+			return err
+		}
+		state.AddCritical(func(check context.Context) bool { return store.Ping(check) == nil && store.Schema(check) == nil })
+	}
 	admin := &http.Server{Handler: state.Handler(), ReadHeaderTimeout: 2 * time.Second, ReadTimeout: 3 * time.Second, WriteTimeout: 3 * time.Second, IdleTimeout: 30 * time.Second}
 	defer func() { _ = admin.Close() }()
 	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Events: events}), limits))
@@ -57,6 +75,25 @@ func Run(ctx context.Context, cfg config.Config) error {
 	}()
 	grpcServer.SetServing(true)
 	state.Set(true)
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		defer grpcServer.SetServing(false)
+		for {
+			select {
+			case <-child.Done():
+				return
+			case <-ticker.C:
+				check, finish := context.WithTimeout(child, time.Second)
+				ready := state.Check(check)
+				finish()
+				if child.Err() != nil {
+					return
+				}
+				grpcServer.SetServing(ready)
+			}
+		}
+	}()
 	logger.Info("service ready", "version", serverruntime.Version, "commit", serverruntime.Commit, "environment", cfg.Environment)
 	events.Audit(ctx, "configure", true)
 	events.Audit(ctx, "startup", true)

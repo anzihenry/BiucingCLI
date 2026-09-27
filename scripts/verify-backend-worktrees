@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local P1 acceptance: real Git worktrees, Docker reload, private admin and persistent volumes."""
+"""Local backend acceptance: real Git worktrees, Docker reload, private admin and persistent volumes."""
 
 import argparse, json, os, pathlib, subprocess, tempfile, time, urllib.request, urllib.error
 
@@ -108,7 +108,7 @@ try:
         endpoint = run(compose + ["port", "app-dev", "8080"], root)
         url = "http://" + endpoint
         wait(url + "/api/v1/ping")
-        assert get(url + "/api/v1/users")[0] == 401
+        assert get(url + "/auth/session")[0] == 401
         assert get(url + "/healthz")[0] != 200
         cid = run(compose + ["ps", "-q", "app-dev"], root)
         run(
@@ -125,7 +125,7 @@ try:
             "project": name,
             "endpoint": endpoint,
             "admin_private": True,
-            "users_denied": True,
+            "anonymous_session_denied": True,
         }
     assert projects[0] != projects[1]
     assert report[str(repo)]["endpoint"] != report[str(second)]["endpoint"]
@@ -154,15 +154,28 @@ try:
     image = image_name + ":verify"
     env = {**verification_env, "IMAGE": image_name, "TAG": "verify"}
     run(["./scripts/task", "image"], repo, env)
-    cid = run(["docker", "run", "-d", "--rm", "-p", "127.0.0.1::8080", image])
+    runtime = ["docker", "compose", "-p", projects[0] + "-runtime", "-f", "compose.yaml"]
     try:
-        endpoint = run(["docker", "port", cid, "8080/tcp"])
+        run(["./scripts/task", "docker-run"], repo, env)
+        endpoint = run(runtime + ["port", "source", "8080"], repo, env)
         wait("http://" + endpoint + "/api/v1/ping")
-        run(["docker", "exec", cid, "/app/server", "healthcheck", "http://127.0.0.1:9000/readyz"])
-        run(["docker", "stop", "-t", "15", cid])
+        run(
+            runtime
+            + [
+                "exec",
+                "-T",
+                "source",
+                "/app/server",
+                "healthcheck",
+                "http://127.0.0.1:9000/readyz",
+            ],
+            repo,
+            env,
+        )
+        run(runtime + ["stop", "-t", "15"], repo, env)
         report["runtime_image_and_stop"] = "passed"
     finally:
-        subprocess.run(["docker", "rm", "-f", cid], capture_output=True)
+        subprocess.run(runtime + ["down", "--volumes"], cwd=repo, env=env, capture_output=True)
     report["result"] = "passed"
 finally:
     for root in roots:

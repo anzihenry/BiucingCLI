@@ -32,7 +32,7 @@ def main():
         root.mkdir(parents=True, exist_ok=False)
     else:
         root = Path(tempfile.mkdtemp(prefix="biucing-backends-"))
-    report = {"schema_version": 1, "task": "P0/B03", "started_at": datetime.now(timezone.utc).isoformat(),
+    report = {"schema_version": 1, "task": "backend-template-verification", "started_at": datetime.now(timezone.utc).isoformat(),
               "mode": "generate-only" if args.generate_only else "docker", "environment": {}, "cases": []}
     report_path = root / "evidence.json"
 

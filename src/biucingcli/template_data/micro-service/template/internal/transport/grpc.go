@@ -1,6 +1,9 @@
 package transport
 
 import (
+	"context"
+	"crypto/tls"
+	"google.golang.org/grpc/credentials"
 	"net"
 
 	servicev1 "{{MODULE_NAME}}/api/gen/go/service/v1"
@@ -22,10 +25,12 @@ type GRPCServer struct {
 }
 
 type Options struct {
-	Limits pipeline.Limits
-	Policy security.Policy
-	Public map[string]bool
-	Events *observability.Events
+	TLS          *tls.Config
+	Authenticate func(context.Context, string) (context.Context, error)
+	Limits       pipeline.Limits
+	Policy       security.Policy
+	Public       map[string]bool
+	Events       *observability.Events
 }
 
 func NewGRPCServer(serviceName string, pingService service.PingService, options ...Options) *GRPCServer {
@@ -42,7 +47,13 @@ func NewGRPCServer(serviceName string, pingService service.PingService, options 
 		public[name] = allowed
 	}
 	gate := NewGate(opts.Limits, opts.Policy, public, opts.Events)
-	server := grpc.NewServer(grpc.UnaryInterceptor(gate.Unary), grpc.StreamInterceptor(gate.Stream), grpc.MaxRecvMsgSize(int(opts.Limits.MaxBytes)), grpc.MaxSendMsgSize(int(opts.Limits.MaxBytes)), grpc.MaxConcurrentStreams(uint32(opts.Limits.Concurrent)))
+	gate.authenticate = opts.Authenticate
+	extra := []grpc.ServerOption{}
+	if opts.TLS != nil {
+		extra = append(extra, grpc.Creds(credentials.NewTLS(opts.TLS)))
+	}
+	extra = append(extra, grpc.UnaryInterceptor(gate.Unary), grpc.StreamInterceptor(gate.Stream), grpc.MaxRecvMsgSize(int(opts.Limits.MaxBytes)), grpc.MaxSendMsgSize(int(opts.Limits.MaxBytes)), grpc.MaxConcurrentStreams(uint32(opts.Limits.Concurrent)))
+	server := grpc.NewServer(extra...)
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus(serviceName, healthpb.HealthCheckResponse_NOT_SERVING)
 	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_NOT_SERVING)

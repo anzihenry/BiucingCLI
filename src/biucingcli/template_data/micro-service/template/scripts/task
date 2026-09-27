@@ -15,7 +15,7 @@ export HOST_GRPC_PORT="${HOST_GRPC_PORT:-0}"
 compose=(docker compose --project-name "$COMPOSE_PROJECT_NAME" -f compose.dev.yaml)
 run=("${compose[@]}" run --rm --no-deps app-dev)
 case "${1:-help}" in
- bootstrap) "${compose[@]}" build app-dev; "${compose[@]}" run --rm --no-deps --user 0 app-dev ./scripts/init-workspace ;;
+ bootstrap) ./scripts/local-ca; "${compose[@]}" build app-dev; "${compose[@]}" run --rm --no-deps --user 0 app-dev ./scripts/init-workspace ;;
  dev|up) "${compose[@]}" up -d app-dev otel-collector; "${compose[@]}" port app-dev {{HTTP_PORT}} ;;
  down|clean) "${compose[@]}" down --remove-orphans ;;
  clean-worktree) if [ "${CONFIRM_DELETE_DATA:-}" != yes ]; then echo 'Set CONFIRM_DELETE_DATA=yes to delete this project data and caches.' >&2; exit 2; fi; "${compose[@]}" down --volumes --remove-orphans ;;
@@ -27,11 +27,12 @@ case "${1:-help}" in
  dev-shell) "${run[@]}" bash ;;
  image|docker-build) "${run[@]}" ./scripts/check proto
  docker build ${DOCKER_PLATFORM:+--platform=$DOCKER_PLATFORM} --build-arg GOPROXY="${GOPROXY:-https://proxy.golang.org,direct}" --build-arg GOSUMDB="${GOSUMDB:-sum.golang.org}" --build-arg BUILDER_IMAGE="${BUILDER_IMAGE:-golang:1.26.8-alpine}" --build-arg RUNTIME_IMAGE="${RUNTIME_IMAGE:-alpine:3.20}" --build-arg VERSION="${VERSION:-dev}" --build-arg COMMIT="${COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}" --build-arg BUILT_AT="${BUILT_AT:-$(date -u +%FT%TZ)}" -t "$IMAGE:$TAG" . ;;
- docker-run) docker compose --project-name "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml up -d ;;
+ docker-run) runtime=(docker compose --project-name "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml); if [ "{{DATABASE}}" = postgres ]; then "${runtime[@]}" up -d --wait postgres; "${runtime[@]}" run --rm --no-deps -e MIGRATION_DSN="${MIGRATION_DSN:-postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable}" --entrypoint /app/migrate {{SERVICE_NAME}}; fi; "${runtime[@]}" up -d ;;
  docker-push) docker push "$IMAGE:$TAG" ;;
- migrate) echo 'Database migrations are not implemented until B10; refusing a no-op success.' >&2;exit 2 ;;
+ migrate) [ "{{DATABASE}}" = postgres ] || { echo 'No database configured' >&2; exit 2; }; "${compose[@]}" up -d --wait postgres; "${compose[@]}" run --rm --no-deps -e MIGRATION_DSN="${MIGRATION_DSN:-postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable}" app-dev go run ./cmd/migrate ;;
+ integration) [ "{{DATABASE}}" = postgres ] || exit 0; ./scripts/task migrate; "${compose[@]}" run --rm --no-deps -e TEST_DATABASE_DSN="postgres://{{SERVICE_NAME}}_app:local-app-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" -e TEST_MIGRATION_DSN="postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" app-dev go test -race -count=1 ./internal/database ./internal/migration ;;
  worktree-compose-config) "${compose[@]}" config ;;
  worktree-info|worktree-doctor) printf 'Worktree: %s\nCompose project: %s\nImage: %s:%s\n' "$root" "$COMPOSE_PROJECT_NAME" "$IMAGE" "$TAG"; "${compose[@]}" ps ;;
- help) printf '%s\n' 'Commands: bootstrap dev verify image migrate up down logs doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
+ help) printf '%s\n' 'Commands: bootstrap dev verify integration image migrate up down logs doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
  *) echo 'Unknown task' >&2;exit 2 ;;
 esac

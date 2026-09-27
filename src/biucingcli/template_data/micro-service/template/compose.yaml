@@ -15,7 +15,9 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
 {{COMPONENT_ENVIRONMENT}}
     depends_on: {{COMPONENT_DEPENDENCIES}}
-    stop_grace_period: 15s
+    volumes:
+      - ./.secrets:/app/.secrets:ro
+    stop_grace_period: 30s
 
 {{COMPONENT_SERVICES}}
   otel-collector:

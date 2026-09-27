@@ -11,6 +11,11 @@ services:
     command: air -c .air.toml
     environment:
 {{COMPONENT_ENVIRONMENT}}
+      OIDC_CLIENT_SECRET: local-web-secret
+      OIDC_ISSUER: ${OIDC_ISSUER:-http://localhost:5556/dex}
+      OIDC_AUTHORIZE_URL: ${OIDC_AUTHORIZE_URL:-http://localhost:5556/dex/auth}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
+      OIDC_CALLBACK: ${OIDC_CALLBACK:-http://localhost:8080/auth/callback}
       HOME: /tmp
       GOFLAGS: -buildvcs=false
       LOCAL_UID: "${LOCAL_UID:-1000}"
@@ -22,7 +27,7 @@ services:
     ports:
       - "127.0.0.1:${HOST_PORT:-0}:{{HTTP_PORT}}"
     depends_on: {{COMPONENT_DEPENDENCIES}}
-    stop_grace_period: 15s
+    stop_grace_period: 30s
     volumes:
       - .:/workspace
       - web-service-go-build:/workspace/.cache/go-build
@@ -30,6 +35,12 @@ services:
       - web-service-golangci-lint:/workspace/.cache/golangci-lint
 
 {{COMPONENT_SERVICES}}
+  dex:
+    image: ghcr.io/dexidp/dex:v2.45.1
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    ports: ["127.0.0.1:${IDP_PORT:-5556}:5556"]
+    volumes: ["./.secrets/dex.yaml:/etc/dex/config.yaml:ro"]
+
 volumes:
   postgres-data:
   web-service-go-build:

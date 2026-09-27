@@ -2,6 +2,9 @@ package transport
 
 import (
 	"context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"regexp"
 
 	servicev1 "{{MODULE_NAME}}/api/gen/go/service/v1"
 	"{{MODULE_NAME}}/internal/service"
@@ -18,8 +21,11 @@ func newPingServer(pingService service.PingService) *pingServer {
 
 func (server *pingServer) Ping(
 	_ context.Context,
-	_ *servicev1.PingRequest,
+	request *servicev1.PingRequest,
 ) (*servicev1.PingResponse, error) {
+	if request.GetRequestId() != "" && !regexp.MustCompile(`^[a-zA-Z0-9_-]{1,64}$`).MatchString(request.GetRequestId()) {
+		return nil, status.Error(codes.InvalidArgument, "invalid request ID")
+	}
 	response := server.service.Ping()
 	return &servicev1.PingResponse{
 		Message: response.Message,

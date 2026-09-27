@@ -121,3 +121,17 @@ func TestDecodeJSONRejectsUnknownFieldsAndTrailingDocuments(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestIdentityHookRunsInsideGate(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+	e := gin.New()
+	e.Use(Middleware(Limits{}, nil, func(_ context.Context, p security.Principal, _ string) bool { return p.Subject == "verified" }, &observability.Events{Logger: observability.New(io.Discard, "INFO")}, func(c *gin.Context) {
+		c.Request = c.Request.WithContext(security.WithPrincipal(c.Request.Context(), security.Principal{Subject: "verified"}))
+	}))
+	e.GET("/private", func(c *gin.Context) { c.Status(204) })
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, httptest.NewRequest("GET", "/private", nil))
+	if rec.Code != 204 {
+		t.Fatal("verified context was lost before policy", rec.Code)
+	}
+}

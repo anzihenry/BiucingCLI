@@ -127,7 +127,7 @@ func (cfg *Config) validateCommon() error {
 			}
 			if item.name == "DATABASE_DSN" {
 				password, _ := parsed.User.Password()
-				if password == "postgres" || (parsed.Query().Get("sslmode") != "verify-full") {
+				if (password == "postgres" || strings.HasPrefix(password, "local-")) || (parsed.Query().Get("sslmode") != "verify-full") {
 					return errors.New("production database requires non-development credentials and sslmode=verify-full")
 				}
 			} else if parsed.Scheme != "rediss" {

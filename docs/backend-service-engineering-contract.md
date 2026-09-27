@@ -2,7 +2,8 @@
 
 2026-09-26。范围是两类生成项目的工程边界、固定选型与验证入口。
 架构目标见[整体架构](backend-service-architecture.md)，状态见[实施任务](backend-service-implementation-tasks.md)。
-P0 不宣称已实现持久化、登录会话、mTLS 或生产交付。
+P0 的历史范围不包含持久化、登录会话、mTLS 或生产交付。
+当前数据、迁移、协议与身份实现及依赖版本见 [P2 验证记录](backend-service-p2-verification.md)；生产交付仍属后续阶段。
 
 ## 工程与依赖方向
 

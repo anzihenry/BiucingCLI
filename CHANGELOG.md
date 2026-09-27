@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+- implement backend P2 data, protocol and identity foundations: pgx pools, independent locked
+  migrations, OpenAPI/Buf compatibility gates, Web OIDC and PostgreSQL sessions, Micro mTLS
+  workload authorization and trusted user delegation; add real dependency/security tests.
+- remove the Web in-memory user CRUD fixture. Development Web/Dex ports are worktree-derived
+  for exact callback URLs; runtime testing still uses independently assigned ports.
+
 - implement backend P1 runtime foundations: Docker task wrappers and worktree-safe ports,
   validated file secrets, deny-by-default HTTP/gRPC pipelines, private health/admin listeners,
-  bounded shutdown, JSON logs and rate-limited audit hooks; identity verifiers remain P2 work.
+  bounded shutdown, JSON logs and rate-limited audit hooks; identity verifiers are supplied by P2 below the runtime boundary.
 
 - implement backend architecture P0: engineering decisions, independent `database`/`cache`
   choices, generated Docker verification scripts and CI, plus six-case evidence collection.

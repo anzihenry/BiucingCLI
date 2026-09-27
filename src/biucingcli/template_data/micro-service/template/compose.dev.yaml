@@ -24,7 +24,7 @@ services:
       - "127.0.0.1:${HOST_HTTP_PORT:-0}:{{HTTP_PORT}}"
       - "127.0.0.1:${HOST_GRPC_PORT:-0}:{{GRPC_PORT}}"
     depends_on: {{COMPONENT_DEPENDENCIES}}
-    stop_grace_period: 15s
+    stop_grace_period: 30s
     volumes:
       - .:/workspace
       - micro-service-go-build:/workspace/.cache/go-build

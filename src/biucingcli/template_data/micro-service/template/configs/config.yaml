@@ -28,3 +28,17 @@ database:
 cache:
   driver: {{CACHE}}
   dsn: "{{CACHE_DSN}}"
+
+data:
+  max_connections: 10
+  query_timeout_seconds: 3
+
+workload:
+  certificate: .secrets/server.crt
+  key: .secrets/server.key
+  roots: .secrets/ca.crt
+  methods:
+    /{{PROTO_PACKAGE}}.{{SERVICE_TYPE_NAME}}Service/Ping: ["spiffe://local/client"]
+    /grpc.health.v1.Health/Check: ["spiffe://local/client"]
+    /grpc.health.v1.Health/Watch: ["spiffe://local/client"]
+  delegates: {}

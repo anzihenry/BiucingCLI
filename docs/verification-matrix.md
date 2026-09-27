@@ -162,3 +162,11 @@ configuration checks, lint, protocol checks where applicable, race tests and com
 `uv run --locked python scripts/verify-backend-worktrees --output-dir /tmp/new-worktree-evidence`
 exercises real worktree isolation, reload, file ownership, retained volumes and a runtime image.
 Production identity, persistence and HA remain separate gates.
+
+## Backend P2 data and identity
+
+See [P2 verification](backend-service-p2-verification.md). Container verification now starts real
+PostgreSQL for enabled variants, checks migrations/permissions/transactions and browser sessions.
+Web includes OpenAPI breaking and signed-token tests; Micro includes a real Proto baseline,
+TLS handshake/rotation tests and method/delegation authorization. `scripts/verify-backend-login`
+exercises the local Dex flow after `scripts/task dev`. Runtime smoke runs migration separately.

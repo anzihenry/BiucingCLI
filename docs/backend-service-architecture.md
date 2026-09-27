@@ -195,7 +195,7 @@ profiles 只用于可选设施；生产必需依赖缺失时启动失败，不�
 保留既有 worktree 隔离：project name、端口、镜像、volume、缓存按项目/工作树命名。
 
 P1 已提供 `./scripts/task bootstrap/dev/verify/image/up/down/logs/doctor`；
-Make 保留同名包装。`migrate` 在 B10 实现前明确报错。生成 README 记录已有命令迁移说明。
+Make 保留同名包装。P2 的 `migrate` 已提供独立迁移入口。生成 README 记录已有命令迁移说明。
 普通 `down` 不删持久数据；破坏性清理使用独立显式命令。
 
 ### 9.2 单机生产
@@ -254,10 +254,10 @@ Compose 的启动顺序要用健康条件或单次任务成功条件表达；服
 | --- | --- |
 | 两模板已有独立 dev/runtime Compose、统一 Docker 命令与 worktree 隔离 | 生产代理、镜像 digest、权限加固和网络交付在 B20 实施 |
 | 两模板已有配置/文件密钥校验、请求预算、默认拒绝策略、私有管理口和结构化日志 | 真实依赖、身份验证、完整观测及部署验收仍待实现 |
-| Web 内存用户示例已受保护，公开入口仅有 ping | 缺 OIDC/共享会话、真实数据接入与独立迁移 |
-| Micro 有 Ping gRPC、Buf、健康服务、trace provider 和本地 Collector | 缺生产 mTLS、身份到策略的接入、完整指标、出站客户端与真实持久化 |
+| Web 已有 OIDC、PostgreSQL 会话与公开协议，移除内存用户示例 | 出站调用、完整遥测与生产交付待实现 |
+| Micro 已有 mTLS、方法/委托策略、Buf baseline、可选真实数据与迁移 | 完整指标、出站客户端与生产 PKI 平台交付待实现 |
 
-P0/P1 的完成范围见 [实施任务](backend-service-implementation-tasks.md) 和 [P1 验证记录](backend-service-p1-verification.md)。
+P0–P2 的完成范围见 [实施任务](backend-service-implementation-tasks.md) 和 [P2 验证记录](backend-service-p2-verification.md)。
 
 建议实施顺序：
 1. 统一容器、配置、启动/退出、健康、管理端口和日志。

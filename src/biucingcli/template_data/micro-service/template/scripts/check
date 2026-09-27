@@ -7,7 +7,7 @@ case "${1:-verify}" in
  tidy) go mod tidy ;;
  build) proto; go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
  test) proto; go test -race ./... ;;
- lint) proto; (cd api && buf lint); golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./... ;;
- verify) proto; ./scripts/doctor; (cd api && buf lint); golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...; go test -race ./...; go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
+ lint) proto; (cd api && buf lint && buf breaking --against baseline); golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./... ;;
+ verify) proto; ./scripts/doctor; (cd api && buf lint && buf breaking --against baseline); golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...; go test -race ./...; go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
  *) exit 2 ;;
 esac

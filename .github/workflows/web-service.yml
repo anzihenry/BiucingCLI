@@ -26,9 +26,15 @@ jobs:
         working-directory: /tmp/biucing-web-service-ci/audit-web
       - run: make docker-build DOCKER_PLATFORM=linux/amd64 IMAGE=audit-web-ci TAG=ci
         working-directory: /tmp/biucing-web-service-ci/audit-web
-      - name: Smoke test runtime image
+      - name: Smoke test runtime image with separate migration
+        working-directory: /tmp/biucing-web-service-ci/audit-web
+        env:
+          COMPOSE_PROJECT_NAME: audit-web-ci
+          IMAGE: audit-web-ci
+          TAG: ci
+          HOST_PORT: "18081"
         run: |
-          docker run --rm -d --name audit-web-ci -p 18081:8080 audit-web-ci:ci
-          trap 'docker rm -f audit-web-ci >/dev/null 2>&1 || true' EXIT
+          trap 'docker compose -p audit-web-ci-runtime -f compose.yaml down --volumes >/dev/null 2>&1 || true' EXIT
+          ./scripts/task docker-run
           curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:18081/api/v1/ping
-          docker exec audit-web-ci /app/server healthcheck http://127.0.0.1:9000/readyz
+          docker compose -p audit-web-ci-runtime -f compose.yaml exec -T audit-web /app/server healthcheck http://127.0.0.1:9000/readyz

@@ -10,3 +10,4 @@ trap cleanup EXIT
 "${compose[@]}" config --quiet
 ./scripts/task bootstrap
 ./scripts/task verify
+./scripts/task integration

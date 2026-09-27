@@ -43,3 +43,5 @@ ENV GOCACHE=/workspace/.cache/go-build
 ENV GOLANGCI_LINT_CACHE=/workspace/.cache/golangci-lint
 
 CMD ["air", "-c", ".air.toml"]
+
+RUN go install github.com/oasdiff/oasdiff@v1.11.7

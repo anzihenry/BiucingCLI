@@ -34,20 +34,11 @@ func (r *Readiness) Handler() http.Handler {
 	mux.HandleFunc("GET /livez", live)
 	mux.HandleFunc("GET /healthz", live) // migration alias, admin listener only
 	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, req *http.Request) {
-		if !r.ready.Load() {
-			w.WriteHeader(503)
-			return
-		}
 		ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 		defer cancel()
-		r.mu.RLock()
-		checks := append([]func(context.Context) bool{}, r.critical...)
-		r.mu.RUnlock()
-		for _, check := range checks {
-			if !check(ctx) {
-				w.WriteHeader(503)
-				return
-			}
+		if !r.Check(ctx) {
+			w.WriteHeader(503)
+			return
 		}
 		w.WriteHeader(200)
 	})
@@ -72,4 +63,20 @@ func BindAll(addresses ...string) ([]net.Listener, error) {
 		listeners = append(listeners, l)
 	}
 	return listeners, nil
+}
+
+// Check is shared by HTTP readiness and service discovery health reporting.
+func (r *Readiness) Check(ctx context.Context) bool {
+	if !r.ready.Load() {
+		return false
+	}
+	r.mu.RLock()
+	checks := append([]func(context.Context) bool{}, r.critical...)
+	r.mu.RUnlock()
+	for _, check := range checks {
+		if !check(ctx) {
+			return false
+		}
+	}
+	return true
 }

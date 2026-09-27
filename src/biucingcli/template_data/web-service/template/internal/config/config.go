@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"gopkg.in/yaml.v3"
+	"{{MODULE_NAME}}/internal/auth"
+	"{{MODULE_NAME}}/internal/database"
 )
 
 const defaultConfigFile = "configs/config.yaml"
@@ -18,6 +20,8 @@ type ComponentConfig struct {
 }
 
 type Config struct {
+	Auth        auth.Config     `yaml:"auth"`
+	Data        database.Config `yaml:"data"`
 	Environment string          `yaml:"environment"`
 	AdminAddr   string          `yaml:"admin_addr"`
 	LogLevel    string          `yaml:"log_level"`
@@ -109,8 +113,35 @@ func Load() (Config, error) {
 	if cfg.Cache.Driver == "none" {
 		cfg.Cache.DSN = ""
 	}
+	if cfg.Data.MaxConnections == 0 {
+		cfg.Data.MaxConnections = 10
+	}
+	if cfg.Data.QueryTimeoutSeconds == 0 {
+		cfg.Data.QueryTimeoutSeconds = 3
+	}
+	if err := cfg.Data.Validate(); err != nil {
+		return Config{}, err
+	}
 	if err := cfg.validateCommon(); err != nil {
 		return Config{}, err
+	}
+	if cfg.Auth.ClientSecret, err = secret("OIDC_CLIENT_SECRET", ""); err != nil {
+		return Config{}, err
+	}
+	for name, target := range map[string]*string{"OIDC_ISSUER": &cfg.Auth.Issuer, "OIDC_JWKS": &cfg.Auth.JWKS, "OIDC_AUTHORIZE_URL": &cfg.Auth.AuthorizeURL, "OIDC_TOKEN_URL": &cfg.Auth.TokenURL, "WEB_ORIGIN": &cfg.Auth.Origin, "OIDC_CALLBACK": &cfg.Auth.Callback} {
+		if value, ok := os.LookupEnv(name); ok {
+			*target = value
+		}
+	}
+	if cfg.Auth.Issuer != "" {
+		if cfg.Database.Driver != "postgres" {
+			return Config{}, errors.New("browser identity requires PostgreSQL")
+		}
+		if err = cfg.Auth.Validate(cfg.Environment == "production"); err != nil {
+			return Config{}, err
+		}
+	} else if cfg.Environment == "production" {
+		return Config{}, errors.New("OIDC is required in production")
 	}
 	return cfg, nil
 }

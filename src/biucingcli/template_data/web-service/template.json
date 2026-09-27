@@ -34,7 +34,7 @@
   "operating_assumptions": [
     "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
     "Generated projects are expected to keep config, build, and verification workflows repo-local.",
-    "Database and cache are independent components. P1 provides guarded runtime infrastructure only; persistence, sessions and authentication require later architecture stages."
+    "Database and cache are independent components. P2 adds PostgreSQL/migration and protocol identity foundations; production delivery, full telemetry and HA remain later architecture stages."
   ],
   "workflow_labels": [
     "bootstrap",
@@ -116,11 +116,10 @@
     }
   ],
   "next_steps": [
-    "make bootstrap",
-    "make dev",
-    "make verify",
-    "make docker-build",
-    "make docker-run"
+    "./scripts/task bootstrap",
+    "./scripts/task dev",
+    "./scripts/task verify",
+    "./scripts/task image"
   ],
   "contracts": [
     "docker-compose",
@@ -139,7 +138,17 @@
     "internal/runtime/admin.go",
     "internal/pipeline/http.go",
     "internal/security/principal.go",
-    "internal/observability/log.go"
+    "internal/observability/log.go",
+    "internal/database/database.go",
+    "internal/migration/migration.go",
+    "cmd/migrate/main.go",
+    "migrations/sql/000001_runtime.up.sql",
+    "deploy/postgres-init.sql",
+    "api/openapi.json",
+    "api/baseline/openapi.json",
+    "internal/auth/auth.go",
+    "deploy/dex.yaml",
+    "scripts/contract"
   ],
   "rule": "backend",
   "derived_outputs": [

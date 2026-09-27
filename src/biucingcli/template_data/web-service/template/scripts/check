@@ -8,6 +8,6 @@ case "${1:-verify}" in
  build) go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
  test) go test -race ./... ;;
  lint) golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./... ;;
- verify) ./scripts/doctor; golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...; go test -race ./...; go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
+ verify) ./scripts/contract; ./scripts/doctor; golangci-lint run --default=none --enable=errcheck --enable=govet --enable=ineffassign --enable=staticcheck --enable=unused ./...; go test -race ./...; go build -o bin/{{SERVICE_NAME}} ./cmd/server ;;
  *) exit 2 ;;
 esac
