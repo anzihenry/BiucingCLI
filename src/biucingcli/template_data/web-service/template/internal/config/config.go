@@ -6,10 +6,13 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 	"{{MODULE_NAME}}/internal/auth"
 	"{{MODULE_NAME}}/internal/database"
+	"{{MODULE_NAME}}/internal/outbound"
+	"{{MODULE_NAME}}/internal/telemetry"
 )
 
 const defaultConfigFile = "configs/config.yaml"
@@ -20,16 +23,18 @@ type ComponentConfig struct {
 }
 
 type Config struct {
-	Auth        auth.Config     `yaml:"auth"`
-	Data        database.Config `yaml:"data"`
-	Environment string          `yaml:"environment"`
-	AdminAddr   string          `yaml:"admin_addr"`
-	LogLevel    string          `yaml:"log_level"`
-	Request     RequestConfig   `yaml:"request"`
-	Database    ComponentConfig `yaml:"database"`
-	Cache       ComponentConfig `yaml:"cache"`
-	Service     ServiceConfig   `yaml:"service"`
-	Server      ServerConfig    `yaml:"server"`
+	Telemetry    telemetry.Config           `yaml:"telemetry"`
+	Dependencies map[string]outbound.Config `yaml:"dependencies"`
+	Auth         auth.Config                `yaml:"auth"`
+	Data         database.Config            `yaml:"data"`
+	Environment  string                     `yaml:"environment"`
+	AdminAddr    string                     `yaml:"admin_addr"`
+	LogLevel     string                     `yaml:"log_level"`
+	Request      RequestConfig              `yaml:"request"`
+	Database     ComponentConfig            `yaml:"database"`
+	Cache        ComponentConfig            `yaml:"cache"`
+	Service      ServiceConfig              `yaml:"service"`
+	Server       ServerConfig               `yaml:"server"`
 }
 
 type ServiceConfig struct {
@@ -142,6 +147,23 @@ func Load() (Config, error) {
 		}
 	} else if cfg.Environment == "production" {
 		return Config{}, errors.New("OIDC is required in production")
+	}
+	if v, set := os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT"); set {
+		cfg.Telemetry.OTLPHTTPEndpoint = v
+	}
+	if err := cfg.Telemetry.Validate(); err != nil {
+		return Config{}, err
+	}
+	if err := outbound.Validate(cfg.Dependencies); err != nil {
+		return Config{}, err
+	}
+	for _, dependency := range cfg.Dependencies {
+		if err := dependency.Validate(); err != nil {
+			return Config{}, err
+		}
+		if cfg.Environment == "production" && strings.HasPrefix(dependency.Identity, "spiffe://local/") {
+			return Config{}, errors.New("local dependency identity forbidden in production")
+		}
 	}
 	return cfg, nil
 }

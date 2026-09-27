@@ -9,23 +9,26 @@ import (
 
 	"gopkg.in/yaml.v3"
 	"{{MODULE_NAME}}/internal/database"
+	"{{MODULE_NAME}}/internal/outbound"
 	"{{MODULE_NAME}}/internal/security"
+	"{{MODULE_NAME}}/internal/telemetry"
 )
 
 const defaultConfigFile = "configs/config.yaml"
 
 type Config struct {
-	Workload    security.WorkloadConfig `yaml:"workload"`
-	Data        database.Config         `yaml:"data"`
-	Environment string                  `yaml:"environment"`
-	AdminAddr   string                  `yaml:"admin_addr"`
-	LogLevel    string                  `yaml:"log_level"`
-	Request     RequestConfig           `yaml:"request"`
-	Service     ServiceConfig           `yaml:"service"`
-	Server      ServerConfig            `yaml:"server"`
-	Telemetry   TelemetryConfig         `yaml:"telemetry"`
-	Database    ComponentConfig         `yaml:"database"`
-	Cache       ComponentConfig         `yaml:"cache"`
+	Dependencies map[string]outbound.Config `yaml:"dependencies"`
+	Workload     security.WorkloadConfig    `yaml:"workload"`
+	Data         database.Config            `yaml:"data"`
+	Environment  string                     `yaml:"environment"`
+	AdminAddr    string                     `yaml:"admin_addr"`
+	LogLevel     string                     `yaml:"log_level"`
+	Request      RequestConfig              `yaml:"request"`
+	Service      ServiceConfig              `yaml:"service"`
+	Server       ServerConfig               `yaml:"server"`
+	Telemetry    telemetry.Config           `yaml:"telemetry"`
+	Database     ComponentConfig            `yaml:"database"`
+	Cache        ComponentConfig            `yaml:"cache"`
 }
 
 type ServerConfig struct {
@@ -40,10 +43,6 @@ type ServiceConfig struct {
 	Name     string `yaml:"name"`
 	HTTPPort string `yaml:"http_port"`
 	GRPCPort string `yaml:"grpc_port"`
-}
-
-type TelemetryConfig struct {
-	OTLPHTTPEndpoint string `yaml:"otlp_http_endpoint"`
 }
 
 type ComponentConfig struct {
@@ -97,11 +96,8 @@ func Load() (Config, error) {
 	if err := cfg.Server.applyDefaults(); err != nil {
 		return Config{}, err
 	}
-	if override := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"); override != "" {
+	if override, set := os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT"); set {
 		cfg.Telemetry.OTLPHTTPEndpoint = override
-	}
-	if cfg.Telemetry.OTLPHTTPEndpoint == "" {
-		cfg.Telemetry.OTLPHTTPEndpoint = "{{OTEL_EXPORTER_ENDPOINT_JSON}}"
 	}
 
 	if cfg.Database.Driver == "" {
@@ -147,6 +143,20 @@ func Load() (Config, error) {
 					return Config{}, errors.New("local workload identity is forbidden in production")
 				}
 			}
+		}
+	}
+	if err := cfg.Telemetry.Validate(); err != nil {
+		return Config{}, err
+	}
+	if err := outbound.Validate(cfg.Dependencies); err != nil {
+		return Config{}, err
+	}
+	for _, dependency := range cfg.Dependencies {
+		if err := dependency.Validate(); err != nil {
+			return Config{}, err
+		}
+		if cfg.Environment == "production" && strings.HasPrefix(dependency.Identity, "spiffe://local/") {
+			return Config{}, errors.New("local dependency identity forbidden in production")
 		}
 	}
 	return cfg, nil

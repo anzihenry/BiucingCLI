@@ -22,8 +22,9 @@ func (c Config) Validate() error {
 }
 
 type Store struct {
-	Pool    *pgxpool.Pool
-	timeout time.Duration
+	Pool      *pgxpool.Pool
+	timeout   time.Duration
+	unobserve func()
 }
 
 func Open(ctx context.Context, dsn string, cfg Config) (*Store, error) {
@@ -34,6 +35,7 @@ func Open(ctx context.Context, dsn string, cfg Config) (*Store, error) {
 	if err != nil {
 		return nil, errors.New("invalid database configuration")
 	}
+	c.ConnConfig.Tracer = queryTracer{}
 	c.MaxConns = cfg.MaxConnections
 	c.MinConns = 0
 	c.MaxConnLifetime = 30 * time.Minute
@@ -46,8 +48,10 @@ func Open(ctx context.Context, dsn string, cfg Config) (*Store, error) {
 	if err != nil {
 		return nil, errors.New("database pool initialization failed")
 	}
-	s := &Store{pool, time.Duration(cfg.QueryTimeoutSeconds) * time.Second}
+	s := &Store{Pool: pool, timeout: time.Duration(cfg.QueryTimeoutSeconds) * time.Second}
+	s.unobserve, _ = s.observe()
 	if err = s.Ping(ctx); err != nil {
+		s.unobserve()
 		pool.Close()
 		return nil, errors.New("database unavailable")
 	}
@@ -56,6 +60,9 @@ func Open(ctx context.Context, dsn string, cfg Config) (*Store, error) {
 
 // A caller that ignores cancellation must not make process shutdown unbounded.
 func (s *Store) Close() {
+	if s.unobserve != nil {
+		s.unobserve()
+	}
 	done := make(chan struct{})
 	go func() { s.Pool.Close(); close(done) }()
 	timer := time.NewTimer(5 * time.Second)

@@ -1233,7 +1233,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 65,
+      "template_file_count": 73,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -1313,7 +1313,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "15735b28bdbaea22d40c10a6700b272d8fcfd5fb07c8ea22ba5b60301f7cb72d",
+        "sha256": "e25171eac54ec46268d82c570b66e9eaff56864c89305601dc992b04d7206fc6",
         "execute_bits": "0o0"
       },
       "api": {
@@ -1366,7 +1366,7 @@
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "022c43ba504e6d546c53cb20a51164f7daf26023b925584bd0348079c5df4a38",
+        "sha256": "b0c471e0a3e2913c8a1ef0f853b2b96f9fe4ef24aaa4eef432909f25c2b26b76",
         "execute_bits": "0o0"
       },
       "compose.yaml": {
@@ -1379,15 +1379,25 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "ae9e751a2375e8edc17cc9ea20362d93ec18f9543287c2e2c488478b53278ade",
+        "sha256": "e57597e65fc33e8fe7bede93e6a65ff403e31383fbc7070ca3701993f96395fe",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
       },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
+      },
       "deploy/dex.yaml": {
         "kind": "file",
         "sha256": "971de37716e183b82675eaaffd839b25aa61105676f0b12657739b629645022b",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -1397,12 +1407,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "5152e7018e1693720da57d2c8ca8866bd3465455b40a5ab4e5ba57b5ab17b0d0",
+        "sha256": "9935042eb501578216ff5e197e58a48e77e32b50beaa3f430abeae572569bd6d",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "c1aa2394710f7963ff9a7c595099be746c602a791fed2a5e93ee7297664520c8",
+        "sha256": "daa7a734c9ed986761bbd29228cbe44610fce68c9bf7f9cb81de5bcfc624008a",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -1413,7 +1423,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "0fb1224ff19eb419132534bcb97a5dc2c1873dd2990e5d693cbd9895a492f0c8",
+        "sha256": "807eb941fb92eb73e5922f44267e0a82d1148a7786f7710ce33defcacfb4fc53",
         "execute_bits": "0o0"
       },
       "internal/auth": {
@@ -1434,7 +1444,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "5a2ae7e68a4654e947a2dd4eae53210e7daee7e495761ed1430e11334138607c",
+        "sha256": "3a4762d4e50d47cc34a720ae5edd0069e323d4f470e46847918115a29ed70a98",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -1467,12 +1477,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -1519,7 +1534,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -1527,12 +1542,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -1558,7 +1591,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "ac86d5d1c27d122d443225b108a752ef9794a8f725eee1e56735633ec8e2d19e",
+        "sha256": "358f32761a0cd977fad80d42448e97c7d56907a5158f4b417c4ea3f2b92238bd",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -1603,6 +1636,19 @@
       "internal/service/ping.go": {
         "kind": "file",
         "sha256": "5334c957ffd3e47976d4c630806a2eda6ee60553fbf54eb556a8a982fa500c01",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "migrations": {
@@ -1651,7 +1697,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "444511e730afe60c4937c6b909bc2671f8440ee3a8e29c22cf00a3d08ffe85c0",
+        "sha256": "40bff1c4823f3b85658f7096a36741113e487da464a5823c97f583cd02e68005",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
@@ -6023,7 +6069,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 72,
+      "template_file_count": 78,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6103,7 +6149,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "9ac10813129a1aa5d6cb38dc65e801e2955275eb45a10b88d12bdf1cfbe30405",
+        "sha256": "60e967eaf272f81c434f12d640abbb9da64c3e657f70a0656903a9439fb6a1fb",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6197,11 +6243,16 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "912ea7eab3e7d6bec0edeb0eaf1e5aef5223744fce05094ec422bd040118c614",
+        "sha256": "ff136b2dd02fd0c93c2dd654f65e2f86a4cd0a5f318fd1b7502b7bc6e9ebb4b4",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
+      },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
       },
       "deploy/compose.yaml": {
         "kind": "file",
@@ -6210,7 +6261,7 @@
       },
       "deploy/otel-collector.yaml": {
         "kind": "file",
-        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -6220,12 +6271,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "074ca7766b453646398908dd50deceddd53a1cf0fc18f05d45a948a1652bee59",
+        "sha256": "3a9ff9f3d5ffcefe25775c04636ab081b33c8e6561c9883f78351b4ad6e417e9",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "feea1cbe0bd2ba438c796ee22b6933583c6b2afe4374f5cc09e862b2496a7bd8",
+        "sha256": "22f185267f6bf94cd47ec27fe0c8b29eb5a36f7f62b70f1db30544fdb16d9338",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -6236,7 +6287,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "bd72a2c1fced790cb30b68294834a9852288f18d2aaa7cfe01167eb36f40daa8",
+        "sha256": "9728d9595dcb77aa1b90e7324dc3745f21843b0711e5662c1c2c6ce0f70609a0",
         "execute_bits": "0o0"
       },
       "internal/config": {
@@ -6244,7 +6295,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "1cb8099db164756412f9ed9ff1151d7124c9760eca4ed6edd8165f9dccaf6dd8",
+        "sha256": "61681d99afe4a48a629f12f11bda104a1a89894f7e6b8120d75bbc8103dd8300",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -6277,12 +6328,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -6329,7 +6385,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -6337,12 +6393,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -6368,7 +6442,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
+        "sha256": "259e73ce60ba44202ae29c1ee8a71ff5180467058e62f0fcb62629b513a9929f",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -6430,7 +6504,12 @@
       },
       "internal/telemetry/telemetry.go": {
         "kind": "file",
-        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "internal/transport": {
@@ -6448,7 +6527,7 @@
       },
       "internal/transport/pipeline.go": {
         "kind": "file",
-        "sha256": "da71fd4a0ba87370bb40000c8046bd8135ff9aa80bfdaca8603ca10edf361498",
+        "sha256": "ed8e305618857b35dc795946c18aa22d32e7df389f215e1b8e9cc7859b22d1c0",
         "execute_bits": "0o0"
       },
       "internal/transport/pipeline_test.go": {
@@ -6502,7 +6581,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "d9025b5f05d05771598d0f8721f62abf91b1d5b90457e5d3cf61250f2b2f8c10",
+        "sha256": "aba21e4973c01b50a5cc17a176831348c1788d714cd609b488427d03cfb8ce3b",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
@@ -6603,7 +6682,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 72,
+      "template_file_count": 78,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6683,7 +6762,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "2a3f5109f693970d4ccb075a920e0db51b93211091e5fdd9e442630fcae1cdcd",
+        "sha256": "10136c7b7c0af20b004e72a434f25eab481a6934625e7234c21776e6920bc035",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6777,11 +6856,16 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "e4f101ffed93f4bf7b2970896539da8aa54cd65317dc6ef3cd504904c4568509",
+        "sha256": "b2fbf8727134dd2ec828bc45df2927624fb181dd735cec77f832e408eefc7f9d",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
+      },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
       },
       "deploy/compose.yaml": {
         "kind": "file",
@@ -6790,7 +6874,7 @@
       },
       "deploy/otel-collector.yaml": {
         "kind": "file",
-        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -6800,12 +6884,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "074ca7766b453646398908dd50deceddd53a1cf0fc18f05d45a948a1652bee59",
+        "sha256": "3a9ff9f3d5ffcefe25775c04636ab081b33c8e6561c9883f78351b4ad6e417e9",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "feea1cbe0bd2ba438c796ee22b6933583c6b2afe4374f5cc09e862b2496a7bd8",
+        "sha256": "22f185267f6bf94cd47ec27fe0c8b29eb5a36f7f62b70f1db30544fdb16d9338",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -6816,7 +6900,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "bd72a2c1fced790cb30b68294834a9852288f18d2aaa7cfe01167eb36f40daa8",
+        "sha256": "9728d9595dcb77aa1b90e7324dc3745f21843b0711e5662c1c2c6ce0f70609a0",
         "execute_bits": "0o0"
       },
       "internal/config": {
@@ -6824,7 +6908,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "f32d93a69da42214ed44ac4a79fb54f1b0835a938ba3d00ca5cefd7ce2284e67",
+        "sha256": "7dbd12c8d9a38e0dcfe8c9193bba053b2768d09c07225ef27ddf19a13b8e7093",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -6857,12 +6941,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -6909,7 +6998,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -6917,12 +7006,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -6948,7 +7055,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
+        "sha256": "259e73ce60ba44202ae29c1ee8a71ff5180467058e62f0fcb62629b513a9929f",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -7010,7 +7117,12 @@
       },
       "internal/telemetry/telemetry.go": {
         "kind": "file",
-        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "internal/transport": {
@@ -7028,7 +7140,7 @@
       },
       "internal/transport/pipeline.go": {
         "kind": "file",
-        "sha256": "da71fd4a0ba87370bb40000c8046bd8135ff9aa80bfdaca8603ca10edf361498",
+        "sha256": "ed8e305618857b35dc795946c18aa22d32e7df389f215e1b8e9cc7859b22d1c0",
         "execute_bits": "0o0"
       },
       "internal/transport/pipeline_test.go": {
@@ -7082,7 +7194,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "d9025b5f05d05771598d0f8721f62abf91b1d5b90457e5d3cf61250f2b2f8c10",
+        "sha256": "aba21e4973c01b50a5cc17a176831348c1788d714cd609b488427d03cfb8ce3b",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
@@ -7183,7 +7295,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 72,
+      "template_file_count": 78,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -7263,7 +7375,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "55a9590060ed28e524192cd9ef5da6ad1fbeab4b51be0d886a93536460e6323e",
+        "sha256": "821058a61889d58050c2b9ae5506f852b25e4b2f073a449a83cc2f14ef83a327",
         "execute_bits": "0o0"
       },
       "api": {
@@ -7357,11 +7469,16 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "5da6324df89b5db9023c2f499d78a5458f9d3605c094613f81683037c48b87a9",
+        "sha256": "0e7198ea6b3e91200d48ca39f0e5284f980a24ed156cb45eb81758b344181477",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
+      },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
       },
       "deploy/compose.yaml": {
         "kind": "file",
@@ -7370,7 +7487,7 @@
       },
       "deploy/otel-collector.yaml": {
         "kind": "file",
-        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -7380,12 +7497,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "074ca7766b453646398908dd50deceddd53a1cf0fc18f05d45a948a1652bee59",
+        "sha256": "3a9ff9f3d5ffcefe25775c04636ab081b33c8e6561c9883f78351b4ad6e417e9",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "feea1cbe0bd2ba438c796ee22b6933583c6b2afe4374f5cc09e862b2496a7bd8",
+        "sha256": "22f185267f6bf94cd47ec27fe0c8b29eb5a36f7f62b70f1db30544fdb16d9338",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -7396,7 +7513,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "bd72a2c1fced790cb30b68294834a9852288f18d2aaa7cfe01167eb36f40daa8",
+        "sha256": "9728d9595dcb77aa1b90e7324dc3745f21843b0711e5662c1c2c6ce0f70609a0",
         "execute_bits": "0o0"
       },
       "internal/config": {
@@ -7404,7 +7521,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "c83c505e0aef239de4c5bb8fd8b1a500aa3e6f2ea9b1f7c380cab63620d537fd",
+        "sha256": "f643c35ad1e822057d887c2d0430196715be82a2fbdb39573db9e7d32c749f08",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -7437,12 +7554,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -7489,7 +7611,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -7497,12 +7619,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -7528,7 +7668,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
+        "sha256": "259e73ce60ba44202ae29c1ee8a71ff5180467058e62f0fcb62629b513a9929f",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -7590,7 +7730,12 @@
       },
       "internal/telemetry/telemetry.go": {
         "kind": "file",
-        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "internal/transport": {
@@ -7608,7 +7753,7 @@
       },
       "internal/transport/pipeline.go": {
         "kind": "file",
-        "sha256": "da71fd4a0ba87370bb40000c8046bd8135ff9aa80bfdaca8603ca10edf361498",
+        "sha256": "ed8e305618857b35dc795946c18aa22d32e7df389f215e1b8e9cc7859b22d1c0",
         "execute_bits": "0o0"
       },
       "internal/transport/pipeline_test.go": {
@@ -7662,7 +7807,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "5ca02245664edaf49d4f5c543bd1f435a13b8ab4f51289f096f5a93ac2bb3957",
+        "sha256": "d2eafd988df68f8bfcc3fe8c959a5c9a79f446eab712944f33487508f6719723",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
@@ -7763,7 +7908,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 72,
+      "template_file_count": 78,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -7843,7 +7988,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "0b99517c464c00c507f7f5be647b0a187946d1a6048b02b97cc06ffe327abb58",
+        "sha256": "52ff72bbb942dad84d9deae1ba34274d408aa9f1e8f9c01e875b8d87c9d9279a",
         "execute_bits": "0o0"
       },
       "api": {
@@ -7937,11 +8082,16 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "aa34796d47eb68060b5788bfbffe9df0b93dba52827e12fb5c9c44924e75e36e",
+        "sha256": "b0a704167cc6d000f3aa0f995fd503ee34a6e5e5d6dede1f01626df4f9af2e85",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
+      },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
       },
       "deploy/compose.yaml": {
         "kind": "file",
@@ -7950,7 +8100,7 @@
       },
       "deploy/otel-collector.yaml": {
         "kind": "file",
-        "sha256": "b30b1affc62cd7607f3c0d47a2e593a7b02edfe7ded464b0579d2e834aa6bf44",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -7960,12 +8110,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "074ca7766b453646398908dd50deceddd53a1cf0fc18f05d45a948a1652bee59",
+        "sha256": "3a9ff9f3d5ffcefe25775c04636ab081b33c8e6561c9883f78351b4ad6e417e9",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "feea1cbe0bd2ba438c796ee22b6933583c6b2afe4374f5cc09e862b2496a7bd8",
+        "sha256": "22f185267f6bf94cd47ec27fe0c8b29eb5a36f7f62b70f1db30544fdb16d9338",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -7976,7 +8126,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "bd72a2c1fced790cb30b68294834a9852288f18d2aaa7cfe01167eb36f40daa8",
+        "sha256": "9728d9595dcb77aa1b90e7324dc3745f21843b0711e5662c1c2c6ce0f70609a0",
         "execute_bits": "0o0"
       },
       "internal/config": {
@@ -7984,7 +8134,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "632321e15f8105c29ca801a1613a596dbe09a39ab780113260f9ade445ca4e3c",
+        "sha256": "719ef14b1c5306c68edd66ec4975a37d7178c289ae94673eeca4188c6149fbea",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -8017,12 +8167,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -8069,7 +8224,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -8077,12 +8232,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -8108,7 +8281,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "a9468bc0de66d5c55785a9d6171b45da749d6613013afa5763ee46754f7b87a0",
+        "sha256": "259e73ce60ba44202ae29c1ee8a71ff5180467058e62f0fcb62629b513a9929f",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -8170,7 +8343,12 @@
       },
       "internal/telemetry/telemetry.go": {
         "kind": "file",
-        "sha256": "178842c6f9cfc6fb3a294369461e410b2a69490fd18b53de3ae4418022a78a5a",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "internal/transport": {
@@ -8188,7 +8366,7 @@
       },
       "internal/transport/pipeline.go": {
         "kind": "file",
-        "sha256": "da71fd4a0ba87370bb40000c8046bd8135ff9aa80bfdaca8603ca10edf361498",
+        "sha256": "ed8e305618857b35dc795946c18aa22d32e7df389f215e1b8e9cc7859b22d1c0",
         "execute_bits": "0o0"
       },
       "internal/transport/pipeline_test.go": {
@@ -8242,7 +8420,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "5ca02245664edaf49d4f5c543bd1f435a13b8ab4f51289f096f5a93ac2bb3957",
+        "sha256": "d2eafd988df68f8bfcc3fe8c959a5c9a79f446eab712944f33487508f6719723",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {
@@ -8323,7 +8501,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 65,
+      "template_file_count": 73,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -8403,7 +8581,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "c6b4224a73357f34f68bc419713356cc76ccf29e1b733ddbaceee265133f02e7",
+        "sha256": "31fb97647c1aa65e34163ceddead0f798d2fc720723b0ceab7c585906589b3e3",
         "execute_bits": "0o0"
       },
       "api": {
@@ -8456,7 +8634,7 @@
       },
       "compose.dev.yaml": {
         "kind": "file",
-        "sha256": "65babbebee6df1ab572f490ea175da62e15106cf7b0af4da4e4f53b8c5960a0e",
+        "sha256": "9e7797098d3933180dc9115df46619339072400600cfd6fcb0ad1d88a8708aaf",
         "execute_bits": "0o0"
       },
       "compose.yaml": {
@@ -8469,15 +8647,25 @@
       },
       "configs/config.yaml": {
         "kind": "file",
-        "sha256": "38a950d2d727b3442fd53fbf6aea78c91d691738fc539d60b02c5e93375de527",
+        "sha256": "40ca964b218bc3491cda981941f71246766673d258d8a871a37563af52dff3a6",
         "execute_bits": "0o0"
       },
       "deploy": {
         "kind": "directory"
       },
+      "deploy/alerts.example.yaml": {
+        "kind": "file",
+        "sha256": "07648607d3d1605d6c7498bbd587be7c6f02cd29c9d4ad6a7e8e02e09fed07a6",
+        "execute_bits": "0o0"
+      },
       "deploy/dex.yaml": {
         "kind": "file",
         "sha256": "971de37716e183b82675eaaffd839b25aa61105676f0b12657739b629645022b",
+        "execute_bits": "0o0"
+      },
+      "deploy/otel-collector.yaml": {
+        "kind": "file",
+        "sha256": "63d2535ccccf49779aa4689df827f502f0e62d98125963debe3244797564c2bf",
         "execute_bits": "0o0"
       },
       "deploy/postgres-init.sql": {
@@ -8487,12 +8675,12 @@
       },
       "go.mod": {
         "kind": "file",
-        "sha256": "5152e7018e1693720da57d2c8ca8866bd3465455b40a5ab4e5ba57b5ab17b0d0",
+        "sha256": "9935042eb501578216ff5e197e58a48e77e32b50beaa3f430abeae572569bd6d",
         "execute_bits": "0o0"
       },
       "go.sum": {
         "kind": "file",
-        "sha256": "c1aa2394710f7963ff9a7c595099be746c602a791fed2a5e93ee7297664520c8",
+        "sha256": "daa7a734c9ed986761bbd29228cbe44610fce68c9bf7f9cb81de5bcfc624008a",
         "execute_bits": "0o0"
       },
       "internal": {
@@ -8503,7 +8691,7 @@
       },
       "internal/app/app.go": {
         "kind": "file",
-        "sha256": "0fb1224ff19eb419132534bcb97a5dc2c1873dd2990e5d693cbd9895a492f0c8",
+        "sha256": "807eb941fb92eb73e5922f44267e0a82d1148a7786f7710ce33defcacfb4fc53",
         "execute_bits": "0o0"
       },
       "internal/auth": {
@@ -8524,7 +8712,7 @@
       },
       "internal/config/config.go": {
         "kind": "file",
-        "sha256": "d2ef1be8805aef71bb4b904d2b74c27f61c62418532ac91ace51d5ac5fdc539b",
+        "sha256": "57f0bb15d501760e4d26c821433a846a12da5784105887b51c791013571b36c1",
         "execute_bits": "0o0"
       },
       "internal/config/config_test.go": {
@@ -8557,12 +8745,17 @@
       },
       "internal/database/database.go": {
         "kind": "file",
-        "sha256": "3f813d35c67ca32a3523f44f421353b0119057f564414412283db792cb860f0b",
+        "sha256": "169bde4c4199ea0b71bb56ee2dd535599771c0301e7d1ff5d012875dae517540",
         "execute_bits": "0o0"
       },
       "internal/database/database_integration_test.go": {
         "kind": "file",
         "sha256": "3f58429ad2c822b23ab3530e31ad5fe891dfcc2bf579dfc05cca61859bbd05fa",
+        "execute_bits": "0o0"
+      },
+      "internal/database/telemetry.go": {
+        "kind": "file",
+        "sha256": "bc42f84113047fa47c0a1b42cf0dd8f4e2ddb9c957155bd1607881ba46050be8",
         "execute_bits": "0o0"
       },
       "internal/handler": {
@@ -8609,7 +8802,7 @@
       },
       "internal/observability/log.go": {
         "kind": "file",
-        "sha256": "d051d37598126ac30e66e05ed88763aa0f01483429afeea3021e3d2b4074dd89",
+        "sha256": "f2eb9b2fb32513caaf97b734f63c5018657438c657c4419f36f6020186bd387f",
         "execute_bits": "0o0"
       },
       "internal/observability/log_test.go": {
@@ -8617,12 +8810,30 @@
         "sha256": "1c098ba97c7d73d74883f986235b0ac38fe58cc704afe0c87fde36ca3ed1f82b",
         "execute_bits": "0o0"
       },
+      "internal/outbound": {
+        "kind": "directory"
+      },
+      "internal/outbound/budget.go": {
+        "kind": "file",
+        "sha256": "b481b1bd9d19188cc8d536c9664df71dee4c989cd0316c419033ad66e785ac62",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client.go": {
+        "kind": "file",
+        "sha256": "efa21e6cdfc27cf8b5722f103f3620634a9f9e185977583a0770cc0f7a798daa",
+        "execute_bits": "0o0"
+      },
+      "internal/outbound/client_test.go": {
+        "kind": "file",
+        "sha256": "f43deb42bf8510f9dc2a8aba68b92def1dac0cb36d33d4ccc1f5b91bd25e2394",
+        "execute_bits": "0o0"
+      },
       "internal/pipeline": {
         "kind": "directory"
       },
       "internal/pipeline/http.go": {
         "kind": "file",
-        "sha256": "866e9aaf101e738e300620a968a26ab2d74dcfe62001afeba0211fb5572baf87",
+        "sha256": "4c96ac9eb6ec9a8b10c42393e1b933deef5ed1ca46b5e395a8c968deaf5891fa",
         "execute_bits": "0o0"
       },
       "internal/pipeline/http_test.go": {
@@ -8648,7 +8859,7 @@
       },
       "internal/router/router.go": {
         "kind": "file",
-        "sha256": "ac86d5d1c27d122d443225b108a752ef9794a8f725eee1e56735633ec8e2d19e",
+        "sha256": "358f32761a0cd977fad80d42448e97c7d56907a5158f4b417c4ea3f2b92238bd",
         "execute_bits": "0o0"
       },
       "internal/runtime": {
@@ -8693,6 +8904,19 @@
       "internal/service/ping.go": {
         "kind": "file",
         "sha256": "5334c957ffd3e47976d4c630806a2eda6ee60553fbf54eb556a8a982fa500c01",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry": {
+        "kind": "directory"
+      },
+      "internal/telemetry/telemetry.go": {
+        "kind": "file",
+        "sha256": "421d045776747df74690467737bb441ce217febeffa6dc1925e5f05389f77a64",
+        "execute_bits": "0o0"
+      },
+      "internal/telemetry/telemetry_test.go": {
+        "kind": "file",
+        "sha256": "14359ad827d018e7c0b1967dbaa57b344ecfae2ec3a250a82cfbb335b807891b",
         "execute_bits": "0o0"
       },
       "migrations": {
@@ -8741,7 +8965,7 @@
       },
       "scripts/task": {
         "kind": "file",
-        "sha256": "444511e730afe60c4937c6b909bc2671f8440ee3a8e29c22cf00a3d08ffe85c0",
+        "sha256": "40bff1c4823f3b85658f7096a36741113e487da464a5823c97f583cd02e68005",
         "execute_bits": "0o111"
       },
       "scripts/verify-container": {

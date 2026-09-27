@@ -1,0 +1,17 @@
+# Optional Prometheus rules after configuring a Collector Prometheus exporter.
+# Adapt windows/thresholds to measured traffic; these are examples, not an SLO.
+groups:
+  - name: backend
+    rules:
+      - alert: BackendErrorRatio
+        expr: sum by (service_name) (rate(backend_operations_total{outcome="error"}[5m])) / clamp_min(sum by (service_name) (rate(backend_operations_total[5m])), 0.1) > 0.05
+        for: 5m
+        labels: {severity: warning}
+      - alert: BackendDependencyRejected
+        expr: sum by (service_name) (rate(backend_rejections_total[5m])) > 1
+        for: 5m
+        labels: {severity: warning}
+      - alert: BackendDatabaseSaturation
+        expr: backend_db_connections_used / backend_db_connections_max > 0.9
+        for: 5m
+        labels: {severity: warning}

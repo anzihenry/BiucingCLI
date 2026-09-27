@@ -1,6 +1,7 @@
 # 后端服务整体架构
 
-状态：2026-09-26 架构方向已确认；描述目标架构，不代表模板已经实现。
+状态：2026-09-27 架构方向已确认；P0–P3 已实现并验收，P4/P5 仍是目标架构。
+调用与观测的实际边界见 [P3 验证记录](backend-service-p3-verification.md)，不表示已完成生产交付或高可用验收。
 P0 的选型、组件配置与验证入口见 [工程契约](backend-service-engineering-contract.md)。
 实施顺序、依赖和验收见 [后端服务架构实施任务](backend-service-implementation-tasks.md)。
 本文是两类后端模板共同的架构基线。具体入口分别见 [Web Service](web-service-architecture.md)

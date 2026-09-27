@@ -170,3 +170,7 @@ PostgreSQL for enabled variants, checks migrations/permissions/transactions and 
 Web includes OpenAPI breaking and signed-token tests; Micro includes a real Proto baseline,
 TLS handshake/rotation tests and method/delegation authorization. `scripts/verify-backend-login`
 exercises the local Dex flow after `scripts/task dev`. Runtime smoke runs migration separately.
+
+## Backend P3 call chain
+
+`uv run --locked python scripts/verify-backend-calls --output-dir <new-directory>` verifies independent Web/Micro images, OIDC sessions, mTLS delegation, deadlines, recovery and exported trace/log correlation. Fixture routes are not shipped by either template. See [P3 verification](backend-service-p3-verification.md) for actual platform/results and remaining boundaries.

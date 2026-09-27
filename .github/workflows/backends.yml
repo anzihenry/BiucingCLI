@@ -28,3 +28,24 @@ jobs:
           path: |
             ${{ runner.temp }}/backend-evidence/evidence.json
             ${{ runner.temp }}/backend-evidence/*.log
+
+  inter-service-calls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.16"
+          python-version: "3.11"
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run --locked python scripts/verify-backend-calls --output-dir "${{ runner.temp }}/calls-evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-calls-evidence
+          path: |
+            ${{ runner.temp }}/calls-evidence/evidence.json
+            ${{ runner.temp }}/calls-evidence/*.log
+            ${{ runner.temp }}/calls-evidence/otel/*.json

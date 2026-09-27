@@ -9,6 +9,7 @@ import (
 	"{{MODULE_NAME}}/internal/config"
 	"{{MODULE_NAME}}/internal/database"
 	"{{MODULE_NAME}}/internal/observability"
+	"{{MODULE_NAME}}/internal/outbound"
 	"{{MODULE_NAME}}/internal/pipeline"
 	"{{MODULE_NAME}}/internal/router"
 	serverruntime "{{MODULE_NAME}}/internal/runtime"
@@ -33,12 +34,12 @@ func Run(ctx context.Context, cfg config.Config) error {
 			_ = l.Close()
 		}
 	}()
-	shutdown, telemetryErr := telemetry.Setup(ctx, cfg.Service.Name, cfg.Telemetry.OTLPHTTPEndpoint)
+	shutdown, telemetryErr := telemetry.Setup(ctx, cfg.Service.Name, serverruntime.Version, cfg.Environment, cfg.Telemetry)
 	if telemetryErr != nil {
 		logger.Warn("telemetry initialization failed", "code", "telemetry_unavailable")
 	}
 	defer func() {
-		closeCtx, cancel := context.WithTimeout(context.Background(), timeout)
+		closeCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		_ = shutdown(closeCtx)
 	}()
@@ -49,6 +50,11 @@ func Run(ctx context.Context, cfg config.Config) error {
 	grpcServer := transport.NewGRPCServer(cfg.Service.Name, service.NewPingService(cfg.Service.Name, "{{PROTO_PACKAGE}}"), transport.Options{Limits: limits, Events: events, TLS: tlsConfig, Authenticate: cfg.Workload.Authenticate, Policy: func(_ context.Context, p security.Principal, _ string) bool { return p.Workload != "" }})
 	defer grpcServer.Stop()
 
+	clients, closeClients, err := outbound.OpenAll(cfg.Dependencies)
+	if err != nil {
+		return err
+	}
+	defer closeClients()
 	state := &serverruntime.Readiness{}
 	var store *database.Store
 	if cfg.Database.Driver == "postgres" {
@@ -64,7 +70,7 @@ func Run(ctx context.Context, cfg config.Config) error {
 	}
 	admin := &http.Server{Handler: state.Handler(), ReadHeaderTimeout: 2 * time.Second, ReadTimeout: 3 * time.Second, WriteTimeout: 3 * time.Second, IdleTimeout: 30 * time.Second}
 	defer func() { _ = admin.Close() }()
-	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Events: events}), limits))
+	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Dependencies: clients, Events: events}), limits))
 	defer func() { _ = httpServer.Close() }()
 	child, cancel := context.WithCancel(ctx)
 	defer cancel()

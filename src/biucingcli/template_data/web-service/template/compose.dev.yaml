@@ -17,6 +17,7 @@ services:
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
       OIDC_CALLBACK: ${OIDC_CALLBACK:-http://localhost:8080/auth/callback}
       HOME: /tmp
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
       GOFLAGS: -buildvcs=false
       LOCAL_UID: "${LOCAL_UID:-1000}"
       LOCAL_GID: "${LOCAL_GID:-1000}"
@@ -40,6 +41,13 @@ services:
     command: ["dex", "serve", "/etc/dex/config.yaml"]
     ports: ["127.0.0.1:${IDP_PORT:-5556}:5556"]
     volumes: ["./.secrets/dex.yaml:/etc/dex/config.yaml:ro"]
+
+  otel-collector:
+    profiles: [observability]
+    image: otel/opentelemetry-collector-contrib:0.126.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./deploy/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
 
 volumes:
   postgres-data:

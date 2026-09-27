@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"go.opentelemetry.io/otel/trace"
 	"io"
 	"log/slog"
 	"regexp"
@@ -71,6 +72,9 @@ func (e *Events) emit(ctx context.Context, kind, action, outcome string, attrs .
 	e.count++
 	e.mu.Unlock()
 	args := []any{"kind", kind, "action", action, "outcome", outcome, "request_id", ID(ctx)}
+	if sc := trace.SpanContextFromContext(ctx); sc.IsValid() {
+		args = append(args, "trace_id", sc.TraceID().String(), "span_id", sc.SpanID().String())
+	}
 	e.Logger.InfoContext(ctx, "request event", append(args, attrs...)...)
 }
 func (e *Events) Access(ctx context.Context, route string, status int, elapsed time.Duration) {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- implement backend P3 outbound HTTP/gRPC clients, workload peer verification, per-dependency
+  budgets and explicit idempotent retries; add bounded OTel traces/metrics, log correlation,
+  PostgreSQL instrumentation and an independent Web-to-Micro Docker verification harness.
+
 - implement backend P2 data, protocol and identity foundations: pgx pools, independent locked
   migrations, OpenAPI/Buf compatibility gates, Web OIDC and PostgreSQL sessions, Micro mTLS
   workload authorization and trusted user delegation; add real dependency/security tests.

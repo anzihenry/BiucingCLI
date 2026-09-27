@@ -6,14 +6,17 @@ import "{{MODULE_NAME}}/internal/service"
 
 import "github.com/gin-gonic/gin"
 import "os"
+import "{{MODULE_NAME}}/internal/outbound"
 import "{{MODULE_NAME}}/internal/pipeline"
 import "{{MODULE_NAME}}/internal/observability"
 import "{{MODULE_NAME}}/internal/security"
 import "time"
 
 type Options struct {
-	Policy security.Policy
-	Events *observability.Events
+	// Dependencies are process-owned; inject named handles into new application services here.
+	Dependencies map[string]*outbound.Client
+	Policy       security.Policy
+	Events       *observability.Events
 }
 
 func New(cfg config.Config, options ...Options) *gin.Engine {

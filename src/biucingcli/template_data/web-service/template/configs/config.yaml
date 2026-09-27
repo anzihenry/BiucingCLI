@@ -39,3 +39,10 @@ auth:
   origin: http://localhost:8080
   callback: http://localhost:8080/auth/callback
   secure: false
+
+# Empty means no downstream startup dependency. See README for a named client.
+dependencies: {}
+
+telemetry:
+  otlp_http_endpoint: ""
+  sample_ratio: 0.1

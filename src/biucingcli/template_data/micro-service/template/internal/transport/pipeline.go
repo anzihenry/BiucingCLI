@@ -3,7 +3,10 @@ package transport
 import (
 	"context"
 	"errors"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"time"
+	"{{MODULE_NAME}}/internal/telemetry"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
@@ -24,14 +27,25 @@ type Gate struct {
 	events       *observability.Events
 }
 
-func NewGate(limits pipeline.Limits, policy security.Policy, public map[string]bool, events *observability.Events) *Gate {
+func NewGate(limits pipeline.Limits, policy security.Policy, public map[string]bool, events *observability.Events, authenticate ...func(context.Context, string) (context.Context, error)) *Gate {
 	l := limits.Defaults()
-	return &Gate{limits: l, slots: make(chan struct{}, l.Concurrent), policy: policy, public: public, events: events}
+	gate := &Gate{limits: l, slots: make(chan struct{}, l.Concurrent), policy: policy, public: public, events: events}
+	if len(authenticate) > 0 {
+		gate.authenticate = authenticate[0]
+	}
+	return gate
 }
 func (g *Gate) admit(ctx context.Context, method string) (context.Context, context.CancelFunc, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	value := ""
+	if ids := md.Get("x-request-id"); len(ids) == 1 {
+		value = ids[0]
+	}
+	ctx = observability.WithRequestID(ctx, observability.RequestID(value))
 	if g.authenticate != nil {
 		verified, err := g.authenticate(ctx, method)
 		if err != nil {
+			g.events.Audit(ctx, "authorize", false)
 			code := codes.Unauthenticated
 			if errors.Is(err, security.ErrWorkloadDenied) {
 				code = codes.PermissionDenied
@@ -40,12 +54,6 @@ func (g *Gate) admit(ctx context.Context, method string) (context.Context, conte
 		}
 		ctx = verified
 	}
-	md, _ := metadata.FromIncomingContext(ctx)
-	value := ""
-	if ids := md.Get("x-request-id"); len(ids) == 1 {
-		value = ids[0]
-	}
-	ctx = observability.WithRequestID(ctx, observability.RequestID(value))
 	if !g.public[method] && !security.Authorized(ctx, method, g.policy) {
 		g.events.Audit(ctx, "authorize", false)
 		code := codes.Unauthenticated
@@ -60,6 +68,7 @@ func (g *Gate) admit(ctx context.Context, method string) (context.Context, conte
 	select {
 	case g.slots <- struct{}{}:
 	default:
+		telemetry.Reject(ctx, "grpc", "overloaded")
 		return ctx, func() {}, status.Error(codes.ResourceExhausted, "overloaded")
 	}
 	child, cancel := context.WithTimeout(ctx, g.limits.Timeout)
@@ -75,6 +84,8 @@ func safeCall(call func() (any, error)) (value any, err error) {
 	return call()
 }
 func (g *Gate) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (response any, callErr error) {
+	ctx, finish := serverSpan(ctx, info.FullMethod)
+	defer func() { finish(callErr) }()
 	ctx, cancel, err := g.admit(ctx, info.FullMethod)
 	defer cancel()
 	if err != nil {
@@ -128,7 +139,9 @@ func (s *boundedStream) SendMsg(value any) error {
 	return s.ServerStream.SendMsg(value)
 }
 func (g *Gate) Stream(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (callErr error) {
-	ctx, cancel, err := g.admit(stream.Context(), info.FullMethod)
+	ctx, finish := serverSpan(stream.Context(), info.FullMethod)
+	defer func() { finish(callErr) }()
+	ctx, cancel, err := g.admit(ctx, info.FullMethod)
 	defer cancel()
 	if err != nil {
 		return err
@@ -173,4 +186,15 @@ func validateMessage(value any) error {
 		return status.Error(codes.InvalidArgument, "InvalidArgument")
 	}
 	return nil
+}
+
+func serverSpan(ctx context.Context, method string) (context.Context, func(error)) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	carrier := propagation.MapCarrier{}
+	for _, k := range []string{"traceparent", "tracestate"} {
+		if values := md.Get(k); len(values) == 1 && len(values[0]) <= 512 {
+			carrier[k] = values[0]
+		}
+	}
+	return telemetry.Start(otel.GetTextMapPropagator().Extract(ctx, carrier), "server", method)
 }

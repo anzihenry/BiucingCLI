@@ -147,3 +147,73 @@ shutdown budgets, increase the enclosing process grace period accordingly. Telem
 
 Structured slog access/audit events share a bounded process budget and redact sensitive keys.
 They are not a lossless compliance ledger. Storage/retention and full metrics/tracing remain B18/platform work.
+
+## P3：出站调用与观测
+
+生成项目不依赖其他服务启动。`dependencies: {}` 表示无下游；在配置中显式声明命名客户端，
+`app.Run` 统一创建/关闭并传入 `router.Options.Dependencies`。增加应用服务时注入所需客户端，
+不能每次请求新建连接。两种模板都提供相同的 `internal/outbound` API。
+
+```yaml
+dependencies:
+  catalog:
+    protocol: grpc
+    address: dns:///catalog:9090
+    server_name: catalog
+    identity: spiffe://example.org/services/catalog
+    certificate: /run/secrets/caller.crt
+    key: /run/secrets/caller.key
+    roots: /run/secrets/ca.crt
+    concurrent: 16
+    timeout_ms: 2000
+    attempt_ms: 600
+    operations:
+      lookup: {idempotent: true, attempts: 3, forward_user: true}
+      submit: {idempotent: false, attempts: 1, forward_user: false}
+```
+
+- gRPC 消费者导入对方发布的 versioned API 模块，使用 `NewXServiceClient(client.Bound("lookup"))`。
+  不导入对方 `internal` 包；模板不绑定某个业务 API。操作名称是静态配置，调用方必须正确声明幂等语义。
+- HTTP 使用 `client.HTTP(ctx, "lookup", "GET", "/v1/items", nil)`，地址必须是固定 HTTPS origin。
+  使用复用的 Transport；不跟随重定向；响应及请求体最多 1 MiB。HTTP 可使用系统根验证外部 HTTPS，
+  内部 mTLS 配置证书、根与精确 URI 身份。无凭据透传接口；有需要时单独实现受限 provider 适配。
+- 对端必须通过 CA 链、serverAuth EKU、DNS 名称和配置的精确 SPIFFE URI 校验。
+  新 TLS 握手重新读证书和根，使用原子目录/符号链接替换；旧连接不会因文件轮换立即重新认证。
+  紧急撤销需要排空并重建客户端/重启实例。gRPC 使用 `dns:///` + `round_robin`，关闭 DNS service-config 覆盖；
+  重连会重新解析地址，DNS 更新不是即时通知。HTTP 在新连接时解析 DNS；已有连接按空闲策略复用。
+- `forward_user` 只提取当前已验证 Principal 的 issuer/subject；不复制入站 metadata、Cookie、Authorization 或 baggage。
+  下游每跳仍须配置方法权限与单独的委托权限。纯服务操作设置 `forward_user: false`。
+
+每个依赖有独立的进程内并发上限，超出立即 `ErrOverloaded`，不积累等待队列。
+总 deadline 包含所有尝试和退避；每次调用预算不会延长上游 deadline。只有显式幂等操作允许最多三次尝试，
+gRPC 只重试 Unavailable，HTTP 只重试 502/503/504，指数 full jitter 为 0–50/100 ms。
+不对超时、取消、权限拒绝自动重试；超时不代表服务端未执行，写操作需要业务自己的幂等协议。
+网关/mesh/调用方不能同时叠加策略重试。gRPC 库仍可能透明重发尚未写出或被远端标记未处理的请求，
+这与应用层语义重试不同。HTTP 禁用请求体自动回放；Go Transport 的安全连接恢复不等同 exactly-once。
+
+熔断通过 `outbound.Breaker` 接口接入，默认不启用，拒绝为 `ErrCircuitOpen`；实现方必须限制半开探测量，
+不能自动返回伪成功。不同依赖隔离；这些配额是单进程限额，不是跨副本全局限流。流式客户端明确拒绝，
+业务 streaming 按 E07 定义认证续期、连接预算和背压之后再开启。
+
+两模板均输出 OTel HTTP/gRPC/PG spans、操作次数/耗时/在途量、拒绝/重试和 PG 连接池指标；结构化访问日志
+带 `trace_id`/`span_id`。标签只包含固定路由、命名操作、依赖和结果，不包含用户、查询参数、SQL 或错误原文。
+资源包含 service.name、service.version、deployment.environment.name。TraceContext 传播不包含 baggage；
+默认本地 trace-ID 采样 10%，远端 sampled 位不能突破本地采样策略。`telemetry.sample_ratio` 可设 0–1。
+
+`OTEL_EXPORTER_OTLP_ENDPOINT` 覆盖 YAML；空 endpoint 不导出。trace 队列 512、批次 128、每秒发送，
+metrics 每 10 秒发送，单次导出超时 1 秒且不重试；指标基数限制 256/仪表，停机清理总预算 2 秒。
+导出故障累计 `backend.telemetry.export_errors`，不记录可能含敏感 endpoint 的 SDK 错误原文；恢复后可观察累计值。
+Collector 不参与 readiness，不是长期存储。生产部署者负责 TLS/网络、存储、留存、查询及告警接收端。
+`deploy/otel-collector.yaml` 提供带内存/批次限制的本地接收与 debug 查看，
+`deploy/alerts.example.yaml` 提供接入 Prometheus 后的告警例子，阈值须用真实流量校准。
+
+Web 的可选本地观测启动方式：
+
+```sh
+./scripts/task telemetry
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318 ./scripts/task dev
+./scripts/task logs
+```
+
+Micro 开发 Compose 已提供 Collector。Collector/指标端口不映射公网。需要可视化与历史查询时，
+将 Collector exporter 配到团队现有 OTel 后端；本模板不预置另一套持久化监控基础设施。

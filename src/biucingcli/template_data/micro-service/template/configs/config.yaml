@@ -19,6 +19,7 @@ server:
   shutdown_timeout_seconds: 10
 
 telemetry:
+  sample_ratio: 0.1
   otlp_http_endpoint: "{{OTEL_EXPORTER_ENDPOINT_JSON}}"
 
 database:
@@ -42,3 +43,6 @@ workload:
     /grpc.health.v1.Health/Check: ["spiffe://local/client"]
     /grpc.health.v1.Health/Watch: ["spiffe://local/client"]
   delegates: {}
+
+# Empty means no downstream startup dependency. See README for a named client.
+dependencies: {}

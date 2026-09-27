@@ -157,7 +157,7 @@ class EscapingTests(unittest.TestCase):
         result = subprocess.run(["swift", "-e", code], capture_output=True, text=True, check=True)
         self.assertEqual(json.loads(result.stdout), SAMPLES)
 
-    def test_endpoint_is_quoted_and_preserved_in_yaml_and_go(self):
+    def test_endpoint_is_quoted_and_preserved_in_yaml_and_docker(self):
         value = r'https://example.com/a"b\c?q=$HOME&x=1#frag'
         with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
             main(["create", "micro-service", "demo", "--output-dir", tmp,
@@ -166,9 +166,6 @@ class EscapingTests(unittest.TestCase):
             project = Path(tmp) / "demo"
             yaml = (project / "configs/config.yaml").read_text()
             literal = re.search(r"otlp_http_endpoint: (" + JS_STRING + ")", yaml)[1]
-            self.assertEqual(json.loads(literal), value)
-            go = (project / "internal/config/config.go").read_text()
-            literal = re.search(r"cfg.Telemetry.OTLPHTTPEndpoint = (" + JS_STRING + ")", go)[1]
             self.assertEqual(json.loads(literal), value)
             docker = (project / "Dockerfile").read_text()
             self.assertIn(r"\$HOME", docker)

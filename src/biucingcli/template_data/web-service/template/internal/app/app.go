@@ -10,10 +10,12 @@ import (
 	"{{MODULE_NAME}}/internal/config"
 	"{{MODULE_NAME}}/internal/database"
 	"{{MODULE_NAME}}/internal/observability"
+	"{{MODULE_NAME}}/internal/outbound"
 	"{{MODULE_NAME}}/internal/pipeline"
 	"{{MODULE_NAME}}/internal/router"
 	serverruntime "{{MODULE_NAME}}/internal/runtime"
 	"{{MODULE_NAME}}/internal/security"
+	"{{MODULE_NAME}}/internal/telemetry"
 )
 
 // Bind before starting resources; every exit path closes partial initialization.
@@ -32,6 +34,20 @@ func Run(ctx context.Context, cfg config.Config) error {
 		}
 	}()
 
+	shutdown, telemetryErr := telemetry.Setup(ctx, cfg.Service.Name, serverruntime.Version, cfg.Environment, cfg.Telemetry)
+	if telemetryErr != nil {
+		logger.Warn("telemetry initialization failed", "code", "telemetry_unavailable")
+	}
+	defer func() {
+		cleanup, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		_ = shutdown(cleanup)
+	}()
+	clients, closeClients, err := outbound.OpenAll(cfg.Dependencies)
+	if err != nil {
+		return err
+	}
+	defer closeClients()
 	state := &serverruntime.Readiness{}
 	var store *database.Store
 	if cfg.Database.Driver == "postgres" {
@@ -51,7 +67,7 @@ func Run(ctx context.Context, cfg config.Config) error {
 	if cfg.Auth.Issuer != "" {
 		identity = auth.New(ctx, cfg.Auth, store)
 	}
-	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Events: events, Auth: identity, Policy: func(_ context.Context, p security.Principal, action string) bool {
+	httpServer := serverruntime.NewHTTPServer(cfg, pipeline.Bounded(router.New(cfg, router.Options{Dependencies: clients, Events: events, Auth: identity, Policy: func(_ context.Context, p security.Principal, action string) bool {
 		return p.Subject != "" && (action == "GET /auth/session" || action == "POST /auth/logout")
 	}}), limits))
 	defer func() { _ = httpServer.Close() }()

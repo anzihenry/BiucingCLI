@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"io"
 	"net/http"
 	"time"
+	"{{MODULE_NAME}}/internal/telemetry"
 
 	"github.com/gin-gonic/gin"
 	"{{MODULE_NAME}}/internal/observability"
@@ -44,6 +47,25 @@ func Middleware(limits Limits, public map[string]bool, policy security.Policy, e
 		if route == "" {
 			route = "unmatched"
 		}
+		ctx = otel.GetTextMapPropagator().Extract(ctx, propagation.HeaderCarrier(c.Request.Header))
+		method := c.Request.Method
+		switch method {
+		case "GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS":
+		default:
+			method = "OTHER"
+		}
+		ctx, finish := telemetry.Start(ctx, "server", method+" "+route)
+		c.Request = c.Request.WithContext(ctx)
+		defer func() {
+			var outcome error
+			if c.Writer.Status() >= 400 {
+				outcome = errors.New("request failed")
+			}
+			if ctx.Err() != nil {
+				outcome = ctx.Err()
+			}
+			finish(outcome)
+		}()
 		defer func() {
 			if recover() != nil {
 				c.AbortWithStatusJSON(500, gin.H{"error": "internal_error"})
@@ -54,6 +76,7 @@ func Middleware(limits Limits, public map[string]bool, policy security.Policy, e
 		case slots <- struct{}{}:
 			defer func() { <-slots }()
 		default:
+			telemetry.Reject(ctx, "http", "overloaded")
 			c.AbortWithStatusJSON(429, gin.H{"error": "overloaded"})
 			return
 		}

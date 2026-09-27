@@ -148,7 +148,15 @@
     "api/baseline/openapi.json",
     "internal/auth/auth.go",
     "deploy/dex.yaml",
-    "scripts/contract"
+    "scripts/contract",
+    "internal/outbound/client.go",
+    "internal/outbound/budget.go",
+    "internal/outbound/client_test.go",
+    "internal/telemetry/telemetry.go",
+    "internal/telemetry/telemetry_test.go",
+    "internal/database/telemetry.go",
+    "deploy/otel-collector.yaml",
+    "deploy/alerts.example.yaml"
   ],
   "rule": "backend",
   "derived_outputs": [

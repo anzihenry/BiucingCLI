@@ -182,7 +182,15 @@
     "api/baseline/proto/service/v1/service.proto",
     "internal/security/workload.go",
     "scripts/local-ca",
-    "cmd/rpc-probe/main.go"
+    "cmd/rpc-probe/main.go",
+    "internal/outbound/client.go",
+    "internal/outbound/budget.go",
+    "internal/outbound/client_test.go",
+    "internal/telemetry/telemetry.go",
+    "internal/telemetry/telemetry_test.go",
+    "internal/database/telemetry.go",
+    "deploy/otel-collector.yaml",
+    "deploy/alerts.example.yaml"
   ],
   "rule": "microservice",
   "derived_outputs": [

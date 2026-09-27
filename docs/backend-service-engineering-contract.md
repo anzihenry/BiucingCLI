@@ -4,6 +4,7 @@
 架构目标见[整体架构](backend-service-architecture.md)，状态见[实施任务](backend-service-implementation-tasks.md)。
 P0 的历史范围不包含持久化、登录会话、mTLS 或生产交付。
 当前数据、迁移、协议与身份实现及依赖版本见 [P2 验证记录](backend-service-p2-verification.md)；生产交付仍属后续阶段。
+出站调用与观测见 [P3 验证记录](backend-service-p3-verification.md)。
 
 ## 工程与依赖方向
 
@@ -58,15 +59,15 @@ Buf 1.70.0；Buf 远端插件也固定版本，防止后续生成悄然漂移。
 
 ## 两模板能力矩阵
 
-| 能力 | Web | Micro | P0 状态 |
+| 能力 | Web | Micro | 当前实现状态 |
 | --- | --- | --- | --- |
 | 用户 HTTP 入口 | 主入口 | 管理/技术验证 HTTP；服务主入口为 RPC | 既有 starter |
 | gRPC 服务 | 非默认 | 默认 | 既有 starter |
-| 数据库 | PostgreSQL 必选，为会话留基础 | none / PostgreSQL，默认 none | 生成配置和 Compose 完成；无真实数据适配 |
+| 数据库 | PostgreSQL 必选，为会话留基础 | none / PostgreSQL，默认 none | P2 已接入 pgx、独立迁移与最小权限 |
 | 缓存 | none / Redis，默认 none | none / Redis，默认 none | 与数据库独立，尚无缓存适配 |
-| 认证授权 | OIDC + 会话/访问令牌 | mTLS + 方法授权 | B13–B15，未完成 |
-| 出站调用/故障隔离 | HTTP + gRPC | HTTP + gRPC | B16/B17，未完成 |
-| CI | 项目内 Docker 检查 | 项目内 Docker 检查 + Buf | P0 骨架；真实依赖/生产关卡以后追加 |
+| 认证授权 | OIDC + 会话/访问令牌 | mTLS + 方法授权 | B13–B15 已完成，见 P2 验证 |
+| 出站调用/故障隔离 | HTTP + gRPC | HTTP + gRPC | B16/B17，实现与验收见 P3 |
+| CI | 项目内 Docker 检查 | 项目内 Docker 检查 + Buf | P0–P3 生成/依赖/协议/互调检查；生产关卡属 P4 |
 
 ## B02 配置契约与兼容
 

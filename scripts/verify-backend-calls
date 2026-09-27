@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+"""P3 Docker integration: independently generated Web/Micro, OIDC, mTLS and OTLP.
+Creates only isolated local fixtures; never publishes fixture routes in templates.
+"""
+import argparse
+from datetime import datetime, timezone
+import http.cookiejar
+import importlib.machinery
+import json
+import os
+from pathlib import Path
+import shutil
+import socket
+import subprocess
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+import yaml
+from biucingcli.cli import main as cli_main
+
+REPO = Path(__file__).resolve().parents[1]
+login = importlib.machinery.SourceFileLoader("fixture_login", str(REPO / "scripts/verify-backend-login")).load_module()
+
+
+def free_port():
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, required=True, help="New evidence directory")
+    parser.add_argument("--build-cache-dir", type=Path, help="Optional reusable Go build/module cache directory")
+    args = parser.parse_args()
+    root = args.output_dir.resolve()
+    root.mkdir(parents=True, exist_ok=False)
+    cache_root = args.build_cache_dir.resolve() if args.build_cache_dir else root
+    cache_root.mkdir(parents=True, exist_ok=True)
+    project = "p3-" + str(os.getpid()) + "-" + str(int(time.time()))
+    report = {"task": "B16-B19", "started_at": datetime.now(timezone.utc).isoformat(), "checks": {}, "result": "running"}
+    logfile = (root / "commands.log").open("w")
+    build_containers = []
+    compose = ["docker", "compose", "-p", project, "-f", str(root / "compose.yaml")]
+
+    def save():
+        (root / "evidence.json").write_text(json.dumps(report, indent=2) + "\n")
+
+    def run(command, cwd=root, capture=False, timeout=600):
+        print("Running: " + " ".join(command[:5]), flush=True)
+        return subprocess.run(command, cwd=cwd, check=True, text=True, stdout=subprocess.PIPE if capture else logfile,
+                              stderr=logfile, timeout=timeout).stdout
+
+    def check(name):
+        report["checks"][name] = "passed"
+        save()
+        print(name + ": passed", flush=True)
+
+    try:
+        report["docker"] = run(["docker", "version", "--format", "{{.Server.Os}}/{{.Server.Arch}}"], capture=True).strip()
+        web, micro = root / "edge-api", root / "internal-api"
+        for template, name in [("web-service", "edge-api"), ("micro-service", "internal-api")]:
+            options = ["--proto-package", "p3.internal.v1"] if template == "micro-service" else []
+            if cli_main(["create", template, name, "--output-dir", str(root), "--module-name", "example.org/p3/" + name, "--non-interactive", *options]):
+                raise RuntimeError("generation failed")
+        for path, name in [(web, "web"), (micro, "micro")]:
+            fixture = path / "cmd/p3-fixture"
+            fixture.mkdir()
+            shutil.copyfile(REPO / "scripts/fixtures/backend-p3" / (name + ".go"), fixture / "main.go")
+        # The consumer depends only on the peer's versioned public generated API.
+        for path, name in [(micro, "micro"), (web, "web")]:
+            image = project + "-" + name + "-dev"
+            run(["docker", "build", "-f", "Dockerfile.dev", "-t", image, "."], cwd=path)
+            if name == "web":
+                with (web / "go.mod").open("a") as f:
+                    f.write("\nrequire example.org/p3/internal-api v0.0.0\nreplace example.org/p3/internal-api => ../internal-api\n")
+            commands = "./scripts/check proto && " if name == "micro" else ""
+            commands += "go mod tidy && CGO_ENABLED=0 go build -o bin/p3-fixture ./cmd/p3-fixture && CGO_ENABLED=0 go build -o bin/migrate ./cmd/migrate"
+            build_name = project + "-build-" + name
+            build_containers.append(build_name)
+            run(["docker", "run", "--rm", "--name", build_name, "-v", str(root) + ":/work", "-v", str(cache_root / ".go-cache") + ":/root/.cache/go-build", "-v", str(cache_root / ".go-mod") + ":/go/pkg", "-w", "/work/" + path.name, image, "sh", "-ec", commands])
+            # Separate immutable runtime images; no source mount at runtime.
+            runtime = root / (name + "-runtime")
+            runtime.mkdir()
+            shutil.copytree(path / "bin", runtime / "bin")
+            (runtime / "Dockerfile.fixture").write_text("FROM alpine:3.20\nRUN apk add --no-cache ca-certificates\nWORKDIR /app\nCOPY bin/p3-fixture /app/server\nCOPY bin/migrate /app/migrate\nUSER 65532:65532\nENTRYPOINT [\"/app/server\"]\n")
+            run(["docker", "build", "-f", "Dockerfile.fixture", "-t", project + "-" + name, "."], cwd=runtime)
+        run(["./scripts/local-ca"], cwd=micro)
+        secrets = micro / ".secrets"
+        run(["docker", "run", "--rm", "-v", str(secrets) + ":/certs", "--entrypoint", "step", "smallstep/step-cli:0.30.6", "certificate", "create", "stranger", "/certs/stranger.crt", "/certs/stranger.key", "--profile", "leaf", "--ca", "/certs/ca.crt", "--ca-key", "/certs/ca.key", "--san", "spiffe://local/stranger", "--not-after", "24h", "--no-password", "--insecure"])
+        # Private fixture mount is host-private; runtime UID needs its leaf readable.
+        for key in secrets.glob("*.key"):
+            if key.name != "ca.key":
+                key.chmod(0o644)
+        root.chmod(0o700)
+        webport, idpport = free_port(), free_port()
+        origin, issuer = f"http://localhost:{webport}", f"http://localhost:{idpport}/dex"
+        dex = yaml.safe_load((web / "deploy/dex.yaml").read_text())
+        dex["issuer"] = issuer
+        dex["staticClients"][0]["redirectURIs"] = [origin + "/auth/callback"]
+        (root / "dex.yaml").write_text(yaml.safe_dump(dex))
+        cfg = yaml.safe_load((web / "configs/config.yaml").read_text())
+        cfg["database"]["dsn"] = "postgres://edge-api_app:local-app-only@postgres:5432/edge-api?sslmode=disable"
+        cfg["telemetry"] = {"otlp_http_endpoint": "http://collector:4318", "sample_ratio": 1}
+        cfg["dependencies"] = {}
+        for name, cert in [("peer", "client"), ("denied", "stranger")]:
+            cfg["dependencies"][name] = {"protocol": "grpc", "address": "dns:///internal-api:9090", "server_name": "internal-api", "identity": "spiffe://local/server", "certificate": "/secrets/" + cert + ".crt", "key": "/secrets/" + cert + ".key", "roots": "/secrets/ca.crt", "concurrent": 2, "timeout_ms": 1200, "attempt_ms": 400, "operations": {"ping": {"idempotent": True, "attempts": 3, "forward_user": True}}}
+        (root / "web.yaml").write_text(yaml.safe_dump(cfg))
+        mc = yaml.safe_load((micro / "configs/config.yaml").read_text())
+        mc["telemetry"] = cfg["telemetry"]
+        mc["workload"].update(certificate="/secrets/server.crt", key="/secrets/server.key", roots="/secrets/ca.crt")
+        method = next(m for m in mc["workload"]["methods"] if m.endswith("/Ping"))
+        mc["workload"]["delegates"] = {method: ["spiffe://local/client"]}
+        (root / "micro.yaml").write_text(yaml.safe_dump(mc))
+        collector = yaml.safe_load((micro / "deploy/otel-collector.yaml").read_text())
+        collector["exporters"] = {"file/traces": {"path": "/evidence/traces.json"}, "file/metrics": {"path": "/evidence/metrics.json"}}
+        for signal in ("traces", "metrics"):
+            collector["service"]["pipelines"][signal]["exporters"] = ["file/" + signal]
+        (root / "collector.yaml").write_text(yaml.safe_dump(collector))
+        (root / "otel").mkdir(mode=0o777)
+        common = {"volumes": [str(secrets) + ":/secrets:ro"], "environment": {"CONFIG_FILE": "/app/config.yaml"}}
+        services = {
+            "postgres": {"image": "postgres:16.13-alpine", "environment": {"POSTGRES_USER": "postgres", "POSTGRES_PASSWORD": "postgres", "POSTGRES_DB": "edge-api"}, "volumes": [str(web / "deploy/postgres-init.sql") + ":/docker-entrypoint-initdb.d/init.sql:ro"], "healthcheck": {"test": ["CMD-SHELL", "pg_isready -U postgres -d edge-api"], "interval": "1s", "retries": 30}},
+            "dex": {"image": "ghcr.io/dexidp/dex:v2.45.1", "command": ["dex", "serve", "/etc/dex/config.yaml"], "volumes": [str(root / "dex.yaml") + ":/etc/dex/config.yaml:ro"], "ports": [f"127.0.0.1:{idpport}:5556"]},
+            "collector": {"image": "otel/opentelemetry-collector-contrib:0.126.0", "user": "0:0", "command": ["--config=/etc/collector.yaml"], "volumes": [str(root / "collector.yaml") + ":/etc/collector.yaml:ro", str(root / "otel") + ":/evidence"]},
+            "internal-api": {**common, "image": project + "-micro", "volumes": common["volumes"] + [str(root / "micro.yaml") + ":/app/config.yaml:ro"]},
+            "edge-api": {**common, "image": project + "-web", "volumes": common["volumes"] + [str(root / "web.yaml") + ":/app/config.yaml:ro"], "ports": [f"127.0.0.1:{webport}:8080"], "environment": {**common["environment"], "OIDC_CLIENT_SECRET": "local-web-secret", "OIDC_ISSUER": issuer, "OIDC_AUTHORIZE_URL": issuer + "/auth", "WEB_ORIGIN": origin, "OIDC_CALLBACK": origin + "/auth/callback"}}
+        }
+        (root / "compose.yaml").write_text(yaml.safe_dump({"services": services}))
+        run(compose + ["up", "-d", "--wait", "postgres", "dex", "collector", "internal-api"])
+        run(compose + ["run", "--rm", "--no-deps", "-e", "MIGRATION_DSN=postgres://edge-api_migrator:local-migrate-only@postgres:5432/edge-api?sslmode=disable", "--entrypoint", "/app/migrate", "edge-api"])
+        run(compose + ["up", "-d", "edge-api"])
+
+        def request(path, client=None, headers=None):
+            req = urllib.request.Request(origin + path, headers=headers or {})
+            try:
+                with (client.open(req, timeout=5) if client else urllib.request.urlopen(req, timeout=5)) as response:
+                    return response.status, json.load(response)
+            except urllib.error.HTTPError as exc:
+                return exc.code, {}
+
+        for _ in range(50):
+            try:
+                if request("/api/v1/ping")[0] == 200:
+                    break
+            except OSError:
+                time.sleep(0.2)
+        else:
+            raise RuntimeError("Web did not start")
+        assert request("/_fixture/call", headers={"X-User-Subject": "forged", "X-User-Issuer": issuer})[0] == 401
+        check("anonymous_and_forged_identity_denied")
+        client = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()), login.LocalRedirect())
+        response = client.open(origin + "/auth/login", timeout=10)
+        for _ in range(6):
+            page = response.read().decode()
+            if response.url.startswith(origin + "/auth/callback?"):
+                assert json.loads(page)["authenticated"]
+                break
+            form = login.Form()
+            form.feed(page)
+            form.fields.update(login="developer@example.test", password="local-development-only", approval="approve")
+            response = client.open(login.local(urllib.parse.urljoin(response.url, form.action)), urllib.parse.urlencode(form.fields).encode(), timeout=10)
+        else:
+            raise RuntimeError("Login failed")
+        session = json.load(client.open(origin + "/auth/session", timeout=10))
+
+        def success():
+            code, data = request("/_fixture/call", client, {"X-User-Subject": "forged", "X-User-Issuer": "forged", "X-Request-ID": "p3-call"})
+            assert code == 200 and data["subject"] == session["subject"], (code, data)
+
+        success()
+        check("oidc_web_mtls_micro_verified_subject")
+        assert request("/_fixture/call?denied=yes", client)[0] == 403
+        check("valid_certificate_without_service_permission_denied")
+        assert request("/_fixture/call?cancel=yes", client)[0] == 499
+        check("parent_cancellation")
+        run(compose + ["pause", "internal-api"])
+        try:
+            start = time.monotonic()
+            assert request("/_fixture/call", client)[0] == 504
+            assert time.monotonic() - start < 2
+        finally:
+            run(compose + ["unpause", "internal-api"])
+        check("slow_dependency_deadline")
+        run(compose + ["stop", "dex"])
+        success()
+        check("existing_session_during_idp_outage")
+        run(compose + ["restart", "internal-api"])
+        for _ in range(20):
+            try:
+                success()
+                break
+            except AssertionError:
+                time.sleep(0.25)
+        else:
+            raise RuntimeError("Downstream did not recover")
+        check("downstream_restart_reconnect")
+        run(["env", "ROTATE_LOCAL_CERTS=yes", "./scripts/local-ca"], cwd=micro)
+        for key in secrets.glob("*.key"):
+            if key.name != "ca.key":
+                key.chmod(0o644)
+        run(compose + ["restart", "internal-api"])
+        for _ in range(20):
+            try:
+                success()
+                break
+            except AssertionError:
+                time.sleep(0.25)
+        else:
+            raise RuntimeError("Rotated certificate did not reconnect")
+        check("certificate_rotation_new_handshake")
+        # A trusted workload still cannot delegate after its separate grant is removed.
+        mc["workload"]["delegates"] = {}
+        (root / "micro.yaml").write_text(yaml.safe_dump(mc))
+        run(compose + ["restart", "internal-api"])
+        for _ in range(20):
+            if request("/_fixture/call", client)[0] == 403:
+                break
+            time.sleep(0.25)
+        else:
+            raise RuntimeError("Undelegated user accepted")
+        check("user_delegation_permission_denied")
+        # Periodic metrics export is 10s; wait boundedly for actual OTLP evidence.
+        for _ in range(60):
+            path = root / "otel/metrics.json"
+            if path.exists() and "backend.operations" in path.read_text():
+                break
+            time.sleep(0.25)
+        traces = (root / "otel/traces.json").read_text()
+        metrics = (root / "otel/metrics.json").read_text()
+        assert "client peer/ping" in traces and "server " + method in traces and "database query" in traces
+        assert "backend.db.connections" in metrics and "backend.operations" in metrics
+        # Compare actual exported IDs with structured logs from both services.
+        logs = run(compose + ["logs", "--no-color", "edge-api", "internal-api"], capture=True)
+        (root / "service.log").write_text(logs)
+        ids = {}
+        for line in logs.splitlines():
+            if '"trace_id"' in line:
+                event = json.loads(line[line.index("{"):])
+                ids.setdefault(event["trace_id"], set()).add(line.split("|")[0].strip())
+        assert any(len(services) == 2 and trace in traces for trace, services in ids.items()), "No shared Web/Micro trace in export and logs"
+        check("http_rpc_database_trace_metrics_log_correlation")
+        run(compose + ["stop", "collector"])
+        # Restore delegation, keep telemetry and IdP unavailable.
+        mc["workload"]["delegates"] = {method: ["spiffe://local/client"]}
+        (root / "micro.yaml").write_text(yaml.safe_dump(mc))
+        run(compose + ["restart", "internal-api"])
+        for _ in range(20):
+            try:
+                success()
+                break
+            except AssertionError:
+                time.sleep(0.25)
+        else:
+            raise RuntimeError("Telemetry outage affected requests")
+        check("telemetry_outage_is_optional")
+        report["result"] = "passed"
+    except BaseException as exc:
+        report["result"] = "failed"
+        report["error"] = str(exc)
+        raise
+    finally:
+        if build_containers:
+            subprocess.run(["docker", "rm", "-f", *build_containers], stdout=logfile, stderr=logfile, timeout=30)
+        if (root / "compose.yaml").exists():
+            subprocess.run(compose + ["logs", "--no-color"], stdout=(root / "compose.log").open("w"), stderr=logfile, timeout=30)
+            subprocess.run(compose + ["down", "--volumes", "--remove-orphans"], stdout=logfile, stderr=logfile, timeout=60)
+        report["finished_at"] = datetime.now(timezone.utc).isoformat()
+        save()
+        logfile.close()
+        print("Evidence: " + str(root / "evidence.json"), flush=True)
+
+
+if __name__ == "__main__":
+    main()
