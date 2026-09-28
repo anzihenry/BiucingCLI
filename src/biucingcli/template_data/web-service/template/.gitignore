@@ -13,3 +13,5 @@ coverage.out
 backups/
 .release.env
 *.dump
+
+deploy/kubernetes/.render.*/

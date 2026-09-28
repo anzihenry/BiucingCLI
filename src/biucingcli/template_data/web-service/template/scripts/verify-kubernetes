@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+command -v kubectl >/dev/null || { echo 'kubectl with Kustomize is required' >&2; exit 2; }
+validator=ghcr.io/yannh/kubeconform:v0.7.0@sha256:85dbef6b4b312b99133decc9c6fc9495e9fc5f92293d4ff3b7e1b30f5611823c
+mkdir -p .releases
+scratch="$(mktemp -d "$PWD/.releases/kubernetes-check.XXXXXX")"
+trap 'rm -rf "$scratch"' EXIT
+for profile in production autoscaling; do
+  ./scripts/kube-release prepare backend-prod "deploy/kubernetes/overlays/$profile" 'registry.example.com/validation@sha256:1111111111111111111111111111111111111111111111111111111111111111' "$scratch/$profile"
+  ./scripts/kube-capacity "$scratch/$profile/capacity.env"
+  docker run --rm -v "$scratch/$profile:/manifests:ro" "$validator" -strict -summary -kubernetes-version 1.35.0 -ignore-filename-pattern 'SHA256SUMS|.*\.txt|.*\.env' /manifests
+ done
+echo 'Kustomize and Kubernetes 1.35 schema checks passed. No cluster deployment, admission, fault injection or HA verification was performed.'

@@ -1,0 +1,21 @@
+name: Kubernetes reference manifests
+on:
+  workflow_call:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pinned kubectl
+        run: |
+          curl --fail --silent --show-error --location -o kubectl https://dl.k8s.io/release/v1.36.1/bin/linux/amd64/kubectl
+          curl --fail --silent --show-error --location -o kubectl.sha256 https://dl.k8s.io/release/v1.36.1/bin/linux/amd64/kubectl.sha256
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+      - run: ./scripts/verify-kubernetes

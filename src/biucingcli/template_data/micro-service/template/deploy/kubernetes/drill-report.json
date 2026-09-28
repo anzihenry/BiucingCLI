@@ -1,0 +1,108 @@
+{
+  "status": "not-run",
+  "environment": {
+    "context": null,
+    "namespace": null,
+    "cluster_version": null,
+    "node_zones": [],
+    "ingress": null,
+    "cni": null,
+    "postgres_provider": null,
+    "image_digest": null
+  },
+  "traffic": {
+    "requests": null,
+    "failed_requests": null,
+    "p95_ms": null,
+    "p99_ms": null
+  },
+  "scenarios": [
+    {
+      "name": "bad-release",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "node-maintenance",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "node-loss",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "zone-loss",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "postgres-failover",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "certificate-rotation",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "isolated-restore",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    },
+    {
+      "name": "autoscaling-pressure",
+      "status": "not-run",
+      "started_at": null,
+      "fault_at": null,
+      "recovered_at": null,
+      "data_checks": null,
+      "manual_actions": [],
+      "evidence": []
+    }
+  ],
+  "recovery": {
+    "last_verified_data_point": null,
+    "restore_seconds": null,
+    "observed_rpo_seconds": null
+  },
+  "remaining_single_points": [],
+  "availability_target": null
+}

@@ -221,3 +221,7 @@ Micro 开发 Compose 已提供 Collector。Collector/指标端口不映射公网
 ## 单机生产交付（P4）
 
 使用独立 `compose.prod.yaml` 与 `scripts/release`，完整步骤见 [生产运行手册](deploy/RUNBOOK.md)。默认非 root/只读镜像、固定 digest、扫描/SBOM/签名、迁移前置、失败发布停止、应用回退与隔离备份恢复。生产外部 PG/身份/证书/遥测由平台提供；开发 Compose 不用于生产叠加。单机部署存在中断窗口，Kubernetes/多机 HA 属于后续阶段。
+
+## Kubernetes 参考部署（P5）
+
+[集群部署契约](deploy/kubernetes/README.md)提供 Kustomize、三副本/可选 HPA、独立迁移、发布回退与容量模型；[演练清单](deploy/kubernetes/DRILLS.md)用于实际节点/AZ/数据库切换验收。复用 P4 镜像，Docker 开发流程不变。清单校验不代表高可用已经实测。

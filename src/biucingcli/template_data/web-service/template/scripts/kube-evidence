@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[ "$#" = 3 ] && [ -n "$1" ] && [ -n "$2" ] && [ ! -e "$3" ] || { echo 'Usage: scripts/kube-evidence <explicit-context> <namespace> <new-directory>' >&2; exit 2; }
+umask 077
+mkdir -p "$3"
+kube=(kubectl --context "$1" --namespace "$2" --request-timeout=15s)
+printf 'observed_at=%s\ncontext=%s\nnamespace=%s\nresult=observation-only\n' "$(date -u +%FT%TZ)" "$1" "$2" > "$3/observation.txt"
+"${kube[@]}" version -o json > "$3/version.json"
+for resource in deployments pods services endpointslices poddisruptionbudgets horizontalpodautoscalers jobs; do
+  selector='app.kubernetes.io/name={{SERVICE_NAME}}'
+  [ "$resource" != endpointslices ] || selector='kubernetes.io/service-name={{SERVICE_NAME}}'
+  if ! "${kube[@]}" get "$resource" -l "$selector" -o wide > "$3/$resource.txt" 2> "$3/$resource.errors"; then
+    printf 'unavailable=%s\n' "$resource" >> "$3/observation.txt"
+  fi
+done
+# Nodes are cluster-scoped; absent read permission is recorded, not bypassed.
+if ! "${kube[@]}" get nodes -L topology.kubernetes.io/zone -o wide > "$3/nodes.txt" 2> "$3/nodes.errors"; then
+  echo 'unavailable=nodes' >> "$3/observation.txt"
+fi
+echo 'Read-only snapshot captured. No fault was injected and no HA/RPO/RTO result is inferred. Fill the drill report with measured traffic and data checks.'

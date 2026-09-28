@@ -301,3 +301,10 @@ Use this template in the PR body, release-prep note, or rollout summary:
 - Run `scripts/verify-backend-production` against isolated local fixtures; retain scan/SBOM/signature, TLS, failed migration/release, previous digest rollback and real isolated restore evidence.
 - Record image/platform versions, backup data point and restoration time. Keep full-disk tests bounded to disposable storage.
 - Check generated `deploy/RUNBOOK.md`, metadata and architecture profiles against the evidence. Local pinned-key signing does not validate GitHub OIDC/GHCR publication, remote backup retention or multi-host availability; record those separately.
+
+## Backend Kubernetes reference
+
+- Render both production and autoscaling overlays for all six component combinations; check Kubernetes schemas and release failure guards.
+- Verify installed wheel/sdist contain executable kube scripts, ConfigMaps, policy/Secret refs, migration Jobs and drill templates; run generated manifest verification.
+- Preserve real-cluster/HA `not-run` when only Kustomize/schema or fake API tests ran. Require traffic, data and recovery evidence before changing B27 status.
+- Review hard topology spread, PDB scope, HPA replicas ownership, terminating Pod connection allowance, immutable credential refs and external CNI/Ingress/PKI/PG contracts.

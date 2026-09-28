@@ -260,7 +260,7 @@ Compose 的启动顺序要用健康条件或单次任务成功条件表达；服
 | 扫描/签名/来源证明发布入口、单机回退及隔离恢复演练 | GitHub OIDC/GHCR 实际发布、多机 HA 与远端灾难恢复验收 |
 
 P0–P4 的实现和验收范围见 [实施任务](backend-service-implementation-tasks.md) 与各阶段验证记录。
-下一阶段是 P5 多机高可用参考；第 4 节扩展组件仍按实际需求启用，不作为默认启动依赖。
+P5 参考清单与发布工具已落地，下一关卡是 B27 真实环境演练；第 4 节扩展组件仍按实际需求启用，不作为默认启动依赖。
 
 ## 12. 依据
 
@@ -272,3 +272,5 @@ P0–P4 的实现和验收范围见 [实施任务](backend-service-implementatio
 - [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)：遥测接收、处理及导出。
 
 P4 实现与实际验证边界见 [单机生产交付验证记录](backend-service-p4-verification.md)。
+
+P5 已提供 Kustomize、集群发布/回退和容量契约，真实节点/AZ/托管数据库切换仍待 B27；见 [P5 验证记录](backend-service-p5-verification.md)。

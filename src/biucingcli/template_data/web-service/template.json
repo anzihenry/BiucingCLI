@@ -18,7 +18,7 @@
   ],
   "maturity": {
     "level": "validated",
-    "summary": "Docker backend foundation with protocol identity, bounded outbound calls, telemetry and single-host production delivery; multi-host HA is separate."
+    "summary": "Docker backend with identity, telemetry, verified single-host delivery and Kubernetes reference manifests; multi-zone HA requires target-platform drills."
   },
   "validation": {
     "status": "real-build-verified",
@@ -30,13 +30,15 @@
       "real docker runtime image builds",
       "real docker development image builds",
       "P3 independent OIDC/mTLS call-chain and telemetry fault verification (docs/backend-service-p3-verification.md)",
-      "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/backend-service-p4-verification.md)"
+      "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/backend-service-p4-verification.md)",
+      "P5 Kustomize/schema and release failure guards; real cluster/HA remains not-run (docs/backend-service-p5-verification.md)"
     ]
   },
   "operating_assumptions": [
     "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
     "Generated projects are expected to keep config, build, and verification workflows repo-local.",
-    "Database and cache are independent. Production Compose consumes platform-provisioned dependencies, credentials and certificates; single-host updates have interruption windows and do not provide HA."
+    "Database and cache are independent. Production Compose consumes platform-provisioned dependencies, credentials and certificates; single-host updates have interruption windows and do not provide HA.",
+    "P5 Kustomize and release tools require platform-provisioned Kubernetes/CNI/Ingress/PKI/managed PostgreSQL. Local manifest verification is separate from real HA acceptance."
   ],
   "workflow_labels": [
     "bootstrap",
@@ -167,7 +169,24 @@
     "scripts/release",
     "scripts/security",
     "scripts/database-backup",
-    ".github/workflows/release.yml"
+    ".github/workflows/release.yml",
+    "deploy/kubernetes/base/kustomization.yaml",
+    "deploy/kubernetes/base/deployment.yaml",
+    "deploy/kubernetes/base/service.yaml",
+    "deploy/kubernetes/base/pdb.yaml",
+    "deploy/kubernetes/platform/networkpolicy.yaml",
+    "deploy/kubernetes/migration/job.yaml",
+    "deploy/kubernetes/overlays/production/app/kustomization.yaml",
+    "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml",
+    "deploy/kubernetes/README.md",
+    "deploy/kubernetes/DRILLS.md",
+    "deploy/kubernetes/drill-report.json",
+    "deploy/kubernetes/capacity.env",
+    "scripts/kube-release",
+    "scripts/kube-capacity",
+    "scripts/kube-evidence",
+    "scripts/verify-kubernetes",
+    ".github/workflows/kubernetes.yml"
   ],
   "rule": "backend",
   "derived_outputs": [

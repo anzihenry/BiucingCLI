@@ -4,7 +4,7 @@ Category: backend
 Platforms: linux, container
 Tags: api, docker, go, service
 Workflow labels: bootstrap, dev, verify, build, runtime
-Maturity: validated - Docker backend foundation with protocol identity, bounded outbound calls, telemetry and single-host production delivery; multi-host HA is separate.
+Maturity: validated - Docker backend with identity, telemetry, verified single-host delivery and Kubernetes reference manifests; multi-zone HA requires target-platform drills.
 Validation: real-build-verified
 Verification tier: real-build
 Worktree support: worktree-ready
@@ -14,6 +14,7 @@ Operating assumptions:
 - The starter is optimized for Go service development with Docker-based dev and runtime flows.
 - Generated projects are expected to keep config, build, and verification workflows repo-local.
 - Database and cache are independent. Production Compose consumes platform-provisioned dependencies, credentials and certificates; single-host updates have interruption windows and do not provide HA.
+- P5 Kustomize and release tools require platform-provisioned Kubernetes/CNI/Ingress/PKI/managed PostgreSQL. Local manifest verification is separate from real HA acceptance.
 Worktree diagnostics:
 - make worktree-info
 - make worktree-doctor

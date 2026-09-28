@@ -1233,7 +1233,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 83,
+      "template_file_count": 112,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -1268,7 +1268,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -1277,9 +1277,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -1289,7 +1294,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "67515a054b25595e4c667c1ec3eb5017de3bb1da527b8825f72e663683fd3c58",
+        "sha256": "ea0da38ccdd878ea99ea5a98e90641b5dbaf22c22169934292b0e50ce5891189",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -1319,7 +1324,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "d770fe76950a459cf08c8133521922a5248ce2d2ba9f0ffc147c3a11ef24585b",
+        "sha256": "28d38b44e3a30dc8d8160e12f9042c0f6e093675d1e1726177d80988990354a7",
         "execute_bits": "0o0"
       },
       "api": {
@@ -1424,6 +1429,171 @@
       "deploy/dex.yaml": {
         "kind": "file",
         "sha256": "971de37716e183b82675eaaffd839b25aa61105676f0b12657739b629645022b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "9411272b6090ec28db24d21b4da2e8022cf139e8dd5dd910c2debf615dbaaceb",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "e6cf914ca1f7a0c93f0d37e3ae50be3ad384900758474f6221f4823d2632fb68",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "df01ab886a1bcd8aa6451ecf151eab9d82bf5e41766b71f3d886a8f3aceb45a8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "f48e83d993c0822b3c1522ceec63ae8da795d0c1a1f67308085189e605f85195",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/ingress.yaml": {
+        "kind": "file",
+        "sha256": "8dbac760e2bcb6120a43958423e5c43e50089a08abb6aa14042369ce3661c3dc",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "94b6be14127d2fd1a930485d4f2bcd20e64e9e38b3abc9b1335b10c0d97d2b85",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "0299b773a6ff26710204a956547e0b2c8a21c0e36d6a8cbae2dd33f75e71f935",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -1736,6 +1906,21 @@
         "sha256": "3898ddabc60aec0dcdf20da1a176f52d4b84ffe441f3806ad64849c07a3efa78",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "82c106a7c314b4ae45f7165b5f4b0fdf8b7dde3a806836a5097e2d6c8437decd",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "6e66273c9dbe72cecad9c90e35ed455e974b6e548f4c5720cc25764a8948581f",
+        "execute_bits": "0o111"
+      },
       "scripts/release": {
         "kind": "file",
         "sha256": "f6b25e2222d00c4f90b766452f353a31f49f36bd0a24ddc2119f4f5aeb45dcce",
@@ -1754,6 +1939,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -6120,7 +6310,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 87,
+      "template_file_count": 115,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6155,7 +6345,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -6164,9 +6354,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -6176,7 +6371,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "31aaed4bc8c74126a064641d0225a693d2a1bfb25ca5f42dbdc369680ddab6f4",
+        "sha256": "b9b1268fed0775571c0da129192f49211ba1087b78f546c0f1d323695d104053",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -6206,7 +6401,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "6e67e4102ac750b35f5c20cc5873c2d40b63861d24845f911b196915a72e9298",
+        "sha256": "d5360eaf4b28c62fa5acb9e9d8fc68fc63952c2fba391f503859a2ff953565b5",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6334,6 +6529,166 @@
       "deploy/config.prod.yaml": {
         "kind": "file",
         "sha256": "db5e026aa1e986f23697f256e8b1769cdf107f357efed169b3f4f5ad93c39c86",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "db5e026aa1e986f23697f256e8b1769cdf107f357efed169b3f4f5ad93c39c86",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "0b848837c80159d52567f66c8ceb666a3baf4173ceb7cfd8a31eb07a7976a68d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "65990c4f093795565123e1f3802bc2c349f0ede049fe4b3cee320e7203259a9f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "96986652718e24c8acad9f2295f2180f16b213651f4541fe79045c9458dcec3e",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "85a9db69d367bf6115f38a70ab4a6b30f17398097b09c98398ad370bfa617b6d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "3a57212c9836167057d42d120b3a8f478ded4774f5d7d50cf3075e0d4d4aa8c3",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -6661,6 +7016,21 @@
         "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "bd976d3998fe13ebb030ccdac99406fa8fd37e85864254626080322b8f5ffacf",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "9de23d5b2e664f996a439b9c6633d23688a49975804e1190c65c96ed2389c40e",
+        "execute_bits": "0o111"
+      },
       "scripts/local-ca": {
         "kind": "file",
         "sha256": "68a1063a9a416126b6bee97edba6ccd9a597e8cb40d793c4ee7596b026ac2b32",
@@ -6684,6 +7054,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -6779,7 +7154,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 87,
+      "template_file_count": 115,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -6814,7 +7189,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -6823,9 +7198,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -6835,7 +7215,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "31aaed4bc8c74126a064641d0225a693d2a1bfb25ca5f42dbdc369680ddab6f4",
+        "sha256": "b9b1268fed0775571c0da129192f49211ba1087b78f546c0f1d323695d104053",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -6865,7 +7245,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "df14e08ecb7a3ad1011c1e0fd99ba0fe67701340bdbf7b6d9ffeb3cf079bf66e",
+        "sha256": "d17fb1897e04e26fa9ede30f8276de0c0dd68eaf3e685c74827aaee773c36fe5",
         "execute_bits": "0o0"
       },
       "api": {
@@ -6993,6 +7373,166 @@
       "deploy/config.prod.yaml": {
         "kind": "file",
         "sha256": "17df1f1726f74fcb98fc647a7e75bab1f164e9731f312c3b51d2cd0fa19f2c26",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "17df1f1726f74fcb98fc647a7e75bab1f164e9731f312c3b51d2cd0fa19f2c26",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "68537e9639993a845541cb8d6717a2dfe219f29470884f7d0824eaaffe6d0fc6",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "65990c4f093795565123e1f3802bc2c349f0ede049fe4b3cee320e7203259a9f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "96986652718e24c8acad9f2295f2180f16b213651f4541fe79045c9458dcec3e",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "85a9db69d367bf6115f38a70ab4a6b30f17398097b09c98398ad370bfa617b6d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "3a57212c9836167057d42d120b3a8f478ded4774f5d7d50cf3075e0d4d4aa8c3",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -7320,6 +7860,21 @@
         "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "bd976d3998fe13ebb030ccdac99406fa8fd37e85864254626080322b8f5ffacf",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "9de23d5b2e664f996a439b9c6633d23688a49975804e1190c65c96ed2389c40e",
+        "execute_bits": "0o111"
+      },
       "scripts/local-ca": {
         "kind": "file",
         "sha256": "68a1063a9a416126b6bee97edba6ccd9a597e8cb40d793c4ee7596b026ac2b32",
@@ -7343,6 +7898,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -7438,7 +7998,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 87,
+      "template_file_count": 115,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -7473,7 +8033,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -7482,9 +8042,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -7494,7 +8059,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "31aaed4bc8c74126a064641d0225a693d2a1bfb25ca5f42dbdc369680ddab6f4",
+        "sha256": "b9b1268fed0775571c0da129192f49211ba1087b78f546c0f1d323695d104053",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -7524,7 +8089,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "a95414c79b67ca8ee4e2b4c65b96c39ae6a8edbda62d7b99612e1e84b5eb34a3",
+        "sha256": "7eb4bee2798f87b59fe717ecd5f5679c84952b129a6c1600a6b90029ebdbf27c",
         "execute_bits": "0o0"
       },
       "api": {
@@ -7652,6 +8217,166 @@
       "deploy/config.prod.yaml": {
         "kind": "file",
         "sha256": "31f2d26a8a2ec723e3678b00333dd925985188963999e8f846a491b23f6388de",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "31f2d26a8a2ec723e3678b00333dd925985188963999e8f846a491b23f6388de",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "84827a23832c01132e8bef8cd6424bcdca798bac7444ab4420f71e3f2bf46027",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "65990c4f093795565123e1f3802bc2c349f0ede049fe4b3cee320e7203259a9f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "f48e83d993c0822b3c1522ceec63ae8da795d0c1a1f67308085189e605f85195",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "85a9db69d367bf6115f38a70ab4a6b30f17398097b09c98398ad370bfa617b6d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "3a57212c9836167057d42d120b3a8f478ded4774f5d7d50cf3075e0d4d4aa8c3",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -7979,6 +8704,21 @@
         "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "82c106a7c314b4ae45f7165b5f4b0fdf8b7dde3a806836a5097e2d6c8437decd",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "6e66273c9dbe72cecad9c90e35ed455e974b6e548f4c5720cc25764a8948581f",
+        "execute_bits": "0o111"
+      },
       "scripts/local-ca": {
         "kind": "file",
         "sha256": "68a1063a9a416126b6bee97edba6ccd9a597e8cb40d793c4ee7596b026ac2b32",
@@ -8002,6 +8742,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -8097,7 +8842,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 87,
+      "template_file_count": 115,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -8132,7 +8877,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -8141,9 +8886,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -8153,7 +8903,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "31aaed4bc8c74126a064641d0225a693d2a1bfb25ca5f42dbdc369680ddab6f4",
+        "sha256": "b9b1268fed0775571c0da129192f49211ba1087b78f546c0f1d323695d104053",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -8183,7 +8933,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "de9f49edfec75e844da132eb98f68c5cf2e820c1eb5878c9125dc8b5f5f460b3",
+        "sha256": "a2a0cfd9b965dc56789db45bb44232187edc091f5ef029596566db4fd458ab0d",
         "execute_bits": "0o0"
       },
       "api": {
@@ -8311,6 +9061,166 @@
       "deploy/config.prod.yaml": {
         "kind": "file",
         "sha256": "8d60089a9452eee78a44cd4dbdf0dd07571ed6c2722daa7ca7165ed401c83695",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "8d60089a9452eee78a44cd4dbdf0dd07571ed6c2722daa7ca7165ed401c83695",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "a21008bb812f1f05e6bc5658c9743cf52b68b04c986b52618bb16f1caa826930",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "65990c4f093795565123e1f3802bc2c349f0ede049fe4b3cee320e7203259a9f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "f48e83d993c0822b3c1522ceec63ae8da795d0c1a1f67308085189e605f85195",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "85a9db69d367bf6115f38a70ab4a6b30f17398097b09c98398ad370bfa617b6d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "3a57212c9836167057d42d120b3a8f478ded4774f5d7d50cf3075e0d4d4aa8c3",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -8638,6 +9548,21 @@
         "sha256": "8a900dbffa9cfbe5c916ef50420a994aa510ff0b2c7ec36e29ccd8da8dd4ade8",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "82c106a7c314b4ae45f7165b5f4b0fdf8b7dde3a806836a5097e2d6c8437decd",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "6e66273c9dbe72cecad9c90e35ed455e974b6e548f4c5720cc25764a8948581f",
+        "execute_bits": "0o111"
+      },
       "scripts/local-ca": {
         "kind": "file",
         "sha256": "68a1063a9a416126b6bee97edba6ccd9a597e8cb40d793c4ee7596b026ac2b32",
@@ -8661,6 +9586,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {
@@ -8736,7 +9666,7 @@
         "./scripts/task verify",
         "./scripts/task image"
       ],
-      "template_file_count": 83,
+      "template_file_count": 112,
       "template_top_level_entries": [
         ".air.toml",
         ".dockerignore",
@@ -8771,7 +9701,7 @@
       },
       ".dockerignore": {
         "kind": "file",
-        "sha256": "b98c0f5754942c850a6a595e63c46b1e4f819021ab6fecd989244510036f941f",
+        "sha256": "e8a8934f17834a88ba0589aa8899094247db0636b3f4c6dc147039ea8480ed78",
         "execute_bits": "0o0"
       },
       ".github": {
@@ -8780,9 +9710,14 @@
       ".github/workflows": {
         "kind": "directory"
       },
+      ".github/workflows/kubernetes.yml": {
+        "kind": "file",
+        "sha256": "e35f437b68a54c287c79ed8821128fbde166d631fb26221b60d71a93971d8e62",
+        "execute_bits": "0o0"
+      },
       ".github/workflows/release.yml": {
         "kind": "file",
-        "sha256": "32f578a44bec2d6f83985067ed426f837dfcff1c172bace640ec5bcee43d9556",
+        "sha256": "314cb482a430abc86efbe2b0e9ae85faca51ed2abbdffb1e1006535f5d6c86f7",
         "execute_bits": "0o0"
       },
       ".github/workflows/verify.yml": {
@@ -8792,7 +9727,7 @@
       },
       ".gitignore": {
         "kind": "file",
-        "sha256": "67515a054b25595e4c667c1ec3eb5017de3bb1da527b8825f72e663683fd3c58",
+        "sha256": "ea0da38ccdd878ea99ea5a98e90641b5dbaf22c22169934292b0e50ce5891189",
         "execute_bits": "0o0"
       },
       ".mise.toml": {
@@ -8822,7 +9757,7 @@
       },
       "README.md": {
         "kind": "file",
-        "sha256": "3f826542158178a5b52f0cddbc73501e5c34517e394624498a27aca3b1acf128",
+        "sha256": "4aef067f71a2da96f0905f8216eabc49689e87ea8118164f3cf17400a44647ea",
         "execute_bits": "0o0"
       },
       "api": {
@@ -8927,6 +9862,171 @@
       "deploy/dex.yaml": {
         "kind": "file",
         "sha256": "971de37716e183b82675eaaffd839b25aa61105676f0b12657739b629645022b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/DRILLS.md": {
+        "kind": "file",
+        "sha256": "9a9775223c0bf43f47a21a8bb919536168bb59fdc316c26bb5c444587dc9882d",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/README.md": {
+        "kind": "file",
+        "sha256": "cf1f29d8316b719f89828e38b60c56e0c4808d5971697cca93afad2b13667228",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/base/config.yaml": {
+        "kind": "file",
+        "sha256": "594cb993f3967336fea0ace03d509dbb4953a4cd5c266ad2f1b0711fc95db9cb",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/deployment.yaml": {
+        "kind": "file",
+        "sha256": "d53fbf4b3f81909c3f797c3bdc5b7e6f5259ee9a725c0eb9caf1f638241c7d6c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "0201b3b8d834e38623121ed725196374b6f396e4e18c6eb768e2da9278a7cd2f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/pdb.yaml": {
+        "kind": "file",
+        "sha256": "588a3dba374e4a13eda0b0c294ab9599d6a69b8bdb9deb5a74a1a072d52ea083",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/base/service.yaml": {
+        "kind": "file",
+        "sha256": "df01ab886a1bcd8aa6451ecf151eab9d82bf5e41766b71f3d886a8f3aceb45a8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/capacity.env": {
+        "kind": "file",
+        "sha256": "95ae5ed31a3e22464c3bf8057dc5584a86366a56c8e7d8ab09c31a0c3c4da83c",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/components/autoscaling/hpa.yaml": {
+        "kind": "file",
+        "sha256": "6b7c9e000b4aa42d73f8034537809b05d52ddfed7a8302cd09bdb7d154ff99e8",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/components/autoscaling/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "aee14a9ce39a23717ed53c7d9375422017541b8733fd9c40bf76121cda411a18",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/drill-report.json": {
+        "kind": "file",
+        "sha256": "e6b4deeb817b644936760aa58ae252afc1858057b4747df5102cf498ca264b67",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/migration/job.yaml": {
+        "kind": "file",
+        "sha256": "f48e83d993c0822b3c1522ceec63ae8da795d0c1a1f67308085189e605f85195",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "c91db60b9f1ca35742fa73df6546eb069fcf200936c929da297aa5a6b161258a",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "2e0fa18aecff5c145c28d15434e9698aa666bd91e3567ab450a2f36962c6eb2b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "5db9768002b73b479428bfbbb282c20b717ae6a92a1bcdae1fc98f2ce55bc2c2",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/autoscaling/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "300efb5e2cec22426338d394976befc2afef8f9abded6df9b4850a9e1cf1d959",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/app/ingress.yaml": {
+        "kind": "file",
+        "sha256": "8dbac760e2bcb6120a43958423e5c43e50089a08abb6aa14042369ce3661c3dc",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/app/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "94b6be14127d2fd1a930485d4f2bcd20e64e9e38b3abc9b1335b10c0d97d2b85",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/migration": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/migration/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "fb6a2999153917ede22bd02e74ef91227a8825fa33ec6681f7fecee2494c9f1b",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/overlays/production/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/overlays/production/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "483bd87bb4b093a738028fc19ce6d7a5582028f6b3ad4c27a82faeab212573ee",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform": {
+        "kind": "directory"
+      },
+      "deploy/kubernetes/platform/kustomization.yaml": {
+        "kind": "file",
+        "sha256": "e7258075541cf63158fb564d68bf88fb3d772359a48299ead1c98fb38d0d8f8f",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/migration-account.yaml": {
+        "kind": "file",
+        "sha256": "da42751eae8fd277931aaa53ac6334fc6ab7a782d70bbf6ee651ab0091d8ad84",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/networkpolicy.yaml": {
+        "kind": "file",
+        "sha256": "0299b773a6ff26710204a956547e0b2c8a21c0e36d6a8cbae2dd33f75e71f935",
+        "execute_bits": "0o0"
+      },
+      "deploy/kubernetes/platform/serviceaccount.yaml": {
+        "kind": "file",
+        "sha256": "3de90c404d200fbfdc09963f7de9c69a30858ccfef653024eb12ba310c8bdf83",
         "execute_bits": "0o0"
       },
       "deploy/otel-collector.yaml": {
@@ -9239,6 +10339,21 @@
         "sha256": "3898ddabc60aec0dcdf20da1a176f52d4b84ffe441f3806ad64849c07a3efa78",
         "execute_bits": "0o111"
       },
+      "scripts/kube-capacity": {
+        "kind": "file",
+        "sha256": "82c106a7c314b4ae45f7165b5f4b0fdf8b7dde3a806836a5097e2d6c8437decd",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-evidence": {
+        "kind": "file",
+        "sha256": "343dabb044f4044c93401ea446ca0f50c3ecd0edf1cc552efaed1c47835bdcbb",
+        "execute_bits": "0o111"
+      },
+      "scripts/kube-release": {
+        "kind": "file",
+        "sha256": "6e66273c9dbe72cecad9c90e35ed455e974b6e548f4c5720cc25764a8948581f",
+        "execute_bits": "0o111"
+      },
       "scripts/release": {
         "kind": "file",
         "sha256": "f6b25e2222d00c4f90b766452f353a31f49f36bd0a24ddc2119f4f5aeb45dcce",
@@ -9257,6 +10372,11 @@
       "scripts/verify-container": {
         "kind": "file",
         "sha256": "bca74f8bef2b9006c3ab1bd986bff342b0e47fe180704e6a8161037ba8ab91bf",
+        "execute_bits": "0o111"
+      },
+      "scripts/verify-kubernetes": {
+        "kind": "file",
+        "sha256": "c54de98b353036b73dce61969c6ebc4a7378edca63042409e4b7c3b96d70b2cd",
         "execute_bits": "0o111"
       },
       "tests": {

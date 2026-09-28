@@ -47,3 +47,5 @@ P2 已移除内存用户示例，接入 OpenAPI、OIDC、pgx/独立迁移及 Pos
 P3 实现边界与互调验证见 [P3 验证记录](backend-service-p3-verification.md)。
 
 P4 单机部署、供应链和恢复边界见 [P4 验证记录](backend-service-p4-verification.md)。
+
+P5 已提供 Kustomize、集群发布/回退和容量契约，真实节点/AZ/托管数据库切换仍待 B27；见 [P5 验证记录](backend-service-p5-verification.md)。

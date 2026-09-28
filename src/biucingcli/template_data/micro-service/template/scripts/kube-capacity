@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[ "$#" = 1 ] && [ -f "$1" ] || { echo 'Usage: scripts/kube-capacity <capacity.env>' >&2; exit 2; }
+# Explicit integers only: never source the budget file, and never inherit ambient budget values.
+unset MAX_REPLICAS MAX_SURGE TERMINATING_ALLOWANCE POOL_MAX MIGRATION_CONNECTIONS BACKUP_CONNECTIONS OPERATOR_CONNECTIONS OTHER_SERVICE_CONNECTIONS DB_MAX_CONNECTIONS DB_RESERVED_CONNECTIONS
+while IFS='=' read -r key value || [ -n "$key" ]; do
+  case "$key" in ''|\#*) continue ;; esac
+  case "$key" in MAX_REPLICAS|MAX_SURGE|TERMINATING_ALLOWANCE|POOL_MAX|MIGRATION_CONNECTIONS|BACKUP_CONNECTIONS|OPERATOR_CONNECTIONS|OTHER_SERVICE_CONNECTIONS|DB_MAX_CONNECTIONS|DB_RESERVED_CONNECTIONS) ;; *) echo "Unknown budget field: $key" >&2; exit 2;; esac
+  [[ "$value" =~ ^(0|[1-9][0-9]{0,6})$ ]] || { echo "Invalid integer: $key" >&2; exit 2; }
+  declare "$key=$value"
+done < "$1"
+: "${MAX_REPLICAS:?required}" "${MAX_SURGE:?required}" "${TERMINATING_ALLOWANCE:?required}" "${POOL_MAX:?required}" "${MIGRATION_CONNECTIONS:?required}" "${BACKUP_CONNECTIONS:?required}" "${OPERATOR_CONNECTIONS:?required}" "${OTHER_SERVICE_CONNECTIONS:?required}" "${DB_MAX_CONNECTIONS:?required}" "${DB_RESERVED_CONNECTIONS:?required}"
+if [ '{{DATABASE}}' = none ]; then echo 'Stateless Micro: no application PostgreSQL pool. Still budget any downstream dependencies separately.'; exit 0; fi
+required=$(((MAX_REPLICAS + MAX_SURGE + TERMINATING_ALLOWANCE) * POOL_MAX + MIGRATION_CONNECTIONS + BACKUP_CONNECTIONS + OPERATOR_CONNECTIONS + OTHER_SERVICE_CONNECTIONS))
+available=$((DB_MAX_CONNECTIONS - DB_RESERVED_CONNECTIONS))
+printf 'PostgreSQL model: demand=%s available=%s margin=%s\n' "$required" "$available" "$((available-required))"
+[ "$POOL_MAX" -gt 0 ] && [ "$MAX_REPLICAS" -ge 3 ] && [ "$required" -le "$available" ] || { echo 'Connection budget rejected' >&2; exit 1; }
+echo 'This is a declared budget, not a measured guarantee. Match manifests/config and enforce DB role limits; terminating replicas can exceed the allowance.'

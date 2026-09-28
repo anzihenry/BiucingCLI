@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: '{{SERVICE_NAME}}'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  minAvailable: 2
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api

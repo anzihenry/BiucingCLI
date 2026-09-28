@@ -12,3 +12,5 @@ bin/
 backups/
 .release.env
 *.dump
+
+deploy/kubernetes/.render.*/

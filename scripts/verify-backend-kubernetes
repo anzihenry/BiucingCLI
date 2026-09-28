@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+"""P5 structural acceptance, without connecting to or mutating a Kubernetes cluster."""
+
+import argparse
+from datetime import datetime, timezone
+import importlib.machinery
+import json
+from pathlib import Path
+import subprocess
+
+import yaml
+from biucingcli.cli import main as cli_main
+
+cases = (
+    importlib.machinery.SourceFileLoader(
+        "backend_cases", str(Path(__file__).with_name("verify-backends"))
+    )
+    .load_module()
+    .CASES
+)
+
+
+def validate(bundle, database, cache, web, autoscaling):
+    documents = list(yaml.safe_load_all((bundle / "app.yaml").read_text()))
+    by_kind = {d["kind"]: d for d in documents}
+    assert not any(d["kind"] == "Secret" for d in documents)
+    deployment = by_kind["Deployment"]
+    spec = deployment["spec"]
+    pod = spec["template"]["spec"]
+    labels = spec["template"]["metadata"]["labels"]
+    container = pod["containers"][0]
+    assert len(pod["containers"]) == 1 and "initContainers" not in pod
+    assert labels["backend.biucing.dev/database"] == database
+    assert labels["backend.biucing.dev/cache"] == cache
+    assert container["image"] == (bundle / "image.txt").read_text().strip()
+    assert pod["automountServiceAccountToken"] is False
+    assert pod["securityContext"]["runAsUser"] == 65532
+    assert pod["securityContext"]["seccompProfile"]["type"] == "RuntimeDefault"
+    assert container["securityContext"]["readOnlyRootFilesystem"] is True
+    assert container["securityContext"]["allowPrivilegeEscalation"] is False
+    assert container["securityContext"]["capabilities"]["drop"] == ["ALL"]
+    assert container["resources"]["requests"]["cpu"] == "250m"
+    assert spec["strategy"]["rollingUpdate"] == {"maxSurge": 1, "maxUnavailable": 0}
+    assert container["startupProbe"]["httpGet"]["path"] == "/livez"
+    assert container["livenessProbe"]["httpGet"]["path"] == "/livez"
+    assert container["readinessProbe"]["httpGet"]["path"] == "/readyz"
+    assert container["lifecycle"]["preStop"]["sleep"]["seconds"] == 10
+    assert pod["terminationGracePeriodSeconds"] >= 10 + 10 + 2 + 10
+    assert len(pod["topologySpreadConstraints"]) == 2
+    assert {x["topologyKey"] for x in pod["topologySpreadConstraints"]} == {
+        "kubernetes.io/hostname",
+        "topology.kubernetes.io/zone",
+    }
+    service = by_kind["Service"]["spec"]
+    assert service["selector"] == spec["selector"]["matchLabels"]
+    assert all(labels.get(key) == value for key, value in service["selector"].items())
+    assert len(service["ports"]) == 1 and service["ports"][0]["port"] != 9000
+    assert service["type"] == "ClusterIP"
+    assert ("Ingress" in by_kind) == web
+    if not web:
+        assert service["clusterIP"] == "None" and service["publishNotReadyAddresses"] is False
+    assert by_kind["PodDisruptionBudget"]["spec"]["minAvailable"] == 2
+    if autoscaling:
+        assert "replicas" not in spec
+        hpa = by_kind["HorizontalPodAutoscaler"]["spec"]
+        assert hpa["scaleTargetRef"]["name"] == deployment["metadata"]["name"]
+        assert (hpa["minReplicas"], hpa["maxReplicas"]) == (3, 6)
+    else:
+        assert spec["replicas"] == 3 and "HorizontalPodAutoscaler" not in by_kind
+    config_name = next(x["configMap"]["name"] for x in pod["volumes"] if x["name"] == "config")
+    assert by_kind["ConfigMap"]["metadata"]["name"] == config_name
+    cfg = yaml.safe_load(by_kind["ConfigMap"]["data"]["config.yaml"])
+    assert cfg["data"]["max_connections"] == 10
+    assert cfg["database"]["driver"] == database and cfg["cache"]["driver"] == cache
+    secret = next(x["secret"] for x in pod["volumes"] if x["name"] == "runtime")
+    assert secret["defaultMode"] == 0o440 and not secret.get("optional", False)
+    assert not any("migration" in x.get("mountPath", "") for x in container["volumeMounts"])
+    platform = list(yaml.safe_load_all((bundle / "platform.yaml").read_text()))
+    assert {d["kind"] for d in platform} == {"ServiceAccount", "NetworkPolicy"}
+    policies = [d["spec"] for d in platform if d["kind"] == "NetworkPolicy"]
+    assert any(
+        p.get("policyTypes") == ["Ingress", "Egress"]
+        and not p.get("ingress")
+        and not p.get("egress")
+        for p in policies
+    )
+    requests = next(d for d in platform if d["metadata"]["name"].endswith("-requests"))
+    peer = requests["spec"]["ingress"][0]["from"][0]
+    assert "namespaceSelector" in peer and "podSelector" in peer
+    assert all("0.0.0.0/0" not in json.dumps(policy) for policy in policies)
+    assert (bundle / "migration.yaml").exists() == (database == "postgres")
+    if database == "postgres":
+        job = yaml.safe_load((bundle / "migration.yaml").read_text())
+        assert job["kind"] == "Job" and job["spec"]["backoffLimit"] == 0
+        assert job["spec"]["activeDeadlineSeconds"] == 120
+        js = job["spec"]["template"]["spec"]
+        assert not js["automountServiceAccountToken"] and js["restartPolicy"] == "Never"
+        assert js["containers"][0]["image"] == container["image"]
+        assert js["containers"][0]["command"] == ["/app/migrate"]
+        assert js["serviceAccountName"] != pod["serviceAccountName"]
+        assert not any("runtime" in x["name"] for x in js["volumes"])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument(
+        "--schema",
+        action="store_true",
+        help="Also run Docker schema checks; downloads schemas but never connects to the cluster",
+    )
+    args = parser.parse_args()
+    root = args.output_dir.resolve()
+    root.mkdir(exist_ok=False)
+    report = {
+        "result": "failed",
+        "cluster": "not-run",
+        "ha": "not-run",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "cases": [],
+    }
+    try:
+        report["tools"] = json.loads(
+            subprocess.check_output(["kubectl", "version", "--client", "-o", "json"], text=True)
+        )
+        for key, (family, name, options) in cases.items():
+            case_root = root / key
+            case_root.mkdir()
+            assert (
+                cli_main(
+                    [
+                        "create",
+                        family,
+                        name,
+                        "--output-dir",
+                        str(case_root),
+                        "--non-interactive",
+                        *options,
+                    ]
+                )
+                in (None, 0)
+            )
+            project = case_root / name
+            database = "postgres" if family == "web-service" or "--database" in options else "none"
+            cache = "redis" if "--cache" in options else "none"
+            for profile in ("production", "autoscaling"):
+                bundle = case_root / profile
+                with (case_root / (profile + ".log")).open("w") as log:
+                    subprocess.run(
+                        [
+                            "./scripts/kube-release",
+                            "prepare",
+                            "backend-prod",
+                            "deploy/kubernetes/overlays/" + profile,
+                            "registry.example.com/test@sha256:" + "1" * 64,
+                            str(bundle),
+                        ],
+                        cwd=project,
+                        check=True,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                    )
+                    subprocess.run(
+                        ["./scripts/kube-capacity", str(bundle / "capacity.env")],
+                        cwd=project,
+                        check=True,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                    )
+                validate(bundle, database, cache, family == "web-service", profile == "autoscaling")
+                report["cases"].append(
+                    {"case": key, "overlay": profile, "structure": "passed", "schema": "not-run"}
+                )
+            if args.schema:
+                with (case_root / "schema.log").open("w") as log:
+                    subprocess.run(
+                        ["./scripts/verify-kubernetes"],
+                        cwd=project,
+                        check=True,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                    )
+                for entry in report["cases"][-2:]:
+                    entry["schema"] = "passed"
+        report["result"] = "structure-verified"
+    finally:
+        report["finished_at"] = datetime.now(timezone.utc).isoformat()
+        (root / "evidence.json").write_text(json.dumps(report, indent=2) + "\n")
+        print("Evidence:", root / "evidence.json")
+
+
+if __name__ == "__main__":
+    main()

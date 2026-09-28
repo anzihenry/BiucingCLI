@@ -1,0 +1,48 @@
+environment: production
+admin_addr: "0.0.0.0:9000"
+log_level: INFO
+request:
+  max_bytes: 1048576
+  concurrent: 64
+  timeout_seconds: 5
+
+service:
+  name: {{SERVICE_NAME}}
+  port: {{HTTP_PORT}}
+
+server:
+  read_timeout_seconds: 5
+  read_header_timeout_seconds: 5
+  write_timeout_seconds: 15
+  idle_timeout_seconds: 60
+  shutdown_timeout_seconds: 10
+
+database:
+  driver: {{DATABASE}}
+  dsn: ""
+
+cache:
+  driver: {{CACHE}}
+  dsn: ""
+
+data:
+  max_connections: 10
+  query_timeout_seconds: 3
+
+auth:
+  issuer: https://identity.example.com
+  jwks: https://identity.example.com/keys
+  authorize_url: https://identity.example.com/auth
+  token_url: https://identity.example.com/token
+  client_id: web-client
+  audience: web-api
+  origin: https://api.example.com
+  callback: https://api.example.com/auth/callback
+  secure: true
+
+# Empty means no downstream startup dependency. See README for a named client.
+dependencies: {}
+
+telemetry:
+  otlp_http_endpoint: ""
+  sample_ratio: 0.1

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: '{{SERVICE_NAME}}'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  ingressClassName: platform-public
+  tls:
+  - hosts:
+    - api.example.com
+    secretName: '{{SERVICE_NAME}}-edge-tls-v1'
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: '{{SERVICE_NAME}}'
+            port:
+              name: http

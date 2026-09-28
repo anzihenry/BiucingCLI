@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+usage() {
+  echo 'Usage: scripts/kube-release prepare <namespace> <overlay-root> <image@sha256:digest> <new-bundle-directory>' >&2
+  echo '       scripts/kube-release preflight|deploy|rollback <explicit-context> <bundle-directory>' >&2
+  exit 2
+}
+valid_image() { [[ "$1" =~ ^[a-zA-Z0-9._:/-]+@sha256:[a-f0-9]{64}$ ]] && [[ "$1" != *@sha256:0000000000000000000000000000000000000000000000000000000000000000 ]]; }
+checksum() {
+  if command -v sha256sum >/dev/null; then sha256sum "$@"; else shasum -a 256 "$@"; fi
+}
+action="${1:-}"
+if [ "$action" = prepare ]; then
+  [ "$#" = 5 ] || usage
+  namespace="$2"; overlay="$3"; image="$4"; bundle="$5"
+  [[ "$namespace" =~ ^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$ ]] || usage
+  [[ "$overlay" =~ ^deploy/kubernetes/overlays/[a-zA-Z0-9_-]+$ ]] || usage
+  valid_image "$image" || { echo 'An immutable non-placeholder image digest is required' >&2; exit 2; }
+  [ ! -e "$bundle" ] || { echo 'Choose a new bundle directory' >&2; exit 2; }
+  umask 077
+  mkdir -p "$bundle"
+  bundle="$(cd "$bundle" && pwd)"
+  scratch="$(mktemp -d deploy/kubernetes/.render.XXXXXX)"
+  trap 'rm -rf "$scratch"' EXIT # Only the directory allocated by this invocation.
+  for part in app platform migration; do
+    if [ "$part" = migration ] && [ '{{DATABASE}}' != postgres ]; then continue; fi
+    mkdir "$scratch/$part"
+    {
+      printf 'apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nnamespace: %s\n' "$namespace"
+      printf 'resources:\n- ../../overlays/%s/%s\n' "${overlay##*/}" "$part"
+      if [ "$part" = migration ]; then
+        # Unique Job per preparation; do not delete/reuse a potentially active migration.
+        printf 'nameSuffix: -%s\n' "$(printf '%s' "${scratch##*.}" | tr '[:upper:]' '[:lower:]')"
+      fi
+      printf 'images:\n- name: registry.example.invalid/{{SERVICE_NAME}}\n  newName: %s\n  digest: %s\n' "${image%@*}" "${image#*@}"
+    } > "$scratch/$part/kustomization.yaml"
+    kubectl kustomize "$scratch/$part" > "$bundle/$part.yaml"
+  done
+  printf '%s\n' "$image" > "$bundle/image.txt"
+  printf '%s\n' "$namespace" > "$bundle/namespace.txt"
+  cp deploy/kubernetes/capacity.env "$bundle/capacity.env"
+  (cd "$bundle"; checksum app.yaml platform.yaml image.txt namespace.txt capacity.env > SHA256SUMS
+    if [ -f migration.yaml ]; then checksum migration.yaml >> SHA256SUMS; fi)
+  echo "Prepared $bundle; no cluster connection or mutation. Review platform CIDRs, Secret refs and capacity before preflight."
+  exit 0
+fi
+case "$action" in preflight|deploy|rollback) ;; *) usage ;; esac
+[ "$#" = 3 ] || usage
+context="$2"; bundle="$3"
+[ -n "$context" ] && [ -d "$bundle" ] || usage
+bundle="$(cd "$bundle" && pwd)"
+(cd "$bundle"; if command -v sha256sum >/dev/null; then sha256sum -c SHA256SUMS; else shasum -a 256 -c SHA256SUMS; fi)
+image="$(cat "$bundle/image.txt")"; namespace="$(cat "$bundle/namespace.txt")"
+valid_image "$image" || usage
+[[ "$namespace" =~ ^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$ ]] || usage
+# Default profile has one image, with no init/sidecar containers. Extensions must extend this policy.
+for manifest in "$bundle/app.yaml" "$bundle/migration.yaml"; do
+  [ -f "$manifest" ] || continue
+  images="$(awk '$1 == "image:" {print $2}' "$manifest")"
+  [ "$images" = "$image" ] || { echo 'Bundle contains an unexpected image set' >&2; exit 2; }
+done
+if [ "$action" = rollback ]; then
+  [ -f "$bundle/deployed-context.txt" ] && [ "$(cat "$bundle/deployed-context.txt")" = "$context" ] || { echo 'Rollback requires a previously successful bundle on this context' >&2; exit 2; }
+fi
+# Namespace/controller-level serialization belongs to the CD platform. This is a local safety lock only.
+lock_root=".releases/kubernetes/$(printf '%s/%s/{{SERVICE_NAME}}' "$context" "$namespace" | cksum | awk '{print $1}')"
+mkdir -p "$lock_root"
+mkdir "$lock_root/lock" 2>/dev/null || { echo 'Another local Kubernetes release is active; investigate stale locks before removal' >&2; exit 1; }
+trap 'rmdir "$lock_root/lock"' EXIT
+trust=()
+if [ -n "${SIGNER_KEY:-}" ]; then
+  [[ "$SIGNER_KEY" != /* && "$SIGNER_KEY" != *..* && -f "$SIGNER_KEY" ]] || usage
+  trust=(--key "$SIGNER_KEY" --insecure-ignore-tlog)
+else
+  : "${SIGNER_IDENTITY:?Exact signing identity required}" "${SIGNER_ISSUER:?OIDC issuer required}"
+  trust=(--certificate-identity "$SIGNER_IDENTITY" --certificate-oidc-issuer "$SIGNER_ISSUER")
+fi
+./scripts/security cosign verify "${trust[@]}" "$image" > "$bundle/signature.json"
+./scripts/security cosign verify-attestation "${trust[@]}" --type spdxjson "$image" > "$bundle/sbom.json"
+./scripts/security cosign verify-attestation "${trust[@]}" --type slsaprovenance1 "$image" > "$bundle/provenance.json"
+kube=(kubectl --context "$context" --namespace "$namespace" --request-timeout=30s)
+for manifest in app platform; do "${kube[@]}" apply --dry-run=server -f "$bundle/$manifest.yaml" >/dev/null; done
+if [ "$action" != rollback ] && [ -f "$bundle/migration.yaml" ]; then "${kube[@]}" apply --dry-run=server -f "$bundle/migration.yaml" >/dev/null; fi
+[ "$action" = preflight ] && { echo 'Signature and API admission passed; this does not prove scheduling, readiness or HA.'; exit 0; }
+# Platform network policy/ServiceAccounts are reviewed and applied separately before deployment.
+"${kube[@]}" get serviceaccount '{{SERVICE_NAME}}' >/dev/null
+./scripts/kube-capacity "$bundle/capacity.env"
+if [ "$action" = deploy ] && [ '{{DATABASE}}' = postgres ]; then
+  job="$("${kube[@]}" create -f "$bundle/migration.yaml" -o name)"
+  # Failed Jobs are retained for investigation. Never retry DDL automatically or overwrite a running Job.
+  if ! "${kube[@]}" --request-timeout=160s wait --for=condition=complete --timeout=150s "$job"; then
+    echo 'Migration did not complete. Deployment unchanged; inspect the Job and schema state.' >&2
+    exit 1
+  fi
+fi
+"${kube[@]}" apply -f "$bundle/app.yaml"
+if ! "${kube[@]}" --request-timeout=250s rollout status 'deployment/{{SERVICE_NAME}}' --timeout=240s; then
+  echo 'Rollout failed; do not record success or assume database rollback. Review the previous compatible bundle.' >&2
+  exit 1
+fi
+# A newly created HPA-managed Deployment may initially default to one replica.
+# rollout status alone can finish before HPA raises it to minReplicas.
+minimum_ready=no
+for attempt in $(seq 1 30); do
+  available="$("${kube[@]}" --request-timeout=5s get deployment '{{SERVICE_NAME}}' -o 'jsonpath={.status.availableReplicas}')"
+  if [[ "$available" =~ ^[0-9]+$ ]] && [ "$available" -ge 3 ]; then minimum_ready=yes; break; fi
+  sleep 2
+done
+[ "$minimum_ready" = yes ] || { echo 'Fewer than three available replicas; release not recorded as successful.' >&2; exit 1; }
+printf '%s\n' "$context" > "$bundle/deployed-context.txt"
+printf '%s %s %s\n' "$(date -u +%FT%TZ)" "$action" "$image" >> "$bundle/history.log"
+echo 'Rollout completed. Verify external traffic, mTLS callers, actual replica connections and the observation window.'

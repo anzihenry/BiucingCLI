@@ -1,0 +1,178 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-deny'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-dns'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-requests'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: edge-system
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/component: ingress-controller
+    ports:
+    - protocol: TCP
+      port: {{HTTP_PORT}}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-admin'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: observability
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/component: prober
+    ports:
+    - protocol: TCP
+      port: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-postgres'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      backend.biucing.dev/database: postgres
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 192.0.2.10/32
+    ports:
+    - protocol: TCP
+      port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-redis'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api
+      backend.biucing.dev/cache: redis
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 198.51.100.20/32
+    ports:
+    - protocol: TCP
+      port: 6380
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-telemetry'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: observability
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: otel-collector
+    ports:
+    - protocol: TCP
+      port: 4318
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{SERVICE_NAME}}-identity'
+  labels:
+    app.kubernetes.io/name: '{{SERVICE_NAME}}'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{SERVICE_NAME}}'
+      app.kubernetes.io/component: api
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 203.0.113.10/32
+    ports:
+    - protocol: TCP
+      port: 443
