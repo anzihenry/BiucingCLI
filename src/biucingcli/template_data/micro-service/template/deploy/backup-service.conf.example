@@ -1,0 +1,17 @@
+# Copy into a private directory as pg_service.conf, with matching pgpass (0600).
+[backup]
+host=database.example.com
+port=5432
+dbname={{SERVICE_NAME}}
+user={{SERVICE_NAME}}_backup
+sslmode=verify-full
+sslrootcert=/run/pg/ca.crt
+connect_timeout=5
+[restore]
+host=isolated-restore.example.com
+port=5432
+dbname={{SERVICE_NAME}}_restore
+user=restore_operator
+sslmode=verify-full
+sslrootcert=/run/pg/ca.crt
+connect_timeout=5

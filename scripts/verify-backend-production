@@ -1,0 +1,636 @@
+#!/usr/bin/env python3
+"""Isolated P4 acceptance using generated projects, real signed images, TLS and PostgreSQL.
+
+Never targets a production deployment. Requires Docker, generated Web/Micro projects,
+and their built runtime images. All containers/networks/volumes are owned by this run.
+"""
+
+import argparse
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import secrets
+import shutil
+import socket
+import ssl
+import subprocess
+import time
+import urllib.error
+import urllib.request
+
+
+PG = "postgres@sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50"
+CADDY = "caddy@sha256:0c994536bddb66445885237f1a5dcc1916bccea922661c76b4e9fc24061f9b52"
+REGISTRY = "registry@sha256:6c5666b861f3505b116bb9aa9b25175e71210414bd010d92035ff64018f9457e"
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ("web-project", "micro-project", "output-dir"):
+        parser.add_argument("--" + name, required=True, type=Path)
+    parser.add_argument("--web-image", required=True)
+    parser.add_argument("--micro-image", required=True)
+    args = parser.parse_args()
+    base = args.output_dir.resolve()
+    base.mkdir(exist_ok=False)
+    base.chmod(0o700)
+    prefix = "p4-" + secrets.token_hex(5)
+    network, callers = prefix + "-deps", prefix + "-callers"
+    containers, volumes, networks, stacks = [], [], [], []
+    report = {"result": "failed", "started": datetime.now(timezone.utc).isoformat(), "checks": []}
+    auth = base / "registry-auth"
+    auth.mkdir()
+    (auth / "config.json").write_text("{}")
+    env = dict(os.environ, COSIGN_PASSWORD=secrets.token_hex(24), SECURITY_DOCKER_CONFIG=str(auth))
+    for key in list(env):
+        if key.startswith("COMPOSE_") or key in {
+            "APP_IMAGE",
+            "CADDY_IMAGE",
+            "DEPLOY_CONFIG",
+            "RUNTIME_SECRETS",
+            "MIGRATION_SECRETS",
+            "DATABASE_DSN_FILE",
+            "CACHE_DSN_FILE",
+            "OTEL_EXPORTER_OTLP_ENDPOINT",
+            "SIGNER_KEY",
+            "SIGNER_IDENTITY",
+            "SIGNER_ISSUER",
+            "PUBLIC_HOST",
+            "PUBLIC_BIND",
+            "HTTPS_PORT",
+            "EDGE_SECRETS",
+            "SERVICE_NETWORK",
+            "DEPENDENCY_NETWORK",
+            "SECURITY_NETWORK",
+        }:
+            env.pop(key)
+
+    def run(cmd, cwd=None, extra=None, ok=True):
+        result = subprocess.run(
+            cmd,
+            cwd=cwd,
+            env=dict(env, **(extra or {})),
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=900,
+        )
+        # Do not record command arguments: fixture SQL/DSNs may contain ephemeral credentials.
+        with (base / "commands.log").open("a") as log:
+            log.write(
+                str(cmd[0]) + ": exit=" + str(result.returncode) + "\n" + result.stdout + "\n"
+            )
+        if ok and result.returncode:
+            raise RuntimeError(result.stdout[-2500:])
+        return result.stdout.strip() if ok else result.returncode
+
+    def check(name):
+        report["checks"].append(name)
+        (base / "evidence.json").write_text(json.dumps(report, indent=2) + "\n")
+        print(name, flush=True)
+
+    def port():
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            return sock.getsockname()[1]
+
+    def wait(fn, expected, attempts=60):
+        for _ in range(attempts):
+            try:
+                if fn() == expected:
+                    return
+            except (OSError, RuntimeError):
+                pass
+            time.sleep(1)
+        raise RuntimeError("Probe did not reach " + str(expected))
+
+    certs = base / "certs"
+    certs.mkdir()
+
+    def cert(name, sans=(), root=False):
+        cmd = [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            f"{certs}:/certs",
+            "--entrypoint",
+            "step",
+            "smallstep/step-cli:0.30.6",
+            "certificate",
+            "create",
+            name,
+            "/certs/" + name + ".crt",
+            "/certs/" + name + ".key",
+            "--profile",
+            "root-ca" if root else "leaf",
+            "--no-password",
+            "--insecure",
+        ]
+        if not root:
+            cmd += ["--ca", "/certs/ca.crt", "--ca-key", "/certs/ca.key", "--not-after", "24h"]
+        for san in sans:
+            cmd += ["--san", san]
+        run(cmd)
+
+    def db_sql(container, sql, database="edge-api"):
+        return run(
+            [
+                "docker",
+                "exec",
+                container,
+                "psql",
+                "-U",
+                "postgres",
+                "-d",
+                database,
+                "-AtX",
+                "-v",
+                "ON_ERROR_STOP=1",
+                "-c",
+                sql,
+            ]
+        )
+
+    try:
+        report["docker"] = json.loads(run(["docker", "version", "--format", "{{json .Server}}"]))
+        for net in (network, callers):
+            run(["docker", "network", "create", net])
+            networks.append(net)
+        cert("ca", root=True)
+        cert("postgres", ["postgres", "restore"])
+        cert("edge", ["localhost"])
+        cert("server", ["internal-api", "spiffe://example.com/services/internal-api"])
+        for p in certs.iterdir():
+            p.chmod(
+                0o644
+            )  # Ephemeral fixtures inside a 0700 parent; never a production permission recipe.
+        web, micro = args.web_project.resolve(), args.micro_project.resolve()
+        password = secrets.token_hex(24)
+        init = base / "init.sql"
+        init.write_text(
+            (web / "deploy/postgres-init.sql")
+            .read_text()
+            .replace("local-app-only", password)
+            .replace("local-migrate-only", password)
+        )
+        for name in ("postgres", "restore"):
+            container = prefix + "-" + name
+            volume = container + "-data"
+            run(["docker", "volume", "create", volume])
+            volumes.append(volume)
+            cmd = [
+                "docker",
+                "run",
+                "-d",
+                "--name",
+                container,
+                "--network",
+                network,
+                "--network-alias",
+                name,
+                "-e",
+                "POSTGRES_PASSWORD=" + password,
+                "-e",
+                "POSTGRES_DB=edge-api",
+                "-v",
+                volume + ":/var/lib/postgresql/data",
+                "-v",
+                str(certs) + ":/certs:ro",
+            ]
+            if name == "postgres":
+                cmd += ["-v", str(init) + ":/docker-entrypoint-initdb.d/init.sql:ro"]
+            cmd += [
+                "--entrypoint",
+                "sh",
+                PG,
+                "-ec",
+                "cp /certs/postgres.key /tmp/server.key; chown postgres:postgres /tmp/server.key; chmod 600 /tmp/server.key; exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/certs/postgres.crt -c ssl_key_file=/tmp/server.key",
+            ]
+            run(cmd)
+            containers.append(container)
+            wait(
+                lambda: run(
+                    ["docker", "exec", container, "pg_isready", "-U", "postgres"], ok=False
+                ),
+                0,
+            )
+        pg = prefix + "-postgres"
+        registry = prefix + "-registry"
+        registry_port = port()
+        run(
+            [
+                "docker",
+                "run",
+                "-d",
+                "--name",
+                registry,
+                "-p",
+                f"127.0.0.1:{registry_port}:5000",
+                REGISTRY,
+            ]
+        )
+        containers.append(registry)
+        wait(
+            lambda: (
+                urllib.request.urlopen(f"http://localhost:{registry_port}/v2/", timeout=2).status
+            ),
+            200,
+        )
+        # Generate private signing keys locally; fixture signatures never enter public transparency logs.
+        for project in (web, micro):
+            (project / ".secrets/p4-signing").mkdir(parents=True, exist_ok=True)
+            run(
+                [
+                    "./scripts/security",
+                    "cosign",
+                    "generate-key-pair",
+                    "--output-key-prefix",
+                    ".secrets/p4-signing/" + prefix,
+                ],
+                cwd=project,
+            )
+            for suffix in ("key", "pub"):
+                shutil.copy(
+                    project / (".secrets/p4-signing/" + prefix + "." + suffix),
+                    project / (".secrets/p4-signing/cosign." + suffix),
+                )
+        projects = []
+        for family, project, source in [
+            ("web", web, args.web_image),
+            ("micro", micro, args.micro_image),
+        ]:
+            tag = f"localhost:{registry_port}/{family}:verified"
+            run(["docker", "tag", source, tag])
+            run(["docker", "push", tag])
+            digest = next(
+                item
+                for item in json.loads(run(["docker", "image", "inspect", tag]))[0]["RepoDigests"]
+                if item.startswith(f"localhost:{registry_port}/")
+            )
+            runtime, migration = base / (family + "-runtime"), base / (family + "-migration")
+            runtime.mkdir()
+            migration.mkdir()
+            for directory in (runtime, migration):
+                shutil.copy(certs / "ca.crt", directory / "ca.crt")
+            if family == "web":
+                (runtime / "database-dsn").write_text(
+                    f"postgres://edge-api_app:{password}@postgres:5432/edge-api?sslmode=verify-full&sslrootcert=/run/secrets/ca.crt"
+                )
+                (migration / "dsn").write_text(
+                    f"postgres://edge-api_migrator:{password}@postgres:5432/edge-api?sslmode=verify-full&sslrootcert=/run/migration/ca.crt"
+                )
+                (runtime / "oidc-client-secret").write_text(secrets.token_hex(24))
+            else:
+                for name in ("server.crt", "server.key"):
+                    shutil.copy(certs / name, runtime / name)
+            config = base / (family + "-config.yaml")
+            config.write_text((project / "deploy/config.prod.yaml").read_text())
+            settings = dict(
+                COMPOSE_PROJECT_NAME=prefix + "-" + family,
+                APP_IMAGE=digest,
+                DEPLOY_CONFIG=str(config),
+                RUNTIME_SECRETS=str(runtime),
+                MIGRATION_SECRETS=str(migration),
+                DEPENDENCY_NETWORK=network,
+                SIGNER_KEY=".secrets/p4-signing/cosign.pub",
+            )
+            if family == "web":
+                tls = base / "tls"
+                tls.mkdir()
+                shutil.copy(certs / "edge.crt", tls / "tls.crt")
+                shutil.copy(certs / "edge.key", tls / "tls.key")
+                https_port = port()
+                settings.update(
+                    CADDY_IMAGE=CADDY,
+                    EDGE_SECRETS=str(tls),
+                    PUBLIC_HOST="localhost",
+                    PUBLIC_BIND="127.0.0.1",
+                    HTTPS_PORT=str(https_port),
+                )
+            else:
+                settings["SERVICE_NETWORK"] = callers
+            envfile = base / (family + ".env")
+            envfile.write_text("".join(k + "=" + v + "\n" for k, v in settings.items()))
+            compose = [
+                "docker",
+                "compose",
+                "--env-file",
+                str(envfile),
+                "-p",
+                settings["COMPOSE_PROJECT_NAME"],
+                "-f",
+                str(project / "compose.prod.yaml"),
+            ]
+            stacks.append((compose, project))
+            assert run(["./scripts/release", "preflight", str(envfile)], cwd=project, ok=False) != 0
+            check(family + ": unsigned image rejected")
+            out = base / (family + "-security")
+            run(["./scripts/security", "scan", tag, str(out)], cwd=project)
+            run(["./scripts/security", "sbom", tag, str(out)], cwd=project)
+            shutil.copy(out / "sbom.spdx.json", project / ".secrets/p4-signing/sbom.json")
+            (project / ".secrets/p4-signing/provenance.json").write_text(
+                json.dumps(
+                    {
+                        "buildDefinition": {
+                            "buildType": "https://biucing.dev/verification/local",
+                            "externalParameters": {"sourceImage": source},
+                        },
+                        "runDetails": {"builder": {"id": "local-p4-verification"}},
+                    }
+                )
+            )
+            sign = ["./scripts/security", "cosign"]
+            run(
+                sign
+                + [
+                    "sign",
+                    "--yes",
+                    "--key",
+                    ".secrets/p4-signing/cosign.key",
+                    "--use-signing-config=false",
+                    "--tlog-upload=false",
+                    digest,
+                ],
+                cwd=project,
+            )
+            for kind, predicate in [("spdxjson", "sbom"), ("slsaprovenance1", "provenance")]:
+                run(
+                    sign
+                    + [
+                        "attest",
+                        "--yes",
+                        "--key",
+                        ".secrets/p4-signing/cosign.key",
+                        "--use-signing-config=false",
+                        "--tlog-upload=false",
+                        "--type",
+                        kind,
+                        "--predicate",
+                        ".secrets/p4-signing/" + predicate + ".json",
+                        digest,
+                    ],
+                    cwd=project,
+                )
+            untrusted = project / ".secrets/p4-signing/untrusted.pub"
+            other = micro if family == "web" else web
+            shutil.copy(other / ".secrets/p4-signing/cosign.pub", untrusted)
+            wrong_trust = base / (family + "-untrusted.env")
+            wrong_trust.write_text(
+                envfile.read_text().replace(
+                    "SIGNER_KEY=.secrets/p4-signing/cosign.pub",
+                    "SIGNER_KEY=.secrets/p4-signing/untrusted.pub",
+                )
+            )
+            assert (
+                run(["./scripts/release", "preflight", str(wrong_trust)], cwd=project, ok=False)
+                != 0
+            )
+            check(family + ": signature from a different trusted key is rejected")
+            run(["./scripts/release", "deploy", str(envfile)], cwd=project)
+            cid = run(compose + ["ps", "-q", "app"], cwd=project)
+            inspected = json.loads(run(["docker", "inspect", cid]))[0]
+            assert inspected["Config"]["User"] == "65532:65532"
+            assert inspected["HostConfig"]["ReadonlyRootfs"]
+            assert not inspected["HostConfig"]["PortBindings"]
+            assert "ALL" in inspected["HostConfig"]["CapDrop"]
+            check(
+                family
+                + ": scan, SBOM, signature, provenance and readonly nonroot deployment passed"
+            )
+            projects.append((project, envfile, compose, cid))
+        context = ssl.create_default_context(cafile=str(certs / "ca.crt"))
+
+        def https(path):
+            try:
+                with urllib.request.urlopen(
+                    f"https://localhost:{https_port}" + path, context=context, timeout=3
+                ) as response:
+                    return response.status
+            except urllib.error.HTTPError as error:
+                return error.code
+
+        wait(lambda: https("/api/v1/ping"), 200)
+        assert https("/readyz") == 404
+        assert https("/metrics") == 404
+        check("TLS edge routes requests and blocks admin endpoints")
+        project, envfile, compose, cid = projects[0]
+        db_sql(
+            pg,
+            "INSERT INTO runtime_metadata (key, value) VALUES ('p4-marker', 'durable') ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value",
+        )
+        run(compose + ["up", "-d", "--force-recreate", "app"], cwd=project)
+        wait(lambda: https("/api/v1/ping"), 200)
+        assert db_sql(pg, "SELECT value FROM runtime_metadata WHERE key='p4-marker'") == "durable"
+        cid = run(compose + ["ps", "-q", "app"], cwd=project)
+        before = json.loads(run(["docker", "inspect", cid]))[0]["RestartCount"]
+        run(["docker", "stop", pg])
+        wait(lambda: https("/api/v1/ping"), 503)
+        assert (
+            run(
+                compose
+                + [
+                    "exec",
+                    "-T",
+                    "app",
+                    "/app/server",
+                    "healthcheck",
+                    "http://127.0.0.1:9000/livez",
+                ],
+                cwd=project,
+                ok=False,
+            )
+            == 0
+        )
+        assert json.loads(run(["docker", "inspect", cid]))[0]["RestartCount"] == before
+        run(["docker", "start", pg])
+        wait(lambda: https("/api/v1/ping"), 200)
+        check(
+            "container recreation preserves data; DB loss removes edge traffic without liveness restart; DB recovery restores traffic"
+        )
+        # Migration failure occurs before replacing a healthy application.
+        db_sql(pg, "UPDATE schema_migrations SET dirty=true")
+        assert run(["./scripts/release", "deploy", str(envfile)], cwd=project, ok=False) != 0
+        assert cid == run(compose + ["ps", "-q", "app"], cwd=project)
+        db_sql(pg, "UPDATE schema_migrations SET dirty=false")
+        check("dirty migration stops deployment before replacing the running app")
+        # Runtime DSN is syntactically valid but unreachable; migration still uses its valid credentials.
+        candidate = base / "unready.env"
+        broken_runtime = base / "broken-runtime"
+        shutil.copytree(base / "web-runtime", broken_runtime)
+        dsn = broken_runtime / "database-dsn"
+        dsn.write_text(dsn.read_text().replace("@postgres:", "@missing-database:"))
+        candidate.write_text(
+            envfile.read_text().replace(str(base / "web-runtime"), str(broken_runtime))
+        )
+        assert run(["./scripts/release", "deploy", str(candidate)], cwd=project, ok=False) != 0
+        state = project / ".releases" / (prefix + "-web")
+        assert (state / "current.env").read_text() == envfile.read_text()
+        run(["./scripts/release", "rollback", str(state / "current.env")], cwd=project)
+        wait(lambda: https("/api/v1/ping"), 200)
+        check(
+            "unready candidate is not recorded; reviewed previous configuration and digest recover service"
+        )
+        revision_context = base / "revision-context"
+        revision_context.mkdir()
+        revision = revision_context / "Dockerfile"
+        revision.write_text(
+            "FROM " + args.web_image + "\nLABEL biucing.verification.revision=two\n"
+        )
+        revision_tag = f"localhost:{registry_port}/web:revision-two"
+        run(["docker", "build", "-f", str(revision), "-t", revision_tag, str(revision_context)])
+        run(["docker", "push", revision_tag])
+        revision_digest = next(
+            item
+            for item in json.loads(run(["docker", "image", "inspect", revision_tag]))[0][
+                "RepoDigests"
+            ]
+            if item.startswith(f"localhost:{registry_port}/")
+        )
+        sign = ["./scripts/security", "cosign"]
+        key_args = [
+            "--yes",
+            "--key",
+            ".secrets/p4-signing/cosign.key",
+            "--use-signing-config=false",
+            "--tlog-upload=false",
+        ]
+        run(sign + ["sign"] + key_args + [revision_digest], cwd=web)
+        for kind, predicate in [("spdxjson", "sbom"), ("slsaprovenance1", "provenance")]:
+            run(
+                sign
+                + ["attest"]
+                + key_args
+                + [
+                    "--type",
+                    kind,
+                    "--predicate",
+                    ".secrets/p4-signing/" + predicate + ".json",
+                    revision_digest,
+                ],
+                cwd=web,
+            )
+        revision_env = base / "revision.env"
+        original = envfile.read_text()
+        revision_env.write_text(
+            "\n".join(
+                "APP_IMAGE=" + revision_digest if line.startswith("APP_IMAGE=") else line
+                for line in original.splitlines()
+            )
+            + "\n"
+        )
+        old_image = json.loads(
+            run(["docker", "inspect", run(compose + ["ps", "-q", "app"], cwd=web)])
+        )[0]["Image"]
+        run(["./scripts/release", "deploy", str(revision_env)], cwd=web)
+        assert (state / "current.env").read_text() == revision_env.read_text()
+        run(["./scripts/release", "rollback", str(state / "previous.env")], cwd=web)
+        assert (state / "current.env").read_text() == original
+        assert (
+            json.loads(run(["docker", "inspect", run(compose + ["ps", "-q", "app"], cwd=web)]))[0][
+                "Image"
+            ]
+            == old_image
+        )
+        wait(lambda: https("/api/v1/ping"), 200)
+        check("distinct signed image update and schema-compatible previous digest rollback passed")
+        backup_secrets = base / "backup-secrets"
+        backup_secrets.mkdir()
+        shutil.copy(certs / "ca.crt", backup_secrets / "ca.crt")
+        db_sql(
+            pg,
+            f"CREATE ROLE backup_reader LOGIN PASSWORD '{password}'; GRANT CONNECT ON DATABASE \"edge-api\" TO backup_reader; GRANT USAGE ON SCHEMA public TO backup_reader; GRANT SELECT ON ALL TABLES IN SCHEMA public TO backup_reader",
+        )
+        (backup_secrets / "pg_service.conf").write_text(
+            "".join(
+                f"[{service}]\nhost={host}\nport=5432\ndbname=edge-api\nuser={user}\nsslmode=verify-full\nsslrootcert=/run/pg/ca.crt\nconnect_timeout=5\n\n"
+                for service, host, user in [
+                    ("backup", "postgres", "backup_reader"),
+                    ("restore", "restore", "postgres"),
+                ]
+            )
+        )
+        (backup_secrets / "pgpass").write_text(
+            f"*:5432:edge-api:postgres:{password}\n*:5432:edge-api:backup_reader:{password}\n"
+        )
+        (backup_secrets / "pgpass").chmod(0o600)
+        backup_env = dict(
+            PG_TOOLS_IMAGE=PG,
+            PG_SECRETS=str(backup_secrets),
+            PG_NETWORK=network,
+            CONFIRM_ISOLATED_RESTORE="yes",
+        )
+        archive = base / "snapshot.dump"
+        report["snapshot_started_at"] = datetime.now(timezone.utc).isoformat()
+        run(["./scripts/database-backup", "backup", str(archive)], cwd=web, extra=backup_env)
+        report["snapshot_finished_at"] = datetime.now(timezone.utc).isoformat()
+        start = time.monotonic()
+        run(["./scripts/database-backup", "restore", str(archive)], cwd=web, extra=backup_env)
+        assert (
+            db_sql(prefix + "-restore", "SELECT value FROM runtime_metadata WHERE key='p4-marker'")
+            == "durable"
+        )
+        report["restore_seconds"] = round(time.monotonic() - start, 3)
+        assert (
+            run(
+                ["./scripts/database-backup", "restore", str(archive)],
+                cwd=web,
+                extra=backup_env,
+                ok=False,
+            )
+            != 0
+        )
+        check(
+            "real TLS logical backup restored in separate isolated database; marker verified; nonempty restore refused"
+        )
+        # Force a real pg_dump write failure on a bounded filesystem, never the host/DB volume.
+        db_sql(
+            pg,
+            "CREATE TABLE capacity_fixture AS SELECT n, md5(n::text) AS content FROM generate_series(1, 100000) n; GRANT SELECT ON capacity_fixture TO backup_reader",
+        )
+        output = run(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "--network",
+                network,
+                "--tmpfs",
+                "/limited:size=1m",
+                "-v",
+                str(backup_secrets) + ":/run/pg:ro",
+                "-e",
+                "PGSERVICEFILE=/run/pg/pg_service.conf",
+                "-e",
+                "PGPASSFILE=/run/pg/pgpass",
+                "--entrypoint",
+                "sh",
+                PG,
+                "-ec",
+                'if pg_dump "service=backup sslmode=verify-full" --format=custom --compress=0 > /limited/archive.partial; then exit 1; fi; test ! -e /limited/archive.dump; echo expected-full-disk',
+            ]
+        )
+        assert "No space left on device" in output and "expected-full-disk" in output
+        check("real pg_dump fails on bounded full filesystem; no completed archive")
+        report["result"] = "passed"
+    finally:
+        for compose, project in reversed(stacks):
+            run(
+                compose + ["--profile", "maintenance", "down", "--remove-orphans"],
+                cwd=project,
+                ok=False,
+            )
+        for container in reversed(containers):
+            run(["docker", "rm", "-f", container], ok=False)
+        for volume in reversed(volumes):
+            run(["docker", "volume", "rm", volume], ok=False)
+        for net in reversed(networks):
+            run(["docker", "network", "rm", net], ok=False)
+        report["finished"] = datetime.now(timezone.utc).isoformat()
+        (base / "evidence.json").write_text(json.dumps(report, indent=2) + "\n")
+        print("Evidence: " + str(base / "evidence.json"), flush=True)
+
+
+if __name__ == "__main__":
+    main()

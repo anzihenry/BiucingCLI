@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Explicit external database credentials; never target the production runtime role.
+action="${1:-}";file="${2:-}"
+: "${PG_TOOLS_IMAGE:?Pin postgres 16 tools by digest}" "${PG_SECRETS:?Directory with pg_service.conf, pgpass, ca.crt}"
+[[ "$PG_TOOLS_IMAGE" =~ ^[A-Za-z0-9._:/-]+@sha256:[a-f0-9]{64}$ ]] || exit 2
+[ -d "$PG_SECRETS" ] || exit 2
+run=(docker run --rm -i --read-only --memory 256m --pids-limit 64 --cap-drop ALL --security-opt no-new-privileges --user "$(id -u):$(id -g)" --network "${PG_NETWORK:-bridge}" -e PGSERVICEFILE=/run/pg/pg_service.conf -e PGPASSFILE=/run/pg/pgpass -v "$PG_SECRETS:/run/pg:ro" "$PG_TOOLS_IMAGE")
+case "$action" in
+ backup)
+  [ -n "$file" ] && [ ! -e "$file" ] || { echo 'Choose a new backup path' >&2;exit 2; }
+  umask 077;tmp="$file.partial.$$";trap 'rm -f "$tmp"' EXIT
+  # pg_dump uses a consistent snapshot. Logical backup is not PITR/WAL retention.
+  "${run[@]}" pg_dump --dbname="service=backup sslmode=verify-full" --format=custom --no-owner --no-acl > "$tmp"
+  "${run[@]}" pg_restore --list < "$tmp" >/dev/null
+  mv "$tmp" "$file"
+  printf 'Completed UTC %s; upload encrypted to independent storage and test restore.\n' "$(date -u +%FT%TZ)" ;;
+ restore)
+  [ "${CONFIRM_ISOLATED_RESTORE:-}" = yes ] || { echo 'Set CONFIRM_ISOLATED_RESTORE=yes for an empty isolated restore target.' >&2;exit 2; }
+  [ -f "$file" ] || exit 2
+  count="$("${run[@]}" psql "service=restore sslmode=verify-full" -AtX -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'")"
+  [ "$count" = 0 ] || { echo 'Restore target is not empty; refused' >&2;exit 1; }
+  "${run[@]}" pg_restore --dbname="service=restore sslmode=verify-full" --exit-on-error --single-transaction --no-owner --no-acl < "$file"
+  echo 'Restore completed; verify data and reapply reviewed runtime-role grants before cutover.' ;;
+ *) echo 'Usage: scripts/database-backup backup|restore <archive.dump>' >&2;exit 2 ;;
+esac

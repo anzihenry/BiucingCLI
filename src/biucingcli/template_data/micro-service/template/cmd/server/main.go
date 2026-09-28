@@ -24,6 +24,12 @@ func execute() int {
 		}
 		return 0
 	}
+	if len(os.Args) == 2 && os.Args[1] == "version" {
+		if json.NewEncoder(os.Stdout).Encode(map[string]string{"version": serverruntime.Version, "commit": serverruntime.Commit, "built_at": serverruntime.BuiltAt}) != nil {
+			return 1
+		}
+		return 0
+	}
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Error("configuration rejected", "code", "invalid_config", "reason", err.Error())

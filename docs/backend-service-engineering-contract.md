@@ -67,7 +67,7 @@ Buf 1.70.0；Buf 远端插件也固定版本，防止后续生成悄然漂移。
 | 缓存 | none / Redis，默认 none | none / Redis，默认 none | 与数据库独立，尚无缓存适配 |
 | 认证授权 | OIDC + 会话/访问令牌 | mTLS + 方法授权 | B13–B15 已完成，见 P2 验证 |
 | 出站调用/故障隔离 | HTTP + gRPC | HTTP + gRPC | B16/B17，实现与验收见 P3 |
-| CI | 项目内 Docker 检查 | 项目内 Docker 检查 + Buf | P0–P3 生成/依赖/协议/互调检查；生产关卡属 P4 |
+| CI | 项目内 Docker 检查 | 项目内 Docker 检查 + Buf | P0–P3 生成/依赖/协议/互调检查；P4 增加扫描/SBOM/来源证明/签名、独立生产 Compose 与恢复验收 |
 
 ## B02 配置契约与兼容
 

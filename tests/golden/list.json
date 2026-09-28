@@ -769,7 +769,7 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Containerized microservice starter with coordinated HTTP/gRPC shutdown, bounded timeouts, health checks, protobuf, and observability."
+        "summary": "Docker backend foundation with protocol identity, bounded outbound calls, telemetry and single-host production delivery; multi-host HA is separate."
       },
       "validation": {
         "status": "real-build-verified",
@@ -779,7 +779,9 @@
           "generated-project HTTP and gRPC shutdown tests",
           "HTTP and gRPC health checks",
           "real docker runtime image builds",
-          "real docker development image builds"
+          "real docker development image builds",
+          "P3 independent OIDC/mTLS call-chain and telemetry fault verification (docs/backend-service-p3-verification.md)",
+          "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/backend-service-p4-verification.md)"
         ]
       },
       "worktree": {
@@ -804,7 +806,7 @@
       "operating_assumptions": [
         "The starter assumes a contract-first backend workflow with Buf and local dependency orchestration.",
         "Generated projects are expected to validate protobuf, service runtime, and container packaging together.",
-        "Database and cache are independent components. P2 adds PostgreSQL/migration and protocol identity foundations; production delivery, full telemetry and HA remain later architecture stages."
+        "Database and cache are independent. Production Compose consumes platform-provisioned dependencies, credentials and certificates; single-host updates have interruption windows and do not provide HA."
       ],
       "workflow_labels": [
         "bootstrap",
@@ -947,7 +949,7 @@
       ],
       "maturity": {
         "level": "validated",
-        "summary": "Dockerized web service starter with bounded HTTP timeouts, graceful shutdown, runtime health checks, lint, and tests."
+        "summary": "Docker backend foundation with protocol identity, bounded outbound calls, telemetry and single-host production delivery; multi-host HA is separate."
       },
       "validation": {
         "status": "real-build-verified",
@@ -957,7 +959,9 @@
           "generated-project graceful shutdown and timeout tests",
           "runtime image HTTP health check",
           "real docker runtime image builds",
-          "real docker development image builds"
+          "real docker development image builds",
+          "P3 independent OIDC/mTLS call-chain and telemetry fault verification (docs/backend-service-p3-verification.md)",
+          "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/backend-service-p4-verification.md)"
         ]
       },
       "worktree": {
@@ -981,7 +985,7 @@
       "operating_assumptions": [
         "The starter is optimized for Go service development with Docker-based dev and runtime flows.",
         "Generated projects are expected to keep config, build, and verification workflows repo-local.",
-        "Database and cache are independent components. P2 adds PostgreSQL/migration and protocol identity foundations; production delivery, full telemetry and HA remain later architecture stages."
+        "Database and cache are independent. Production Compose consumes platform-provisioned dependencies, credentials and certificates; single-host updates have interruption windows and do not provide HA."
       ],
       "workflow_labels": [
         "bootstrap",

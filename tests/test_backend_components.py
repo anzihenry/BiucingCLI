@@ -113,3 +113,36 @@ sys.exit(7 if "run" in sys.argv else 0)
                 self.assertEqual(run[run.index("--project-name") + 1], project)
                 self.assertIn("compose.dev.yaml", run)
                 self.assertNotIn("production", " ".join(run + cleanup))
+
+    def test_production_topology_and_release_guards(self):
+        for family in ('web-service', 'micro-service'):
+            with self.subTest(family=family), tempfile.TemporaryDirectory() as tmp:
+                with redirect_stdout(io.StringIO()):
+                    main(['create', family, 'prod-probe', '--output-dir', tmp, '--non-interactive',
+                          '--module-name', 'example.org/prod/probe',
+                          *(['--proto-package', 'platform.prod.v1'] if family == 'micro-service' else [])])
+                root = Path(tmp) / 'prod-probe'
+                services = yaml.safe_load((root / 'compose.prod.yaml').read_text())['services']
+                self.assertEqual(set(services), {'app', 'migrate', 'edge'} if family == 'web-service' else {'app', 'migrate'})
+                for name, service in services.items():
+                    self.assertNotIn('build', service)
+                    self.assertEqual(service['user'], '65532:65532')
+                    self.assertTrue(service['read_only'])
+                    self.assertEqual(service['cap_drop'], ['ALL'])
+                    self.assertTrue(all(mount.startswith('/') for mount in service['tmpfs']))
+                    if name != 'edge':
+                        self.assertNotIn('ports', service)
+                self.assertEqual(services['migrate']['profiles'], ['maintenance'])
+                self.assertNotIn('/run/migration', str(services['app']['volumes']))
+                self.assertNotIn('postgres', services)
+                self.assertNotIn('idp', services)
+                # Malicious environment data must never be evaluated, even before Docker is invoked.
+                marker = Path(tmp) / 'executed'
+                envfile = root / '.release.env'
+                envfile.write_text('COMPOSE_PROJECT_NAME=$(touch ' + str(marker) + ')\n')
+                result = subprocess.run(['./scripts/release', 'preflight', str(envfile)], cwd=root, capture_output=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse(marker.exists())
+                for script in ('release', 'security', 'database-backup'):
+                    self.assertTrue((root / 'scripts' / script).stat().st_mode & 0o111)
+                    subprocess.run(['bash', '-n', str(root / 'scripts' / script)], check=True)

@@ -41,7 +41,9 @@
 
 P1 已实现统一 Docker 工作流、配置与文件密钥校验、HTTP 请求预算和默认拒绝策略、私有管理口、有限退出和结构化日志。
 P2 已移除内存用户示例，接入 OpenAPI、OIDC、pgx/独立迁移及 PostgreSQL 会话。会话采用固定期限，
-登录后丢弃提供方令牌，不请求或保存 refresh token；会话到期重新登录。P3 已加入出站客户端和 OTel 仪表化；生产交付仍待实现。
+登录后丢弃提供方令牌，不请求或保存 refresh token；会话到期重新登录。P3 已加入出站客户端和 OTel 仪表化；P4 已提供独立生产 Compose、Caddy TLS、签名镜像发布、回退与备份恢复入口。
 详见 [P2 验证记录](backend-service-p2-verification.md)。
 
 P3 实现边界与互调验证见 [P3 验证记录](backend-service-p3-verification.md)。
+
+P4 单机部署、供应链和恢复边界见 [P4 验证记录](backend-service-p4-verification.md)。

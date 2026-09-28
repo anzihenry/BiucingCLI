@@ -188,7 +188,7 @@ OpenTelemetry Collector 作为可选转发设施，不是日志查询或长期�
 宿主机的必要工具为 Docker Engine/Desktop、Compose 和 Git；Go/Buf/lint/迁移工具在开发镜像内。
 保留可选宿主 Go 调试，但标准验收不依赖宿主 Go、Homebrew 或 mise。
 建议统一文件：`Dockerfile.dev`、`Dockerfile`、`compose.yaml`、`compose.dev.yaml`、`compose.prod.yaml`。
-文件显式组合，不通过隐含加载让生产意外继承源码挂载或调试端口。
+生产 `compose.prod.yaml` 独立使用，禁止与开发文件叠加，避免继承源码挂载或调试端口。
 
 开发支持源码挂载、热重载、调试、依赖缓存、测试 PostgreSQL、Web 的本地测试 IdP、
 Micro 的本地测试证书。按需的观测/缓存/消息等使用 Compose profiles。
@@ -207,7 +207,7 @@ Make 保留同名包装。P2 的 `migrate` 已提供独立迁移入口。生成 
 
 只有反向代理发布公网端口；数据库、RPC、遥测和管理端口通过专用网络及宿主防火墙限制访问。
 开发确需发布依赖端口时默认绑定 loopback。Docker network 的成员仍需应用鉴权，不把网络名视为身份。
-反向代理可选 Caddy/Traefik 等成熟产品；提供明确可运行的参考配置，避免同时维护多套默认代理。
+P4 固定 Caddy 为参考代理，使用平台提供的 TLS 证书与主动 ready 探测。
 生产域名、TLS 证书、存储目录、容量和日志/备份目标是部署配置契约。
 
 非敏感配置可通过环境变量覆盖文件；敏感配置采用挂载文件，支持 `_FILE` 风格。
@@ -251,21 +251,16 @@ Compose 的启动顺序要用健康条件或单次任务成功条件表达；服
 
 ## 11. 当前实现差距与实施顺序
 
-| 当前仓库证据 | 距离目标的差距 |
+| 当前仓库证据 | 剩余部署责任 |
 | --- | --- |
-| 两模板已有独立 dev/runtime Compose、统一 Docker 命令与 worktree 隔离 | 生产代理、镜像 digest、权限加固和网络交付在 B20 实施 |
-| 两模板已有配置/文件密钥校验、请求预算、默认拒绝策略、私有管理口和结构化日志 | 真实依赖、身份验证、完整观测及部署验收仍待实现 |
-| Web 已有 OIDC、PostgreSQL 会话与公开协议，移除内存用户示例 | 出站调用、完整遥测与生产交付待实现 |
-| Micro 已有 mTLS、方法/委托策略、Buf baseline、可选真实数据与迁移 | 完整指标、出站客户端与生产 PKI 平台交付待实现 |
+| Docker 开发/worktree 隔离、P4 独立生产 Compose/Caddy、digest 与最小权限运行 | 目标宿主网络、证书、容量和入口 DNS |
+| 配置与文件密钥校验、请求预算、私网管理口、出站可靠性和 OTel | 生产遥测留存、告警目标、网络访问控制 |
+| Web OIDC、PostgreSQL 会话、公开协议和真实依赖验证 | 生产 IdP、数据库账户、备份保留和恢复目标 |
+| Micro mTLS、方法/委托策略、Buf baseline、可选数据与迁移 | 生产工作负载 PKI 签发、轮换和身份授权 |
+| 扫描/签名/来源证明发布入口、单机回退及隔离恢复演练 | GitHub OIDC/GHCR 实际发布、多机 HA 与远端灾难恢复验收 |
 
-P0–P2 的完成范围见 [实施任务](backend-service-implementation-tasks.md) 和 [P2 验证记录](backend-service-p2-verification.md)。
-
-建议实施顺序：
-1. 统一容器、配置、启动/退出、健康、管理端口和日志。
-2. 补齐两类入口的契约、身份、授权入口与 HTTP/gRPC 出站客户端。
-3. 统一 PostgreSQL/迁移、会话、指标/追踪与真实依赖测试。
-4. 完成单机生产部署、发布/回滚、备份恢复及跨服务组合验收。
-5. 补齐多机高可用参考，并按实际需求启用第 4 节的扩展组件。
+P0–P4 的实现和验收范围见 [实施任务](backend-service-implementation-tasks.md) 与各阶段验证记录。
+下一阶段是 P5 多机高可用参考；第 4 节扩展组件仍按实际需求启用，不作为默认启动依赖。
 
 ## 12. 依据
 
@@ -275,3 +270,5 @@ P0–P2 的完成范围见 [实施任务](backend-service-implementation-tasks.m
 - [Compose 网络](https://docs.docker.com/compose/how-tos/networking/)：服务名、网络与容器替换。
 - [gRPC 认证](https://grpc.io/docs/guides/auth/)、[截止时间](https://grpc.io/docs/guides/deadlines/)、[负载均衡](https://grpc.io/docs/guides/custom-load-balancing/)：内部调用的连接与请求责任。
 - [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)：遥测接收、处理及导出。
+
+P4 实现与实际验证边界见 [单机生产交付验证记录](backend-service-p4-verification.md)。

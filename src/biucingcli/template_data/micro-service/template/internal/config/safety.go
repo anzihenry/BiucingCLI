@@ -100,6 +100,10 @@ func (cfg *Config) validateCommon() error {
 		name      string
 		component *ComponentConfig
 	}{{"DATABASE_DSN", &cfg.Database}, {"CACHE_DSN", &cfg.Cache}} {
+		if item.component.Driver == "none" {
+			item.component.DSN = ""
+			continue
+		}
 		value, err := secret(item.name, item.component.DSN)
 		if err != nil {
 			return err

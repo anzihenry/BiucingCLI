@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+# Tool versions are fixed; the release runbook requires reviewing digest updates.
+cosign_image=ghcr.io/sigstore/cosign/cosign:v3.1.3@sha256:9e5c2f2edc34351160407ca3416c61855bdf9403c3c5936e0f0be7fc261611b8
+trivy_image=aquasec/trivy:0.67.2@sha256:e2b22eac59c02003d8749f5b8d9bd073b62e30fefaef5b7c8371204e0a4b0c08
+case "${1:-}" in
+ cosign) shift; exec docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOCKER_CONFIG=/auth --network "${SECURITY_NETWORK:-host}" \
+  -e ACTIONS_ID_TOKEN_REQUEST_URL -e ACTIONS_ID_TOKEN_REQUEST_TOKEN -e COSIGN_PASSWORD \
+  -v "$PWD:/work" -w /work \
+  -v "${SECURITY_DOCKER_CONFIG:-${DOCKER_CONFIG:-$HOME/.docker}}:/auth:ro" \
+  "$cosign_image" "$@" ;;
+ scan|sbom)
+  mode="$1"; image="${2:?image required}"; out="${3:?output directory required}"
+  mkdir -p "$out"; out="$(cd "$out" && pwd)"
+  tmp="$(mktemp -d)"; trap 'rm -f "$tmp/image.tar"; rmdir "$tmp"' EXIT
+  docker image save "$image" -o "$tmp/image.tar"
+  if [ "$mode" = scan ]; then
+   docker run --rm -v "$tmp:/input:ro" -v "$out:/output" "$trivy_image" image --input /input/image.tar --scanners vuln --severity HIGH,CRITICAL --format json --output /output/vulnerabilities.json --exit-code 1
+  else
+   docker run --rm -v "$tmp:/input:ro" -v "$out:/output" "$trivy_image" image --input /input/image.tar --format spdx-json --output /output/sbom.spdx.json
+  fi ;;
+ *) echo 'Usage: scripts/security cosign <args> | scan <image> <output-dir> | sbom <image> <output-dir>' >&2; exit 2 ;;
+esac

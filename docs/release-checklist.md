@@ -293,3 +293,11 @@ Use this template in the PR body, release-prep note, or rollout summary:
 - Known limitations:
   - `none` or explicit note
 ```
+
+## Backend single-host delivery
+
+- Run the six backend Docker component combinations, generation goldens and worktree regression after runtime/topology changes.
+- Preserve wheel/sdist-generated backends with `scripts/verify-distribution --backend-output-dir <new-dir>` and verify their Docker workflows and production images.
+- Run `scripts/verify-backend-production` against isolated local fixtures; retain scan/SBOM/signature, TLS, failed migration/release, previous digest rollback and real isolated restore evidence.
+- Record image/platform versions, backup data point and restoration time. Keep full-disk tests bounded to disposable storage.
+- Check generated `deploy/RUNBOOK.md`, metadata and architecture profiles against the evidence. Local pinned-key signing does not validate GitHub OIDC/GHCR publication, remote backup retention or multi-host availability; record those separately.

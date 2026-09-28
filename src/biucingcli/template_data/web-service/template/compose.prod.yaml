@@ -1,0 +1,102 @@
+# Standalone only: docker compose --env-file <release.env> -f compose.prod.yaml ...
+services:
+  app:
+    image: ${APP_IMAGE:?Use a verified registry/repository@sha256 digest}
+    pull_policy: never
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=16m,mode=1777,noexec,nosuid,nodev"]
+    pids_limit: 128
+    mem_limit: 256m
+    cpus: 1.0
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      CONFIG_FILE: /run/config/config.yaml
+      ADMIN_ADDR: 0.0.0.0:9000
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      DATABASE_DSN_FILE: /run/secrets/database-dsn
+      CACHE_DSN_FILE: ${CACHE_DSN_FILE:-/run/secrets/cache-dsn}
+      OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc-client-secret
+    volumes:
+      - type: bind
+        source: ${DEPLOY_CONFIG:?Path to production config.yaml}
+        target: /run/config/config.yaml
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${RUNTIME_SECRETS:?Path to runtime secrets directory}
+        target: /run/secrets
+        read_only: true
+        bind: {create_host_path: false}
+    networks: [private, egress]
+  migrate:
+    image: ${APP_IMAGE:?Use a verified registry/repository@sha256 digest}
+    pull_policy: never
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=16m,mode=1777,noexec,nosuid,nodev"]
+    pids_limit: 128
+    mem_limit: 256m
+    cpus: 1.0
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    profiles: [maintenance]
+    entrypoint: [/app/migrate]
+    environment:
+      APP_ENV: production
+      MIGRATION_DSN_FILE: /run/migration/dsn
+      DATABASE_RUNTIME_ROLE: {{SERVICE_NAME}}_app
+    volumes:
+      - type: bind
+        source: ${MIGRATION_SECRETS:-/nonexistent/migration-not-configured}
+        target: /run/migration
+        read_only: true
+        bind: {create_host_path: false}
+    networks: [egress]
+  edge:
+    image: ${CADDY_IMAGE:?Pin Caddy 2.11.4 by digest}
+    pull_policy: never
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    # Official Caddy binary has this file capability; an empty bounding set blocks exec.
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    ports: ["${PUBLIC_BIND:-0.0.0.0}:${HTTPS_PORT:-443}:8443"]
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?Public DNS name}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: ${EDGE_SECRETS:?Directory containing tls.crt and tls.key}
+        target: /run/tls
+        read_only: true
+        bind: {create_host_path: false}
+    tmpfs: ["/data:size=16m,mode=0700,uid=65532,gid=65532,noexec,nosuid,nodev", "/config:size=1m,mode=0700,uid=65532,gid=65532,noexec,nosuid,nodev"]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.5
+    stop_grace_period: 30s
+    networks: [private, ingress]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+networks:
+  private:
+    internal: true
+  egress:
+    external: true
+    name: ${DEPENDENCY_NETWORK:?Pre-provisioned dependency egress network}
+  ingress: {}

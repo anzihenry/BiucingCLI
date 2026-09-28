@@ -8,3 +8,8 @@ tmp/
 *.key
 .env*
 !.env.example
+
+.releases/
+backups/
+.release.env
+*.dump

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+action="${1:-}"; envfile="${2:-}"
+case "$action" in preflight|deploy|rollback|status) ;; *) echo "Unknown release action" >&2;exit 2;; esac
+[ -f "$envfile" ] || { echo 'Usage: scripts/release preflight|deploy|rollback|status <release.env>' >&2; exit 2; }
+# No eval/source: this data file cannot execute shell commands. Use unquoted values.
+while IFS='=' read -r key value || [ -n "$key" ]; do
+ case "$key" in ''|\#*) continue ;; esac
+ case "$key" in COMPOSE_PROJECT_NAME|APP_IMAGE|DEPLOY_CONFIG|RUNTIME_SECRETS|MIGRATION_SECRETS|DATABASE_DSN_FILE|CACHE_DSN_FILE|OTEL_EXPORTER_OTLP_ENDPOINT|SIGNER_IDENTITY|SIGNER_ISSUER|SIGNER_KEY|PUBLIC_HOST|PUBLIC_BIND|HTTPS_PORT|CADDY_IMAGE|EDGE_SECRETS|SERVICE_NETWORK|DEPENDENCY_NETWORK|SECURITY_NETWORK) export "$key=$value" ;; *) echo "Unknown release setting: $key" >&2; exit 2 ;; esac
+done < "$envfile"
+: "${COMPOSE_PROJECT_NAME:?required}"
+[[ "$COMPOSE_PROJECT_NAME" =~ ^[a-z0-9][a-z0-9_-]{0,62}$ ]] || exit 2
+compose=(docker compose --env-file /dev/null -p "$COMPOSE_PROJECT_NAME" -f compose.prod.yaml)
+state=".releases/$COMPOSE_PROJECT_NAME";mkdir -p "$state";chmod 700 .releases "$state"
+[ "$action" = status ] && { "${compose[@]}" ps;exit; }
+mkdir "$state/lock" 2>/dev/null || { echo 'Release locked; investigate a stale lock before removing it.' >&2;exit 1; }
+trap 'rmdir "$state/lock"' EXIT
+if [ "$action" = rollback ]; then
+ [ -s "$state/current.env" ] || { echo 'No previous successful release' >&2;exit 1; }
+ # The caller reviews/restores the previous environment; never silently swap credentials.
+ { cmp -s "$envfile" "$state/previous.env" || cmp -s "$envfile" "$state/current.env"; } || { echo "Use the reviewed $state/previous.env for rollback" >&2;exit 1; }
+fi
+[[ "${APP_IMAGE:-}" =~ ^[A-Za-z0-9._:/-]+@sha256:[a-f0-9]{64}$ ]] || { echo 'APP_IMAGE must be an immutable digest' >&2;exit 2; }
+if [ -n "${CADDY_IMAGE:-}" ];then [[ "$CADDY_IMAGE" =~ ^[A-Za-z0-9._:/-]+@sha256:[a-f0-9]{64}$ ]] || exit 2;fi
+"${compose[@]}" config --quiet
+trust=()
+if [ -n "${SIGNER_KEY:-}" ]; then
+ # Public key is project-relative so the verification tool can read it in /work.
+ [[ "$SIGNER_KEY" != /* && "$SIGNER_KEY" != *..* && -f "$SIGNER_KEY" ]] || exit 2
+ trust=(--key "$SIGNER_KEY" --insecure-ignore-tlog) # Explicit pinned-key trust; keyless mode still requires transparency.
+else
+ : "${SIGNER_IDENTITY:?Exact signing workflow identity required}" "${SIGNER_ISSUER:?OIDC issuer required}"
+ trust=(--certificate-identity "$SIGNER_IDENTITY" --certificate-oidc-issuer "$SIGNER_ISSUER")
+fi
+./scripts/security cosign verify "${trust[@]}" "$APP_IMAGE" > "$state/signature.json"
+./scripts/security cosign verify-attestation "${trust[@]}" --type spdxjson "$APP_IMAGE" > "$state/sbom-attestation.json"
+./scripts/security cosign verify-attestation "${trust[@]}" --type slsaprovenance1 "$APP_IMAGE" > "$state/provenance-attestation.json"
+docker pull "$APP_IMAGE"
+if [ -n "${CADDY_IMAGE:-}" ];then docker pull "$CADDY_IMAGE";fi
+"${compose[@]}" run --rm --no-deps app /app/server check-config
+if [ -n "${CADDY_IMAGE:-}" ];then "${compose[@]}" run --rm --no-deps edge caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile;fi
+[ "$action" = preflight ] && exit 0
+[ "$action" = deploy ] || [ "$action" = rollback ] || { echo 'Unknown action' >&2;exit 2; }
+# Migration only on forward deployment, with its separate secret mount and DB lock.
+if [ "$action" = deploy ] && [ "{{DATABASE}}" = postgres ];then "${compose[@]}" --profile maintenance run --rm --no-deps migrate;fi
+started="$(date -u +%FT%TZ)"
+"${compose[@]}" up -d --no-build app
+ready=no
+for attempt in $(seq 1 30);do
+ if "${compose[@]}" exec -T app /app/server healthcheck http://127.0.0.1:9000/readyz;then ready=yes;break;fi
+ sleep 1
+done
+if [ "$ready" != yes ];then
+ echo 'Candidate is not ready. Release stopped; previous release remains recorded. Restore the reviewed image/config manually.' >&2
+ exit 1
+fi
+if [ -n "${CADDY_IMAGE:-}" ];then "${compose[@]}" up -d --no-build --wait --wait-timeout 30 edge;fi
+"${compose[@]}" exec -T app /app/server version > "$state/version.json"
+# Store only non-secret paths and digest. Secret/config contents are versioned outside this checkout.
+cp "$envfile" "$state/candidate.env"
+if [ -f "$state/current.env" ] && ! cmp -s "$envfile" "$state/current.env";then cp "$state/current.env" "$state/previous.env";fi
+mv "$state/candidate.env" "$state/current.env"
+printf '%s %s %s %s\n' "$started" "$(date -u +%FT%TZ)" "$action" "$APP_IMAGE" >> "$state/history.log"
+echo 'Release ready. Single-instance replacement has an interruption window; this is not rolling zero downtime.'

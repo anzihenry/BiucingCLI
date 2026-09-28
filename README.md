@@ -221,6 +221,7 @@ Local HarmonyOS validation status:
 - [后端服务 P1 实施与验证](docs/backend-service-p1-verification.md)
 - [后端服务 P2 实施与验证](docs/backend-service-p2-verification.md)
 - [后端服务 P3 实施与验证](docs/backend-service-p3-verification.md)
+- [后端服务 P4 单机生产交付与恢复验证](docs/backend-service-p4-verification.md)
 - [后端服务工程契约与 P0 选型](docs/backend-service-engineering-contract.md)
 - [后端服务架构实施任务（阶段、依赖与验收）](docs/backend-service-implementation-tasks.md)
 - [Web Service 架构（终端用户入口）](docs/web-service-architecture.md)

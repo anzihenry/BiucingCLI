@@ -1,5 +1,5 @@
 ARG BUILDER_IMAGE=golang:1.26.8-alpine
-ARG RUNTIME_IMAGE=alpine:3.20
+ARG RUNTIME_IMAGE=alpine:3.23.6
 
 FROM ${BUILDER_IMAGE} AS builder
 
@@ -33,6 +33,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} go build -trimpath -o /
 FROM ${RUNTIME_IMAGE}
 
 WORKDIR /app
+
+USER 65532:65532
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /out/server /app/server

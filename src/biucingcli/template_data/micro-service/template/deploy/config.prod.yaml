@@ -1,0 +1,48 @@
+environment: production
+admin_addr: "0.0.0.0:9000"
+log_level: INFO
+request:
+  max_bytes: 1048576
+  concurrent: 64
+  timeout_seconds: 5
+
+service:
+  name: {{SERVICE_NAME}}
+  http_port: {{HTTP_PORT}}
+  grpc_port: {{GRPC_PORT}}
+
+server:
+  read_timeout_seconds: 5
+  read_header_timeout_seconds: 5
+  write_timeout_seconds: 15
+  idle_timeout_seconds: 60
+  shutdown_timeout_seconds: 10
+
+telemetry:
+  sample_ratio: 0.1
+  otlp_http_endpoint: ""
+
+database:
+  driver: {{DATABASE}}
+  dsn: ""
+
+cache:
+  driver: {{CACHE}}
+  dsn: ""
+
+data:
+  max_connections: 10
+  query_timeout_seconds: 3
+
+workload:
+  certificate: /run/secrets/server.crt
+  key: /run/secrets/server.key
+  roots: /run/secrets/ca.crt
+  methods:
+    /{{PROTO_PACKAGE}}.{{SERVICE_TYPE_NAME}}Service/Ping: ["spiffe://example.com/services/caller"]
+    /grpc.health.v1.Health/Check: ["spiffe://example.com/services/caller"]
+    /grpc.health.v1.Health/Watch: ["spiffe://example.com/services/caller"]
+  delegates: {}
+
+# Empty means no downstream startup dependency. See README for a named client.
+dependencies: {}

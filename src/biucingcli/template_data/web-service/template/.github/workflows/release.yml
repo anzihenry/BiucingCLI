@@ -1,0 +1,79 @@
+name: Verified image release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - run: ./scripts/verify-container
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - run: ./scripts/task bootstrap
+      - run: ./scripts/task image
+        env:
+          IMAGE: release-candidate
+          TAG: verified
+          VERSION: ${{ github.ref_name }}
+          COMMIT: ${{ github.sha }}
+      - run: ./scripts/security scan release-candidate:verified .releases/evidence
+      - run: ./scripts/security sbom release-candidate:verified .releases/evidence
+      - name: Non-root immutable filesystem smoke
+        run: |
+          test "$(docker image inspect release-candidate:verified --format '{{.Config.User}}')" = '65532:65532'
+          docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges release-candidate:verified /app/server check-config
+      - run: docker save release-candidate:verified -o image.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-image
+          include-hidden-files: true
+          path: |
+            image.tar
+            .releases/evidence/sbom.spdx.json
+            .releases/evidence/vulnerabilities.json
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-image
+      - name: Publish exact reviewed image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker load -i image.tar
+          repository="ghcr.io/${GITHUB_REPOSITORY,,}"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker tag release-candidate:verified "$repository:$GITHUB_SHA"
+          docker push "$repository:$GITHUB_SHA"
+          reference="$(docker inspect "$repository:$GITHUB_SHA" --format '{{index .RepoDigests 0}}')"
+          echo "RELEASE_IMAGE=$reference" >> "$GITHUB_ENV"
+      - name: Sign digest and attest SBOM/provenance
+        run: |
+          ./scripts/security cosign sign --yes "$RELEASE_IMAGE"
+          ./scripts/security cosign attest --yes --type spdxjson --predicate .releases/evidence/sbom.spdx.json "$RELEASE_IMAGE"
+          python3 - <<'PYCODE'
+          import json, os
+          predicate = {"buildDefinition": {"buildType": "https://github.com/biucing/backend-container/v1", "externalParameters": {"ref": os.environ["GITHUB_REF"]}, "resolvedDependencies": [{"uri": "git+https://github.com/" + os.environ["GITHUB_REPOSITORY"], "digest": {"gitCommit": os.environ["GITHUB_SHA"]}}]}, "runDetails": {"builder": {"id": os.environ["GITHUB_WORKFLOW_REF"]}, "metadata": {"invocationId": "https://github.com/" + os.environ["GITHUB_REPOSITORY"] + "/actions/runs/" + os.environ["GITHUB_RUN_ID"]}}}
+          with open(".releases/evidence/provenance.json", "w") as out: json.dump(predicate, out)
+          PYCODE
+          ./scripts/security cosign attest --yes --type slsaprovenance1 --predicate .releases/evidence/provenance.json "$RELEASE_IMAGE"
+          printf 'Verified release: `%s`\n' "$RELEASE_IMAGE" >> "$GITHUB_STEP_SUMMARY"

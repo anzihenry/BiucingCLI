@@ -1,0 +1,33 @@
+{
+ admin off
+ auto_https off
+ servers {
+  timeouts {
+   read_header 5s
+   read_body 15s
+   write 20s
+   idle 60s
+  }
+ }
+}
+https://{$PUBLIC_HOST}:8443 {
+ tls /run/tls/tls.crt /run/tls/tls.key
+ # No access log: query strings may contain OIDC authorization codes.
+ @private path /livez /readyz /healthz /version /metrics /debug/*
+ respond @private 404
+ reverse_proxy app:{{HTTP_PORT}} {
+  health_uri /readyz
+  health_port 9000
+  health_interval 2s
+  health_timeout 1s
+  health_fails 1
+  health_passes 1
+  lb_try_duration 0s
+  header_up -X-User-*
+  header_up -Forwarded
+  transport http {
+   dial_timeout 2s
+   response_header_timeout 10s
+  }
+ }
+}

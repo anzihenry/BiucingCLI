@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
       args:
         BUILDER_IMAGE: ${BUILDER_IMAGE:-golang:1.26.8-alpine}
-        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.20}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-alpine:3.23.6}
+    user: "${LOCAL_UID:-65532}:${LOCAL_GID:-65532}"
     image: ${IMAGE:-{{SERVICE_NAME}}}:${TAG:-latest}
     ports:
       - "127.0.0.1:${HOST_HTTP_PORT:-0}:{{HTTP_PORT}}"

@@ -201,3 +201,7 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318 ./scripts/task dev
 
 Micro 开发 Compose 已提供 Collector。Collector/指标端口不映射公网。需要可视化与历史查询时，
 将 Collector exporter 配到团队现有 OTel 后端；本模板不预置另一套持久化监控基础设施。
+
+## 单机生产交付（P4）
+
+使用独立 `compose.prod.yaml` 与 `scripts/release`，完整步骤见 [生产运行手册](deploy/RUNBOOK.md)。默认非 root/只读镜像、固定 digest、扫描/SBOM/签名、迁移前置、失败发布停止、应用回退与隔离备份恢复。生产外部 PG/身份/证书/遥测由平台提供；开发 Compose 不用于生产叠加。单机部署存在中断窗口，Kubernetes/多机 HA 属于后续阶段。
