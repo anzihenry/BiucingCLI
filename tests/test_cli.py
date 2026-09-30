@@ -405,7 +405,7 @@ class CLITestCase(CLIHelpers, unittest.TestCase):
                 main(["--version"])
 
         self.assertEqual(excinfo.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "biucing 0.9.1\n")
+        self.assertEqual(stdout.getvalue(), "biucing 0.10.0\n")
         self.assertEqual(stderr.getvalue(), "")
 
     def test_create_android_prompts_for_package_name(self):

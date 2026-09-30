@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 - 2026-09-30
+
+- add backend production delivery: hardened Compose, immutable release verification,
+  migration gates, rollback and isolated PostgreSQL backup/restore tooling.
+- add Kubernetes/Kustomize reference delivery with replica spreading, HPA, network
+  policies, capacity budgets and release/evidence scripts. Real multi-zone HA
+  acceptance remains deferred (B27).
+- fix backend help output, portable DNS reconnect tests, Linux certificate fixture
+  ownership and Android CI SDK initialization before publication.
 
 - implement backend P3 outbound HTTP/gRPC clients, workload peer verification, per-dependency
   budgets and explicit idempotent retries; add bounded OTel traces/metrics, log correlation,
@@ -64,7 +72,7 @@
 - add a portable C++20 core to the Apple starter, with one source tree consumed
   by SwiftPM and CMake, a C ABI and throwing Swift facade, binary shell integration,
   worktree-scoped test commands, and macOS/Linux/Windows core CI. Android JNI is now implemented by the component architecture above;
-  HarmonyOS Node-API remains an extension point.
+  HarmonyOS Node-API is implemented by the component architecture above.
 
 - fix frontend generation baselines contaminated by local empty pnpm cache
   directories; guard shared and mode-specific resource layers against build artifacts.
@@ -90,8 +98,7 @@
 - migrate frontend to a CSR-only React Router Framework preset with shared React
   19.3 / TypeScript 7 / Tailwind 4 / shadcn UI resources and a pnpm 11 lockfile;
   preserve worktree-scoped Docker/Make workflows, add typed-lint negative checks,
-  browser interaction coverage and frontend-only golden updates. SSG/SSR are not
-  advertised yet. Revalidate development/production Docker images on Linux arm64
+  browser interaction coverage and frontend-only golden updates. SSG/SSR are included in this release as described above. Revalidate development/production Docker images on Linux arm64
   and browser behavior against actual Nginx; fix the IPv4/IPv6 preview mismatch
   in container SPA prerender and protect the configuration with a regression check.
 

@@ -39,6 +39,6 @@ case "${1:-help}" in
  integration) [ "{{DATABASE}}" = postgres ] || exit 0; ./scripts/task migrate; "${compose[@]}" run --rm --no-deps -e TEST_DATABASE_DSN="postgres://{{SERVICE_NAME}}_app:local-app-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" -e TEST_MIGRATION_DSN="postgres://{{SERVICE_NAME}}_migrator:local-migrate-only@postgres:5432/{{SERVICE_NAME}}?sslmode=disable" app-dev go test -race -count=1 ./internal/database ./internal/migration ./internal/auth ;;
  worktree-compose-config) "${compose[@]}" config ;;
  worktree-info|worktree-doctor) printf 'Worktree: %s\nCompose project: %s\nImage: %s:%s\n' "$root" "$COMPOSE_PROJECT_NAME" "$IMAGE" "$TAG"; "${compose[@]}" ps ;;
- help) printf '%s\n' 'Commands: bootstrap dev verify integration image migrate up down logs telemetry doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree' ;;
+ help) for command in bootstrap dev verify integration image migrate up down logs telemetry doctor lint test build proto tidy run dev-shell docker-build docker-run docker-push clean worktree-info worktree-doctor worktree-compose-config clean-worktree help; do printf "./scripts/task %s (make %s)\n" "$command" "$command"; done ;;
  *) echo 'Unknown task' >&2;exit 2 ;;
 esac

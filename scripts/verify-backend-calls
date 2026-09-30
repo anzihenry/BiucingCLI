@@ -88,7 +88,7 @@ def main():
             run(["docker", "build", "-f", "Dockerfile.fixture", "-t", project + "-" + name, "."], cwd=runtime)
         run(["./scripts/local-ca"], cwd=micro)
         secrets = micro / ".secrets"
-        run(["docker", "run", "--rm", "-v", str(secrets) + ":/certs", "--entrypoint", "step", "smallstep/step-cli:0.30.6", "certificate", "create", "stranger", "/certs/stranger.crt", "/certs/stranger.key", "--profile", "leaf", "--ca", "/certs/ca.crt", "--ca-key", "/certs/ca.key", "--san", "spiffe://local/stranger", "--not-after", "24h", "--no-password", "--insecure"])
+        run(["docker", "run", "--rm", "--user", f"{os.getuid()}:{os.getgid()}", "-e", "HOME=/tmp", "-v", str(secrets) + ":/certs", "--entrypoint", "step", "smallstep/step-cli:0.30.6", "certificate", "create", "stranger", "/certs/stranger.crt", "/certs/stranger.key", "--profile", "leaf", "--ca", "/certs/ca.crt", "--ca-key", "/certs/ca.key", "--san", "spiffe://local/stranger", "--not-after", "24h", "--no-password", "--insecure"])
         # Private fixture mount is host-private; runtime UID needs its leaf readable.
         for key in secrets.glob("*.key"):
             if key.name != "ca.key":

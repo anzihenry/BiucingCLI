@@ -343,8 +343,11 @@ func TestDNSAddressChangeAndInFlightCancellation(t *testing.T) {
 			}
 			response := dnsmessage.Message{Header: dnsmessage.Header{ID: request.ID, Response: true, RecursionAvailable: true}, Questions: request.Questions}
 			for _, q := range request.Questions {
-				if q.Type == dnsmessage.TypeA {
-					response.Answers = append(response.Answers, dnsmessage.Resource{Header: dnsmessage.ResourceHeader{Name: q.Name, Type: dnsmessage.TypeA, Class: dnsmessage.ClassINET, TTL: 0}, Body: &dnsmessage.AResource{A: [4]byte{127, 0, 0, byte(address.Load())}}})
+				if q.Type == dnsmessage.TypeA && address.Load() == 1 {
+					response.Answers = append(response.Answers, dnsmessage.Resource{Header: dnsmessage.ResourceHeader{Name: q.Name, Type: dnsmessage.TypeA, Class: dnsmessage.ClassINET, TTL: 0}, Body: &dnsmessage.AResource{A: [4]byte{127, 0, 0, 1}}})
+				}
+				if q.Type == dnsmessage.TypeAAAA && address.Load() == 2 {
+					response.Answers = append(response.Answers, dnsmessage.Resource{Header: dnsmessage.ResourceHeader{Name: q.Name, Type: dnsmessage.TypeAAAA, Class: dnsmessage.ClassINET, TTL: 0}, Body: &dnsmessage.AAAAResource{AAAA: [16]byte{15: 1}}})
 				}
 			}
 			packet, e := response.Pack()
@@ -372,7 +375,7 @@ func TestDNSAddressChangeAndInFlightCancellation(t *testing.T) {
 	if _, e = rpc.Check(ctx, &grpc_health_v1.HealthCheckRequest{}); e != nil {
 		t.Fatal(e)
 	}
-	l2, e := net.Listen("tcp", "127.0.0.2:"+port)
+	l2, e := net.Listen("tcp6", "[::1]:"+port)
 	if e != nil {
 		t.Fatal(e)
 	}

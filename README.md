@@ -10,7 +10,7 @@ Apple 模版默认生成 iOS、macOS、watchOS、tvOS 四个薄壳，使用静�
 
 ## Version
 
-The current repository release target is `0.9.1`.
+The current repository release target is `0.10.0`. See the [release notes](docs/0.10.0-release-notes.md) for changes and migration notes.
 
 ```bash
 biucing --version
@@ -23,7 +23,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the latest release summary.
 Install the PyPI release as an isolated command with `uv`:
 
 ```bash
-uv tool install biucingcli==0.9.1
+uv tool install biucingcli==0.10.0
 biucing --version
 ```
 
