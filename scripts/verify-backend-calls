@@ -90,6 +90,8 @@ def main():
         secrets = micro / ".secrets"
         run(["docker", "run", "--rm", "--user", f"{os.getuid()}:{os.getgid()}", "-e", "HOME=/tmp", "-v", str(secrets) + ":/certs", "--entrypoint", "step", "smallstep/step-cli:0.30.6", "certificate", "create", "stranger", "/certs/stranger.crt", "/certs/stranger.key", "--profile", "leaf", "--ca", "/certs/ca.crt", "--ca-key", "/certs/ca.key", "--san", "spiffe://local/stranger", "--not-after", "24h", "--no-password", "--insecure"])
         # Private fixture mount is host-private; runtime UID needs its leaf readable.
+        for certificate in secrets.glob("*.crt"):
+            certificate.chmod(0o644)
         for key in secrets.glob("*.key"):
             if key.name != "ca.key":
                 key.chmod(0o644)
@@ -186,41 +188,41 @@ def main():
         run(compose + ["stop", "dex"])
         success()
         check("existing_session_during_idp_outage")
+        def await_reconnection(check_name, expected_status=200):
+            # grpc-go DNS resolution is throttled for 30s by default. Keep the
+            # production resolver policy and measure recovery across that window.
+            started = time.monotonic()
+            deadline = started + 45
+            while True:
+                try:
+                    if expected_status == 200:
+                        success()
+                    else:
+                        code, _ = request("/_fixture/call", client)
+                        assert code == expected_status, (code, expected_status)
+                    report.setdefault("recovery_seconds", {})[check_name] = round(time.monotonic() - started, 3)
+                    check(check_name)
+                    return
+                except AssertionError as exc:
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError(f"{check_name} did not recover within 45s: {exc}") from exc
+                    time.sleep(0.25)
+
         run(compose + ["restart", "internal-api"])
-        for _ in range(20):
-            try:
-                success()
-                break
-            except AssertionError:
-                time.sleep(0.25)
-        else:
-            raise RuntimeError("Downstream did not recover")
-        check("downstream_restart_reconnect")
+        await_reconnection("downstream_restart_reconnect")
         run(["env", "ROTATE_LOCAL_CERTS=yes", "./scripts/local-ca"], cwd=micro)
+        for certificate in secrets.glob("*.crt"):
+            certificate.chmod(0o644)
         for key in secrets.glob("*.key"):
             if key.name != "ca.key":
                 key.chmod(0o644)
         run(compose + ["restart", "internal-api"])
-        for _ in range(20):
-            try:
-                success()
-                break
-            except AssertionError:
-                time.sleep(0.25)
-        else:
-            raise RuntimeError("Rotated certificate did not reconnect")
-        check("certificate_rotation_new_handshake")
+        await_reconnection("certificate_rotation_new_handshake")
         # A trusted workload still cannot delegate after its separate grant is removed.
         mc["workload"]["delegates"] = {}
         (root / "micro.yaml").write_text(yaml.safe_dump(mc))
         run(compose + ["restart", "internal-api"])
-        for _ in range(20):
-            if request("/_fixture/call", client)[0] == 403:
-                break
-            time.sleep(0.25)
-        else:
-            raise RuntimeError("Undelegated user accepted")
-        check("user_delegation_permission_denied")
+        await_reconnection("user_delegation_permission_denied", expected_status=403)
         # Periodic metrics export is 10s; wait boundedly for actual OTLP evidence.
         for _ in range(60):
             path = root / "otel/metrics.json"

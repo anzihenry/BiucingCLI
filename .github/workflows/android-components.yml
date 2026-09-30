@@ -37,6 +37,8 @@ jobs:
       - name: Verify portable source authority
         run: python scripts/sync-shared-core --check
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Install native tools
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358' 'cmake;3.22.1'
       - name: Generate product
