@@ -2,159 +2,58 @@
 
 ## 0.10.0 - 2026-09-30
 
-- add backend production delivery: hardened Compose, immutable release verification,
-  migration gates, rollback and isolated PostgreSQL backup/restore tooling.
-- add Kubernetes/Kustomize reference delivery with replica spreading, HPA, network
-  policies, capacity budgets and release/evidence scripts. Real multi-zone HA
-  acceptance remains deferred (B27).
-- fix backend help output, portable DNS reconnect tests, Linux certificate fixture
-  ownership and Android CI SDK initialization before publication.
+### CLI and packaging
 
-- implement backend P3 outbound HTTP/gRPC clients, workload peer verification, per-dependency
-  budgets and explicit idempotent retries; add bounded OTel traces/metrics, log correlation,
-  PostgreSQL instrumentation and an independent Web-to-Micro Docker verification harness.
+- Add versioned JSON results and errors, strict option names, non-interactive input
+  handling and safe escaping across generated language/configuration files.
+- Introduce typed creation plans, metadata-declared file contracts and deterministic
+  resource variants shared by preview, validation and project generation.
+- Verify exact wheel/sdist resources, executable flags, rebuilt wheels and installed
+  template output; split core and platform tests across Python 3.11–3.14.
 
-- implement backend P2 data, protocol and identity foundations: pgx pools, independent locked
-  migrations, OpenAPI/Buf compatibility gates, Web OIDC and PostgreSQL sessions, Micro mTLS
-  workload authorization and trusted user delegation; add real dependency/security tests.
-- remove the Web in-memory user CRUD fixture. Development Web/Dex ports are worktree-derived
-  for exact callback URLs; runtime testing still uses independently assigned ports.
+### Frontend
 
-- implement backend P1 runtime foundations: Docker task wrappers and worktree-safe ports,
-  validated file secrets, deny-by-default HTTP/gRPC pipelines, private health/admin listeners,
-  bounded shutdown, JSON logs and rate-limited audit hooks; identity verifiers are supplied by P2 below the runtime boundary.
+- Ship CSR, SSG and SSR React Router presets with shared React/TypeScript/Tailwind
+  tooling, frozen dependencies, quality gates and browser acceptance.
+- Add SSG content routes, metadata, sitemap and real static 404 delivery. Add SSR
+  request isolation, private configuration, bounded rendering and graceful shutdown.
+- Verify installed-package projects and production Nginx/Node containers on Linux
+  and macOS through the release frontend matrix.
 
-- implement backend architecture P0: engineering decisions, independent `database`/`cache`
-  choices, generated Docker verification scripts and CI, plus six-case evidence collection.
-- remove `--dependency-store` / `dependency_store`; use `--database postgres --cache none`
-  or `--database none --cache redis` for the equivalent micro-service configuration.
-  Micro-service now defaults to no database/cache; web-service requires PostgreSQL.
+### Native components
 
-- rename the `microservice` template to `micro-service` for consistency with
-  `web-service`; the old CLI template name is no longer accepted.
+- Generate iOS, macOS, watchOS and tvOS shells consuming versioned static XCFrameworks,
+  exact SDK locks and SafeDI constructor graphs; require Swift 6.4 or later.
+- Generate Android mobile, Wear OS and TV shells with binary Maven AARs, Dagger
+  graphs, JNI sessions, device-specific input and independent release identities.
+- Add HarmonyOS binary HARs, constructor graphs and a Node-API bridge using the same
+  canonical C++20 core as Apple and Android.
+- Define session ownership, cancellation and asynchronous close across platforms;
+  verify source-free SDK consumption, integrity and explicit local overrides.
 
-- implement the HarmonyOS thin shell, contracts/design system, SharedCore and HomeFeature
-  bytecode HARs; reuse the canonical C++20 core through a cancellable Node-API session wrapper.
-- add component/shell constructor-graph generation, immutable publication, exact manifest
-  locks, installed-SDK byte verification, explicit local overrides and CI/Release rejection.
-- include phone, tablet, 2in1, wearable and TV in the architecture; pin the reviewed
-  DevEco toolchain and arm64-v8a/x86_64 native outputs. Add host, Hypium, device-test-package
-  and source-free consumer checks; real-device and signed delivery remain separate gates.
+### Backend
 
-- generate mobile/tablet, standalone Wear OS and Android TV shells by default;
-  share binary Home state and native services while using device-specific Compose UI.
-- add rotary scrolling, D-pad focus navigation, separate platform release identities,
-  `PLATFORM=mobile|wear|tv` commands, all-shell validation and armeabi-v7a native delivery.
+- Add Docker-first task wrappers, independent database/cache choices, validated
+  file secrets, private health/admin endpoints and bounded request/shutdown behavior.
+- Add PostgreSQL pools and locked migrations, Web OIDC/PostgreSQL sessions,
+  Micro mTLS authorization, trusted user delegation and protocol compatibility gates.
+- Add outbound HTTP/gRPC clients with identity verification, budgets and explicit
+  idempotent retries, plus structured logs and OpenTelemetry traces/metrics.
+- Add hardened production Compose, signed-image verification, migration/release
+  guards, rollback and isolated PostgreSQL backup/restore tooling.
+- Add Kubernetes/Kustomize references with replica spreading, HPA, network policies,
+  connection budgets and release/evidence tools. B27 real multi-zone HA acceptance
+  remains on hold; no production availability or recovery target is claimed.
+- Fix backend help output, macOS DNS reconnect tests, Linux certificate fixture
+  permissions and recovery timing, plus Android CI SDK initialization.
 
-- align Android with the Apple component architecture: thin binary-only shell,
-  independently published Maven AARs, separate Dagger 2.52 component/shell graphs,
-  explicit service injection and typed navigation output.
-- share one authoritative C++20 source baseline across Apple and Android; add
-  Kotlin/JNI sessions with serial execution, cooperative cancellation and async close.
-- pin NDK/CMake and arm64-v8a/x86_64 packaging; add immutable SDK manifests,
-  exact component/Gradle locks, explicit binary overrides, JNI consumer rules and
-  matching native symbols. Verify host JNI, emulator flows and source-free builds.
+### Compatibility changes
 
-- generate iOS, macOS, watchOS and tvOS shells in one Apple product repository;
-  keep `--platform` as the default build/run selection. Shells consume versioned
-  static XCFramework SDKs with exact manifest locks and explicit local overrides.
-- integrate pinned SafeDI 2.0.0 CLI generation at component and shell boundaries,
-  check missing/cyclic dependencies, and keep public SDK APIs independent of DI.
-- add cancellable C++ sessions with fixed-width errors, serial Swift scheduling,
-  async idempotent close, resource delivery and artifact integrity tests.
-
-- fix the watchOS starter's simulator installation by declaring its standalone
-  Watch app identity (`WKApplication` and `WKWatchOnly`) in the generated Info.plist.
-
-- require Swift 6.4+ for all Apple starter packages and validate the compiler
-  minimum in doctor, while retaining Swift 6 language mode and the C++20 core.
-
-- add a portable C++20 core to the Apple starter, with one source tree consumed
-  by SwiftPM and CMake, a C ABI and throwing Swift facade, binary shell integration,
-  worktree-scoped test commands, and macOS/Linux/Windows core CI. Android JNI is now implemented by the component architecture above;
-  HarmonyOS Node-API is implemented by the component architecture above.
-
-- fix frontend generation baselines contaminated by local empty pnpm cache
-  directories; guard shared and mode-specific resource layers against build artifacts.
-
-- add installed-wheel CSR/SSG/SSR acceptance with native frontend quality/browser
-  checks, real production-container checks, scoped cleanup and retained diagnostics;
-  share a six-job Linux/macOS frontend matrix between CI and release gates.
-- verify every template resource in wheel/sdist and in a wheel rebuilt from sdist,
-  including hidden files, binaries and executable flags; add artifact/runner/CI
-  regressions without changing generated projects or existing golden outputs.
-
-- add the frontend SSR preset with request-isolated loaders, private server
-  configuration, uncached HTML/data responses, bounded rendering and a non-root
-  Node production image; cover input/error handling, client artifact boundaries,
-  HTTP/static file safety and graceful/forced shutdown. Preserve one shared
-  frontend dependency lockfile and add SSR generation/distribution regressions.
-
-- add the frontend SSG preset with explicitly enumerated content routes, build-time
-  HTML/navigation data, validated SITE_URL, per-page metadata, sitemap/robots and
-  static Nginx real-404 deployment; share dependencies/components with CSR and
-  separate preview routing so deep-link refresh does not fall back to the homepage.
-
-- migrate frontend to a CSR-only React Router Framework preset with shared React
-  19.3 / TypeScript 7 / Tailwind 4 / shadcn UI resources and a pnpm 11 lockfile;
-  preserve worktree-scoped Docker/Make workflows, add typed-lint negative checks,
-  browser interaction coverage and frontend-only golden updates. SSG/SSR are included in this release as described above. Revalidate development/production Docker images on Linux arm64
-  and browser behavior against actual Nginx; fix the IPv4/IPv6 preview mismatch
-  in container SPA prerender and protect the configuration with a regression check.
-
-- integrate optional resource variants with generation plans, effective file/Make/
-  placeholder validation, all-mode validation and staged execution; detect source
-  drift and add optional schema-1 variant summaries without changing legacy output;
-- add 17 fixture-based integration tests for variants, JSON contracts, source
-  changes, conflicts and cleanup; shipped frontend resources remain unchanged.
-
-- add immutable resource-variant models, strict optional metadata loading and a
-  standalone deterministic resource resolver with 21 fixture-based core tests;
-  generation/preview integration and shipped frontend modes remain future work.
-
-- document the stage-0 frontend CSR/SSG/SSR design, resource composition contract,
-  compatibility decisions and phased acceptance gates; no runtime changes yet.
-
-- move text/JSON presentation and output versioning out of CLI, retaining formatter
-  adapters and existing output contracts;
-- organize CLI, generated-output, platform and module tests without dropping
-  existing cases, and document template contribution and compatibility boundaries.
-
-- introduce typed creation requests and generation plans shared by preview and
-  execution, and inject input callbacks instead of reading terminals in the core;
-- consolidate CLI variable aliases while retaining legacy resolver/context adapters.
-
-- declare template file contracts, rule outputs and escape contexts in metadata;
-- scope generation placeholders per template and validate extension declarations;
-- verify declaration-only onboarding with a Python backend fixture, preserving
-  existing output and required-file baselines.
-
-- extract Apple, Android and microservice derivations into pure built-in rules
-  selected by a static registry, preserving generated output and JSON metadata.
-
-- separate variable constraints, template validation, text rendering and filesystem
-  generation, preserving legacy exports and adding multi-stage cleanup regressions.
-
-- extract template models, domain errors and resource loading into independent
-  modules, retaining legacy imports and adding explicit fixture-root loading.
-
-- parse generated JSON, JSON5, YAML, TOML, XML and plist configurations in
-  regression tests and installed-wheel verification;
-- split Python-only Linux/macOS core CI from macOS tool integration release gates;
-- add explicit suite selection and prevent dedicated suites from silently skipping tests.
-
-- expose variable validators, choices, and effective numeric bounds in list/info JSON;
-- add schema_version and generator_version to every JSON result and error envelope.
-
-- handle terminal EOF and Ctrl+C without tracebacks, with exit codes 2 and 130;
-- disable prompts for JSON mode and non-terminal stdin, and send prompts to stderr;
-- emit versioned JSON errors on stderr, including argument parsing and validation failures;
-- require complete long option names so JSON error-mode detection is unambiguous.
-
-- escape free-text template inputs for their XML, Android resource, JSON,
-  JavaScript, Kotlin, Swift, YAML, and Dockerfile contexts;
-- preserve placeholder-like user text with single-pass rendering and add
-  special-character generation regression coverage.
+- Rename `microservice` to `micro-service`; remove the old CLI template name.
+- Remove `--dependency-store` / `dependency_store`; use independent `--database`
+  and `--cache` options. Micro defaults to neither; Web requires PostgreSQL.
+- Remove the Web in-memory user CRUD fixture. Application business APIs are added
+  by the generated project's owner.
 
 ## 0.9.1 - 2026-09-19
 
