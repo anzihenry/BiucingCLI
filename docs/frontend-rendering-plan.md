@@ -6,6 +6,12 @@ Initially recorded on 2026-09-20, against commit `070841f`. This plan is separat
 completed kernel extraction stages 0–6. Examples below describe future behavior;
 the current frontend accepts `--set rendering=csr|ssg|ssr` (default: `csr`).
 
+Current kernel note: the original stage-1/stage-2 decision to preserve a separate
+legacy copytree path has been superseded by [unified generation](unified-generation.md).
+Ordinary and variant templates now share strict resources, fingerprints, effective
+validation and one publisher. The historical sections below record the migration
+as it happened; frontend resource composition and generated payloads are unchanged.
+
 ## Scope and decisions
 
 - Keep one `frontend` template, with `rendering=csr|ssg|ssr`; default to `csr`.

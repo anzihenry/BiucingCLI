@@ -5,6 +5,14 @@ For kernel extraction contracts and generated-output snapshots, see
 Current foundation boundaries and fixture-root APIs are documented in
 [kernel modules](kernel-modules.md).
 
+Current unified-generation coverage is in `test_unified_generation.py`: the same
+contracts run against ordinary and layered fixtures for output bytes/modes, source
+drift, required/Make checks, symlinks, target conflicts, read-only cleanup, cancellation
+and compatibility entrypoints. Existing variant-specific tests still cover overlays,
+selection and shadowed/unselected resources. Historical test totals below describe
+their respective stages; see [unified generation](unified-generation.md) for current
+refactor acceptance. Goldens are not regenerated to accommodate kernel changes.
+
 The planned frontend rendering extension has a separate
 [stage 0 specification and baseline record](frontend-rendering-plan.md).
 Generated-project acceptance is recorded per stage. Stage 6 adds a separate

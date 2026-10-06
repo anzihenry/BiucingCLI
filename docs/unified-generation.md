@@ -72,3 +72,27 @@ preserve error priority; the independent core entrypoint also validates metadata
 The repeated preflight is now metadata-only, not a repeated ordinary resource scan.
 
 Validation: 223 core tests and Ruff passed, including unchanged generation goldens.
+
+## Final acceptance (2026-10-06, Asia/Shanghai)
+
+- Core: 223 tests passed (29.138 seconds), including unchanged generation/output goldens.
+- Platform: 12 tests passed, no skips (31.631 seconds).
+- Ruff E4/E7/E9/F, template validation and `git diff --check`: passed.
+- `scripts/verify-distribution --check-make`: passed. Exact bytes/executable flags
+  match for 637 resources in wheel, sdist and the wheel rebuilt from sdist. Installed
+  generation covers all seven templates plus frontend SSG/SSR, configuration parsing
+  and generated Make entrypoints outside the source checkout.
+- Git comparison confirms no changes to template_data, shared sources or goldens.
+  No full native device/container deployment rerun was needed for unchanged payloads.
+
+The first sandboxed platform run failed at the Swift subprocess and Go loopback
+socket binding (`operation not permitted`). The complete platform suite passed when
+rerun with local tool/cache/socket access; no tests were skipped or weakened.
+
+Local diagnostic logs (not durable release evidence):
+`/tmp/biucing-unified-core.log`, `/tmp/biucing-unified-platform.log`,
+`/tmp/biucing-unified-platform-unrestricted.log`,
+`/tmp/biucing-unified-distribution.log`.
+
+Stages 1–4 are complete. Kernel/module dependency boundaries and platform templates
+are unchanged; the deliberate ordinary-template contract changes above now apply.

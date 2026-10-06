@@ -1,8 +1,7 @@
 # Adding a built-in template
 
 This document describes shipped generation behavior. For the optional resource
-variant extension (integrated with planning, validation and generation; shipped
-frontend presets are still pending), see the
+variant extension (used by the shipped CSR/SSG/SSR frontend presets), see the
 [frontend rendering plan](frontend-rendering-plan.md).
 
 Place `template.json` and a `template/` resource tree under
@@ -44,6 +43,29 @@ normalized relative POSIX paths, without traversal. Category and tags are displa
 metadata, not implicit Go/native contracts. Built-ins have project-owned minimum
 contract assignments; removing declarations is an error and does not remove the
 underlying file checks. The required-entry golden pins all pre-migration checks.
+
+## Resource and generation contract
+
+Ordinary templates select the common `template/` tree; variants additionally select
+one declared layer. Both use the same resource inventory and staged publisher.
+Every resource must be a regular file or directory at a normalized relative path.
+Symlinks (including dangling links and resource-root links), special files and
+case/Unicode-normalization path collisions are rejected, including for ordinary
+templates. Do not use symlinks to import external source files into a template.
+
+Create/preview validates metadata, then resolves inputs and checks the selected
+effective required entries, Make commands and placeholders before writing anything.
+Full `validate` checks every declared variant. Generation preserves binaries and
+empty directories, renders text once, restores permission bits and gives text
+scripts/gradlew owner execute permission using project-relative paths. Read-only
+text is temporarily made writable within staging; source permissions are unchanged.
+
+Plans include source/metadata fingerprints. If sources change between preparation
+and publication, rebuild the plan rather than retrying a stale one. This is a
+consistency check, not a filesystem snapshot or concurrency lock. The compatibility
+`render_template` entrypoint uses the same checks/publisher with already resolved
+values; it does not apply defaults, prompts or derivations. See the
+[unified generation record](unified-generation.md) for deliberate compatibility changes.
 
 ## Variables, contexts and bindings
 
