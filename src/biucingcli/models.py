@@ -254,8 +254,8 @@ class GenerationPlan:
     rendered_next_steps: tuple[str, ...]
     template_file_count: int
     template_top_level_entries: tuple[str, ...]
-    resources: ResolvedResources | None = None
-    resource_fingerprint: str | None = None
+    resources: ResolvedResources
+    resource_fingerprint: str
 
     def __post_init__(self):
         object.__setattr__(self, "values", MappingProxyType(dict(self.values)))
@@ -275,5 +275,5 @@ class GenerationPlan:
             "template_top_level_entries": list(self.template_top_level_entries),
             **({"selected_variant": {"selector": self.resources.selector,
                                       "value": self.resources.selected_variant}}
-               if self.resources is not None else {}),
+               if self.resources is not None and self.resources.selector is not None else {}),
         }

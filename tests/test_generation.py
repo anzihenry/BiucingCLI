@@ -15,7 +15,7 @@ from biucingcli.errors import GenerationConflictError, GenerationError
 
 class GenerationTests(unittest.TestCase):
     def fixture(self, root):
-        source = root / "source"
+        source = root / "template"
         source.mkdir()
         (source / "empty").mkdir()
         (source / "scripts").mkdir()
@@ -23,7 +23,15 @@ class GenerationTests(unittest.TestCase):
         (source / "scripts/run").chmod(0o640)
         (source / "binary").write_bytes(b"\xff\x00{{PROJECT_NAME}}")
         (source / "binary").chmod(0o600)
-        return replace(load_template("frontend"), template_dir=source, variants=None)
+        definition = replace(load_template("frontend"), name="fixture", template_dir=source,
+                             variants=None, contracts=[], required_entries=[])
+        (source / "README.md").write_text("fixture")
+        (source / ".gitignore").write_text("build/")
+        (source / "scripts/doctor").write_text("doctor")
+        (source / "Makefile").write_text(
+            ".PHONY: " + " ".join(definition.commands) + "\n" +
+            "".join(f"{name}:\n\t@true\n" for name in definition.commands))
+        return definition
 
     def test_direct_render_preserves_binary_modes_and_single_pass(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -37,10 +45,10 @@ class GenerationTests(unittest.TestCase):
             self.assertEqual((target / "binary").stat().st_mode & 0o777, 0o600)
             self.assertTrue((target / "empty").is_dir())
             self.assertEqual((definition.template_dir / "scripts/run").read_text(), "{{PROJECT_NAME}}")
-            self.assertEqual({p.name for p in root.iterdir()}, {"source", "output"})
+            self.assertEqual({p.name for p in root.iterdir()}, {"template", "output"})
 
     def test_failure_and_cancellation_cleanup_at_multiple_stages(self):
-        for boundary in ("shutil.copytree", "render_text", "os.replace"):
+        for boundary in ("shutil.copy2", "render_text", "os.replace"):
             for exception in (OSError("injected"), KeyboardInterrupt()):
                 with self.subTest(boundary=boundary, exception=type(exception).__name__), \
                         tempfile.TemporaryDirectory() as tmp:
@@ -50,7 +58,7 @@ class GenerationTests(unittest.TestCase):
                     with patch(f"biucingcli.generation.{boundary}", side_effect=exception):
                         with self.assertRaises(expected):
                             generation.render_template(definition, {}, root / "output")
-                    self.assertEqual({p.name for p in root.iterdir()}, {"source"})
+                    self.assertEqual({p.name for p in root.iterdir()}, {"template"})
 
     def test_existing_and_late_conflicts_preserve_target(self):
         for late in (False, True):
@@ -71,7 +79,7 @@ class GenerationTests(unittest.TestCase):
                         generation.render_template(definition, {}, target)
                 self.assertEqual((target / "sentinel").read_bytes(), b"user data")
                 self.assertEqual({p.name for p in target.iterdir()}, {"sentinel"})
-                self.assertEqual({p.name for p in root.iterdir()}, {"source", "output"})
+                self.assertEqual({p.name for p in root.iterdir()}, {"template", "output"})
 
     def test_moved_exports_keep_identity(self):
         for module, names in (

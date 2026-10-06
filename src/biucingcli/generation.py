@@ -10,9 +10,8 @@ from pathlib import Path
 from collections.abc import Callable
 
 from biucingcli.errors import BiucingError, GenerationConflictError, GenerationError, InvalidTemplateError
-from biucingcli.declarations import declaration_errors
 from biucingcli.validation import (
-    validate_template_placeholders, validate_template_definition, validate_resolved_resources,
+    validate_template_definition, validate_resolved_resources,
 )
 from biucingcli.models import (
     TemplateDefinition, TemplateVariable, CreateRequest, GenerationPlan, ResolvedResources,
@@ -38,8 +37,7 @@ def top_level_template_entries(template_dir: Path) -> list[str]:
 
 
 def validate_generation_definition(definition: TemplateDefinition) -> None:
-    errors = (validate_template_definition(definition) if definition.variants is not None else
-              declaration_errors(definition) + validate_template_placeholders(definition))
+    errors = validate_template_definition(definition)
     if errors:
         raise InvalidTemplateError("; ".join(errors))
 
@@ -79,10 +77,7 @@ def build_generation_plan(
     errors = validate_resolved_variables(definition, values)
     if errors:
         raise ValueError(f"Invalid input value(s) for {definition.name}: " + "; ".join(errors))
-    resources = None
-    fingerprint = None
-    if definition.variants is not None:
-        resources, fingerprint = prepare_resources(definition, values)
+    resources, fingerprint = prepare_resources(definition, values)
     return GenerationPlan(
         definition=definition,
         project_name=values["project_name"],
@@ -91,25 +86,20 @@ def build_generation_plan(
         resolved_variables=tuple(resolution.resolved_variables),
         derived_values={key: values[key] for key in sorted(rule_result.derived_values) if key in values},
         rendered_next_steps=tuple(render_text(step, values, definition) for step in
-                                  (resources.next_steps if resources else definition.next_steps)),
-        template_file_count=(sum(e.kind == "file" for e in resources.entries) if resources else
-                             count_template_files(definition.template_dir)),
-        template_top_level_entries=(tuple(sorted({e.output_path.split("/")[0] for e in resources.entries}))
-                                    if resources else tuple(top_level_template_entries(definition.template_dir))),
+                                  resources.next_steps),
+        template_file_count=sum(e.kind == "file" for e in resources.entries),
+        template_top_level_entries=tuple(sorted({e.output_path.split("/")[0] for e in resources.entries})),
         resources=resources,
         resource_fingerprint=fingerprint,
     )
 
 
 def execute_generation_plan(plan: GenerationPlan) -> None:
-    """Execute a resolved plan; render_template rechecks current target state."""
-    if plan.resources is not None:
-        publish_resources(plan.definition, dict(plan.values), plan.target_dir,
-                          plan.resources, plan.resource_fingerprint)
-    elif plan.definition.variants is not None:
-        raise GenerationError("variant plan has no resolved resources; build a new plan")
-    else:
-        render_template(plan.definition, dict(plan.values), plan.target_dir)
+    """Execute the planned inventory; never silently rebuild an incomplete plan."""
+    if plan.resources is None or not plan.resource_fingerprint:
+        raise GenerationError("plan has no resolved resources or fingerprint; build a new plan")
+    publish_resources(plan.definition, dict(plan.values), plan.target_dir,
+                      plan.resources, plan.resource_fingerprint)
 
 
 def prepare_resources(
@@ -203,52 +193,7 @@ def render_template(
     values: dict[str, str],
     target_dir: Path,
 ) -> None:
-    """Copy and render a template into the target directory."""
-    if definition.variants is not None:
-        validate_generation_definition(definition)
-        resources, fingerprint = prepare_resources(definition, values)
-        publish_resources(definition, values, target_dir, resources, fingerprint)
-        return
-    if target_dir.exists():
-        raise GenerationConflictError(f"target directory already exists: {target_dir}")
-    if not target_dir.parent.exists():
-        raise GenerationError(f"output directory does not exist: {target_dir.parent}")
-    if not target_dir.parent.is_dir():
-        raise GenerationError(f"output path is not a directory: {target_dir.parent}")
-
-    errors = declaration_errors(definition) + validate_template_placeholders(definition)
-    if errors:
-        raise InvalidTemplateError("; ".join(errors))
-
-    staging_root: Path | None = None
-    try:
-        staging_root = Path(
-            tempfile.mkdtemp(prefix=f".{target_dir.name}.biucing-", dir=target_dir.parent)
-        )
-        rendered_dir = staging_root / "project"
-        shutil.copytree(definition.template_dir, rendered_dir)
-
-        for path in rendered_dir.rglob("*"):
-            if not path.is_file():
-                continue
-
-            try:
-                content = path.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
-                continue
-
-            path.write_text(render_text(content, values, definition), encoding="utf-8")
-            if path.name == "gradlew" or "scripts" in path.parts:
-                current_mode = path.stat().st_mode
-                path.chmod(current_mode | stat.S_IXUSR)
-
-        if target_dir.exists():
-            raise GenerationConflictError(f"target directory already exists: {target_dir}")
-        os.replace(rendered_dir, target_dir)
-    except BiucingError:
-        raise
-    except OSError as exc:
-        raise GenerationError(f"could not generate project at {target_dir}: {exc}") from exc
-    finally:
-        if staging_root is not None:
-            shutil.rmtree(staging_root, ignore_errors=True)
+    """Compatibility entrypoint for already resolved values; no input derivation."""
+    validate_generation_definition(definition)
+    resources, fingerprint = prepare_resources(definition, values)
+    publish_resources(definition, values, target_dir, resources, fingerprint)

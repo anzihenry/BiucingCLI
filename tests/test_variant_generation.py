@@ -275,6 +275,7 @@ class VariantGenerationTests(ResourceFixture, unittest.TestCase):
     def test_legacy_output_omits_variant_fields(self):
         definition = cli.load_template("web-service")
         plan = generation.build_generation_plan(CreateRequest("web-service", "demo", self.output, {"module_name": "example.com/demo"}))
-        self.assertIsNone(plan.resources)
+        self.assertIsNotNone(plan.resources)
+        self.assertIsNone(plan.resources.selector)
         self.assertNotIn("variants", definition.to_dict())
         self.assertNotIn("selected_variant", presentation.create_manifest(plan, "plan"))

@@ -55,3 +55,20 @@ still uses its previous two execution paths until stage 3.
 
 Validation: 42 focused resource/variant/shared/template-validation tests, Ruff and
 `biucing validate` passed. No payload or golden output was changed.
+
+## Stage 3 result
+
+All plans now require resource inventories/fingerprints and use one staged publisher.
+`render_template` keeps its resolved-value signature and adapts to that same resource
+preparation/publisher without repeating defaults, prompts or derivations. The old
+copytree generation branch is removed. Ordinary public results still omit variant
+fields; incomplete manually assembled plans fail instead of silently rebuilding.
+
+Shared tests now cover source/render-time drift, effective validation, symlink
+rejection, read-only permissions/cleanup, output ancestor independence, conflicts,
+cancellation, binary/empty-directory output and direct-entrypoint equivalence.
+CLI preflight metadata validation is intentionally retained before --set parsing to
+preserve error priority; the independent core entrypoint also validates metadata.
+The repeated preflight is now metadata-only, not a repeated ordinary resource scan.
+
+Validation: 223 core tests and Ruff passed, including unchanged generation goldens.
