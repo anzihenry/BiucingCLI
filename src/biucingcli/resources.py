@@ -24,17 +24,15 @@ def _check_root(root: Path, metadata_dir: Path, context: str) -> None:
             raise InvalidTemplateError(f"{context}: resource root must be a real directory: {current}")
 
 
-def _entries(root: Path, layer: str, context: str, *, strict: bool):
+def _entries(root: Path, layer: str, context: str):
     def walk(directory):
         for path in sorted(directory.iterdir()):
             relative = path.relative_to(root).as_posix()
             info = path.lstat()
-            if strict and not normalized_path(relative):
+            if not normalized_path(relative):
                 raise InvalidTemplateError(f"{context}: unsafe resource path: {relative!r}")
             if stat.S_ISLNK(info.st_mode):
-                if strict:
-                    raise InvalidTemplateError(f"{context}: symlink resource forbidden: {relative}")
-                kind = "symlink"
+                raise InvalidTemplateError(f"{context}: symlink resource forbidden: {relative}")
             elif stat.S_ISDIR(info.st_mode):
                 kind = "directory"
             elif stat.S_ISREG(info.st_mode):
@@ -47,41 +45,50 @@ def _entries(root: Path, layer: str, context: str, *, strict: bool):
     yield from walk(root)
 
 
+def resource_context(definition: TemplateDefinition, selected: str | None) -> str:
+    return definition.name if selected is None else f"{definition.name}[{selected}]"
+
+
+def _select_layers(definition: TemplateDefinition, selected: str | None):
+    """Single authority for source layers used by enumeration and fingerprinting."""
+    layers = [("common", definition.template_dir)]
+    option = None
+    if definition.variants is not None:
+        if not isinstance(selected, str) or selected not in definition.variants.options:
+            raise ValueError(
+                f"{definition.name}: invalid resolved value for {definition.variants.selector!r}: {selected!r}"
+            )
+        option = definition.variants.options[selected]
+        layers.append((selected, definition.template_dir.parent / option.source))
+    elif selected is not None:
+        raise ValueError(f"{definition.name}: ordinary resources cannot select a variant")
+    return tuple(layers), option
+
+
 def resolve_resources(definition: TemplateDefinition, values: Mapping[str, str]) -> ResolvedResources:
     """Compose sources using resolved inputs, without rendering or writing files.
 
-    No defaults/prompts/derivations are applied here. Legacy symlinks are retained
-    as inventory entries, not followed; legacy generation remains on its existing
-    copytree path. Fingerprinting is explicit and separate from enumeration.
+    No defaults/prompts/derivations are applied here. Every layer uses the same
+    strict path/type policy. Fingerprinting is separate from enumeration.
     """
     errors = variant_declaration_errors(definition)
     if errors:
         raise InvalidTemplateError("; ".join(errors))
     variants = definition.variants
-    selected = None
-    option = None
-    context = definition.name
-    if variants is not None:
-        selected = values.get(variants.selector)
-        if not isinstance(selected, str) or selected not in variants.options:
-            raise ValueError(f"{definition.name}: invalid resolved value for {variants.selector!r}: {selected!r}")
-        option = variants.options[selected]
-        context = f"{definition.name}[{selected}]"
-    layers = [("common", definition.template_dir)]
-    if option is not None:
-        layers.append((selected, definition.template_dir.parent / option.source))
+    selected = values.get(variants.selector) if variants else None
+    layers, option = _select_layers(definition, selected)
+    context = resource_context(definition, selected)
     output = {}
     canonical = {}
     consumed = set()
     overrides = set(option.overrides) if option else set()
     try:
         for layer, root in layers:
-            if variants is not None:
-                _check_root(root, definition.template_dir.parent, context)
-            for entry in _entries(root, layer, context, strict=variants is not None):
+            _check_root(root, definition.template_dir.parent, context)
+            for entry in _entries(root, layer, context):
                 path = entry.output_path
                 key = collision_key(path)
-                if variants is not None and key in canonical and canonical[key] != path:
+                if key in canonical and canonical[key] != path:
                     raise InvalidTemplateError(
                         f"{context}: case/Unicode resource collision: {canonical[key]!r} and {path!r}"
                     )
@@ -128,7 +135,7 @@ def resource_fingerprint(definition: TemplateDefinition, resources: ResolvedReso
     record(resources)
     metadata_dir = definition.template_dir.parent
     metadata = metadata_dir / "template.json"
-    context = f"{definition.name}[{resources.selected_variant}]"
+    context = resource_context(definition, resources.selected_variant)
     try:
         # Injected definitions need not have a metadata file. Track its absence too.
         if metadata.exists() or metadata.is_symlink():
@@ -138,12 +145,11 @@ def resource_fingerprint(definition: TemplateDefinition, resources: ResolvedReso
             record(metadata.read_bytes())
         else:
             record(None)
-        option = definition.variants.options[resources.selected_variant]
-        for layer, root in (("common", definition.template_dir),
-                            (resources.selected_variant, metadata_dir / option.source)):
+        layers, _ = _select_layers(definition, resources.selected_variant)
+        for layer, root in layers:
             _check_root(root, metadata_dir, context)
             record((layer, stat.S_IMODE(root.stat().st_mode)))
-            for entry in _entries(root, layer, context, strict=True):
+            for entry in _entries(root, layer, context):
                 record(entry)
                 if entry.kind == "file":
                     record(hashlib.sha256(entry.source.read_bytes()).hexdigest())

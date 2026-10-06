@@ -44,3 +44,14 @@ resource/generation suite has 51 passing tests. Existing ordinary-template resou
 inventories allow symlinks and generation uses copytree; variant plans alone have
 fingerprints and strict effective-resource validation. Shared contract tests start
 with behavior already supported by both paths, then expand as the paths converge.
+
+## Stage 2 result
+
+Resource enumeration and fingerprinting now share layer selection and enforce the
+same strict policy for ordinary and variant resources. Full `validate` checks all
+ordinary/selected inventories through the effective-resource validator. Missing
+entries retain the aggregated diagnostic used by ordinary templates. Generation
+still uses its previous two execution paths until stage 3.
+
+Validation: 42 focused resource/variant/shared/template-validation tests, Ruff and
+`biucing validate` passed. No payload or golden output was changed.

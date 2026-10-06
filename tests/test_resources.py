@@ -5,7 +5,6 @@ from dataclasses import FrozenInstanceError, replace
 import json
 import os
 from pathlib import Path
-import stat
 import subprocess
 import sys
 import tempfile
@@ -15,7 +14,7 @@ from unittest.mock import patch
 from biucingcli.catalog import load_template, templates_root
 from biucingcli.errors import InvalidTemplateError
 from biucingcli.models import TemplateVariant, TemplateVariants
-from biucingcli.resources import resolve_resources
+from biucingcli.resources import resolve_resources, resource_fingerprint
 from biucingcli.variables import resolve_variables_detailed
 
 
@@ -285,17 +284,22 @@ class ResourceTests(ResourceFixture, unittest.TestCase):
             with self.assertRaisesRegex(InvalidTemplateError, "denied"):
                 self.resolve("ssr")
 
-    def test_legacy_inventory_does_not_tighten_symlink_policy(self):
+    def test_ordinary_resources_use_strict_policy_and_fingerprints(self):
         metadata = deepcopy(self.metadata)
         del metadata["variants"]
-        (self.common / "link").symlink_to(self.common / ".hidden")
         definition = self.load(metadata)
         resources = resolve_resources(definition, {})
         self.assertIsNone(resources.selector)
         self.assertIsNone(resources.selected_variant)
-        link = next(e for e in resources.entries if e.output_path == "link")
-        self.assertEqual(link.kind, "symlink")
-        self.assertEqual(link.mode, stat.S_IMODE(link.source.lstat().st_mode))
+        before = resource_fingerprint(definition, resources)
+        self.assertEqual(before, resource_fingerprint(definition, resources))
+        (self.common / ".hidden").write_bytes(b"changed")
+        self.assertNotEqual(before, resource_fingerprint(definition, resources))
+        (self.common / "link").symlink_to(self.common / ".hidden")
+        with self.assertRaisesRegex(InvalidTemplateError, "symlink resource forbidden"):
+            resolve_resources(definition, {})
+        with self.assertRaisesRegex(InvalidTemplateError, "symlink resource forbidden"):
+            resource_fingerprint(definition, resources)
 
     def test_resolver_revalidates_direct_model_changes(self):
         definition = self.load()

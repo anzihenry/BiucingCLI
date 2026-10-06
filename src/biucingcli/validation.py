@@ -9,7 +9,7 @@ from pathlib import PurePosixPath
 from biucingcli import catalog
 from biucingcli.catalog import load_templates
 from biucingcli.models import TemplateDefinition, ResolvedResources
-from biucingcli.resources import resolve_resources
+from biucingcli.resources import resolve_resources, resource_context
 from biucingcli.variant_declarations import at_or_below, collision_key
 from biucingcli.variables import ALLOWED_VARIABLE_VALIDATORS, variable_validation_error
 from biucingcli.rendering import PLACEHOLDER_PATTERN, supported_placeholders
@@ -330,11 +330,12 @@ def validate_template_placeholders(
 
 def validate_resolved_resources(definition: TemplateDefinition, resources: ResolvedResources) -> list[str]:
     """Validate the effective output; never scan unselected or shadowed files."""
-    context = f"{definition.name}[{resources.selected_variant}]"
+    context = resource_context(definition, resources.selected_variant)
     paths = {entry.output_path for entry in resources.entries}
     errors = []
-    for missing in sorted(set(resources.required_entries) - paths):
-        errors.append(f"{context}: missing required entry: {missing}")
+    missing = sorted(set(resources.required_entries) - paths)
+    if missing:
+        errors.append(f"{context}: missing required starter entries: {', '.join(missing)}")
     for path in sorted(paths):
         for forbidden in resources.forbidden_entries:
             if at_or_below(collision_key(path), collision_key(forbidden)):
@@ -356,17 +357,14 @@ def validate_templates() -> list[str]:
 
     for definition in definitions:
         errors.extend(validate_template_definition(definition))
-        if definition.variants is not None:
-            for name in sorted(definition.variants.options):
-                try:
-                    resources = resolve_resources(definition, {definition.variants.selector: name})
-                    errors.extend(validate_resolved_resources(definition, resources))
-                except InvalidTemplateError as exc:
-                    errors.append(str(exc))
-            continue
-        errors.extend(validate_template_placeholders(definition))
-        errors.extend(validate_template_required_files(definition))
-        errors.extend(validate_template_command_contract(definition))
+        selections = ({definition.variants.selector: name} for name in sorted(definition.variants.options)) \
+            if definition.variants else ({},)
+        for values in selections:
+            try:
+                resources = resolve_resources(definition, values)
+                errors.extend(validate_resolved_resources(definition, resources))
+            except (InvalidTemplateError, ValueError) as exc:
+                errors.append(str(exc))
 
     for metadata_path in sorted(catalog.templates_root().glob("*/template.json")):
         folder_name = metadata_path.parent.name
