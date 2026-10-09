@@ -13,6 +13,34 @@ Use uv 0.12.16, matching both GitHub workflows. `.python-version` selects Python
 3.11 for development; package support remains Python >=3.11. uv can download
 the interpreter when needed. CI overrides the default to test 3.11–3.14.
 
+## Branches and pull requests
+
+GitHub branch protection is enabled for `main`. All changes enter through pull
+requests, and administrators follow the same rules. Start a `codex/` work branch
+from the latest `main`, commit and push changes on that branch, then open a PR
+targeting `main`.
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c codex/your-change
+# Make changes, run the relevant checks, and commit them.
+git push -u origin codex/your-change
+gh pr create --base main --head codex/your-change
+```
+
+Before merging, the branch must be up to date with `main`, all review conversations
+must be resolved, and all 17 required GitHub Actions checks must pass: documentation,
+frontend artifact verification, macOS platform integration, core tests on
+Linux/macOS with Python 3.11–3.14, and frontend acceptance on Linux/macOS for
+CSR/SSG/SSR. Approval votes from other people are currently optional, so maintainers
+can merge their own PRs once checks pass. Force pushes and deletion of `main` are
+disabled.
+
+Protection is maintained in the GitHub repository's Settings → Branches. When
+changing CI job names or matrices, update the required check names as well so
+PRs do not wait for checks that no longer run.
+
 ## Dependencies and local checks
 
 ```bash
