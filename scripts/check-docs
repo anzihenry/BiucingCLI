@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+"""Validate maintained repository docs; generated-project Markdown is out of scope."""
+from __future__ import annotations
+
+import datetime
+import json
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+ROOT = Path(__file__).resolve().parents[1]
+LONG_STATES = {'draft', 'current', 'superseded'}
+INITIATIVE_STATES = {'proposed', 'active', 'paused', 'completed', 'cancelled'}
+RELEASE_STATES = {'recorded', 'planned', 'verified', 'released', 'cancelled', 'withdrawn'}
+LINK = re.compile(r'!?\[[^\]]*\]\(([^\s)]+)(?:\s+"[^"]*")?\)')
+REFERENCE = re.compile(r'^\s*\[[^\]]+\]:\s*(\S+)', re.MULTILINE)
+TABLE = re.compile(r'^\| \[([^\]]+)\]\(([^)]+)\) \| ([a-z-]+) \|$', re.MULTILINE)
+
+
+def prose(text: str) -> str:
+    """Ignore fenced code examples when interpreting headings and references."""
+    return re.sub(r'^(`{3,}|~{3,})[^\n]*\n.*?^\1\s*$', '', text,
+                  flags=re.MULTILINE | re.DOTALL)
+
+
+def code_blocks(text: str) -> list[str]:
+    """Executable examples must not change between language counterparts."""
+    return [
+        match.group(0).rstrip() for match in re.finditer(
+            r'^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$', text,
+            flags=re.MULTILINE | re.DOTALL)]
+
+
+def anchors(text: str) -> set[str]:
+    result: set[str] = set()
+    counts: Counter[str] = Counter()
+    for heading in re.findall(r'^#{1,6}\s+(.+?)\s*#*$', prose(text), re.MULTILINE):
+        heading = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', heading)
+        slug = re.sub(r'[^\w\- ]', '', heading.lower()).replace(' ', '-')
+        number = counts[slug]
+        counts[slug] += 1
+        result.add(slug + (f'-{number}' if number else ''))
+    result.update(re.findall(r'\bid=["\']([^"\']+)["\']', text))
+    return result
+
+
+def metadata(text: str) -> dict[str, str]:
+    match = re.match(r'\A---\n(.*?)\n---\n', text, re.DOTALL)
+    if not match:
+        raise ValueError('missing YAML metadata')
+    result = {}
+    for key, value in re.findall(r'^(title|status|owner|updated):\s*(.+)$',
+                                 match.group(1), re.MULTILINE):
+        if key in result:
+            raise ValueError(f'duplicate {key}')
+        result[key] = json.loads(value) if value.startswith('"') else value
+    missing = {'title', 'status', 'owner', 'updated'} - result.keys()
+    if missing:
+        raise ValueError(f'missing metadata: {sorted(missing)}')
+    datetime.date.fromisoformat(result['updated'])
+    return result
+
+
+def main() -> int:
+    paths = sorted(ROOT.glob('README*.md')) + sorted(ROOT.glob('CHANGELOG*.md'))
+    paths += sorted((ROOT / 'docs').rglob('*.md'))
+    errors: list[str] = []
+    texts = {p: p.read_text() for p in paths}
+    metas = {}
+    graph: dict[Path, set[Path]] = {p: set() for p in paths}
+
+    def fail(path: Path, message: str) -> None:
+        errors.append(f'{path.relative_to(ROOT)}: {message}')
+
+    for p, text in texts.items():
+        try:
+            info = metadata(text)
+            metas[p] = info
+            states = (INITIATIVE_STATES if 'initiatives' in p.parts else
+                      RELEASE_STATES if 'releases' in p.parts else LONG_STATES)
+            # Domain indexes are durable knowledge, even below initiatives/releases.
+            if p.parent in {ROOT / 'docs/initiatives', ROOT / 'docs/releases'}:
+                states = LONG_STATES
+            if info['status'] not in states:
+                fail(p, f'illegal status {info["status"]}')
+            if info['owner'] != 'project-maintainers':
+                fail(p, 'unconfigured owner')
+            heading = re.search(r'^# (.+)$', text, re.MULTILINE)
+            if not heading or heading.group(1) != info['title']:
+                fail(p, 'title does not match H1')
+        except (ValueError, TypeError) as exc:
+            fail(p, str(exc))
+        if not re.fullmatch(r'(README|CHANGELOG|[a-z0-9]+(?:-[a-z0-9]+)*)(\.en)?\.md', p.name):
+            fail(p, 'invalid filename')
+        for part in p.relative_to(ROOT).parts[:-1]:
+            if not re.fullmatch(r'[a-z0-9]+(?:[-.][a-z0-9]+)*', part):
+                fail(p, f'invalid directory {part}')
+        body = prose(text)
+        hrefs = [m.group(1) for m in LINK.finditer(body)]
+        hrefs += REFERENCE.findall(body)
+        for href in hrefs:
+            url = urlsplit(href.strip('<>'))
+            if url.scheme or url.netloc:
+                continue
+            if url.path.startswith('/'):
+                fail(p, f'absolute repository link {href}')
+                continue
+            target = (p.parent / unquote(url.path)).resolve() if url.path else p
+            if not target.is_relative_to(ROOT):
+                fail(p, f'link outside repository {href}')
+            elif not target.exists():
+                fail(p, f'missing link target {href}')
+            else:
+                graph[p].add(target)
+                if url.fragment and target.suffix == '.md':
+                    if unquote(url.fragment) not in anchors(target.read_text()):
+                        fail(p, f'missing heading anchor {href}')
+
+    reachable: set[Path] = set()
+    pending = [ROOT / "README.md", ROOT / "README.en.md"]
+    while pending:
+        current = pending.pop()
+        if current in reachable:
+            continue
+        reachable.add(current)
+        pending.extend(graph.get(current, set()) - reachable)
+
+    for p, info in metas.items():
+        if p.name.endswith('.md'):
+            other = (p.with_name(p.name.removesuffix('.en.md') + '.md')
+                     if p.name.endswith('.en.md') else
+                     p.with_name(p.stem + '.en.md'))
+            if other not in metas:
+                fail(p, 'missing bilingual counterpart')
+                continue
+            for key in ('owner', 'status', 'updated'):
+                if info[key] != metas[other][key]:
+                    fail(p, f'bilingual {key} mismatch')
+            if f']({other.name})' not in texts[p]:
+                fail(p, 'missing reciprocal language link')
+            if code_blocks(texts[p]) != code_blocks(texts[other]):
+                fail(p, 'bilingual code-block mismatch')
+        if p.name.startswith('README'):
+            for label, href, state in TABLE.findall(texts[p]):
+                target = (p.parent / href).resolve()
+                if target in metas:
+                    if label != metas[target]['title'] or state != metas[target]['status']:
+                        fail(p, f'index title/status mismatch for {href}')
+        if p.parent != ROOT and p not in reachable:
+            fail(p, 'not reachable by a maintained-document link')
+
+    for p in (ROOT / 'docs').rglob('*'):
+        if p.is_dir() and list(p.glob('*.md')):
+            if not (p / 'README.md').exists():
+                fail(p, 'populated documentation directory lacks README')
+
+    inventory_path = ROOT / 'docs/initiatives/process/documentation-standard/evidence/migration-inventory.json'
+    inventory = json.loads(inventory_path.read_text())
+    for item in inventory['files']:
+        if (ROOT / item['source']).exists():
+            fail(inventory_path, f'old path still exists: {item["source"]}')
+        for target in item.get("additional_targets", []):
+            if not (ROOT / target).is_file():
+                fail(inventory_path, f"missing split migration target: {target}")
+        if not (ROOT / item['target']).is_file():
+            fail(inventory_path, f'missing migration target: {item["target"]}')
+        for p, text in texts.items():
+            if item['source'] in text:
+                fail(p, f'stale repository path {item["source"]}')
+    for p in ROOT.glob('src/biucingcli/template_data/*/template.json'):
+        text = p.read_text()
+        for item in inventory['files']:
+            if item['source'] in text:
+                fail(p, f'stale metadata evidence path {item["source"]}')
+        for href in re.findall(r"\bdocs/[a-z0-9/.-]+\.md", text):
+            if not (ROOT / href).is_file():
+                fail(p, f"missing metadata evidence target {href}")
+    if errors:
+        print('\n'.join(errors), file=sys.stderr)
+        return 1
+    print(f'Documentation checks passed: {len(paths)} Markdown files, '
+          f'{len(inventory["files"])} migrated paths.')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

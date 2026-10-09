@@ -1,0 +1,409 @@
+{
+  "baseline_commit": "9ee0efb1bdd20969808f8bffbea42bef72e9a142",
+  "reference": "/Users/xiejinheng/Coding/HarnessBrew/docs/documentation.md",
+  "scope": "repository documentation structure; existing prose languages retained; generated-project Markdown payloads excluded",
+  "files": [
+    {
+      "source": "docs/template-system.md",
+      "target": "docs/engineering/template-system.md",
+      "source_sha256": "9fc4d30309d29a2334d4371d5c5f2e3e4aabfba0dbdc345083577c0b757273e1",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record; extract obsolete starter examples; update current CLI description",
+      "additional_targets": [
+        "docs/initiatives/feature/scaffold-baseline/template-shapes.md"
+      ]
+    },
+    {
+      "source": "docs/template-authoring.md",
+      "target": "docs/guides/template-authoring.md",
+      "source_sha256": "54cd4f8fd8683b28ee0d5259d8adef74b9c937633045e732cbc6293dd6dec7c8",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/kernel-modules.md",
+      "target": "docs/engineering/kernel-modules.md",
+      "source_sha256": "e79ce145dcf312582014a40fefbbd1ad900970c028d9f4e7f617367225e8cf00",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record; extract historical stages into initiative",
+      "additional_targets": [
+        "docs/initiatives/refactor/generation-kernel/plan.md"
+      ]
+    },
+    {
+      "source": "docs/json-contract.md",
+      "target": "docs/engineering/json-contract.md",
+      "source_sha256": "cf061ec687a0f635d4261b55f94e4f67f0e6c84430b7296f1cdb33c9e5e5788d",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/cli-errors.md",
+      "target": "docs/engineering/cli-errors.md",
+      "source_sha256": "6bf889b8a2c6a1dc9d93e5a6b97253bc80ead2a37de8c3ee312b4442427f116b",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/worktree-isolation-contract.md",
+      "target": "docs/engineering/worktree-isolation-contract.md",
+      "source_sha256": "9d4549251d441be015b543330e3448213674bced0359037e2457d1ad5145d541",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-architecture.md",
+      "target": "docs/engineering/backend/architecture.md",
+      "source_sha256": "53c1ed35171cfd9b15ec9b05326fa651a391ccef41a92e2ebdcc227ac902f9d4",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-engineering-contract.md",
+      "target": "docs/engineering/backend/contracts.md",
+      "source_sha256": "fb9c45347a9f599e064bfa61d087876129e54658786cf2aef0251e0eff3f669e",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/web-service-architecture.md",
+      "target": "docs/engineering/backend/web-service.md",
+      "source_sha256": "7b37fb2f83b0e1f63df044e222cd34a1555282f0989281de1c16c561ad12cc55",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/micro-service-architecture.md",
+      "target": "docs/engineering/backend/micro-service.md",
+      "source_sha256": "5dd79828d1b5e9f127a0aa1ac785240c5a8f350190272cf1272222d0aa47ae97",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/cross-platform-architecture-decisions.md",
+      "target": "docs/engineering/native/cross-platform-decisions.md",
+      "source_sha256": "aed155f6e9e08730763228697721dcfcd3844a27cab19dbec7ad344e1c8df4f0",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/apple-shell-component-architecture.md",
+      "target": "docs/engineering/native/apple.md",
+      "source_sha256": "345514f2eeee2a9187615acaf35970560aca7c89377373b44d33bc21878531de",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/android-shell-component-architecture.md",
+      "target": "docs/engineering/native/android.md",
+      "source_sha256": "4fce3a19c19218869d4ff41205e646ef7c941da48845c22af0a27113bf3b1c8c",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/harmonyos-shell-component-architecture.md",
+      "target": "docs/engineering/native/harmonyos.md",
+      "source_sha256": "bd89b69d0c2ea626844fa32a45024dd5ecacc351cec1894e45e23da9fcb41f66",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/testing.md",
+      "target": "docs/guides/testing.md",
+      "source_sha256": "c7f0631fc73e718beb1fd63794d135f892b76cd0f2bf868c2d71275abd0d0951",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/uv-workflow.md",
+      "target": "docs/guides/development.md",
+      "source_sha256": "0de389269474e996cf8b88c4e6dc3975678a67d26131ce3826c313b3bdfbf8f1",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/release-checklist.md",
+      "target": "docs/guides/releasing.md",
+      "source_sha256": "0ec98c494217e9f35f3177755f045112ce80a099f6580d5f47d66872c5a9a656",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/verification-matrix.md",
+      "target": "docs/guides/verification-matrix.md",
+      "source_sha256": "0aad7f14686918ba9122c6ead52fafd6cfdc2efa0e778323e9fd297bb9415954",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/frontend-artifact-acceptance.md",
+      "target": "docs/guides/frontend-acceptance.md",
+      "source_sha256": "8bce2c5a0e61ec637a72c1e7be5fd4b9de5814e8afbf9d4ecb43d9c9f682c700",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/apple-team-environment-standard.md",
+      "target": "docs/guides/environments/apple.md",
+      "source_sha256": "a4393779735578ae1f79b83af50cc38a43878a93260c8b31b91c0a49e51dca0e",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/android-team-environment-standard.md",
+      "target": "docs/guides/environments/android.md",
+      "source_sha256": "44f479022843ae1ce97a62d5e563e9323903f2008c9fc47e0ae8e8529c1f04aa",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/harmonyos-team-environment-standard.md",
+      "target": "docs/guides/environments/harmonyos.md",
+      "source_sha256": "e3fb6484d295c14e38acc00f590e6ebd55fe3853726fe7757dac4f29737bf05b",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/web-service-team-environment-standard.md",
+      "target": "docs/guides/environments/web-service.md",
+      "source_sha256": "fc9101ab11073001da1b75fb4b3389e3681c5847a0e36e68ed64d1e328b9f5b0",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/microservice-team-environment-standard.md",
+      "target": "docs/guides/environments/micro-service.md",
+      "source_sha256": "d08c67c7bb5ef7c30399a9379634e5bcbd495dc027b85a2db30b05d38ffd2445",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/roadmap.md",
+      "target": "docs/planning/delivery-history.md",
+      "source_sha256": "26ec15504c47d3566d78bdcd1dc76b0f22e5a06cb7671620cfb78a8568ceefd8",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/product-design.md",
+      "target": "docs/initiatives/feature/scaffold-baseline/design.md",
+      "source_sha256": "b17751b8487af2200e1b4ff4cd2c1c98b1922bac76ad840081b4c707ecad91ca",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/android-template-design.md",
+      "target": "docs/initiatives/feature/android-starter/design.md",
+      "source_sha256": "0913bbf69e0b06c913e00813e1bf4af740ab055af4421949a6f914715de83f67",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/microservice-template-design.md",
+      "target": "docs/initiatives/feature/micro-service-starter/design.md",
+      "source_sha256": "c40d6cf9ccf028fbe51c29a9af82e5fc69189a6fe080e919139feb65b60373a9",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/apple-android-template-roadmap.md",
+      "target": "docs/initiatives/improvement/native-starters/plan.md",
+      "source_sha256": "92d745149fd78812dd5e88ae5962bbf8c1576b13a9464c53fedb6403bee38144",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/frontend-rendering-plan.md",
+      "target": "docs/initiatives/feature/frontend-rendering/plan.md",
+      "source_sha256": "812d4930a74b286a3a51e2ff32dc1b53a9f45f706f592f2bb052757b842d81f8",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-implementation-tasks.md",
+      "target": "docs/initiatives/feature/backend-services/plan.md",
+      "source_sha256": "c5bc8fb2bcea5774771d0bf60490fe0fc61058f0c5981461aa47740a8a3ff9c2",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/kernel-refactor-baseline.md",
+      "target": "docs/initiatives/refactor/generation-kernel/baseline.md",
+      "source_sha256": "306f33bfb65ceca15fe42a2759bb6304f81e0d0a84b1236b5411834f1216df49",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/unified-generation.md",
+      "target": "docs/initiatives/refactor/unified-generation/validation.md",
+      "source_sha256": "7bc9c8faabb3248526c98c1a7f2e5808db01a28c92e6cf3a3ed7bfa9644ccc90",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/apple-cpp-core.md",
+      "target": "docs/initiatives/feature/native-components/apple-validation.md",
+      "source_sha256": "86c399487b288a4f7d05ef7f0bac54aaf6e2c0dce5a71abcda29ceb6adee752e",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/android-component-verification.md",
+      "target": "docs/initiatives/feature/native-components/android-validation.md",
+      "source_sha256": "dc6a1ed06e0cfb103ed9d445a0a4099117fbee9e904ed71ee1485342dcc21e76",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/harmonyos-component-verification.md",
+      "target": "docs/initiatives/feature/native-components/harmonyos-validation.md",
+      "source_sha256": "189004ffd9f445d32d9261a9730197d97725150c1680898ab34f52a8ed877394",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/cross-platform-architecture-verification.md",
+      "target": "docs/initiatives/feature/native-components/cross-platform-validation.md",
+      "source_sha256": "a01d5baa55c1cbc6c3a7ddf5dd5f96ea8c7bf0e3034ab2c68a602db5f0764723",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.0-worktree-tasks.md",
+      "target": "docs/initiatives/feature/worktree-isolation/plan.md",
+      "source_sha256": "f65278d12bace6f1d30a52e4df5bd0ca63ac2561e3e70726bd76ef7f7e3d1fa1",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.0-worktree-collision-audit.md",
+      "target": "docs/initiatives/feature/worktree-isolation/audit.md",
+      "source_sha256": "8a5a493265740d766041972b20450adad23dc5543a1b7c05b9e5e003f0b04b03",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.1-worktree-hardening-tasks.md",
+      "target": "docs/initiatives/improvement/worktree-hardening/plan.md",
+      "source_sha256": "0a93984e0b6e1f22113d6afe3728595b18aaa05a5a0c9d728dbba609719e1c93",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.4.0-template-candidate-selection.md",
+      "target": "docs/initiatives/feature/template-portfolio/candidate-selection.md",
+      "source_sha256": "5367b1e2b81b775264b15493f6dea1d7347c713a9f97f3b0e6ae8268f7c587e2",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.4.0-template-consistency-audit.md",
+      "target": "docs/initiatives/feature/template-portfolio/consistency-audit.md",
+      "source_sha256": "f6d7c4155772a28c4576364174906403f972fd55b4c547c89dcf781db8b0fbdf",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.3.0-plan.md",
+      "target": "docs/initiatives/feature/generator-productization/plan.md",
+      "source_sha256": "3e19f4e63bb3efe8b403a688576c81735ff32fa35af9b078f15e4d4c03b0c448",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.4.0-plan.md",
+      "target": "docs/initiatives/feature/template-portfolio/design.md",
+      "source_sha256": "376b9a53ccaeae5545d00d089ebd5319241d61088777a095d84286c51cb45178",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.0-plan.md",
+      "target": "docs/initiatives/feature/worktree-isolation/design.md",
+      "source_sha256": "571abdade18baac90e0bd196612d3629f27b23a4c02319c3ec9515b7b854e242",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.1-plan.md",
+      "target": "docs/initiatives/improvement/worktree-hardening/design.md",
+      "source_sha256": "7cf80cb708f2c45e2944aab0066c6823a29c64e7b80973876169b284363708f2",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.9.0-plan.md",
+      "target": "docs/initiatives/improvement/distribution-hardening/plan.md",
+      "source_sha256": "18f3516db6292988dcd4d867fc39daff64861ae30ca39c2b52ef337ef8a6bbec",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p0-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p0-validation.md",
+      "source_sha256": "f9442f10debdbe602d95f982c87d2c1e600ef7d5e3d93118402c3028d7f93bfd",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p1-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p1-validation.md",
+      "source_sha256": "5756a9cb3588dfa3dcab714891c694a2016115da828743a3e04d89b7c7f289ed",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p2-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p2-validation.md",
+      "source_sha256": "ebf5f7bb12b2252be32cfab9d24de32b8c94fb3da9904b369b3c583c2ee30474",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p3-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p3-validation.md",
+      "source_sha256": "83a6dd8a8c37773e1fd8c1cdfc29935de2ab8201d42ebc4d56bfa5d7da2e2e57",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p4-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p4-validation.md",
+      "source_sha256": "f01e52e412140943363bd931c319a482b74cb7171f9b1e6f7f43c014069fff5a",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/backend-service-p5-verification.md",
+      "target": "docs/initiatives/feature/backend-services/p5-validation.md",
+      "source_sha256": "49d5bbe760e733f9480da7e39676fe7bc3d75032c03e383eecc58b0d0a99827f",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.10.0-release-notes.md",
+      "target": "docs/releases/0.10.0/notes.md",
+      "source_sha256": "1c698368b83af04b9b38e17f0bf2158f3ea0c98cada387d4218501f938db46e5",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.10.0-release-prep.md",
+      "target": "docs/releases/0.10.0/validation.md",
+      "source_sha256": "32a674762552173698d50b3e957154990d910c83d56f22916e70e3ee95b8476b",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.3.0-release-prep.md",
+      "target": "docs/releases/0.3.0/validation.md",
+      "source_sha256": "77037b1df5f6eb84e9fbf924c89870f75b89828cd87378254a809ca51b2d2606",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.4.0-release-prep.md",
+      "target": "docs/releases/0.4.0/validation.md",
+      "source_sha256": "94adc3033064da8890b0ec69abca7b85cf8904ff6f96671ba62d9be84eaf21d7",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.0-release-prep.md",
+      "target": "docs/releases/0.6.0/validation.md",
+      "source_sha256": "ca1f764e1a15cde136ea522695efab748bc62251a9b4315d38427671e9d99d6a",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.6.1-release-prep.md",
+      "target": "docs/releases/0.6.1/validation.md",
+      "source_sha256": "441d0738917df97c1c31d1dbb8abd86c946c3e5b2a2deac2d64509b86d8d3278",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.7.0-release-notes.md",
+      "target": "docs/releases/0.7.0/notes.md",
+      "source_sha256": "95add279b3bc6ddfdf975f04f0f62d244688d15b12c0d377ca6c8be19425233d",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.7.0-release-prep.md",
+      "target": "docs/releases/0.7.0/validation.md",
+      "source_sha256": "fb66eb32581a5c043ecc21c823d005b4fff50fdd397ef91fbe756265c35f25a7",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.8.0-release-notes.md",
+      "target": "docs/releases/0.8.0/notes.md",
+      "source_sha256": "8eedd6897fb9641de54ce6b84963879026ea17bf34d59464ab61f254eb9ccde3",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.8.0-release-prep.md",
+      "target": "docs/releases/0.8.0/validation.md",
+      "source_sha256": "9ec7b51396f053c4e6a83ca80ef918a56e859ca29d14d939bf37c501ec2e441a",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.9.0-release-notes.md",
+      "target": "docs/releases/0.9.0/notes.md",
+      "source_sha256": "88d6eb6ed57e56c0ae1198af817ba927b197a4fa35eeccd11e0b4ecc53c432e9",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.9.0-release-prep.md",
+      "target": "docs/releases/0.9.0/validation.md",
+      "source_sha256": "d2aaf8eff7b0acc37510c4723bb8234f070740f32891382acc1eb592e29f66fa",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    },
+    {
+      "source": "docs/0.9.1-release-notes.md",
+      "target": "docs/releases/0.9.1/notes.md",
+      "source_sha256": "78f6743887e1f576303f1dea702c8ad2fc19cbc63f2aa5c71da0d8b233434d4a",
+      "action": "move; rewrite relative links; add metadata; classify current knowledge or historical initiative/release record"
+    }
+  ]
+}

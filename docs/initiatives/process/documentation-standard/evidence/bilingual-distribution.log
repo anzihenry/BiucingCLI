@@ -1,0 +1,11 @@
+Exact bytes/executable flags verified for 637 resources in wheel, sdist and rebuilt wheel
+audit-frontend: parsed 7 configuration files ({'.json': 4, '.yaml': 3})
+audit-web-service: parsed 36 configuration files ({'.toml': 2, '.yml': 3, '.json': 3, '.yaml': 28})
+audit-micro-service: parsed 36 configuration files ({'.toml': 2, '.yml': 3, '.yaml': 30, '.json': 1})
+audit-worker: parsed 3 configuration files ({'.toml': 1, '.yaml': 1, '.json': 1})
+audit-apple: parsed 5 configuration files ({'.toml': 1, '.yml': 1, '.plist': 1, '.json': 2})
+audit-android: parsed 21 configuration files ({'.toml': 2, '.xml': 17, '.json': 2})
+audit-harmonyos: parsed 38 configuration files ({'.toml': 1, '.json5': 24, '.json': 13})
+audit-frontend-ssg: parsed 7 configuration files ({'.json': 4, '.yaml': 3})
+audit-frontend-ssr: parsed 7 configuration files ({'.json': 4, '.yaml': 3})
+Distribution verification passed for wheel, sdist, and all seven templates.

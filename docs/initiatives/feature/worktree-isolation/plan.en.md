@@ -1,0 +1,407 @@
+---
+title: "BiucingCLI 0.6.0 Worktree Task Breakdown"
+status: completed
+owner: project-maintainers
+updated: 2026-10-09
+---
+
+# BiucingCLI 0.6.0 Worktree Task Breakdown
+
+[中文](plan.md) · Translation of the Chinese primary document.
+
+> Initiative material: historical background, design or acceptance for the recorded stage. See the [documentation map](../../../README.en.md) for current usage.
+
+This document turns the `0.6.0` worktree-first plan into reviewable implementation slices.
+
+The guiding rule is:
+
+> Each phase should leave the repo in a validated state and should be commit-sized.
+
+## Phase A: Contract and Audit
+
+### Goal
+
+Define what "worktree-first" means for BiucingCLI before changing template behavior.
+
+### Tasks
+
+1. Add `docs/engineering/worktree-isolation-contract.md`.
+2. Audit all seven templates against the contract.
+3. Record each template's current collision risks:
+   - ports;
+   - containers;
+   - Docker volumes;
+   - runtime images;
+   - language caches;
+   - generated outputs;
+   - local signing/config files;
+   - installed app identity.
+4. Classify gaps as:
+   - blocking for `0.6.0`;
+   - important but not release-blocking;
+   - optional follow-up.
+5. Decide the template metadata shape for worktree support.
+
+### Acceptance Criteria
+
+- The contract document exists and is linked from the `0.6.0` plan.
+- The audit covers `frontend`, `web-service`, `microservice`, `worker`, `apple`, `android`, and `harmonyos`.
+- The audit clearly separates Docker-first and native-template risks.
+- No template implementation changes are required in this phase.
+
+### Status
+
+Complete for planning.
+
+Artifacts:
+
+- [Worktree Isolation Contract](../../../engineering/worktree-isolation-contract.en.md)
+- [0.6.0 Worktree Collision Audit](audit.en.md)
+
+### Verification
+
+```bash
+python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m biucingcli.cli validate
+```
+
+## Phase B: Metadata and Validation
+
+### Goal
+
+Make worktree support visible and enforceable through the generator.
+
+### Tasks
+
+1. Add worktree metadata to each `template.json`.
+2. Extend the template dataclasses and JSON output.
+3. Update `biucing list --json` and `biucing info --json` coverage.
+4. Update human-readable `biucing info` output.
+5. Extend `biucing validate` to require worktree metadata.
+6. Refresh golden files.
+7. Update `docs/engineering/template-system.md`.
+
+### Proposed Metadata Shape
+
+```json
+{
+  "worktree": {
+    "support_level": "planned",
+    "isolation_dimensions": [
+      "runtime-names",
+      "ports",
+      "caches",
+      "local-config"
+    ],
+    "diagnostics": [
+      "make worktree-info",
+      "make worktree-doctor"
+    ],
+    "cleanup": [
+      "make clean-worktree"
+    ]
+  }
+}
+```
+
+Suggested `support_level` values:
+
+- `planned`: declared as part of the `0.6.0` rollout but not implemented yet;
+- `partial`: some isolation is implemented but the template still has known gaps;
+- `worktree-ready`: the template meets the `0.6.0` contract.
+
+### Acceptance Criteria
+
+- Every template has worktree metadata.
+- `biucing validate` fails when worktree metadata is missing or malformed.
+- `biucing info <template>` shows worktree support status.
+- Existing list/info JSON consumers still receive stable existing fields.
+
+### Status
+
+Complete for the generator contract surface.
+
+Implementation notes:
+
+- every template declares worktree metadata;
+- `biucing info` prints worktree support, isolation dimensions, diagnostics, and cleanup commands;
+- `list --json` and `info --json` include the new `worktree` object;
+- `biucing validate` checks support-level values, isolation dimensions, diagnostics, cleanup commands, and duplicate entries.
+
+### Verification
+
+```bash
+python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m biucingcli.cli validate
+PYTHONPATH=src python3 -m biucingcli.cli list --json
+PYTHONPATH=src python3 -m biucingcli.cli info frontend
+PYTHONPATH=src python3 -m biucingcli.cli info frontend --json
+```
+
+## Phase C: Docker-First Template Isolation
+
+### Goal
+
+Make `frontend`, `web-service`, `microservice`, and `worker` safe for parallel worktree development.
+
+### Shared Tasks
+
+1. Add shared Makefile variables:
+   - `WORKTREE_ID`;
+   - `WORKTREE_SLUG`;
+   - `COMPOSE_PROJECT_NAME`;
+   - `CACHE_DIR`;
+   - host port variables.
+2. Add Make targets:
+   - `worktree-info`;
+   - `worktree-doctor`;
+   - `clean-worktree`.
+3. Make Compose project names and volume names worktree-aware.
+4. Make runtime image tags worktree-aware by default.
+5. Ensure Docker Compose commands pass `COMPOSE_PROJECT_NAME`.
+6. Update generated README files with parallel worktree examples.
+7. Add rendering tests for every touched Makefile and Compose file.
+
+### Frontend-Specific Tasks
+
+1. Isolate:
+   - `node_modules`;
+   - pnpm store;
+   - Playwright cache;
+   - dev server host port;
+   - runtime image tag.
+2. Add `FRONTEND_HOST_PORT` or keep `DEV_PORT`/`HOST_PORT` but make collision behavior explicit.
+3. Ensure browser smoke can run with a worktree-specific base URL.
+
+### Web-Service-Specific Tasks
+
+1. Isolate:
+   - Go build cache;
+   - golangci-lint cache;
+   - live-reload container;
+   - runtime image tag;
+   - host HTTP port.
+2. Make `make dev`, `make verify`, `make docker-run`, and `make clean-worktree` use the same identity model.
+
+### Microservice-Specific Tasks
+
+1. Isolate:
+   - HTTP host port;
+   - gRPC host port;
+   - dependency store host port;
+   - OTel host ports;
+   - dependency store volume;
+   - generated protobuf output assumptions.
+2. Verify both `postgres` and `redis` dependency-store variants still render correctly.
+
+### Worker-Specific Tasks
+
+1. Isolate:
+   - Go cache;
+   - worker container;
+   - runtime image tag;
+   - schedule/dev container state.
+2. Confirm `oneshot` and `scheduled` modes remain unaffected by the worktree layer.
+
+### Acceptance Criteria
+
+- Two generated projects from the same template can run `make worktree-info` and show different identities.
+- Docker Compose config renders with different project names for different `WORKTREE_ID` values.
+- No hard-coded shared Docker volume names remain where they can collide.
+- Existing Docker-first commands remain familiar.
+
+### Status
+
+Complete for Docker-first templates.
+
+Implementation notes:
+
+- `frontend`, `web-service`, `microservice`, and `worker` now declare `worktree.support_level = worktree-ready`;
+- Makefiles derive `WORKTREE_ID`, `WORKTREE_SLUG`, `COMPOSE_PROJECT_NAME`, and worktree-aware image defaults;
+- Docker Compose commands route through the Makefile `COMPOSE` wrapper;
+- host ports are visible and overridable through Makefile variables;
+- `make worktree-info`, `make worktree-doctor`, and `make clean-worktree` are generated for the four Docker-first templates.
+
+### Verification
+
+```bash
+python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m biucingcli.cli validate
+PYTHONPATH=src python3 -m biucingcli.cli create frontend wt-frontend-a --output-dir /tmp/biucing-0.6-check --non-interactive
+PYTHONPATH=src python3 -m biucingcli.cli create web-service wt-web-a --output-dir /tmp/biucing-0.6-check --module-name github.com/example/wt-web-a --non-interactive
+PYTHONPATH=src python3 -m biucingcli.cli create microservice wt-micro-a --output-dir /tmp/biucing-0.6-check --module-name github.com/example/wt-micro-a --proto-package example.service.v1 --non-interactive
+PYTHONPATH=src python3 -m biucingcli.cli create worker wt-worker-a --output-dir /tmp/biucing-0.6-check --module-name github.com/example/wt-worker-a --non-interactive
+```
+
+For each generated project:
+
+```bash
+make worktree-info
+make worktree-doctor
+WORKTREE_ID=alpha docker compose -f compose.dev.yaml config
+WORKTREE_ID=beta docker compose -f compose.dev.yaml config
+```
+
+Use heavier Docker builds only after the fast Compose checks pass.
+
+## Phase D: Native Template Isolation
+
+### Goal
+
+Make `apple`, `android`, and `harmonyos` safe for parallel builds, tests, and local release preparation.
+
+### Shared Tasks
+
+1. Add shared Makefile variables:
+   - `WORKTREE_ID`;
+   - `WORKTREE_SLUG`;
+   - worktree-local cache/build paths;
+   - local signing/config paths;
+   - native debug identity suffixes.
+2. Add Make targets:
+   - `worktree-info`;
+   - `worktree-doctor`;
+   - `clean-worktree`.
+3. Keep local signing and SDK configuration worktree-local and git-ignored.
+4. Update generated README files with parallel worktree examples.
+5. Add rendering tests for every touched Makefile and native identity hook.
+
+### Apple-Specific Tasks
+
+1. Isolate:
+   - Xcode DerivedData;
+   - SwiftPM build path visibility;
+   - Tuist cache;
+   - SwiftLint cache;
+   - SwiftFormat cache.
+2. Pass `DEBUG_BUNDLE_SUFFIX` into Tuist manifests for parallel simulator installs.
+3. Keep `fastlane/.env` local-only and visible in diagnostics without printing secrets.
+
+### Android-Specific Tasks
+
+1. Isolate:
+   - Gradle user home;
+   - project build outputs;
+   - `local.properties`;
+   - debug install identity.
+2. Make debug `applicationIdSuffix` configurable from Gradle properties or environment variables.
+3. Route Makefile Gradle commands through a worktree-aware wrapper.
+
+### HarmonyOS-Specific Tasks
+
+1. Isolate:
+   - hvigor home;
+   - ohpm home;
+   - `oh_modules`;
+   - entry module build output;
+   - local signing properties.
+2. Pass worktree identity and requested debug bundle suffix as hvigor build properties.
+3. Keep `AppScope/app.json5` stable unless a local DevEco setup explicitly supports per-worktree bundle rewriting.
+
+### Acceptance Criteria
+
+- Generated native projects expose `make worktree-info`, `make worktree-doctor`, and `make clean-worktree`.
+- `apple`, `android`, and `harmonyos` declare `worktree-ready` metadata.
+- Apple build/test commands use worktree-local DerivedData and expose a debug bundle suffix.
+- Android build/test/install commands use worktree-local Gradle home and expose a debug `applicationIdSuffix`.
+- HarmonyOS build commands expose worktree-local hvigor/ohpm paths and requested bundle suffix behavior.
+
+### Status
+
+Complete for native templates.
+
+Implementation notes:
+
+- `apple`, `android`, and `harmonyos` now declare `worktree.support_level = worktree-ready`;
+- native Makefiles derive `WORKTREE_ID`, `WORKTREE_SLUG`, platform cache paths, diagnostics, and cleanup commands;
+- Apple reads `DEBUG_BUNDLE_SUFFIX` in the Tuist manifest and routes `xcodebuild` through worktree-local DerivedData;
+- Android reads `biucing.worktree.applicationIdSuffix` for debug builds and routes Gradle commands through a worktree-local `GRADLE_USER_HOME`;
+- HarmonyOS passes worktree identity and requested bundle suffix through hvigor properties while keeping `AppScope/app.json5` stable by default.
+
+### Verification
+
+```bash
+python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m biucingcli.cli validate
+PYTHONPATH=src python3 -m biucingcli.cli create apple phase-d-apple --output-dir /tmp/biucing-phase-d --platform ios --bundle-identifier com.example.phasedapple --organization-name Example --development-team ABCDE12345
+PYTHONPATH=src python3 -m biucingcli.cli create android phase-d-android --output-dir /tmp/biucing-phase-d --package-name com.example.phasedandroid --application-id com.example.phasedandroid.app --android-namespace com.example.phasedandroid
+PYTHONPATH=src python3 -m biucingcli.cli create harmonyos phase-d-harmony --output-dir /tmp/biucing-phase-d --bundle-name com.example.phasedharmony --harmony-module-name entry --ability-name EntryAbility
+```
+
+For each generated project:
+
+```bash
+make worktree-info WORKTREE_ID=alpha
+make worktree-doctor WORKTREE_ID=alpha
+make -n build WORKTREE_ID=beta
+```
+
+## Phase E: Release Hardening
+
+### Goal
+
+Make the release evidence and user-facing docs match the worktree-first story.
+
+### Tasks
+
+1. Update `README.md`.
+2. Update `docs/planning/delivery-history.md`.
+3. Update `docs/engineering/template-system.md`.
+4. Update `docs/guides/releasing.md`.
+5. Update `docs/guides/verification-matrix.md`.
+6. Add `docs/releases/0.6.0/validation.md`.
+7. Draft the `CHANGELOG.md` entry.
+8. Run repo-level verification.
+9. Gather targeted generated-project evidence.
+
+### Acceptance Criteria
+
+- Docs describe the same worktree contract that templates implement.
+- Release checklist includes worktree isolation checks.
+- Verification matrix includes per-template worktree proof.
+- Changelog summarizes user-visible reliability improvements.
+
+### Status
+
+Complete for release hardening.
+
+Implementation notes:
+
+- README, roadmap, and template-system docs now describe the finished `0.6.0` worktree-ready template family;
+- release checklist and verification matrix now include worktree-specific checks;
+- `docs/releases/0.6.0/validation.md` records the Phase E generated-project evidence run;
+- `CHANGELOG.md` has a draft `0.6.0` entry.
+
+### Verification
+
+```bash
+python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m biucingcli.cli validate
+PYTHONPATH=src python3 -m biucingcli.cli list --json
+```
+
+## Suggested Commit Slices
+
+1. `docs: plan worktree-first 0.6.0`
+2. `docs: add worktree isolation contract`
+3. `feat: expose worktree metadata in templates`
+4. `feat: validate worktree metadata`
+5. `feat: isolate frontend worktree workflows`
+6. `feat: isolate web service worktree workflows`
+7. `feat: isolate microservice worktree workflows`
+8. `feat: isolate worker worktree workflows`
+9. `feat: isolate apple worktree workflows`
+10. `feat: isolate android worktree workflows`
+11. `feat: isolate harmonyos worktree workflows`
+12. `docs: prepare 0.6.0 release evidence`
+
+## Risk Register
+
+| Risk | Mitigation |
+| --- | --- |
+| Port auto-selection becomes too clever and hard to debug | prefer explicit host port variables plus diagnostics before any dynamic allocator |
+| Worktree IDs change unexpectedly | derive from worktree root by default and allow explicit `WORKTREE_ID` override |
+| Compose volume naming becomes inconsistent | route all Compose commands through Makefile variables and lock generated output with tests |
+| Native toolchains resist custom cache paths | document the supported isolation layer and defer unsafe hacks |
+| Cleanup targets delete too much | keep `clean-worktree` scoped to current worktree state and avoid global cache deletion |
+| Metadata grows without implementation value | keep metadata tied to validation, info output, and release evidence |

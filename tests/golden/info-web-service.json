@@ -31,9 +31,9 @@
       "runtime image HTTP health check",
       "real docker runtime image builds",
       "real docker development image builds",
-      "P3 independent OIDC/mTLS call-chain and telemetry fault verification (docs/backend-service-p3-verification.md)",
-      "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/backend-service-p4-verification.md)",
-      "P5 Kustomize/schema and release failure guards; real cluster/HA remains not-run (docs/backend-service-p5-verification.md)"
+      "P3 independent OIDC/mTLS call-chain and telemetry fault verification (docs/initiatives/feature/backend-services/p3-validation.md)",
+      "P4 Linux arm64 Docker Compose signed-image deployment and recovery evidence (docs/initiatives/feature/backend-services/p4-validation.md)",
+      "P5 Kustomize/schema and release failure guards; real cluster/HA remains not-run (docs/initiatives/feature/backend-services/p5-validation.md)"
     ]
   },
   "worktree": {

@@ -1,0 +1,169 @@
+---
+title: "Delivery history and historical roadmap"
+status: current
+owner: project-maintainers
+updated: 2026-10-09
+---
+
+# Delivery history and historical roadmap
+
+[中文](delivery-history.md) · Translation of the Chinese primary document.
+
+> Historical record. The current source version and cross-initiative priorities are maintained in [the roadmap](roadmap.en.md). The older planning statements below describe their original context, not the current backlog.
+
+## Shipped
+
+### 0.1.0 - Scaffold Generator Baseline
+
+- established the metadata-driven template system;
+- shipped `biucing list`, `biucing info`, `biucing create`, and `biucing --version`;
+- shipped five starters: `frontend`, `web-service`, `micro-service`, `apple`, and `android`;
+- aligned the repo around a focused scaffold-generator product direction.
+
+### 0.2.0 - Template Maturity Expansion
+
+- fully Dockerized the `frontend`, `web-service`, and `micro-service` starters for local development and runtime packaging;
+- expanded the Apple starter into a stronger Tuist + SwiftPM baseline with platform-aware output and better doctor/lint/release guidance;
+- expanded the Android starter into a more complete Kotlin + Compose baseline with a committed Gradle wrapper, stronger doctor checks, UI smoke coverage, and release-signing placeholders;
+- validated generated starters repeatedly with real build and test workflows.
+
+### 0.3.0 - Productize The Generator
+
+- expanded the CLI surface beyond create-time generation by shipping `validate` plus JSON output for `list`, `info`, and `validate`;
+- made `create` more scriptable with `--set KEY=VALUE`, `--non-interactive`, and clearer variable resolution behavior;
+- enriched template metadata so the CLI can expose category, tags, platform support, maturity, validation status, variables, and next steps;
+- added repo-level validation and golden coverage so the generator surface is easier to trust and maintain;
+- prepared versioned release-planning and verification docs to make future releases easier to repeat.
+
+### 0.4.0 - Sharpen The Product, Normalize The Portfolio, Add One New Surface
+- improved generation UX with dry-run, plan-style inspection, and machine-readable create manifests;
+- tightened the shared metadata, validation, docs, and workflow contract across the template family;
+- added the new `worker` starter as a sixth template surface;
+- `biucing create` can preview what it will generate before files are written.
+- scripts can rely on a stable, machine-readable generation summary after create succeeds.
+- the current template family follows a clearer shared product contract.
+- the portfolio grows through a new `worker` starter without lowering validation quality.
+
+### 0.5.0 - HarmonyOS Starter
+
+- added an experimental `harmonyos` template for ArkTS + ArkUI DevEco Studio projects;
+- wired HarmonyOS bootstrap, doctor, lint, build, and release-signing guidance;
+- expanded the template portfolio to seven shipped starters;
+- kept HarmonyOS generated-project validation separate from workstation-specific SDK availability.
+
+### 0.6.0 - Worktree-First Starters
+
+`0.6.0` makes BiucingCLI's generated starters safe for parallel Git worktree development.
+
+The release is centered on:
+
+- a shared worktree isolation contract across all seven templates;
+- Docker-first isolation for Compose project names, volumes, ports, runtime image tags, dependency stores, and caches;
+- native-template isolation for build caches, local signing files, IDE output, and debug app identities;
+- generated `make worktree-info`, `make worktree-doctor`, and `make clean-worktree` workflows where appropriate;
+- validation, docs, and release evidence that prove parallel-worktree behavior instead of only claiming it.
+
+Implementation status:
+
+- Phase A through Phase D are complete;
+- all seven templates declare `worktree-ready` metadata;
+- Phase E release-hardening docs and verification evidence are complete.
+
+Planning anchors:
+
+- [0.6.0 Plan](../initiatives/feature/worktree-isolation/design.en.md)
+- [0.6.0 Worktree Task Breakdown](../initiatives/feature/worktree-isolation/plan.en.md)
+- [0.6.0 Release Prep](../releases/0.6.0/validation.en.md)
+
+### 0.6.1 - Worktree Isolation Hardening
+
+`0.6.1` hardened the worktree-first behavior shipped in `0.6.0`.
+
+The release is focused on:
+
+- unifying the worktree identity model across Docker-first and native templates;
+- adding actionable port-conflict advice for Docker-first templates;
+- exposing non-invasive Compose config diagnostics as generated-project commands;
+- making native worktree evidence more precise;
+- deciding the safe boundary for HarmonyOS debug identity behavior.
+
+Planning anchors:
+
+- [0.6.1 Plan](../initiatives/improvement/worktree-hardening/design.en.md)
+- [0.6.1 Worktree Hardening Task Breakdown](../initiatives/improvement/worktree-hardening/plan.en.md)
+- [0.6.1 Release Prep](../releases/0.6.1/validation.en.md)
+
+Implementation status:
+
+- all seven templates use one worktree identity model;
+- Docker-first templates expose port conflict advice and Compose config diagnostics;
+- native evidence is split into `static`, `doctor`, and `real-build` tiers;
+- HarmonyOS debug bundle rewriting is explicitly deferred behind a read-only diagnostic boundary.
+
+### 0.7.0 - Native Release Readiness
+
+`0.7.0` completes the native templates' local verification and pre-distribution workflows.
+
+The release is focused on:
+
+- Apple Fastlane archive, TestFlight, and App Store Connect delivery lanes;
+- Android signing validation, release AAB validation, and Google Play internal/production delivery lanes;
+- HarmonyOS signing preflight and local release HAP generation;
+- fresh real-build evidence across Apple, Android, and HarmonyOS.
+
+Release anchors:
+
+- [0.7.0 Release Notes](../releases/0.7.0/notes.en.md)
+- [0.7.0 Release Prep](../releases/0.7.0/validation.en.md)
+
+External account credentials and actual store submissions remain intentionally outside the committed template configuration.
+
+### 0.8.0 - Cross-Template Runtime And Release Hardening
+
+`0.8.0` strengthened validated generator inputs, the common Make command contract, production browser coverage, backend lifecycle behavior, Worker retry semantics, and native release verification.
+
+Release anchors:
+
+- [0.8.0 Release Notes](../releases/0.8.0/notes.en.md)
+- [0.8.0 Release Prep](../releases/0.8.0/validation.en.md)
+
+## Historical 0.9.0 planning snapshot
+
+### 0.9.0 - Distribution And Generator-Core Hardening
+
+`0.9.0` treats the installed distribution as the primary product boundary.
+
+The release is focused on:
+
+- bundling all seven templates in wheel and source distributions;
+- deriving platform and dependency values only after input normalization;
+- stable user-facing errors and atomic project generation;
+- installed-artifact verification on Python 3.11 through 3.14.
+
+Planning anchors:
+
+- [0.9.0 Plan](../initiatives/improvement/distribution-hardening/plan.en.md)
+- [0.9.0 Release Prep](../releases/0.9.0/validation.en.md)
+
+## Historical backend planning snapshot
+
+The backend architecture direction is approved; implementation is tracked separately from the current release scope.
+No release version is assigned yet.
+
+- [Backend Service Architecture](../engineering/backend/architecture.en.md)
+- [Backend Service Implementation Tasks](../initiatives/feature/backend-services/plan.en.md)
+
+The plan covers 27 baseline tasks across runtime foundations, protocol and identity, persistence,
+service calls, observability, Docker/Compose production delivery, and a separate Kubernetes HA reference.
+Fourteen optional extension tasks remain demand-driven. Existing starter validation does not imply
+completion of this architecture baseline.
+
+## Deferred
+
+These remain intentionally out of scope unless the roadmap changes:
+
+- several unrelated new templates in one release;
+- a heavy external templating engine;
+- remote registries, plugin systems, or online template marketplaces;
+- turning BiucingCLI into a generalized platform or workflow orchestrator.
+- automatically managing Git worktrees inside BiucingCLI.

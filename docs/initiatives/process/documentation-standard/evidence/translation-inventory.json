@@ -1,0 +1,841 @@
+{
+  "date": "2026-10-09",
+  "timezone": "Asia/Shanghai",
+  "scope": "root README, CHANGELOG and all maintained Markdown under docs; generated-project docs and raw evidence excluded",
+  "pairs": 109,
+  "markdown_files": 218,
+  "new_prose_translations": 70,
+  "source_snapshot": "uncommitted structural-migration workspace before bilingual follow-up; not a Git commit",
+  "sources": {
+    "CHANGELOG.md": {
+      "source_language": "en",
+      "sha256": "7289826f4f09d04281c20a85595e0d710b979f4688e65285c30044dc21e7a729"
+    },
+    "docs/engineering/backend/architecture.md": {
+      "source_language": "zh",
+      "sha256": "7aab4a71a7ec4c8c87f2fc5f6a0cd8328c21a72a8518fcfe94a370ea7266cac6"
+    },
+    "docs/engineering/backend/contracts.md": {
+      "source_language": "zh",
+      "sha256": "ceab28ac869298e3847e03b252d6db1b6f2ecff9989b81d4c8aaafa48f119e73"
+    },
+    "docs/engineering/backend/micro-service.md": {
+      "source_language": "zh",
+      "sha256": "6b0b7590f9f4e94585a0bf0529b569f38c627c79b4787b89a6b03e54ed1a6538"
+    },
+    "docs/engineering/backend/web-service.md": {
+      "source_language": "zh",
+      "sha256": "cc61550da5648198d7599efaf2a409e72ea1e49fd154588e156790213afb26dc"
+    },
+    "docs/engineering/cli-errors.md": {
+      "source_language": "en",
+      "sha256": "05692d8c545533099349e8ea89000e90a0f86e7f4619c3a0d0f90dc4344beb84"
+    },
+    "docs/engineering/json-contract.md": {
+      "source_language": "en",
+      "sha256": "0f8dc9d9013d476dcda146fdd579d71b808bd8fff87b08721aca492607feab2c"
+    },
+    "docs/engineering/kernel-modules.md": {
+      "source_language": "en",
+      "sha256": "f5b9257eb16d9c65aed32f60b2992b7fb5d4daa70f645a1803c583ab91008efa"
+    },
+    "docs/engineering/native/android.md": {
+      "source_language": "zh",
+      "sha256": "a0bbe1829793ca61d829a2fd5f822b4116809c8cf2321b0c473a67fb53da6269"
+    },
+    "docs/engineering/native/apple.md": {
+      "source_language": "zh",
+      "sha256": "7c1660a2dcc3f7719c12aa33bea753cb96e49a34007a277a4179fb7b2b6290e9"
+    },
+    "docs/engineering/native/cross-platform-decisions.md": {
+      "source_language": "zh",
+      "sha256": "ca8c3c938d4d7f0106563ae9b5d2cac4382ba84b81a162c0c907525b79491981"
+    },
+    "docs/engineering/native/harmonyos.md": {
+      "source_language": "zh",
+      "sha256": "c824fb963f1ba22e8eb46412a13961a84158e46b999432312f22531d2879831f"
+    },
+    "docs/engineering/template-system.md": {
+      "source_language": "en",
+      "sha256": "1c7a414efe52bc17c2b690787df934bf52a8c4b68c6c4cd7f3893db55c3f9c63"
+    },
+    "docs/engineering/worktree-isolation-contract.md": {
+      "source_language": "en",
+      "sha256": "600815cfbfd5982561beb5c1907d01db73117b90637210532c5ed6ef39531361"
+    },
+    "docs/guides/development.md": {
+      "source_language": "en",
+      "sha256": "c9d4a525969322d3f485c383b3ff26e0c4b5b2aff0d7c9ebc95b6a7d611d0a59"
+    },
+    "docs/guides/environments/android.md": {
+      "source_language": "en",
+      "sha256": "4b1a564d95c52c9f87a045edf3d4bd19504f3b0d6c24441b6d43585e5298df9f"
+    },
+    "docs/guides/environments/apple.md": {
+      "source_language": "en",
+      "sha256": "a3ffd16a36f66d2cf700f283df88f2d1991578c610f347b3f7022ae34f80297c"
+    },
+    "docs/guides/environments/harmonyos.md": {
+      "source_language": "en",
+      "sha256": "0e9df8dd1ff88239e45a0fd88f9d470e93eb1c513af79f04fe41abbfd1530ee2"
+    },
+    "docs/guides/environments/micro-service.md": {
+      "source_language": "en",
+      "sha256": "32192c0e7e5f3839aab33660fc8e71a08c20d41ce73ff9aca74cc437a15b26a8"
+    },
+    "docs/guides/environments/web-service.md": {
+      "source_language": "en",
+      "sha256": "66898470c416f380062a1b5c39244cdbdc26cc7f499783edd55579f5e32f1dee"
+    },
+    "docs/guides/frontend-acceptance.md": {
+      "source_language": "en",
+      "sha256": "cc453edec749cfd32d0311e14baf4d0c614fae95e2e7625f8b70e1fd0a500f51"
+    },
+    "docs/guides/releasing.md": {
+      "source_language": "en",
+      "sha256": "d5e2cf09ad16143e6f632717cb69d5ca251e03d1299411ed40a47bde655cd736"
+    },
+    "docs/guides/template-authoring.md": {
+      "source_language": "en",
+      "sha256": "7c0cdc7312906724bed2ce10d36b7443cf0eda834ff49975e59b5bfa6fbc92a4"
+    },
+    "docs/guides/testing.md": {
+      "source_language": "en",
+      "sha256": "6febb9421073161237b5e687dd4c48ffaa72eddeddca2be3c4db50052bd32e59"
+    },
+    "docs/guides/using.md": {
+      "source_language": "en",
+      "sha256": "52f16a907ea2d786ac49bcead9d7acc558d5c0c42ca6c979bda58702f1a4909d"
+    },
+    "docs/guides/verification-matrix.md": {
+      "source_language": "en",
+      "sha256": "2faf32878dfffa597f001e6aa95d7d5b54354f6b072cca11b109bb4854ab4348"
+    },
+    "docs/initiatives/feature/android-starter/design.md": {
+      "source_language": "en",
+      "sha256": "4574950b8debbfe9ad5b80f4bee9688d3453e28a62100be6eabb6d796ad579ec"
+    },
+    "docs/initiatives/feature/backend-services/p0-validation.md": {
+      "source_language": "zh",
+      "sha256": "16753755d302e4b0176a2f77871daf91bb3a10071f3b4c1afb6b4fe4c8a1fb32"
+    },
+    "docs/initiatives/feature/backend-services/p1-validation.md": {
+      "source_language": "zh",
+      "sha256": "d89d785d5a3f0c540e5d4530849d78172e8a681fb4d2b99638d16de1442a6736"
+    },
+    "docs/initiatives/feature/backend-services/p2-validation.md": {
+      "source_language": "zh",
+      "sha256": "02288a5153094b2aa7f51fa67e3690bb33807128643d50c0b2beb5732dd30d34"
+    },
+    "docs/initiatives/feature/backend-services/p3-validation.md": {
+      "source_language": "zh",
+      "sha256": "8342cbe3e6c1f9e1cf8d1f72a1a316d163b058f26fe9a9d9281c36555e01d911"
+    },
+    "docs/initiatives/feature/backend-services/p4-validation.md": {
+      "source_language": "zh",
+      "sha256": "472985d1a84af74591bf5d8e331e5193607de7562d420303d83dbf746e0328e9"
+    },
+    "docs/initiatives/feature/backend-services/p5-validation.md": {
+      "source_language": "zh",
+      "sha256": "4c37a618deef6a9b97dbf195d984afbe444eeefc6edb9dda5f16b3144734a7a0"
+    },
+    "docs/initiatives/feature/backend-services/plan.md": {
+      "source_language": "zh",
+      "sha256": "85bbc817549224f20f3662e16f1e68855e815340ab68bf552ad647501ed2e854"
+    },
+    "docs/initiatives/feature/frontend-rendering/plan.md": {
+      "source_language": "en",
+      "sha256": "9a242093d5ea4f78913219e300313705a8fba66edc9ec147529e5d47edd8d4f9"
+    },
+    "docs/initiatives/feature/generator-productization/plan.md": {
+      "source_language": "en",
+      "sha256": "115b7db5fae409a7326f1b49030e91862b830d6e447c3fbf9985184c7f6fd162"
+    },
+    "docs/initiatives/feature/micro-service-starter/design.md": {
+      "source_language": "en",
+      "sha256": "c8dbad8cb7475bb5ac4e00f0bb26c01f9831ab8d22f0fa3b09b07a0de53efb23"
+    },
+    "docs/initiatives/feature/native-components/android-validation.md": {
+      "source_language": "zh",
+      "sha256": "2a09eaf699e7c7a849c8b04359220aadfe632754d3877767974cf54536247c40"
+    },
+    "docs/initiatives/feature/native-components/apple-validation.md": {
+      "source_language": "zh",
+      "sha256": "dde3bb32640a39e355af7eb68dfe31697ce1b131ee766262e2201c70f71f7301"
+    },
+    "docs/initiatives/feature/native-components/cross-platform-validation.md": {
+      "source_language": "zh",
+      "sha256": "d4458ee2bc1f6f6cd98f46a54e67bbdb340f41454ea6ca51abaff3714ab79510"
+    },
+    "docs/initiatives/feature/native-components/harmonyos-validation.md": {
+      "source_language": "zh",
+      "sha256": "4bdb5bb22b620a6bde7f69e645b5d8ffb702d270d9b6e312926c1646786d4144"
+    },
+    "docs/initiatives/feature/scaffold-baseline/design.md": {
+      "source_language": "en",
+      "sha256": "d022fefa1209402abfc918dd3d867bb8f11994470810ac29d2af49c1864d8a9b"
+    },
+    "docs/initiatives/feature/scaffold-baseline/template-shapes.md": {
+      "source_language": "en",
+      "sha256": "4a5e7c82096c8568bc7428fcb95b8136014d15b250b7f1162063524623e10935"
+    },
+    "docs/initiatives/feature/template-portfolio/candidate-selection.md": {
+      "source_language": "en",
+      "sha256": "bf34c86106170546ebc573853b03abe7ceb4ac28af329d76f0913ff7d244b5d5"
+    },
+    "docs/initiatives/feature/template-portfolio/consistency-audit.md": {
+      "source_language": "en",
+      "sha256": "783f7273bd68904e814e48c6ab60bd65fefab6a1b790289ac766297378d6817e"
+    },
+    "docs/initiatives/feature/template-portfolio/design.md": {
+      "source_language": "en",
+      "sha256": "cbeac5e40cd7a22ec9e93583fe1e194698f06538024c875e87d1efe82f580a6b"
+    },
+    "docs/initiatives/feature/worktree-isolation/audit.md": {
+      "source_language": "en",
+      "sha256": "180c1b0ea04ebc60ef1663fcc423f84f8eedb84d42420a20b5521c875f47c4fb"
+    },
+    "docs/initiatives/feature/worktree-isolation/design.md": {
+      "source_language": "en",
+      "sha256": "d78a4470f05980759c3d4bcf0d6dedace02537ca6473c74acb09f0a3ab1cc3a3"
+    },
+    "docs/initiatives/feature/worktree-isolation/plan.md": {
+      "source_language": "en",
+      "sha256": "f026822016e0f3d269dffc5efdda00803619c4796ac8941edcbdcd76591ae7d0"
+    },
+    "docs/initiatives/improvement/distribution-hardening/plan.md": {
+      "source_language": "en",
+      "sha256": "b08a2c68fb08df0320ed044e30ec35dcb281a7ffe2d4256de1b254b6eeed8f72"
+    },
+    "docs/initiatives/improvement/native-starters/plan.md": {
+      "source_language": "en",
+      "sha256": "57e37f3a3a8b663a9456cedd36fc0f0dbec6503af6980e6ce5a4b3dc9182ddc0"
+    },
+    "docs/initiatives/improvement/worktree-hardening/design.md": {
+      "source_language": "en",
+      "sha256": "d32cd017ac565a8606221c6f65e884772adab95b1ad66173dc5bde038d99b69a"
+    },
+    "docs/initiatives/improvement/worktree-hardening/plan.md": {
+      "source_language": "en",
+      "sha256": "f8105048ea4a57c12f0b3cdd9b756000cd27ea219548bfa50dbb28863aedf8ef"
+    },
+    "docs/initiatives/refactor/generation-kernel/baseline.md": {
+      "source_language": "en",
+      "sha256": "2f8c277fc4f07891d104ecd41982d271c1b566bb156798f2f5a51180f5142541"
+    },
+    "docs/initiatives/refactor/generation-kernel/plan.md": {
+      "source_language": "en",
+      "sha256": "deda17102b7a0398b8a1ed7cc84b5f964ed5b9fd4fcf3fad657267d9d8e5e6d7"
+    },
+    "docs/initiatives/refactor/unified-generation/validation.md": {
+      "source_language": "en",
+      "sha256": "a57e61dbed6ce0602bde5bf761766808d349fe0ea86d92eab6c3e179b4cd2248"
+    },
+    "docs/planning/delivery-history.md": {
+      "source_language": "en",
+      "sha256": "f121d875048249dbaefa650a89bbf33f8164ca09fd67a66a2173a1aa2922e1e2"
+    },
+    "docs/releases/0.10.0/notes.md": {
+      "source_language": "en",
+      "sha256": "75fae7b609f212c95664d66c5a39c8537a9b11b8837a564a247cec1861d88d25"
+    },
+    "docs/releases/0.10.0/validation.md": {
+      "source_language": "en",
+      "sha256": "9b76e59aa3b3e183abce6eb6c884a0a90e0baae78f8ccfd70e7b1a301794f4c3"
+    },
+    "docs/releases/0.3.0/validation.md": {
+      "source_language": "en",
+      "sha256": "1fb6b6d97d57b688c111a0e992e7127d0a8ed99b90f371c1448ec5c419797b5c"
+    },
+    "docs/releases/0.4.0/validation.md": {
+      "source_language": "en",
+      "sha256": "0d6becc5a7c1616f24c4cec9ba00a157a7e59328745159c06cff7657590cdf28"
+    },
+    "docs/releases/0.6.0/validation.md": {
+      "source_language": "en",
+      "sha256": "d1fd3987a3e938e6969d81be9763bb20fabd967e29892e3004232ec5a7954790"
+    },
+    "docs/releases/0.6.1/validation.md": {
+      "source_language": "en",
+      "sha256": "67ec4b6779fb99ab34c0845db0b62f794983ef21dfcfb0d5833dd690ed66e6f8"
+    },
+    "docs/releases/0.7.0/notes.md": {
+      "source_language": "en",
+      "sha256": "3715067051f76e1b30e1edb7e128092862d84a97d5472c5067db3be019f547e3"
+    },
+    "docs/releases/0.7.0/validation.md": {
+      "source_language": "en",
+      "sha256": "77679731b75b1c51772176a75fbf8287d9a8f9c31cf53a13e48362523bb89f37"
+    },
+    "docs/releases/0.8.0/notes.md": {
+      "source_language": "en",
+      "sha256": "1832531fa3b93a72f91c9f23e2c30d19ac42d5c52fbe1a8f3287a407b3becd92"
+    },
+    "docs/releases/0.8.0/validation.md": {
+      "source_language": "en",
+      "sha256": "ee37a8028a302764a12792e997dc41265b3b8b82b2c51f10c97e7561dd13bbd7"
+    },
+    "docs/releases/0.9.0/notes.md": {
+      "source_language": "en",
+      "sha256": "c9f4e4b91598cd1e8dd65b9d296c44b28f0064a51d35a5d672c7f87f344ff287"
+    },
+    "docs/releases/0.9.0/validation.md": {
+      "source_language": "en",
+      "sha256": "0a10a0b5119f4e16b9da31a14114f646dbc63283058676a576b8dbcaebb63833"
+    },
+    "docs/releases/0.9.1/notes.md": {
+      "source_language": "en",
+      "sha256": "9f4d406ee330a8ab1153abdc1f3773a9d544470c1fd81a5256d5f6d759fe3f6b"
+    }
+  },
+  "code_blocks_equal": true,
+  "code_formatting_note": "The indented Make example in worktree-hardening/plan was normalized to a standalone fence in both languages; command content is unchanged.",
+  "independent_review": false,
+  "documents": [
+    {
+      "primary": "CHANGELOG.md",
+      "english": "CHANGELOG.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "README.md",
+      "english": "README.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/README.md",
+      "english": "docs/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/documentation.md",
+      "english": "docs/documentation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/README.md",
+      "english": "docs/engineering/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/backend/README.md",
+      "english": "docs/engineering/backend/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/backend/architecture.md",
+      "english": "docs/engineering/backend/architecture.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/engineering/backend/contracts.md",
+      "english": "docs/engineering/backend/contracts.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/engineering/backend/micro-service.md",
+      "english": "docs/engineering/backend/micro-service.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/backend/web-service.md",
+      "english": "docs/engineering/backend/web-service.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/cli-errors.md",
+      "english": "docs/engineering/cli-errors.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/engineering/json-contract.md",
+      "english": "docs/engineering/json-contract.en.md",
+      "code_blocks": 3
+    },
+    {
+      "primary": "docs/engineering/kernel-modules.md",
+      "english": "docs/engineering/kernel-modules.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/native/README.md",
+      "english": "docs/engineering/native/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/native/android.md",
+      "english": "docs/engineering/native/android.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/engineering/native/apple.md",
+      "english": "docs/engineering/native/apple.en.md",
+      "code_blocks": 5
+    },
+    {
+      "primary": "docs/engineering/native/cross-platform-decisions.md",
+      "english": "docs/engineering/native/cross-platform-decisions.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/engineering/native/harmonyos.md",
+      "english": "docs/engineering/native/harmonyos.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/engineering/template-system.md",
+      "english": "docs/engineering/template-system.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/engineering/worktree-isolation-contract.md",
+      "english": "docs/engineering/worktree-isolation-contract.en.md",
+      "code_blocks": 8
+    },
+    {
+      "primary": "docs/guides/README.md",
+      "english": "docs/guides/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/guides/development.md",
+      "english": "docs/guides/development.en.md",
+      "code_blocks": 3
+    },
+    {
+      "primary": "docs/guides/environments/README.md",
+      "english": "docs/guides/environments/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/guides/environments/android.md",
+      "english": "docs/guides/environments/android.en.md",
+      "code_blocks": 7
+    },
+    {
+      "primary": "docs/guides/environments/apple.md",
+      "english": "docs/guides/environments/apple.en.md",
+      "code_blocks": 7
+    },
+    {
+      "primary": "docs/guides/environments/harmonyos.md",
+      "english": "docs/guides/environments/harmonyos.en.md",
+      "code_blocks": 3
+    },
+    {
+      "primary": "docs/guides/environments/micro-service.md",
+      "english": "docs/guides/environments/micro-service.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/guides/environments/web-service.md",
+      "english": "docs/guides/environments/web-service.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/guides/frontend-acceptance.md",
+      "english": "docs/guides/frontend-acceptance.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/guides/releasing.md",
+      "english": "docs/guides/releasing.en.md",
+      "code_blocks": 8
+    },
+    {
+      "primary": "docs/guides/template-authoring.md",
+      "english": "docs/guides/template-authoring.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/guides/testing.md",
+      "english": "docs/guides/testing.en.md",
+      "code_blocks": 4
+    },
+    {
+      "primary": "docs/guides/using.md",
+      "english": "docs/guides/using.en.md",
+      "code_blocks": 5
+    },
+    {
+      "primary": "docs/guides/verification-matrix.md",
+      "english": "docs/guides/verification-matrix.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/README.md",
+      "english": "docs/initiatives/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/android-starter/README.md",
+      "english": "docs/initiatives/feature/android-starter/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/android-starter/design.md",
+      "english": "docs/initiatives/feature/android-starter/design.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/README.md",
+      "english": "docs/initiatives/feature/backend-services/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p0-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p0-validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p1-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p1-validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p2-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p2-validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p3-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p3-validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p4-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p4-validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/p5-validation.md",
+      "english": "docs/initiatives/feature/backend-services/p5-validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/backend-services/plan.md",
+      "english": "docs/initiatives/feature/backend-services/plan.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/frontend-rendering/README.md",
+      "english": "docs/initiatives/feature/frontend-rendering/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/frontend-rendering/plan.md",
+      "english": "docs/initiatives/feature/frontend-rendering/plan.en.md",
+      "code_blocks": 5
+    },
+    {
+      "primary": "docs/initiatives/feature/generator-productization/README.md",
+      "english": "docs/initiatives/feature/generator-productization/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/generator-productization/plan.md",
+      "english": "docs/initiatives/feature/generator-productization/plan.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/micro-service-starter/README.md",
+      "english": "docs/initiatives/feature/micro-service-starter/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/micro-service-starter/design.md",
+      "english": "docs/initiatives/feature/micro-service-starter/design.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/initiatives/feature/native-components/README.md",
+      "english": "docs/initiatives/feature/native-components/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/native-components/android-validation.md",
+      "english": "docs/initiatives/feature/native-components/android-validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/native-components/apple-validation.md",
+      "english": "docs/initiatives/feature/native-components/apple-validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/native-components/cross-platform-validation.md",
+      "english": "docs/initiatives/feature/native-components/cross-platform-validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/native-components/harmonyos-validation.md",
+      "english": "docs/initiatives/feature/native-components/harmonyos-validation.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/initiatives/feature/scaffold-baseline/README.md",
+      "english": "docs/initiatives/feature/scaffold-baseline/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/scaffold-baseline/design.md",
+      "english": "docs/initiatives/feature/scaffold-baseline/design.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/scaffold-baseline/template-shapes.md",
+      "english": "docs/initiatives/feature/scaffold-baseline/template-shapes.en.md",
+      "code_blocks": 6
+    },
+    {
+      "primary": "docs/initiatives/feature/template-portfolio/README.md",
+      "english": "docs/initiatives/feature/template-portfolio/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/template-portfolio/candidate-selection.md",
+      "english": "docs/initiatives/feature/template-portfolio/candidate-selection.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/template-portfolio/consistency-audit.md",
+      "english": "docs/initiatives/feature/template-portfolio/consistency-audit.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/template-portfolio/design.md",
+      "english": "docs/initiatives/feature/template-portfolio/design.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/worktree-isolation/README.md",
+      "english": "docs/initiatives/feature/worktree-isolation/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/feature/worktree-isolation/audit.md",
+      "english": "docs/initiatives/feature/worktree-isolation/audit.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/worktree-isolation/design.md",
+      "english": "docs/initiatives/feature/worktree-isolation/design.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/feature/worktree-isolation/plan.md",
+      "english": "docs/initiatives/feature/worktree-isolation/plan.en.md",
+      "code_blocks": 8
+    },
+    {
+      "primary": "docs/initiatives/improvement/distribution-hardening/README.md",
+      "english": "docs/initiatives/improvement/distribution-hardening/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/improvement/distribution-hardening/plan.md",
+      "english": "docs/initiatives/improvement/distribution-hardening/plan.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/improvement/native-starters/README.md",
+      "english": "docs/initiatives/improvement/native-starters/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/improvement/native-starters/plan.md",
+      "english": "docs/initiatives/improvement/native-starters/plan.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/improvement/worktree-hardening/README.md",
+      "english": "docs/initiatives/improvement/worktree-hardening/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/improvement/worktree-hardening/design.md",
+      "english": "docs/initiatives/improvement/worktree-hardening/design.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/initiatives/improvement/worktree-hardening/plan.md",
+      "english": "docs/initiatives/improvement/worktree-hardening/plan.en.md",
+      "code_blocks": 13
+    },
+    {
+      "primary": "docs/initiatives/process/documentation-standard/README.md",
+      "english": "docs/initiatives/process/documentation-standard/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/process/documentation-standard/validation.md",
+      "english": "docs/initiatives/process/documentation-standard/validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/refactor/generation-kernel/README.md",
+      "english": "docs/initiatives/refactor/generation-kernel/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/refactor/generation-kernel/baseline.md",
+      "english": "docs/initiatives/refactor/generation-kernel/baseline.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/refactor/generation-kernel/plan.md",
+      "english": "docs/initiatives/refactor/generation-kernel/plan.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/initiatives/refactor/unified-generation/README.md",
+      "english": "docs/initiatives/refactor/unified-generation/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/initiatives/refactor/unified-generation/validation.md",
+      "english": "docs/initiatives/refactor/unified-generation/validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/planning/README.md",
+      "english": "docs/planning/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/planning/delivery-history.md",
+      "english": "docs/planning/delivery-history.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/planning/roadmap.md",
+      "english": "docs/planning/roadmap.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/product/README.md",
+      "english": "docs/product/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/product/overview.md",
+      "english": "docs/product/overview.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.10.0/README.md",
+      "english": "docs/releases/0.10.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.10.0/notes.md",
+      "english": "docs/releases/0.10.0/notes.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/releases/0.10.0/validation.md",
+      "english": "docs/releases/0.10.0/validation.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.3.0/README.md",
+      "english": "docs/releases/0.3.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.3.0/validation.md",
+      "english": "docs/releases/0.3.0/validation.en.md",
+      "code_blocks": 5
+    },
+    {
+      "primary": "docs/releases/0.4.0/README.md",
+      "english": "docs/releases/0.4.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.4.0/validation.md",
+      "english": "docs/releases/0.4.0/validation.en.md",
+      "code_blocks": 5
+    },
+    {
+      "primary": "docs/releases/0.6.0/README.md",
+      "english": "docs/releases/0.6.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.6.0/validation.md",
+      "english": "docs/releases/0.6.0/validation.en.md",
+      "code_blocks": 9
+    },
+    {
+      "primary": "docs/releases/0.6.1/README.md",
+      "english": "docs/releases/0.6.1/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.6.1/validation.md",
+      "english": "docs/releases/0.6.1/validation.en.md",
+      "code_blocks": 3
+    },
+    {
+      "primary": "docs/releases/0.7.0/README.md",
+      "english": "docs/releases/0.7.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.7.0/notes.md",
+      "english": "docs/releases/0.7.0/notes.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.7.0/validation.md",
+      "english": "docs/releases/0.7.0/validation.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/releases/0.8.0/README.md",
+      "english": "docs/releases/0.8.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.8.0/notes.md",
+      "english": "docs/releases/0.8.0/notes.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.8.0/validation.md",
+      "english": "docs/releases/0.8.0/validation.en.md",
+      "code_blocks": 2
+    },
+    {
+      "primary": "docs/releases/0.9.0/README.md",
+      "english": "docs/releases/0.9.0/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.9.0/notes.md",
+      "english": "docs/releases/0.9.0/notes.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.9.0/validation.md",
+      "english": "docs/releases/0.9.0/validation.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/releases/0.9.1/README.md",
+      "english": "docs/releases/0.9.1/README.en.md",
+      "code_blocks": 0
+    },
+    {
+      "primary": "docs/releases/0.9.1/notes.md",
+      "english": "docs/releases/0.9.1/notes.en.md",
+      "code_blocks": 1
+    },
+    {
+      "primary": "docs/releases/README.md",
+      "english": "docs/releases/README.en.md",
+      "code_blocks": 0
+    }
+  ]
+}

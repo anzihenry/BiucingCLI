@@ -1,0 +1,197 @@
+---
+title: "BiucingCLI Verification Matrix"
+status: current
+owner: project-maintainers
+updated: 2026-10-09
+---
+
+# BiucingCLI Verification Matrix
+
+[中文](verification-matrix.md) · Translation of the Chinese primary document.
+
+This matrix defines the minimum release bar for the current seven templates and the CLI surface around them.
+
+The goal is not to re-run every heavy workflow on every commit.
+The goal is to make release proof explicit and reusable.
+
+## Release-Wide Checks
+
+These checks apply to every release regardless of which template changed.
+
+| Area | Command or proof | Release bar |
+| --- | --- | --- |
+| Core test suite | `uv run --locked python scripts/run-tests --suite core` | Linux/macOS, Python 3.11–3.14 |
+| Platform test suite | `uv run --locked python scripts/run-tests --suite platform` | macOS, Python 3.11; no skips |
+| Generated configuration parsing | `uv run --locked python scripts/verify-distribution` | Installed wheel output parses in every core matrix job |
+| Generated Make entrypoints | `uv run --locked python scripts/verify-distribution --check-make` | macOS platform gate |
+| Template metadata validation | `uv run --locked biucing validate` | Must pass with zero errors |
+| Human-readable list output | Golden-backed `tests/test_cli.py` coverage for `biucing list` | Must pass |
+| JSON list output | Golden-backed `tests/test_cli.py` coverage for `biucing list --json` | Must pass |
+| Human-readable info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service` | Must pass |
+| JSON info output | Golden-backed `tests/test_cli.py` coverage for `biucing info web-service --json` | Must pass |
+| Worker info output | Python test coverage for `biucing info worker` and `biucing info worker --json` | Must pass |
+| HarmonyOS info output | Python test coverage for `biucing info harmonyos` | Must pass |
+| Worktree metadata | `uv run --locked biucing list --json` plus golden coverage | Every shipped template declares `worktree-ready` |
+| Scriptable create flow | Python test coverage for `--set` and `--non-interactive` | Must pass |
+| Preview and manifest flow | Python test coverage for `--dry-run`, `--plan --json`, and `create --json` | Must pass |
+| Version surface | `biucing --version` test expectation and version files aligned | Must pass |
+
+## Template Matrix
+
+| Template | Validation status | Repo-level proof | Minimum fresh proof when template changes | Notes |
+| --- | --- | --- | --- | --- |
+| `frontend` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make test` and `make docker-build` in the generated project | Browser smoke is valuable when frontend behavior or dev-server flow changes |
+| `web-service` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify` and `make docker-build` in the generated project | Prefer both dev-image and runtime-image proof when Dockerfiles or Makefile flows change |
+| `micro-service` | `real-build-verified` | Python render tests plus metadata validation | Real generation plus Docker verification such as `make verify`, `make up`, and `make docker-build` in the generated project | Re-check independent database/cache combinations when Compose wiring or protobuf flow changes |
+| `worker` | `generated-project-verified` | Python render tests plus metadata validation | Real generation plus `go test ./...` in the generated project, plus Docker packaging sanity when Dockerfiles or Makefile flows change | Keep the proof narrow around background execution rather than HTTP or gRPC behavior |
+| `apple` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Apple project structure, Tuist wiring, or build settings change | Re-run both `ios` and `macos` generation when Apple shared scaffolding changes materially |
+| `android` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when Gradle, Android manifest, signing, packaging, or build settings change | UI smoke should be re-checked when app structure, test wiring, or doctor/build tooling changes |
+| `harmonyos` | `generated-project-verified` | Python render tests plus metadata validation | Native static plus doctor proof; add real-build proof when HarmonyOS metadata, hvigor, signing, packaging, or build settings change | Keep generated-project claims separate from DevEco/HarmonyOS SDK availability on the local machine |
+
+## Worktree Isolation Matrix
+
+These checks are the release bar for the `0.6.0` worktree-first claim, the `0.6.1` worktree hardening follow-up, and later template releases.
+
+| Template family | Required proof | Release bar |
+| --- | --- | --- |
+| All templates | Generate a fresh project, then run `make worktree-info WORKTREE_ID=alpha` and `make worktree-doctor WORKTREE_ID=alpha` | Commands complete and print the resolved worktree identity, cache/output paths, and cleanup surface |
+| Docker-first templates | Run `docker compose -f compose.dev.yaml config` with explicit `COMPOSE_PROJECT_NAME` and non-default host ports where published ports exist | Config shows worktree-scoped Compose project names, Docker volume names, image refs, and host port mappings |
+| Native templates | Run `make -n build WORKTREE_ID=beta` or the nearest supported dry-run command | Command expansion shows worktree-local cache paths and debug identity suffixes without invoking heavyweight platform builds |
+| Cleanup commands | Inspect or dry-run `make clean-worktree WORKTREE_ID=beta` where safe | Cleanup targets current-worktree state only and avoids global SDKs, shared Docker images, unrelated containers, and unrelated worktrees |
+
+## Native Evidence Tiers
+
+Native templates need evidence that is precise about what ran on the current workstation.
+Use these labels in release notes and release-prep docs instead of flattening every proof into "generated-project verified."
+
+| Tier | What it proves | What it does not prove |
+| --- | --- | --- |
+| `static` | Template rendering, metadata validation, generated command wiring, and dry-run expansion such as `make -n ...` | Platform SDK availability, compiler success, simulator/device execution, signing validity |
+| `doctor` | The generated project's diagnostic surface can report local toolchain and worktree paths without mutating global state | A full native build, packaged artifact, installed app, or runtime behavior |
+| `real-build` | The platform toolchain can compile or test the generated project on a configured workstation | Cross-workstation SDK parity, store submission readiness, or every platform variant unless each variant was run |
+
+`make -n` evidence is always `static` evidence.
+Do not describe it as a real build success, even when the expanded command looks correct.
+
+### Native Evidence Commands
+
+Use a fresh output directory for these examples so the output is easy to reproduce.
+
+| Template | `static` evidence | `doctor` evidence | `real-build` evidence |
+| --- | --- | --- | --- |
+| `apple` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when Xcode and Tuist are installed | `make generate`, then `make build` or `make test` for each claimed platform variant |
+| `android` | `make worktree-info WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when JDK and Android SDK are installed | `./gradlew assembleDebug`; add `./gradlew test` or `./gradlew connectedDebugAndroidTest` when claiming test or device/emulator coverage |
+| `harmonyos` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-debug-identity WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` | `make worktree-doctor WORKTREE_ID=alpha`; add `make doctor` when DevEco Studio, ohpm, hvigorw, and HarmonyOS SDK are configured | `make build` on a configured DevEco/HarmonyOS SDK workstation; add signing/package commands only when those flows changed |
+
+Real-build proof is required when the release changes native project structure, generated manifests, package identity, signing inputs, build settings, generated platform dependency files, or native build/test targets.
+It is optional, but valuable, for docs-only, CLI metadata-only, or worktree diagnostic wording changes that do not alter generated native build behavior.
+
+Suggested fresh worktree proof:
+
+| Template | Worktree proof |
+| --- | --- |
+| `frontend` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-frontend-alpha DEV_HOST_PORT=5174 docker compose -f compose.dev.yaml config` |
+| `web-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-service-alpha HOST_PORT=18081 docker compose -f compose.dev.yaml config` |
+| `micro-service` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-micro-alpha HOST_HTTP_PORT=18080 HOST_GRPC_PORT=19090 HOST_DEPENDENCY_STORE_PORT=15432 HOST_OTEL_GRPC_PORT=14317 HOST_OTEL_HTTP_PORT=14318 docker compose -f compose.dev.yaml config` |
+| `worker` | `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `COMPOSE_PROJECT_NAME=demo-worker-alpha DEV_IMAGE=demo-worker-alpha-dev DEV_TAG=dev docker compose -f compose.dev.yaml config` |
+| `apple` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test lint format WORKTREE_ID=beta` |
+| `android` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build test test-ui lint install-debug WORKTREE_ID=beta` |
+| `harmonyos` | Static plus doctor proof: `make worktree-info WORKTREE_ID=alpha`, `make worktree-debug-identity WORKTREE_ID=alpha`, `make worktree-doctor WORKTREE_ID=alpha`, `make -n build clean-worktree WORKTREE_ID=beta` |
+
+## Recommended Command Catalog
+
+These are the default commands to reach for when fresh proof is needed.
+
+| Template | Suggested generation command | Suggested verification commands |
+| --- | --- | --- |
+| `frontend` | `uv run --locked biucing create frontend demo-frontend --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-frontend` | `make test`, `make docker-build` |
+| `web-service` | `uv run --locked biucing create web-service demo-service --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-service --set module_name=github.com/example/demo-service` | `make verify`, `make docker-build` |
+| `micro-service` | `uv run --locked biucing create micro-service demo-microservice --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-microservice --set module_name=github.com/example/demo-microservice --set proto_package=demo.v1` | `make verify`, `make up`, `make docker-build` |
+| `worker` | `uv run --locked biucing create worker demo-worker --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-worker --set module_name=github.com/example/demo-worker` | `go test ./...`, and when Docker paths changed `make docker-build` |
+| `apple` | `uv run --locked biucing create apple demo-apple --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-apple --set bundle_identifier=com.example.demoapple` | `make generate`, then `make build` or `make test` |
+| `android` | `uv run --locked biucing create android demo-android --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-android --set package_name=com.example.demoandroid` | `./gradlew assembleDebug`, and when relevant `./gradlew assembleRelease` |
+| `harmonyos` | `uv run --locked biucing create harmonyos demo-harmony --output-dir /tmp/biucing-verify --non-interactive --set project_name=demo-harmony --set bundle_name=com.example.demoharmony` | `make doctor`, `make lint`, then `make build` on a configured DevEco/HarmonyOS SDK workstation |
+
+When using these commands for release evidence, prefer a fresh empty output directory per template so the proof is easy to explain and reproduce.
+
+## Change-Type Guidance
+
+| Change type | Minimum expected verification |
+| --- | --- |
+| CLI-only change | Release-wide checks |
+| Metadata-only change in one template | Release-wide checks plus `biucing info <template>` sanity check and, when semantics changed, fresh proof for that template |
+| Shared renderer or placeholder change | Release-wide checks plus fresh proof for at least one Dockerized template and one native template |
+| Worktree metadata or command-surface change | Release-wide checks plus fresh worktree proof for every touched template |
+| Dockerfile, Compose, or Makefile change in `frontend`, `web-service`, or `micro-service` | Release-wide checks plus fresh generated-project Docker verification for the touched template |
+| Background-worker template change in `worker` | Release-wide checks plus fresh generated-project `go test ./...` proof and, when Docker paths changed, Docker packaging verification |
+| Native project structure change in `apple` or `android` | Release-wide checks plus fresh native `static`, `doctor`, and `real-build` evidence for the touched native template |
+| Native project structure change in `harmonyos` | Release-wide checks plus fresh native `static` and `doctor` evidence; run and record `real-build` evidence when DevEco Studio and HarmonyOS SDK are available |
+| Version bump and release-doc only | Release-wide checks, changelog/readme/version alignment review |
+
+## Current Evidence Baseline
+
+The current repository metadata declares:
+
+- `frontend`, `web-service`, and `micro-service` as `real-build-verified`;
+- `worker`, `apple`, `android`, and `harmonyos` as `generated-project-verified`.
+
+The current repo-level automated baseline includes:
+
+- template rendering coverage in `uv run --locked python -m unittest discover -s tests`;
+- metadata and placeholder consistency coverage through `biucing validate`;
+- golden checks for `list/info` human-readable and JSON output;
+- scripted create-flow coverage for `--set` and `--non-interactive`;
+- preview and manifest coverage for `--dry-run`, `--plan --json`, and `create --json`;
+- generated-project `go test ./...` proof for the new `worker` starter.
+- worktree metadata and Makefile command-surface coverage for every shipped starter.
+
+The `0.7.0` release additionally records fresh `real-build` evidence for all three native templates in [0.7.0-release-prep.md](../releases/0.7.0/validation.en.md). This is workstation-specific proof and does not claim that store credentials or external distribution accounts were exercised.
+
+## Maintainer Notes
+
+- Prefer evidence that can be rerun with a small number of explicit commands.
+- If a release intentionally skips fresh heavy verification for an untouched template, say so explicitly in release notes instead of implying new proof exists.
+- When environment issues block a heavy verification run, record whether the failure came from the local machine setup or from the template itself before deciding to delay the release.
+- For native templates, label evidence as `static`, `doctor`, or `real-build` so future releases can tell exactly what was proved.
+- For the latest concrete version-prep walkthrough, use [0.10.0-release-prep.md](../releases/0.10.0/validation.en.md).
+
+## Backend P0 verification
+
+See [engineering contract](../engineering/backend/contracts.en.md) and [P0 evidence](../initiatives/feature/backend-services/p0-validation.en.md).
+`uv run --locked python scripts/verify-backends` generates six database/cache combinations,
+runs the generated Docker verification entry points, and writes evidence plus logs in a fresh directory.
+`--generate-only` checks generation only and must not count as real-build evidence.
+The generated `.github/workflows/verify.yml` uses the same project-local `scripts/verify-container`.
+This is the P0 starter gate, not authentication, database integration, or production readiness.
+
+## Backend P1 runtime foundation
+
+See [P1 verification](../initiatives/feature/backend-services/p1-validation.en.md). Generated `scripts/task verify` runs
+configuration checks, lint, protocol checks where applicable, race tests and compilation in Docker.
+`uv run --locked python scripts/verify-backend-worktrees --output-dir /tmp/new-worktree-evidence`
+exercises real worktree isolation, reload, file ownership, retained volumes and a runtime image.
+Production identity, persistence and HA remain separate gates.
+
+## Backend P2 data and identity
+
+See [P2 verification](../initiatives/feature/backend-services/p2-validation.en.md). Container verification now starts real
+PostgreSQL for enabled variants, checks migrations/permissions/transactions and browser sessions.
+Web includes OpenAPI breaking and signed-token tests; Micro includes a real Proto baseline,
+TLS handshake/rotation tests and method/delegation authorization. `scripts/verify-backend-login`
+exercises the local Dex flow after `scripts/task dev`. Runtime smoke runs migration separately.
+
+## Backend P3 call chain
+
+`uv run --locked python scripts/verify-backend-calls --output-dir <new-directory>` verifies independent Web/Micro images, OIDC sessions, mTLS delegation, deadlines, recovery and exported trace/log correlation. Fixture routes are not shipped by either template. See [P3 verification](../initiatives/feature/backend-services/p3-validation.en.md) for actual platform/results and remaining boundaries.
+
+## Backend P4 production delivery
+
+`uv run --locked python scripts/verify-backend-production --web-project <generated-web> --micro-project <generated-micro> --web-image <built-web> --micro-image <built-micro> --output-dir <new-directory>` checks isolated signed registry digests, hardened standalone Compose, TLS edge routing, dependency failure, release rollback and real PostgreSQL backup/restore. Use the default generated names `edge-api` / `internal-api`; the harness owns all temporary infrastructure and requires no production credentials.
+
+`uv run --locked python scripts/verify-distribution --backend-output-dir <new-directory>` preserves projects generated by installed wheel and sdist-rebuilt wheel for Docker acceptance. Run their `scripts/verify-container`, build runtime images, then use them with the production harness. The distribution command itself does not claim Docker validation. See [P4 evidence](../initiatives/feature/backend-services/p4-validation.en.md) for actual platform, commands and external CI/HA limitations.
+
+## Backend P5 Kubernetes reference
+
+`uv run --locked python scripts/verify-backend-kubernetes --schema --output-dir <new-dir>` renders six component combinations and two overlays with real Kustomize, checks policy/identity/capacity invariants, and runs pinned kubeconform against Kubernetes 1.35 schemas. It never connects to a cluster; evidence keeps `cluster` and `ha` as `not-run`. Generated `scripts/verify-kubernetes` is also run on installed-package output.
+
+API admission, CNI enforcement, scheduler/EndpointSlice/draining behavior, managed PG failover and zone loss require B27 facilities. [P5 evidence](../initiatives/feature/backend-services/p5-validation.en.md) separates those pending checks from local structural and mocked release-order tests.

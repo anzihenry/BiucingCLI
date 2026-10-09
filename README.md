@@ -1,240 +1,51 @@
+---
+title: "BiucingCLI"
+status: current
+owner: project-maintainers
+updated: 2026-10-09
+---
+
 # BiucingCLI
 
-BiucingCLI is a scaffold generator for independent developers who want practical, reusable project starters built around a stable personal stack.
+[English](README.en.md)
 
-The project is being restarted from a clean slate with a narrower goal: generate useful project skeletons, not an all-purpose agent workflow.
+BiucingCLI 是面向独立开发者的项目脚手架生成器，围绕固定技术栈提供七类可复用的项目起点。
 
-Apple 模版默认生成 iOS、macOS、watchOS、tvOS 四个薄壳，使用静态组件 SDK、
-精确依赖锁、SafeDI 2.0.0 和 C++20 共享核心。`--platform` 保留为默认操作平台选择。
-详见 [架构与实现记录](docs/apple-shell-component-architecture.md)。
+当前源码版本为 **0.10.0**。源码版本、历史验收和正式发布是不同记录，详见[版本记录索引](docs/releases/README.md)。
 
-## Version
+## 安装与快速开始
 
-The current repository release target is `0.10.0`. See the [release notes](docs/0.10.0-release-notes.md) for changes and migration notes.
+需要 Python 3.11+；推荐使用 uv 管理安装。
 
-```bash
-biucing --version
-```
-
-See [CHANGELOG.md](CHANGELOG.md) for the latest release summary.
-
-## Installation
-
-Install the PyPI release as an isolated command with `uv`:
-
-```bash
+```sh
 uv tool install biucingcli==0.10.0
 biucing --version
-```
-
-Upgrade with `uv tool upgrade biucingcli`, or run temporarily with
-`uvx --from biucingcli biucing --help`.
-
-To install the current checkout instead:
-
-```bash
-git clone https://github.com/anzihenry/BiucingCLI.git
-cd BiucingCLI
-uv tool install .
-biucing --version
-```
-
-For contributor work, use uv 0.12.16 (the version pinned in CI). Python defaults
-to 3.11 via `.python-version`; CI tests 3.11–3.14. uv installs the project and
-locked development/build dependencies into `.venv`:
-
-```bash
-uv sync --locked
-uv run --locked biucing list
-uv run --locked python scripts/run-tests --suite core
-uv run --locked ruff check --select E4,E7,E9,F src tests scripts
-uv run --locked biucing validate
-uv run --locked python scripts/verify-distribution
-```
-
-Core checks run on Linux and macOS without native SDKs. See [testing](docs/testing.md)
-for macOS tool integrations and optional Android resource compilation.
-See [kernel modules](docs/kernel-modules.md) for ownership and compatibility
-boundaries, and [template authoring](docs/template-authoring.md) to add templates.
-The [frontend rendering plan](docs/frontend-rendering-plan.md) tracks CSR/SSG/SSR
-variants. The shipped frontend now defaults to CSR (explicitly select it with
-`--set rendering=csr`); `--set rendering=ssg` generates a static content site.
-SSG production builds require an explicit public HTTPS `SITE_URL` for canonical
-URLs and sitemap. `--set rendering=ssr` generates request-time HTML with a
-self-hosted Node runtime, private server configuration and graceful shutdown.
-See [frontend artifact acceptance](docs/frontend-artifact-acceptance.md) to run
-all three modes from an installed wheel and understand the separate CI/release gates.
-
-Manage dependencies with `uv add`, `uv add --dev`, and `uv remove`; commit
-`pyproject.toml` and `uv.lock` together. For deliberate upgrades use
-`uv lock --upgrade-package PACKAGE`, followed by `uv sync --locked` and tests.
-The `build` group locks setuptools and wheel. Build from that synced environment
-with `uv build --no-sources --no-build-isolation`; plain isolated `uv build`
-does not use the build dependency versions from `uv.lock`.
-
-See [the uv development and publishing guide](docs/uv-workflow.md) for local
-builds, TestPyPI rehearsal, and automated PyPI publishing with `uv publish`.
-
-## Errors and Automation
-
-For scripts, use `--json`; it disables interactive prompts. Successful JSON
-results go to stdout. Failures leave stdout empty and write one JSON error
-object to stderr with `schema_version`, `ok: false`, and `error.code/message`.
-See [the CLI error contract](docs/cli-errors.md) for exit codes and examples.
-All JSON results include `schema_version` and `generator_version`; list/info
-also expose each variable's validator, choices, and effective numeric bounds.
-See [the JSON contract](docs/json-contract.md) for compatibility and field semantics.
-
-## Product Direction
-
-
-BiucingCLI focuses on a small set of templates that match the maintainer's real development habits:
-
-- `frontend`: React Router Framework Mode CSR/SSG/SSR, React 19.3, TypeScript 7, Tailwind 4 and shadcn/ui; shared pnpm lockfile, Vitest and Playwright checks
-- `web-service`: Go + Gin web service starter with Docker development/runtime workflows
-- `micro-service`: Go + Protobuf + Buf + Compose starter with gRPC, OpenTelemetry, and local dependency orchestration
-- `worker`: Go background worker starter with scheduled and oneshot execution modes
-- `apple`: Swift 6.4 + SwiftUI + Tuist + SafeDI starter generating four thin Apple shells, versioned static XCFramework components, exact locks and a portable C++20 core; Android/HarmonyOS adapters remain future integrations
-- `android`: Kotlin + Gradle + Jetpack Compose Android app starter with fastlane and a committed Gradle wrapper
-- `harmonyos`: ArkTS + ArkUI HarmonyOS app starter for DevEco Studio projects
-
-The value is not broad ecosystem coverage. The value is generating starters that are restrained, readable, and worth using as a real base.
-
-## Intended Users
-
-- Independent developers who frequently start new projects.
-- Builders who prefer a consistent personal stack over endless framework choices.
-- Developers who want fewer setup decisions at project start.
-
-## First Commands
-
-```bash
 biucing list
 biucing info frontend
-biucing info web-service
-biucing info micro-service
-biucing info worker
-biucing info apple
-biucing info android
-biucing info harmonyos
 biucing create frontend my-app --dry-run
-biucing create web-service user-service --plan --json
 biucing create frontend my-app
-biucing create web-service user-service
-biucing create micro-service user-service
-biucing create worker email-worker
-biucing create apple my-apple-app
-biucing create android my-android-app
-biucing create harmonyos my-harmony-app
 ```
 
-## Project Status
+可用模板：`frontend`、`web-service`、`micro-service`、`worker`、`apple`、`android`、`harmonyos`。实际平台工具链与验证边界见模板指南和工程文档。
 
-This repository contains a small internal template system with practical starters for seven flows:
+## 从源码开发
 
-- `frontend`
-- `web-service`
-- `micro-service`
-- `worker`
-- `apple`
-- `android`
-- `harmonyos`
+```sh
+uv sync --locked
+uv run --locked biucing list
+uv run --locked python scripts/check-docs
+uv run --locked python scripts/run-tests --suite core
+```
 
-The current maturity split is:
+开发环境使用 Python 3.11，CI 覆盖 3.11–3.14，并固定 uv 0.12.16。
 
-- `frontend`, `web-service`, and `micro-service` include Docker development, verification, and runtime workflows. The migrated frontend's current verification limits are recorded in the [rendering plan](docs/frontend-rendering-plan.md).
-- `worker` is a backend-adjacent starter for scheduled and oneshot background execution, with generated-project `go test ./...` validation and Docker packaging.
-- `apple` and `android` are now first-class native platform starters with stronger doctor flows, release guidance, richer starter architecture, and repeated real generated-project validation.
-- `harmonyos` is an experimental native starter for ArkTS/ArkUI projects that open in DevEco Studio and expose bootstrap, doctor, lint, build, and signing guidance workflows.
+## 文档
 
-Generator UX status:
+- [文档地图](docs/README.md)：按使用、开发、架构、专题和版本查找。
+- [使用 BiucingCLI](docs/guides/using.md)、[使用 uv 开发、构建与发布](docs/guides/development.md)、[添加内置模板](docs/guides/template-authoring.md)。
+- [工程文档](docs/engineering/README.md)、[当前路线图](docs/planning/roadmap.md)。
+- [项目文档组织约定](docs/documentation.md)、[更新日志](CHANGELOG.md)。
 
-- `biucing create ... --dry-run` previews resolved variables, target location, template file count, and next steps without writing files;
-- `biucing create ... --plan --json` returns a machine-readable preview payload for scripts and automation;
-- `biucing create ... --json` returns a machine-readable manifest after a real generation run;
-- non-interactive create failures now report all missing required values together;
-- all resolved inputs are normalized and validated before a target directory is created, including names, package identities, ports, versions, URLs, numeric bounds, and enumerated choices.
+## 许可证
 
-Template consistency status:
-
-- template metadata now exposes verification tier, operating assumptions, and workflow labels;
-- every template implements `make bootstrap`, `doctor`, `lint`, `test`, `verify`, `build`, `clean`, and `help` as a shared command contract;
-- `biucing validate` checks the stronger metadata contract, input validator definitions, matching `.PHONY` Make targets, and family-level required starter entries;
-- `biucing info <template>` now surfaces those consistency fields directly.
-
-Worktree-first status:
-
-- all seven templates now declare `worktree-ready` support metadata;
-- generated projects expose `make worktree-info`, `make worktree-doctor`, and `make clean-worktree`;
-- Docker-first starters isolate Compose project names, volumes, image tags, published host ports, dependency stores, and caches;
-- Docker-first starters now expose port conflict advice and `make worktree-compose-config` for non-invasive Compose diagnostics;
-- native starters isolate build caches, local signing/config files, generated output, and debug install identity hooks where the platform supports them;
-- native release evidence is now labeled as `static`, `doctor`, or `real-build` so worktree claims do not overstate SDK-backed coverage.
-
-Local Android validation status:
-
-- the Android starter now includes a committed Gradle wrapper;
-- the generated Android project has passed real lint, JVM unit tests, debug APK and release AAB builds, plus AAB integrity checks;
-- the maintainer workstation has validated the Compose UI smoke test on `Biucing_API_35`.
-
-Local Apple validation status:
-
-- the generated Apple starter has passed real `make generate` verification for both `iOS` and `macOS`;
-- `iOS` output now renders a mobile-specific starter structure and has passed real `make build`;
-- `macOS` output now renders a desktop-specific starter structure and has passed real `make test`.
-
-Local HarmonyOS validation status:
-
-- the generated HarmonyOS starter has passed real `make bootstrap` and `make verify` verification with a local DevEco Studio/HarmonyOS SDK install;
-- `make verify` now covers `doctor`, `lint`, ArkTS/Hypium `test`, unsigned HAP `build`, and package artifact fingerprinting;
-- `make release-preflight` and `make release` are wired to local-only signing material and fail fast when `local.properties` is missing or incomplete.
-
-## Design Docs
-
-- Android template note: the current Android starter now includes a committed `gradle-wrapper.jar`; if the team refreshes Gradle later, commit the regenerated wrapper files back into the repo.
-- [0.3.0 Plan](docs/0.3.0-plan.md)
-- [0.4.0 Plan](docs/0.4.0-plan.md)
-- [0.6.0 Plan](docs/0.6.0-plan.md)
-- [0.6.0 Worktree Task Breakdown](docs/0.6.0-worktree-tasks.md)
-- [Worktree Isolation Contract](docs/worktree-isolation-contract.md)
-- [0.6.0 Worktree Collision Audit](docs/0.6.0-worktree-collision-audit.md)
-- [0.6.0 Release Prep](docs/0.6.0-release-prep.md)
-- [0.6.1 Plan](docs/0.6.1-plan.md)
-- [0.6.1 Worktree Hardening Task Breakdown](docs/0.6.1-worktree-hardening-tasks.md)
-- [0.6.1 Release Prep](docs/0.6.1-release-prep.md)
-- [0.7.0 Release Notes](docs/0.7.0-release-notes.md)
-- [0.7.0 Release Prep](docs/0.7.0-release-prep.md)
-- [0.8.0 Release Notes](docs/0.8.0-release-notes.md)
-- [0.8.0 Release Prep](docs/0.8.0-release-prep.md)
-- [0.9.0 Plan](docs/0.9.0-plan.md)
-- [0.9.0 Release Notes](docs/0.9.0-release-notes.md)
-- [0.9.0 Release Prep](docs/0.9.0-release-prep.md)
-- [0.4.0 Release Prep](docs/0.4.0-release-prep.md)
-- [0.3.0 Release Prep](docs/0.3.0-release-prep.md)
-- [Release Checklist](docs/release-checklist.md)
-- [Verification Matrix](docs/verification-matrix.md)
-- [Product Design](docs/product-design.md)
-- [Roadmap](docs/roadmap.md)
-- [Template System](docs/template-system.md)
-- [Web Service Team Environment Standard](docs/web-service-team-environment-standard.md)
-- [后端服务整体架构（通用组件与 Docker 开发/部署）](docs/backend-service-architecture.md)
-- [后端服务 P1 实施与验证](docs/backend-service-p1-verification.md)
-- [后端服务 P2 实施与验证](docs/backend-service-p2-verification.md)
-- [后端服务 P3 实施与验证](docs/backend-service-p3-verification.md)
-- [后端服务 P4 单机生产交付与恢复验证](docs/backend-service-p4-verification.md)
-- [后端服务 P5 集群参考交付与验收边界](docs/backend-service-p5-verification.md)
-- [后端服务工程契约与 P0 选型](docs/backend-service-engineering-contract.md)
-- [后端服务架构实施任务（阶段、依赖与验收）](docs/backend-service-implementation-tasks.md)
-- [Web Service 架构（终端用户入口）](docs/web-service-architecture.md)
-- [Micro Service 架构（服务间调用入口）](docs/micro-service-architecture.md)
-- [Microservice Team Environment Standard](docs/microservice-team-environment-standard.md)
-- [Apple Team Environment Standard](docs/apple-team-environment-standard.md)
-- [Apple 四平台壳工程与组件架构（已确认目标）](docs/apple-shell-component-architecture.md)
-- [Android Team Environment Standard](docs/android-team-environment-standard.md)
-- [Android 壳工程与组件架构（已实现基线）](docs/android-shell-component-architecture.md)
-- [Android 组件验证记录](docs/android-component-verification.md)
-- [HarmonyOS Team Environment Standard](docs/harmonyos-team-environment-standard.md)
-- [HarmonyOS shell/component architecture](docs/harmonyos-shell-component-architecture.md)
-- [HarmonyOS component verification](docs/harmonyos-component-verification.md)
-- [Android Template Design](docs/android-template-design.md)
-- [Microservice Template Design（历史 starter 设计）](docs/microservice-template-design.md)
+当前仓库未提供独立 LICENSE 文件；本次文档整理不新增或推断许可条款。
