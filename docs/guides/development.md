@@ -12,6 +12,24 @@ updated: 2026-10-09
 
 使用与 GitHub 工作流一致的 uv 0.12.16。`.python-version` 为开发选择 Python 3.11，包支持 Python >=3.11；必要时 uv 下载解释器。CI 覆盖默认版本以测试 3.11–3.14。
 
+<a id="branches-and-pull-requests"></a>
+## 分支与 Pull Request
+
+`main` 启用 GitHub 分支保护，所有修改通过 Pull Request 合入；管理员也遵守这些规则。开发时从最新 `main` 创建 `codex/` 前缀的工作分支，在工作分支提交并推送，然后创建目标为 `main` 的 PR。
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c codex/your-change
+# Make changes, run the relevant checks, and commit them.
+git push -u origin codex/your-change
+gh pr create --base main --head codex/your-change
+```
+
+合入前，工作分支必须与最新 `main` 同步，所有评审讨论必须解决，并通过 17 项必需的 GitHub Actions 检查：文档检查、前端产物验证、macOS 平台集成、Linux/macOS 上 Python 3.11–3.14 的核心测试，以及 Linux/macOS 上 CSR/SSG/SSR 的前端验收。当前不要求他人的批准票，维护者可在检查通过后合入自己的 PR。禁止强制推送或删除 `main`。
+
+保护配置维护在 GitHub 仓库 Settings → Branches。调整 CI job 名称或矩阵时，同步更新必需检查名称，避免 PR 等待不再运行的检查。
+
 <a id="dependencies-and-local-checks"></a>
 ## 依赖与本地检查
 
