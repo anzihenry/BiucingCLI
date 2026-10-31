@@ -18,6 +18,7 @@ jobs:
       - name: Check source authority and generate product
         run: |
           python3 scripts/sync-shared-core --check
+          mkdir -p generated
           python3 -m biucingcli.cli create harmonyos harmony-ci --bundle-name com.example.harmonyci --output-dir generated --non-interactive
       - name: Publish and validate components
         working-directory: generated/harmony-ci
