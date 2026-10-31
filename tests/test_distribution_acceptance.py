@@ -147,6 +147,14 @@ class DistributionAcceptanceTests(unittest.TestCase):
         self.assertIn("frontend", publishing["publish"]["needs"])
         self.assertEqual(publishing["frontend"]["with"]["artifact-name"], "python-distributions")
         self.assertIn("ref", publishing["frontend"]["with"])
+        self.assertIn("go-starters", publishing["publish"]["needs"])
+        go_job = publishing["go-starters"]
+        self.assertEqual(go_job["needs"], "verify")
+        self.assertEqual({case["template"] for case in go_job["strategy"]["matrix"]["include"]},
+                         {"web-service", "micro-service", "worker"})
+        download = next(step for step in go_job["steps"]
+                        if step.get("uses", "").startswith("actions/download-artifact@"))
+        self.assertEqual(download["with"]["name"], "python-distributions")
 
     def test_runtime_failure_still_removes_only_owned_container_and_image(self):
         class FakeAudit:

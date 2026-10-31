@@ -128,6 +128,9 @@ func (runner *Runner) runScheduled(ctx context.Context) error {
 func (runner *Runner) executeWithRetry(ctx context.Context) error {
 	backoff := runner.initialBackoff
 	for attempt := 1; attempt <= runner.maxAttempts; attempt++ {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		summary, err := runner.executeAttempt(ctx)
 		if err == nil {
 			runner.logger.Printf("%s: %s", runner.name, summary)
