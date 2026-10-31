@@ -2,7 +2,7 @@
 title: "当前路线图"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # 当前路线图
@@ -11,7 +11,7 @@ updated: 2026-10-09
 
 ## 已有交付基线
 
-源码版本 0.10.0；版本变化见[CHANGELOG](../../CHANGELOG.md)，历史候选验收见[版本索引](../releases/README.md)。版本号和本地标签不单独证明正式发布。
+源码版本 0.10.1；版本变化见[CHANGELOG](../../CHANGELOG.md)，历史候选验收见[版本索引](../releases/README.md)。版本号和本地标签不单独证明正式发布。
 
 - 七类模板和包内资源、JSON/错误契约已建立。
 - 前端 CSR/SSG/SSR 的实现与验证见[专题](../initiatives/feature/frontend-rendering/README.md)。

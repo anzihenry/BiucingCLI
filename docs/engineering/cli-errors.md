@@ -2,7 +2,7 @@
 title: "CLI 输入与错误契约"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 <a id="cli-input-and-error-contract"></a>
@@ -26,7 +26,7 @@ biucing info unknown --json >result.json 2>error.json
 命令以 2 退出，`result.json` 保持为空，并写入：
 
 ```json
-{"schema_version": 1, "generator_version": "0.10.0", "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
+{"schema_version": 1, "generator_version": "0.10.1", "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
 ```
 
 | 退出码 | 错误代码 | 含义 |

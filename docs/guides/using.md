@@ -2,7 +2,7 @@
 title: "使用 BiucingCLI"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 <a id="using-biucingcli"></a>
@@ -19,7 +19,7 @@ Apple 默认生成 iOS/macOS/watchOS/tvOS 四个薄壳，使用静态组件 SDK�
 <a id="version"></a>
 ## 版本
 
-当前仓库目标 0.10.0；变化和迁移见[版本说明](../releases/0.10.0/notes.md)。
+当前仓库目标 0.10.1；变化和迁移见[版本说明](../../CHANGELOG.md)。
 
 ```bash
 biucing --version
@@ -33,7 +33,7 @@ biucing --version
 通过 uv 隔离安装 PyPI 版本：
 
 ```bash
-uv tool install biucingcli==0.10.0
+uv tool install biucingcli==0.10.1
 biucing --version
 ```
 

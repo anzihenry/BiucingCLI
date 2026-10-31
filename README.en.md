@@ -2,7 +2,7 @@
 title: "BiucingCLI"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # BiucingCLI
@@ -11,14 +11,14 @@ updated: 2026-10-09
 
 BiucingCLI is a project scaffold generator for independent developers, providing seven reusable starters around a consistent technical stack.
 
-The current source version is **0.10.0**. Source versions, historical acceptance and formal publication are separate records; see the [Release record index](docs/releases/README.en.md).
+The current source version is **0.10.1**. Source versions, historical acceptance and formal publication are separate records; see the [Release record index](docs/releases/README.en.md).
 
 ## Install and quick start
 
 Requires Python 3.11+; uv is the recommended installation tool.
 
 ```sh
-uv tool install biucingcli==0.10.0
+uv tool install biucingcli==0.10.1
 biucing --version
 biucing list
 biucing info frontend

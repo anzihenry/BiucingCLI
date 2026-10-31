@@ -2,7 +2,7 @@
 title: "BiucingCLI"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # BiucingCLI
@@ -11,14 +11,14 @@ updated: 2026-10-09
 
 BiucingCLI 是面向独立开发者的项目脚手架生成器，围绕固定技术栈提供七类可复用的项目起点。
 
-当前源码版本为 **0.10.0**。源码版本、历史验收和正式发布是不同记录，详见[版本记录索引](docs/releases/README.md)。
+当前源码版本为 **0.10.1**。源码版本、历史验收和正式发布是不同记录，详见[版本记录索引](docs/releases/README.md)。
 
 ## 安装与快速开始
 
 需要 Python 3.11+；推荐使用 uv 管理安装。
 
 ```sh
-uv tool install biucingcli==0.10.0
+uv tool install biucingcli==0.10.1
 biucing --version
 biucing list
 biucing info frontend

@@ -2,7 +2,7 @@
 title: "Product positioning and scope"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # Product positioning and scope
@@ -15,7 +15,7 @@ BiucingCLI generates project skeletons for independent developers who frequently
 
 ## Current capabilities
 
-The source version is 0.10.0, with seven built-in templates: frontend, web-service, micro-service, worker, apple, android and harmonyos. The CLI supports discovery, inspection, input validation, previews, JSON output and generation; see [usage](../guides/using.en.md).
+The source version is 0.10.1, with seven built-in templates: frontend, web-service, micro-service, worker, apple, android and harmonyos. The CLI supports discovery, inspection, input validation, previews, JSON output and generation; see [usage](../guides/using.en.md).
 
 Generation uses packaged resources and a unified planning/publication pipeline; see [engineering](../engineering/README.en.md). Native devices, signing, store delivery and backend production availability are bounded by the evidence referenced in the [verification matrix](../guides/verification-matrix.en.md).
 

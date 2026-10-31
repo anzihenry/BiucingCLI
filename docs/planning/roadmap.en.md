@@ -2,7 +2,7 @@
 title: "Current roadmap"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # Current roadmap
@@ -11,7 +11,7 @@ updated: 2026-10-09
 
 ## Existing delivery baseline
 
-The source version is 0.10.0; see [CHANGELOG](../../CHANGELOG.en.md) and [historical candidate records](../releases/README.en.md). Version numbers and local tags alone do not establish publication.
+The source version is 0.10.1; see [CHANGELOG](../../CHANGELOG.en.md) and [historical candidate records](../releases/README.en.md). Version numbers and local tags alone do not establish publication.
 
 - Seven templates, packaged resources and JSON/error contracts are established.
 - Frontend CSR/SSG/SSR implementation and verification live in the [initiative](../initiatives/feature/frontend-rendering/README.en.md).

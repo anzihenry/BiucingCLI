@@ -2,7 +2,7 @@
 title: "更新日志"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 <a id="changelog"></a>
@@ -11,6 +11,13 @@ updated: 2026-10-09
 [English](CHANGELOG.en.md)
 
 详细历史记录与发布证据边界见[发布索引](docs/releases/README.md)。
+
+## 0.10.1 - 2026-10-31
+
+- 七类模板统一使用生成计划、资源指纹校验和暂存目录发布流程。
+- Worker 在任务启动前及重试前检查取消状态，避免关停时执行新任务。
+- 共享 C++ 核心同步检查可识别已删除或改名的旧文件；修复 HarmonyOS 在干净工作目录中的验收流程。
+- 发布前从候选 wheel 验证 Web 就绪、微服务 mTLS RPC 和 Worker 退出行为。更新中英文使用及工程文档。
 
 <a id="0100---2026-09-30"></a>
 ## 0.10.0 - 2026-09-30

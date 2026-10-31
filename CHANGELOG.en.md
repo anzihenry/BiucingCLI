@@ -2,7 +2,7 @@
 title: "Changelog"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # Changelog
@@ -10,6 +10,13 @@ updated: 2026-10-09
 [中文](CHANGELOG.md) · Translation of the Chinese primary document.
 
 Detailed historical records and publication-evidence limits are listed in the [release index](docs/releases/README.en.md).
+
+## 0.10.1 - 2026-10-31
+
+- Generate all seven starters through a shared plan, resource fingerprint checks and staged publication.
+- Check for cancellation before each Worker attempt, including retries, to avoid starting new work during shutdown.
+- Detect stale shared C++ core files after deletion or renaming, and fix HarmonyOS verification from a clean checkout.
+- Exercise web readiness, microservice mTLS RPC and Worker shutdown from the candidate wheel before publishing. Refresh bilingual usage and engineering documentation.
 
 ## 0.10.0 - 2026-09-30
 
