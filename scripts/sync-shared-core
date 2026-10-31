@@ -11,13 +11,25 @@ DESTINATIONS = [ROOT / 'src/biucingcli/template_data' / platform / 'template' / 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--check', action='store_true')
 args = parser.parse_args()
+
+
+def managed_files(root):
+    files = {Path('CMakeLists.txt')} if (root / 'CMakeLists.txt').is_file() else set()
+    for directory in ('Sources/CoreNative', 'Tests/Native'):
+        files.update(path.relative_to(root) for path in (root / directory).rglob('*')
+                     if path.is_file())
+    return files
+
+
+expected = managed_files(SOURCES)
 for destination in DESTINATIONS:
-    for source in sorted(SOURCES.rglob('*')):
-        if not source.is_file():
-            continue
-        relative = source.relative_to(SOURCES)
-        if relative.parts[0] not in ('Sources', 'Tests') and relative.name != 'CMakeLists.txt':
-            continue
+    for relative in sorted(managed_files(destination) - expected):
+        output = destination / relative
+        if args.check:
+            raise SystemExit(f'Unexpected portable core file: {output}; run scripts/sync-shared-core')
+        output.unlink()
+    for relative in sorted(expected):
+        source = SOURCES / relative
         output = destination / relative
         if args.check:
             if not output.is_file() or output.read_bytes() != source.read_bytes():
