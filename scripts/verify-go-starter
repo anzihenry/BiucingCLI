@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Run from a project freshly generated with the installed candidate wheel.
+set -euo pipefail
+
+case "${1:-}" in
+  web-service)
+    export COMPOSE_PROJECT_NAME="wheel-web-$$" IMAGE="wheel-web-$$" TAG=smoke
+    compose=(docker compose -p "$COMPOSE_PROJECT_NAME-runtime" -f compose.yaml)
+    trap '"${compose[@]}" down --volumes --remove-orphans' EXIT
+    ./scripts/task docker-build
+    ./scripts/task docker-run
+    for attempt in {1..30}; do
+      if "${compose[@]}" exec -T smokeweb /app/server healthcheck http://127.0.0.1:9000/readyz; then exit 0; fi
+      sleep 1
+    done
+    "${compose[@]}" logs smokeweb
+    exit 1
+    ;;
+  micro-service)
+    export COMPOSE_PROJECT_NAME="wheel-micro-$$"
+    export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g)
+    compose=(docker compose -p "$COMPOSE_PROJECT_NAME" -f compose.dev.yaml)
+    trap '"${compose[@]}" down --volumes --remove-orphans' EXIT
+    ./scripts/task bootstrap
+    "${compose[@]}" run --rm --no-deps app-dev bash -ec '
+      ./scripts/check proto
+      go build -o /tmp/server ./cmd/server
+      go build -o /tmp/rpc-probe ./cmd/rpc-probe
+      /tmp/server &
+      server=$!
+      trap "kill $server 2>/dev/null || true" EXIT
+      for attempt in {1..30}; do
+        kill -0 "$server"
+        if /tmp/rpc-probe; then exit 0; fi
+        sleep 1
+      done
+      exit 1'
+    ;;
+  worker)
+    go build -o ./worker-smoke ./cmd/worker
+    WORKER_RUN_MODE=oneshot ./worker-smoke > oneshot.log
+    grep -F 'heartbeat completed' oneshot.log
+    WORKER_RUN_MODE=scheduled ./worker-smoke > scheduled.log &
+    worker=$!
+    trap 'kill -KILL "$worker" 2>/dev/null || true' EXIT
+    for attempt in {1..30}; do
+      if grep -qF 'heartbeat completed' scheduled.log; then break; fi
+      kill -0 "$worker"
+      sleep 1
+    done
+    grep -F 'heartbeat completed' scheduled.log
+    kill -TERM "$worker"
+    for attempt in {1..10}; do
+      if ! kill -0 "$worker" 2>/dev/null; then
+        wait "$worker"
+        trap - EXIT
+        grep -F 'shutdown requested' scheduled.log
+        exit 0
+      fi
+      sleep 1
+    done
+    echo 'Worker did not exit after SIGTERM' >&2
+    exit 1
+    ;;
+  *) echo 'Expected web-service, micro-service or worker' >&2; exit 2 ;;
+esac

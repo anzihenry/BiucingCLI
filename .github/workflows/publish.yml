@@ -100,8 +100,49 @@ jobs:
       artifact-name: python-distributions
       ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
 
+  go-starters:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {template: web-service, project: smokeweb}
+          - {template: micro-service, project: smokemicro}
+          - {template: worker, project: smokeworker}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ inputs.tag || github.event.release.tag_name }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: ${{ runner.temp }}/candidate
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-go@v7
+        if: matrix.template == 'worker'
+        with:
+          go-version: "1.26.x"
+          cache: false
+      - name: Generate from installed wheel and exercise the runtime
+        env:
+          TEMPLATE: ${{ matrix.template }}
+          PROJECT: ${{ matrix.project }}
+        run: |
+          python -m venv "$RUNNER_TEMP/smoke-env"
+          "$RUNNER_TEMP/smoke-env/bin/pip" install --no-index --no-deps "$RUNNER_TEMP"/candidate/*.whl
+          cd "$RUNNER_TEMP"
+          options=(--module-name "example.com/$PROJECT" --non-interactive)
+          if [[ "$TEMPLATE" == micro-service ]]; then options+=(--proto-package smoke.service.v1); fi
+          "$RUNNER_TEMP/smoke-env/bin/biucing" create "$TEMPLATE" "$PROJECT" "${options[@]}"
+          cd "$PROJECT"
+          bash "$GITHUB_WORKSPACE/scripts/verify-go-starter" "$TEMPLATE"
+
   publish:
-    needs: [verify, platform, frontend]
+    needs: [verify, platform, frontend, go-starters]
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.target || 'pypi' }}
