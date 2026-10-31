@@ -2,7 +2,7 @@
 title: "产品定位与范围"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # 产品定位与范围
@@ -15,7 +15,7 @@ BiucingCLI 为经常启动新项目的独立开发者生成符合固定个人技
 
 ## 当前能力
 
-当前源码版本为 0.10.0，提供 frontend、web-service、micro-service、worker、apple、android、harmonyos 七类内置模板。CLI 支持模板发现、信息查询、输入校验、预览、JSON 输出和实际生成；命令示例见[使用指南](../guides/using.md)。
+当前源码版本为 0.10.1，提供 frontend、web-service、micro-service、worker、apple、android、harmonyos 七类内置模板。CLI 支持模板发现、信息查询、输入校验、预览、JSON 输出和实际生成；命令示例见[使用指南](../guides/using.md)。
 
 生成器采用包内资源和统一规划/发布管线；现行边界见[工程入口](../engineering/README.md)。原生设备、签名、商店交付和后端生产可用性按[验证矩阵](../guides/verification-matrix.md)中对应证据判断。
 

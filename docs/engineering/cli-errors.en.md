@@ -2,7 +2,7 @@
 title: "CLI input and error contract"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # CLI input and error contract
@@ -33,7 +33,7 @@ biucing info unknown --json >result.json 2>error.json
 The command exits with code 2, leaves `result.json` empty, and writes:
 
 ```json
-{"schema_version": 1, "generator_version": "0.10.0", "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
+{"schema_version": 1, "generator_version": "0.10.1", "ok": false, "error": {"code": "unknown_template", "message": "unknown template 'unknown'"}}
 ```
 
 | Exit | Error code | Meaning |

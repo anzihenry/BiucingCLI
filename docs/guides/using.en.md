@@ -2,7 +2,7 @@
 title: "Using BiucingCLI"
 status: current
 owner: project-maintainers
-updated: 2026-10-09
+updated: 2026-10-31
 ---
 
 # Using BiucingCLI
@@ -17,7 +17,7 @@ Apple generates four thin shells for iOS, macOS, watchOS and tvOS, using static 
 
 ## Version
 
-The current repository release target is `0.10.0`. See the [release notes](../releases/0.10.0/notes.en.md) for changes and migration notes.
+The current repository release target is `0.10.1`. See the [release notes](../../CHANGELOG.en.md) for changes and migration notes.
 
 ```bash
 biucing --version
@@ -30,7 +30,7 @@ See [CHANGELOG.md](../../CHANGELOG.en.md) for the latest release summary.
 Install the PyPI release as an isolated command with `uv`:
 
 ```bash
-uv tool install biucingcli==0.10.0
+uv tool install biucingcli==0.10.1
 biucing --version
 ```
 
