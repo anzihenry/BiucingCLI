@@ -182,9 +182,11 @@ func TestCancellationInterruptsRetryBackoff(t *testing.T) {
 }
 
 func TestShutdownTimeoutIsDeterministic(t *testing.T) {
+	started := make(chan struct{})
 	releaseExecutor := make(chan struct{})
 	defer close(releaseExecutor)
 	executor := &scriptedExecutor{execute: func(ctx context.Context) (string, error) {
+		close(started)
 		<-ctx.Done()
 		<-releaseExecutor
 		return "", ctx.Err()
@@ -194,6 +196,7 @@ func TestShutdownTimeoutIsDeterministic(t *testing.T) {
 	done := make(chan error, 1)
 	go func() { done <- newTestRunner("oneshot", executor, clock).Run(ctx) }()
 
+	<-started
 	cancel()
 	shutdownTimer := clock.Next(t)
 	if shutdownTimer.delay != 5*time.Second {
@@ -211,5 +214,21 @@ func TestNextBackoffCapsWithoutOverflow(t *testing.T) {
 	}
 	if actual := nextBackoff(2*time.Second, 2*time.Second); actual != 2*time.Second {
 		t.Fatalf("expected capped backoff, got %s", actual)
+	}
+}
+
+func TestCancelledRunDoesNotStartExecutor(t *testing.T) {
+	for _, mode := range []string{"oneshot", "scheduled"} {
+		t.Run(mode, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(context.Background())
+			cancel()
+			executor := &scriptedExecutor{results: []executionResult{{summary: "unexpected"}}}
+			if err := newTestRunner(mode, executor, newFakeClock()).Run(ctx); err != nil {
+				t.Fatalf("cancelled run returned %v", err)
+			}
+			if executor.Count() != 0 {
+				t.Fatal("executor started after cancellation")
+			}
+		})
 	}
 }
